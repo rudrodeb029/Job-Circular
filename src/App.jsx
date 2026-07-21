@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAppContext } from './context/AppContext'
+import { AdminProvider } from './context/AdminContext'
 import SplashScreen from './pages/SplashScreen'
 import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
@@ -13,9 +14,41 @@ import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 
+// Admin Pages
+import AdminLogin from './pages/admin/AdminLogin'
+import AdminLayout from './pages/admin/AdminLayout'
+import Dashboard from './pages/admin/Dashboard'
+import ManageJobs from './pages/admin/ManageJobs'
+import ManageNotifications from './pages/admin/ManageNotifications'
+import Statistics from './pages/admin/Statistics'
+import Reports from './pages/admin/Reports'
+import AdminSettings from './pages/admin/AdminSettings'
+
 function App() {
   const { state } = useAppContext()
   const location = useLocation()
+
+  // Check if current route is an admin route
+  const isAdminRoute = location.pathname.startsWith('/admin')
+
+  // Admin routes don't use the mobile container
+  if (isAdminRoute) {
+    return (
+      <AdminProvider>
+        <Routes location={location}>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="jobs" element={<ManageJobs />} />
+            <Route path="notifications" element={<ManageNotifications />} />
+            <Route path="stats" element={<Statistics />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
+        </Routes>
+      </AdminProvider>
+    )
+  }
 
   return (
     <div className="container" data-theme={state.theme}>
