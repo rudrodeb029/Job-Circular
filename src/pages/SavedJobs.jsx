@@ -11,7 +11,7 @@ import { jobs } from '../data/jobs';
 const tabs = [
   { id: 'all', label: 'All' },
   { id: 'applied', label: 'Applied' },
-  { id: 'not_applied', label: 'Not Applied' }
+  { id: 'exam_date', label: 'Exam Date' }
 ];
 
 export default function SavedJobs() {
@@ -19,11 +19,15 @@ export default function SavedJobs() {
   const { state } = useAppContext();
   const [activeTab, setActiveTab] = useState('all');
 
-  const savedJobList = jobs.filter(j => state.savedJobs.includes(j.id));
+  // Load jobs from localStorage if present (to reflect admin updates), fallback to static jobs data
+  const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+
+  const savedJobList = localJobs.filter(j => state.savedJobs.includes(j.id));
 
   const filteredJobs = savedJobList.filter(job => {
-    if (activeTab === 'applied') return state.appliedJobs.includes(job.id);
-    if (activeTab === 'not_applied') return !state.appliedJobs.includes(job.id);
+    const isApplied = state.appliedJobs.includes(job.id);
+    if (activeTab === 'applied') return isApplied;
+    if (activeTab === 'exam_date') return isApplied; // Only show applied jobs under Exam Date tab
     return true;
   });
 
@@ -40,14 +44,112 @@ export default function SavedJobs() {
 
         {filteredJobs.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            {filteredJobs.map(job => (
-              <JobCard key={job.id} job={job} />
-            ))}
+            {filteredJobs.map(job => {
+              if (activeTab === 'exam_date') {
+                return (
+                  <div 
+                    key={job.id} 
+                    className="card animate-fade-in" 
+                    style={{ 
+                      padding: 'var(--space-md)', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '12px',
+                      position: 'relative'
+                    }}
+                  >
+                    {/* Job Header */}
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <div style={{
+                        width: '44px',
+                        height: '44px',
+                        borderRadius: '10px',
+                        background: 'var(--primary-bg)',
+                        color: 'var(--primary)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '18px',
+                        fontWeight: 800
+                      }}>
+                        {job.organization ? job.organization[0] : 'J'}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+                          {job.title}
+                        </h4>
+                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                          {job.organization}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Exam details section */}
+                    <div style={{
+                      background: 'var(--bg-secondary)',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      border: '1px solid var(--border-light)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
+                    }}>
+                      {job.examDate ? (
+                        <>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
+                            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                              📅 Exam Date: {job.examDate}
+                            </span>
+                            {(job.examLink || job.applyLink) && (
+                              <a 
+                                href={job.examLink || job.applyLink} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                style={{ 
+                                  fontSize: '11px', 
+                                  color: 'var(--primary)', 
+                                  fontWeight: 700,
+                                  textDecoration: 'underline',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '2px'
+                                }}
+                              >
+                                Official Website ↗
+                              </a>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{ 
+                            fontSize: '12px', 
+                            fontWeight: 700, 
+                            color: '#d97706', 
+                            background: '#fef3c7', 
+                            padding: '4px 10px', 
+                            borderRadius: '20px',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}>
+                            ⏳ Exam Date: Coming Soon
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              }
+              return <JobCard key={job.id} job={job} />;
+            })}
           </div>
         ) : (
           <EmptyState
             icon={Bookmark}
-            title="No Saved Jobs"
+            title={
+              activeTab === 'exam_date' ? "No Exam Dates Available" : "No Saved Jobs"
+            }
             actionText="Explore Jobs"
             onAction={() => navigate('/search')}
           />

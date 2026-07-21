@@ -15,7 +15,10 @@ export const jobs = [
     postedDate: '১৫ মিনিট আগে',
     isNew: true,
     location: 'ঢাকা',
-    type: 'সরকারি'
+    type: 'সরকারি',
+    examDate: '15 June 2024',
+    examCenter: 'Dhaka College, Dhaka',
+    examLink: 'http://moedu.gov.bd'
   },
   {
     id: 'job-2',
@@ -33,7 +36,10 @@ export const jobs = [
     postedDate: '৩৫ মিনিট আগে',
     isNew: true,
     location: 'সারা বাংলাদেশ',
-    type: 'ব্যাংক'
+    type: 'ব্যাংক',
+    examDate: '20 June 2024',
+    examCenter: 'Eden Mohila College, Dhaka',
+    examLink: 'http://sonalibank.com.bd'
   },
   {
     id: 'job-3',
@@ -51,7 +57,10 @@ export const jobs = [
     postedDate: '১ ঘণ্টা আগে',
     isNew: false,
     location: 'সারা বাংলাদেশ',
-    type: 'সরকারি'
+    type: 'সরকারি',
+    examDate: '',
+    examCenter: '',
+    examLink: ''
   },
   {
     id: 'job-4',
