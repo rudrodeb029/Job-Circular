@@ -216,12 +216,12 @@ export default function ManageNotifications() {
 
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: '#111827' }}>
+      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: '#1e293b' }}>
         Manage Notifications & Updates
       </h1>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', borderBottom: '1px solid #E5E7EB', paddingBottom: '12px' }}>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
         <button
           onClick={() => setActiveTab('notifications')}
           style={{
@@ -230,8 +230,8 @@ export default function ManageNotifications() {
             border: 'none',
             cursor: 'pointer',
             fontWeight: '500',
-            backgroundColor: activeTab === 'notifications' ? '#2563EB' : 'transparent',
-            color: activeTab === 'notifications' ? '#FFFFFF' : '#4B5563',
+            backgroundColor: activeTab === 'notifications' ? '#1a56db' : '#f1f5f9',
+            color: activeTab === 'notifications' ? 'white' : '#64748b',
             transition: 'all 0.2s'
           }}
         >
@@ -245,8 +245,8 @@ export default function ManageNotifications() {
             border: 'none',
             cursor: 'pointer',
             fontWeight: '500',
-            backgroundColor: activeTab === 'admit_results' ? '#2563EB' : 'transparent',
-            color: activeTab === 'admit_results' ? '#FFFFFF' : '#4B5563',
+            backgroundColor: activeTab === 'admit_results' ? '#1a56db' : '#f1f5f9',
+            color: activeTab === 'admit_results' ? 'white' : '#64748b',
             transition: 'all 0.2s'
           }}
         >
@@ -259,7 +259,7 @@ export default function ManageNotifications() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
             <div style={{ position: 'relative', flex: '1', minWidth: '250px', maxWidth: '400px' }}>
-              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', display: 'flex' }}>
+              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex' }}>
                 <SearchIcon />
               </div>
               <input
@@ -271,10 +271,12 @@ export default function ManageNotifications() {
                   width: '100%',
                   padding: '10px 12px 10px 40px',
                   borderRadius: '8px',
-                  border: '1px solid #D1D5DB',
+                  border: '1px solid #e2e8f0',
                   outline: 'none',
                   fontSize: '14px',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
+                  color: '#1e293b',
+                  backgroundColor: '#ffffff'
                 }}
               />
             </div>
@@ -290,16 +292,16 @@ export default function ManageNotifications() {
             </button>
           </div>
 
-          <div style={{ overflowX: 'auto', backgroundColor: '#FFFFFF', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ overflowX: 'auto', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Title</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Organization</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Message</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Type</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Time</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Actions</th>
+                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Title</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Organization</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Message</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Type</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Time</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -307,10 +309,10 @@ export default function ManageNotifications() {
                   const badge = getNotifBadgeColor(notif.type);
                   const truncatedMsg = notif.message.length > 50 ? notif.message.substring(0, 50) + '...' : notif.message;
                   return (
-                    <tr key={notif.id} style={{ borderBottom: '1px solid #E5E7EB' }}>
-                      <td style={{ padding: '12px 16px', color: '#111827', fontSize: '14px', fontWeight: '500' }}>{notif.title}</td>
-                      <td style={{ padding: '12px 16px', color: '#4B5563', fontSize: '14px' }}>{notif.organization}</td>
-                      <td style={{ padding: '12px 16px', color: '#4B5563', fontSize: '14px' }} title={notif.message}>{truncatedMsg}</td>
+                    <tr key={notif.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>{notif.title}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.organization}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }} title={notif.message}>{truncatedMsg}</td>
                       <td style={{ padding: '12px 16px' }}>
                         <span style={{
                           backgroundColor: badge.bg, color: badge.text,
@@ -320,7 +322,7 @@ export default function ManageNotifications() {
                           {notif.type.replace('_', ' ')}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#6B7280', fontSize: '14px' }}>{notif.time}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.time}</td>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button onClick={() => handleOpenNotifModal(notif)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
@@ -336,7 +338,7 @@ export default function ManageNotifications() {
                 })}
                 {filteredNotifications.length === 0 && (
                   <tr>
-                    <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#6B7280' }}>No notifications found.</td>
+                    <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>No notifications found.</td>
                   </tr>
                 )}
               </tbody>
@@ -350,7 +352,7 @@ export default function ManageNotifications() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
             <div style={{ position: 'relative', flex: '1', minWidth: '250px', maxWidth: '400px' }}>
-              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF', display: 'flex' }}>
+              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex' }}>
                 <SearchIcon />
               </div>
               <input
@@ -362,10 +364,12 @@ export default function ManageNotifications() {
                   width: '100%',
                   padding: '10px 12px 10px 40px',
                   borderRadius: '8px',
-                  border: '1px solid #D1D5DB',
+                  border: '1px solid #e2e8f0',
                   outline: 'none',
                   fontSize: '14px',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
+                  color: '#1e293b',
+                  backgroundColor: '#ffffff'
                 }}
               />
             </div>
@@ -381,25 +385,25 @@ export default function ManageNotifications() {
             </button>
           </div>
 
-          <div style={{ overflowX: 'auto', backgroundColor: '#FFFFFF', borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <div style={{ overflowX: 'auto', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
               <thead>
-                <tr style={{ backgroundColor: '#F9FAFB', borderBottom: '1px solid #E5E7EB' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Exam Name</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Organization</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Type</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Status</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Date</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>Actions</th>
+                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Exam Name</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Organization</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Type</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Status</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Date</th>
+                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredItems.map((item) => {
                   const badge = getItemBadgeColor(item.type);
                   return (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #E5E7EB' }}>
-                      <td style={{ padding: '12px 16px', color: '#111827', fontSize: '14px', fontWeight: '500' }}>{item.examName}</td>
-                      <td style={{ padding: '12px 16px', color: '#4B5563', fontSize: '14px' }}>{item.organization}</td>
+                    <tr key={item.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>{item.examName}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{item.organization}</td>
                       <td style={{ padding: '12px 16px' }}>
                         <span style={{
                           backgroundColor: badge.bg, color: badge.text,
@@ -409,8 +413,8 @@ export default function ManageNotifications() {
                           {item.type.replace('_', ' ')}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#4B5563', fontSize: '14px' }}>{item.status}</td>
-                      <td style={{ padding: '12px 16px', color: '#6B7280', fontSize: '14px' }}>{item.date}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{item.status}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{item.date}</td>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button onClick={() => handleOpenItemModal(item)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
@@ -426,7 +430,7 @@ export default function ManageNotifications() {
                 })}
                 {filteredItems.length === 0 && (
                   <tr>
-                    <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#6B7280' }}>No items found.</td>
+                    <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>No items found.</td>
                   </tr>
                 )}
               </tbody>
@@ -438,28 +442,28 @@ export default function ManageNotifications() {
       {/* Modal: Notification */}
       {isNotifModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>{editingNotifId ? 'Edit Notification' : 'Add Notification'}</h2>
-              <button onClick={() => setIsNotifModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}><XIcon /></button>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#1e293b' }}>{editingNotifId ? 'Edit Notification' : 'Add Notification'}</h2>
+              <button onClick={() => setIsNotifModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><XIcon /></button>
             </div>
             <form onSubmit={handleSaveNotif} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Title</label>
-                <input required type="text" value={notifFormData.title} onChange={e => setNotifFormData({...notifFormData, title: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Title</label>
+                <input required type="text" value={notifFormData.title} onChange={e => setNotifFormData({...notifFormData, title: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Organization</label>
-                <input required type="text" value={notifFormData.organization} onChange={e => setNotifFormData({...notifFormData, organization: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Organization</label>
+                <input required type="text" value={notifFormData.organization} onChange={e => setNotifFormData({...notifFormData, organization: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Message</label>
-                <textarea required rows="3" value={notifFormData.message} onChange={e => setNotifFormData({...notifFormData, message: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box', resize: 'vertical' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Message</label>
+                <textarea required rows="3" value={notifFormData.message} onChange={e => setNotifFormData({...notifFormData, message: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', resize: 'vertical', backgroundColor: '#ffffff', color: '#1e293b' }} />
               </div>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Type</label>
-                  <select value={notifFormData.type} onChange={e => setNotifFormData({...notifFormData, type: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Type</label>
+                  <select value={notifFormData.type} onChange={e => setNotifFormData({...notifFormData, type: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }}>
                     <option value="new_job">New Job</option>
                     <option value="deadline">Deadline</option>
                     <option value="admit_card">Admit Card</option>
@@ -467,17 +471,17 @@ export default function ManageNotifications() {
                   </select>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Time</label>
-                  <input required type="text" value={notifFormData.time} onChange={e => setNotifFormData({...notifFormData, time: e.target.value})} placeholder="e.g. 2 hours ago" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Time</label>
+                  <input required type="text" value={notifFormData.time} onChange={e => setNotifFormData({...notifFormData, time: e.target.value})} placeholder="e.g. 2 hours ago" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
                 </div>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Job ID (optional)</label>
-                <input type="text" value={notifFormData.jobId} onChange={e => setNotifFormData({...notifFormData, jobId: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Job ID (optional)</label>
+                <input type="text" value={notifFormData.jobId} onChange={e => setNotifFormData({...notifFormData, jobId: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
-                <button type="button" onClick={() => setIsNotifModalOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid #D1D5DB', backgroundColor: 'white', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#2563EB', color: 'white', cursor: 'pointer', fontWeight: '500' }}>{editingNotifId ? 'Save Changes' : 'Add Notification'}</button>
+                <button type="button" onClick={() => setIsNotifModalOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
+                <button type="submit" style={{ padding: '10px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#1a56db', color: 'white', cursor: 'pointer', fontWeight: '500' }}>{editingNotifId ? 'Save Changes' : 'Add Notification'}</button>
               </div>
             </form>
           </div>
@@ -487,46 +491,46 @@ export default function ManageNotifications() {
       {/* Modal: Admit/Result Item */}
       {isItemModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>{editingItemId ? 'Edit Item' : 'Add Item'}</h2>
-              <button onClick={() => setIsItemModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#6B7280' }}><XIcon /></button>
+              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#1e293b' }}>{editingItemId ? 'Edit Item' : 'Add Item'}</h2>
+              <button onClick={() => setIsItemModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><XIcon /></button>
             </div>
             <form onSubmit={handleSaveItem} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Exam Name</label>
-                <input required type="text" value={itemFormData.examName} onChange={e => setItemFormData({...itemFormData, examName: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Exam Name</label>
+                <input required type="text" value={itemFormData.examName} onChange={e => setItemFormData({...itemFormData, examName: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Organization</label>
-                <input required type="text" value={itemFormData.organization} onChange={e => setItemFormData({...itemFormData, organization: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Organization</label>
+                <input required type="text" value={itemFormData.organization} onChange={e => setItemFormData({...itemFormData, organization: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
               </div>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Type</label>
-                  <select value={itemFormData.type} onChange={e => setItemFormData({...itemFormData, type: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }}>
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Type</label>
+                  <select value={itemFormData.type} onChange={e => setItemFormData({...itemFormData, type: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }}>
                     <option value="admit_card">Admit Card</option>
                     <option value="result">Result</option>
                   </select>
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Status</label>
-                  <input required type="text" value={itemFormData.status} onChange={e => setItemFormData({...itemFormData, status: e.target.value})} placeholder="e.g. Published" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Status</label>
+                  <input required type="text" value={itemFormData.status} onChange={e => setItemFormData({...itemFormData, status: e.target.value})} placeholder="e.g. Published" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Date</label>
-                  <input required type="text" value={itemFormData.date} onChange={e => setItemFormData({...itemFormData, date: e.target.value})} placeholder="YYYY-MM-DD" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Date</label>
+                  <input required type="text" value={itemFormData.date} onChange={e => setItemFormData({...itemFormData, date: e.target.value})} placeholder="YYYY-MM-DD" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>Download Link</label>
-                  <input type="text" value={itemFormData.downloadLink} onChange={e => setItemFormData({...itemFormData, downloadLink: e.target.value})} placeholder="https://..." style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #D1D5DB', boxSizing: 'border-box' }} />
+                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Download Link</label>
+                  <input type="text" value={itemFormData.downloadLink} onChange={e => setItemFormData({...itemFormData, downloadLink: e.target.value})} placeholder="https://..." style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
-                <button type="button" onClick={() => setIsItemModalOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid #D1D5DB', backgroundColor: 'white', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#2563EB', color: 'white', cursor: 'pointer', fontWeight: '500' }}>{editingItemId ? 'Save Changes' : 'Add Item'}</button>
+                <button type="button" onClick={() => setIsItemModalOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
+                <button type="submit" style={{ padding: '10px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#1a56db', color: 'white', cursor: 'pointer', fontWeight: '500' }}>{editingItemId ? 'Save Changes' : 'Add Item'}</button>
               </div>
             </form>
           </div>
@@ -536,14 +540,14 @@ export default function ManageNotifications() {
       {/* Delete Confirmation Modal: Notification */}
       {deleteNotifId && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
             <div style={{ margin: '0 auto 16px', width: '48px', height: '48px', backgroundColor: '#FEE2E2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626' }}>
               <TrashIcon />
             </div>
-            <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '600' }}>Delete Notification?</h3>
-            <p style={{ margin: '0 0 24px', color: '#6B7280', fontSize: '14px' }}>Are you sure you want to delete this notification? This action cannot be undone.</p>
+            <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>Delete Notification?</h3>
+            <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '14px' }}>Are you sure you want to delete this notification? This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button onClick={() => setDeleteNotifId(null)} style={{ padding: '10px 20px', borderRadius: '6px', border: '1px solid #D1D5DB', backgroundColor: 'white', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
+              <button onClick={() => setDeleteNotifId(null)} style={{ padding: '10px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
               <button onClick={handleDeleteNotif} style={{ padding: '10px 20px', borderRadius: '6px', border: 'none', backgroundColor: '#DC2626', color: 'white', cursor: 'pointer', fontWeight: '500' }}>Delete</button>
             </div>
           </div>
@@ -553,14 +557,14 @@ export default function ManageNotifications() {
       {/* Delete Confirmation Modal: Item */}
       {deleteItemId && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}>
-          <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
+          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
             <div style={{ margin: '0 auto 16px', width: '48px', height: '48px', backgroundColor: '#FEE2E2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626' }}>
               <TrashIcon />
             </div>
-            <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '600' }}>Delete Item?</h3>
-            <p style={{ margin: '0 0 24px', color: '#6B7280', fontSize: '14px' }}>Are you sure you want to delete this admit card / result? This action cannot be undone.</p>
+            <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>Delete Item?</h3>
+            <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '14px' }}>Are you sure you want to delete this admit card / result? This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button onClick={() => setDeleteItemId(null)} style={{ padding: '10px 20px', borderRadius: '6px', border: '1px solid #D1D5DB', backgroundColor: 'white', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
+              <button onClick={() => setDeleteItemId(null)} style={{ padding: '10px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
               <button onClick={handleDeleteItem} style={{ padding: '10px 20px', borderRadius: '6px', border: 'none', backgroundColor: '#DC2626', color: 'white', cursor: 'pointer', fontWeight: '500' }}>Delete</button>
             </div>
           </div>

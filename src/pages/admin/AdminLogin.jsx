@@ -2,298 +2,369 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAdminContext } from '../../context/AdminContext';
 
-export default function AdminLogin() {
+const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const navigate = useNavigate();
-  // Assuming useAdminContext returns { dispatch } based on the requirements
+  const [loading, setLoading] = useState(false);
   const { dispatch } = useAdminContext();
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true);
+    setLoading(true);
 
-    // Fake authentication delay
+    // Simulate API call
     setTimeout(() => {
       if (email === 'admin@jobcircular.com' && password === 'admin123') {
-        if (dispatch) {
-          dispatch({
-            type: 'ADMIN_LOGIN',
-            payload: {
-              name: 'Admin',
-              email: 'admin@jobcircular.com',
-              role: 'Super Admin',
-            },
-          });
-        }
+        dispatch({ 
+          type: 'ADMIN_LOGIN', 
+          payload: { name: 'Admin', email: 'admin@jobcircular.com', role: 'Super Admin' } 
+        });
         navigate('/admin');
       } else {
-        setError('Invalid email or password');
-        setIsLoading(false);
+        setError('Invalid admin credentials');
+        setLoading(false);
       }
     }, 800);
   };
 
   return (
-    <>
-      <style>
-        {`
-          @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-          }
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-          .admin-login-wrapper {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #0f172a;
-            position: relative;
-            overflow: hidden;
-            font-family: system-ui, -apple-system, sans-serif;
-          }
-          .admin-login-gradient {
-            position: absolute;
-            top: -150px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
-            pointer-events: none;
-          }
-          .admin-login-card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 16px;
-            max-width: 400px;
-            width: 90%;
-            padding: 40px;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            box-sizing: border-box;
-          }
-          .admin-login-input-group {
-            position: relative;
-            margin-bottom: 20px;
-          }
-          .admin-login-input {
-            width: 100%;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            color: #f8fafc;
-            border-radius: 8px;
-            padding: 12px 12px 12px 40px;
-            font-size: 15px;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-          }
-          .admin-login-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-          }
-          .admin-login-input::placeholder {
-            color: #64748b;
-          }
-          .admin-input-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #64748b;
-            width: 20px;
-            height: 20px;
-            pointer-events: none;
-            transition: color 0.2s ease;
-          }
-          .admin-login-input:focus ~ .admin-input-icon,
-          .admin-login-input:not(:placeholder-shown) ~ .admin-input-icon {
-            color: #3b82f6;
-          }
-          .admin-pwd-toggle {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #64748b;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.2s ease;
-          }
-          .admin-pwd-toggle:hover {
-            color: #f8fafc;
-          }
-          .admin-login-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            margin-top: 24px;
-            box-sizing: border-box;
-          }
-          .admin-login-btn:hover:not(:disabled) {
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-          }
-          .admin-login-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-          }
-          .admin-login-error {
-            background-color: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #f87171;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-          }
-        `}
-      </style>
-
-      <div className="admin-login-wrapper">
-        <div className="admin-login-gradient"></div>
-        
-        <div className="admin-login-card">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px' }}>
-            <div style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #3b82f6, #0ea5e9)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '16px',
-              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
-            }}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-              </svg>
-            </div>
-            <h1 style={{ color: '#f8fafc', fontSize: '24px', fontWeight: '700', margin: '0 0 4px 0' }}>Job Circular</h1>
-            <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>Admin Panel</p>
+    <div className="admin-login-container">
+      <div className="admin-login-bg-shapes">
+        <div className="shape-1"></div>
+        <div className="shape-2"></div>
+      </div>
+      
+      <div className="admin-login-card">
+        <div className="admin-login-header">
+          <div className="admin-logo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
           </div>
+          <h2>Admin Portal</h2>
+          <p>Sign in to manage jobs and candidates</p>
+        </div>
 
-          {error && (
-            <div className="admin-login-error">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-              </svg>
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="admin-error-message">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {error}
+          </div>
+        )}
 
-          <form onSubmit={handleLogin}>
-            <div className="admin-login-input-group">
+        <form onSubmit={handleLogin} className="admin-login-form">
+          <div className="admin-form-group">
+            <label htmlFor="admin-email">Email Address</label>
+            <div className="admin-input-wrapper">
+              <span className="admin-input-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+              </span>
               <input
+                id="admin-email"
                 type="email"
-                placeholder="Email address"
-                className="admin-login-input"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@jobcircular.com"
                 required
               />
-              <svg className="admin-input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                <polyline points="22,6 12,13 2,6"></polyline>
-              </svg>
             </div>
+          </div>
 
-            <div className="admin-login-input-group">
+          <div className="admin-form-group">
+            <label htmlFor="admin-password">Password</label>
+            <div className="admin-input-wrapper">
+              <span className="admin-input-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </span>
               <input
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Password"
-                className="admin-login-input"
+                id="admin-password"
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
                 required
               />
-              <svg className="admin-input-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-              
-              <button 
-                type="button" 
-                className="admin-pwd-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                title={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
-                )}
-              </button>
             </div>
-
-            <button type="submit" className="admin-login-btn" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <svg className="admin-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="12" y1="2" x2="12" y2="6"></line>
-                    <line x1="12" y1="18" x2="12" y2="22"></line>
-                    <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                    <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                    <line x1="2" y1="12" x2="6" y2="12"></line>
-                    <line x1="18" y1="12" x2="22" y2="12"></line>
-                    <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                    <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-                  </svg>
-                  Authenticating...
-                </>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-          </form>
-
-          <div style={{ marginTop: '24px', textAlign: 'center' }}>
-            <Link to="/home" style={{ color: '#94a3b8', fontSize: '14px', textDecoration: 'none', transition: 'color 0.2s' }} onMouseOver={(e) => e.target.style.color = '#e2e8f0'} onMouseOut={(e) => e.target.style.color = '#94a3b8'}>
-              &larr; Back to App
-            </Link>
           </div>
+
+          <button 
+            type="submit" 
+            className={`admin-login-btn ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="spinner"></span>
+            ) : (
+              <>
+                Sign In to Dashboard
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </>
+            )}
+          </button>
+        </form>
+
+        <div className="admin-login-footer">
+          <Link to="/" className="back-to-app">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back to Application
+          </Link>
         </div>
       </div>
-    </>
+
+      <style>{`
+        .admin-login-container {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #f0f4ff;
+          position: relative;
+          overflow: hidden;
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+          padding: 20px;
+        }
+
+        .admin-login-bg-shapes {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+        }
+
+        .shape-1 {
+          position: absolute;
+          top: -10%;
+          left: -10%;
+          width: 50vw;
+          height: 50vw;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(26,86,219,0.08) 0%, rgba(26,86,219,0) 70%);
+        }
+
+        .shape-2 {
+          position: absolute;
+          bottom: -20%;
+          right: -10%;
+          width: 60vw;
+          height: 60vw;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(26,86,219,0.05) 0%, rgba(26,86,219,0) 70%);
+        }
+
+        .admin-login-card {
+          width: 100%;
+          max-width: 440px;
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-radius: 20px;
+          padding: 48px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+          position: relative;
+          z-index: 1;
+        }
+
+        .admin-login-header {
+          text-align: center;
+          margin-bottom: 36px;
+        }
+
+        .admin-logo-icon {
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(135deg, #1a56db, #2563eb);
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 24px;
+          color: white;
+          box-shadow: 0 10px 25px rgba(37,99,235,0.3);
+        }
+
+        .admin-login-header h2 {
+          color: #1e293b;
+          font-size: 28px;
+          font-weight: 700;
+          margin: 0 0 8px 0;
+        }
+
+        .admin-login-header p {
+          color: #64748b;
+          font-size: 15px;
+          margin: 0;
+        }
+
+        .admin-error-message {
+          background: #fee2e2;
+          border: 1px solid #fecaca;
+          color: #dc2626;
+          padding: 14px 16px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 14px;
+          font-weight: 500;
+          margin-bottom: 24px;
+          animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          50% { transform: translateX(5px); }
+          75% { transform: translateX(-5px); }
+        }
+
+        .admin-form-group {
+          margin-bottom: 24px;
+        }
+
+        .admin-form-group label {
+          display: block;
+          color: #1e293b;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 8px;
+        }
+
+        .admin-input-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+        }
+
+        .admin-input-icon {
+          position: absolute;
+          left: 16px;
+          color: #94a3b8;
+          display: flex;
+        }
+
+        .admin-input-wrapper input {
+          width: 100%;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+          border-radius: 12px;
+          padding: 14px 16px 14px 48px;
+          color: #1e293b;
+          font-size: 15px;
+          transition: all 0.2s ease;
+          outline: none;
+          box-sizing: border-box;
+        }
+
+        .admin-input-wrapper input::placeholder {
+          color: #94a3b8;
+        }
+
+        .admin-input-wrapper input:focus {
+          background: #ffffff;
+          border-color: #1a56db;
+          box-shadow: 0 0 0 4px rgba(26,86,219,0.1);
+        }
+
+        .admin-input-wrapper input:focus + .admin-input-icon,
+        .admin-input-wrapper input:focus ~ .admin-input-icon {
+          color: #1a56db;
+        }
+
+        .admin-login-btn {
+          width: 100%;
+          background: linear-gradient(135deg, #1a56db, #2563eb);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          padding: 16px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          transition: all 0.3s ease;
+          box-shadow: 0 10px 25px rgba(37,99,235,0.3);
+          margin-top: 32px;
+        }
+
+        .admin-login-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 15px 30px rgba(37,99,235,0.4);
+        }
+
+        .admin-login-btn:active {
+          transform: translateY(0);
+        }
+
+        .admin-login-btn.loading {
+          opacity: 0.9;
+          cursor: not-allowed;
+          transform: none;
+        }
+
+        .spinner {
+          width: 24px;
+          height: 24px;
+          border: 3px solid rgba(255,255,255,0.3);
+          border-radius: 50%;
+          border-top-color: white;
+          animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .admin-login-footer {
+          margin-top: 32px;
+          text-align: center;
+          border-top: 1px solid #e2e8f0;
+          padding-top: 24px;
+        }
+
+        .back-to-app {
+          color: #64748b;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: color 0.2s ease;
+        }
+
+        .back-to-app:hover {
+          color: #1a56db;
+        }
+
+        @media (max-width: 480px) {
+          .admin-login-card {
+            padding: 32px 24px;
+          }
+        }
+      `}</style>
+    </div>
   );
-}
+};
+
+export default AdminLogin;

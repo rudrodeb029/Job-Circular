@@ -51,12 +51,12 @@ const AdminSettings = () => {
 
   return (
     <div className="admin-page">
-      <h2>Admin Settings</h2>
+      <h2 style={{ color: '#1e293b' }}>Admin Settings</h2>
       
-      <div className="admin-chart-card" style={{ background: '#fff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <h3>Admin Profile</h3>
+      <div className="admin-chart-card" style={{ background: '#ffffff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ color: '#1e293b' }}>Admin Profile</h3>
         {!isEditingProfile ? (
-          <div>
+          <div style={{ color: '#334155' }}>
             <p><strong>Name:</strong> {profileName}</p>
             <p><strong>Email:</strong> {profileEmail}</p>
             <p><strong>Role:</strong> Super Admin</p>
@@ -66,14 +66,14 @@ const AdminSettings = () => {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 300 }}>
+          <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: 10, maxWidth: 300, color: '#334155' }}>
             <div>
               <label style={{ display: 'block', marginBottom: 5 }}>Name:</label>
-              <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: 4 }} />
+              <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #e2e8f0', borderRadius: 4, background: '#ffffff', color: '#1e293b' }} />
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: 5 }}>Email:</label>
-              <input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: 4 }} />
+              <input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)} style={{ width: '100%', padding: '8px', border: '1px solid #e2e8f0', borderRadius: 4, background: '#ffffff', color: '#1e293b' }} />
             </div>
             <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
               <button type="submit" style={{ padding: '8px 16px', background: '#22c55e', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}>Save</button>
@@ -83,42 +83,42 @@ const AdminSettings = () => {
         )}
       </div>
 
-      <div className="admin-chart-card" style={{ background: '#fff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <h3>App Configuration</h3>
+      <div className="admin-chart-card" style={{ background: '#ffffff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ color: '#1e293b' }}>App Configuration</h3>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #e2e8f0', color: '#334155' }}>
           <span>Auto-publish new circulars</span>
           <div 
             onClick={() => setAutoPublish(!autoPublish)}
-            style={{ width: 52, height: 28, borderRadius: 14, background: autoPublish ? '#3b82f6' : '#cbd5e1', position: 'relative', cursor: 'pointer', transition: 'background 0.3s' }}
+            style={{ width: 52, height: 28, borderRadius: 14, background: autoPublish ? '#1a56db' : '#cbd5e1', position: 'relative', cursor: 'pointer', transition: 'background 0.3s' }}
           >
-            <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, left: autoPublish ? 26 : 2, transition: 'left 0.3s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
+            <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#ffffff', position: 'absolute', top: 2, left: autoPublish ? 26 : 2, transition: 'left 0.3s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
           </div>
         </div>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f1f5f9' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #e2e8f0', color: '#334155' }}>
           <span>Email notifications</span>
           <div 
             onClick={() => setEmailNotifs(!emailNotifs)}
-            style={{ width: 52, height: 28, borderRadius: 14, background: emailNotifs ? '#3b82f6' : '#cbd5e1', position: 'relative', cursor: 'pointer', transition: 'background 0.3s' }}
+            style={{ width: 52, height: 28, borderRadius: 14, background: emailNotifs ? '#1a56db' : '#cbd5e1', position: 'relative', cursor: 'pointer', transition: 'background 0.3s' }}
           >
-            <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, left: emailNotifs ? 26 : 2, transition: 'left 0.3s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
+            <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#ffffff', position: 'absolute', top: 2, left: emailNotifs ? 26 : 2, transition: 'left 0.3s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
           </div>
         </div>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', color: '#334155' }}>
           <span>Show expired jobs</span>
           <div 
             onClick={() => setShowExpired(!showExpired)}
-            style={{ width: 52, height: 28, borderRadius: 14, background: showExpired ? '#3b82f6' : '#cbd5e1', position: 'relative', cursor: 'pointer', transition: 'background 0.3s' }}
+            style={{ width: 52, height: 28, borderRadius: 14, background: showExpired ? '#1a56db' : '#cbd5e1', position: 'relative', cursor: 'pointer', transition: 'background 0.3s' }}
           >
-            <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'white', position: 'absolute', top: 2, left: showExpired ? 26 : 2, transition: 'left 0.3s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
+            <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#ffffff', position: 'absolute', top: 2, left: showExpired ? 26 : 2, transition: 'left 0.3s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
           </div>
         </div>
       </div>
 
-      <div className="admin-chart-card" style={{ background: '#fff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-        <h3>Data Management</h3>
+      <div className="admin-chart-card" style={{ background: '#ffffff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ color: '#1e293b' }}>Data Management</h3>
         <div style={{ display: 'flex', gap: 15, flexWrap: 'wrap', marginTop: 15 }}>
           <button onClick={handleExportData} style={{ padding: '8px 16px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
@@ -137,9 +137,9 @@ const AdminSettings = () => {
         </div>
       </div>
 
-      <div className="admin-chart-card" style={{ background: '#fff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)', border: '1px solid #ef4444' }}>
-        <h3 style={{ color: '#ef4444', marginTop: 0 }}>Danger Zone</h3>
-        <p style={{ color: '#64748b', marginBottom: 15 }}>Log out from the admin session completely.</p>
+      <div className="admin-chart-card" style={{ background: '#fee2e2', padding: 20, borderRadius: 8, marginBottom: 20, border: '1px solid #fee2e2' }}>
+        <h3 style={{ color: '#dc2626', marginTop: 0 }}>Danger Zone</h3>
+        <p style={{ color: '#dc2626', marginBottom: 15 }}>Log out from the admin session completely.</p>
         <button onClick={handleLogout} style={{ padding: '8px 16px', background: '#ef4444', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
           Logout
