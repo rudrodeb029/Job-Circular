@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Bookmark } from '../components/Icons';
+import { Bookmark, Globe } from '../components/Icons';
 import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
 import EmptyState from '../components/EmptyState';
@@ -107,15 +107,21 @@ export default function SavedJobs() {
                                 rel="noopener noreferrer" 
                                 style={{ 
                                   fontSize: '11px', 
-                                  color: 'var(--primary)', 
+                                  color: '#ffffff', 
                                   fontWeight: 700,
-                                  textDecoration: 'underline',
+                                  background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
+                                  padding: '6px 14px',
+                                  borderRadius: '20px',
+                                  boxShadow: '0 3px 10px rgba(26, 86, 219, 0.3)',
                                   display: 'inline-flex',
                                   alignItems: 'center',
-                                  gap: '2px'
+                                  gap: '5px',
+                                  textDecoration: 'none',
+                                  transition: 'all 0.2s ease'
                                 }}
                               >
-                                Official Website ↗
+                                <Globe size={13} color="#ffffff" />
+                                <span>Visit Website</span>
                               </a>
                             )}
                           </div>
