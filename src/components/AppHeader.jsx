@@ -2,11 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun } from './Icons';
 import { useAppContext } from '../context/AppContext';
+import { notifications } from '../data/notifications';
 
 export default function AppHeader() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const unreadCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
 
   return (
     <>
@@ -82,19 +85,30 @@ export default function AppHeader() {
             }}
           >
             <Bell size={22} className="bell-animated" color="#1a56db" />
-            <span
-              className="notification-badge-pulse"
-              style={{
-                position: 'absolute',
-                top: '6px',
-                right: '6px',
-                width: '8px',
-                height: '8px',
-                backgroundColor: '#ef4444',
-                borderRadius: '50%',
-                border: '2px solid var(--white)'
-              }}
-            ></span>
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '1px',
+                  right: '1px',
+                  background: '#ef4444',
+                  color: 'white',
+                  borderRadius: '50%',
+                  fontSize: '9px',
+                  fontWeight: '800',
+                  width: '15px',
+                  height: '15px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  border: '1.5px solid var(--white)',
+                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
+                  lineHeight: 1
+                }}
+              >
+                {unreadCount}
+              </span>
+            )}
           </button>
 
           {/* User Profile Avatar Icon (Dynamic Image / Initial) */}

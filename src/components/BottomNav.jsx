@@ -25,7 +25,30 @@ const BottomNav = () => {
       <NavLink to="/notifications" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <div style={{ position: 'relative' }}>
           <Bell size={22} />
-          {unreadCount > 0 && <span className="bottom-nav-badge"></span>}
+          {unreadCount > 0 && (
+            <span
+              style={{
+                position: 'absolute',
+                top: '-4px',
+                right: '-6px',
+                background: 'var(--danger)',
+                color: 'white',
+                borderRadius: '50%',
+                fontSize: '8px',
+                fontWeight: '800',
+                width: '13px',
+                height: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1.5px solid var(--white)',
+                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
+                lineHeight: 1
+              }}
+            >
+              {unreadCount}
+            </span>
+          )}
         </div>
         <span>Notify</span>
       </NavLink>
