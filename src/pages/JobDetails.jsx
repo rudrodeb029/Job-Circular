@@ -387,7 +387,7 @@ export default function JobDetails() {
             boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)'
           }}
         >
-          {isApplied ? "✓ Applied — Open Official Portal" : "Apply Now"}
+          {isApplied ? "✓ Applied" : "Apply Now"}
         </button>
       </div>
     </div>
