@@ -63,14 +63,10 @@ export default function JobDetails() {
   const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
 
   const handleApplyClick = () => {
-    dispatch({ type: 'TOGGLE_SAVE_JOB', payload: job.id });
-    if (!isApplied) {
-      dispatch({ type: 'MARK_APPLIED', payload: job.id });
-    }
+    dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
 
   const handleOfficialApply = () => {
-    dispatch({ type: 'MARK_APPLIED', payload: job.id });
     if (job.applyLink) {
       window.open(job.applyLink, '_blank');
     }
