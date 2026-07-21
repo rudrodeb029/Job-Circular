@@ -6,7 +6,8 @@ export const notifications = [
     message: 'অফিসার (জেনারেল) পদে ১২০ জনের নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে। আজই আবেদন করুন।',
     time: '২ ঘণ্টা আগে',
     isRead: false,
-    type: 'new_job'
+    type: 'new_job',
+    jobId: 'job-11'
   },
   {
     id: 'notif-2',
@@ -15,7 +16,8 @@ export const notifications = [
     message: 'অফিস সহায়ক পদে আবেদনের সময় শেষ হচ্ছে আগামীকাল। দ্রুত আবেদন সম্পন্ন করুন।',
     time: '৫ ঘণ্টা আগে',
     isRead: false,
-    type: 'deadline'
+    type: 'deadline',
+    jobId: 'job-1'
   },
   {
     id: 'notif-3',
@@ -24,7 +26,8 @@ export const notifications = [
     message: 'সিনিয়র অফিসার পদের প্রিলিমিনারি পরীক্ষার অ্যাডমিট কার্ড প্রকাশিত হয়েছে।',
     time: '১ দিন আগে',
     isRead: true,
-    type: 'admit_card'
+    type: 'admit_card',
+    jobId: 'job-2'
   },
   {
     id: 'notif-4',
@@ -33,7 +36,8 @@ export const notifications = [
     message: 'কনস্টেবল পদের চূড়ান্ত ফলাফল ওয়েবসাইটে প্রকাশ করা হয়েছে।',
     time: '১ দিন আগে',
     isRead: true,
-    type: 'result'
+    type: 'result',
+    jobId: 'job-3'
   },
   {
     id: 'notif-5',
@@ -42,7 +46,8 @@ export const notifications = [
     message: 'সফটওয়্যার ইঞ্জিনিয়ার পদে নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে।',
     time: '২ দিন আগে',
     isRead: true,
-    type: 'new_job'
+    type: 'new_job',
+    jobId: 'job-4'
   },
   {
     id: 'notif-6',
@@ -51,7 +56,8 @@ export const notifications = [
     message: 'প্রোগ্রাম অফিসার পদে আবেদনের শেষ দিন আগামী ২৫ মে।',
     time: '২ দিন আগে',
     isRead: true,
-    type: 'deadline'
+    type: 'deadline',
+    jobId: 'job-5'
   },
   {
     id: 'notif-7',
@@ -60,7 +66,8 @@ export const notifications = [
     message: 'ক্যাশ অফিসার পদের লিখিত পরীক্ষার অ্যাডমিট কার্ড ডাউনলোড শুরু হয়েছে।',
     time: '৩ দিন আগে',
     isRead: true,
-    type: 'admit_card'
+    type: 'admit_card',
+    jobId: 'job-7'
   },
   {
     id: 'notif-8',
@@ -69,7 +76,8 @@ export const notifications = [
     message: 'সিনিয়র স্টাফ নার্স পদের মৌখিক পরীক্ষার ফলাফল প্রকাশিত হয়েছে।',
     time: '৪ দিন আগে',
     isRead: true,
-    type: 'result'
+    type: 'result',
+    jobId: 'job-10'
   },
   {
     id: 'notif-9',
@@ -78,7 +86,8 @@ export const notifications = [
     message: 'সাধারণ ট্রেডে সৈনিক পদে বিশাল নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে।',
     time: '৫ দিন আগে',
     isRead: true,
-    type: 'new_job'
+    type: 'new_job',
+    jobId: 'job-6'
   },
   {
     id: 'notif-10',
@@ -87,7 +96,8 @@ export const notifications = [
     message: 'স্টেশন মাস্টার পদে আবেদনের সময়সীমা বৃদ্ধি করা হয়েছে।',
     time: '১ সপ্তাহ আগে',
     isRead: true,
-    type: 'deadline'
+    type: 'deadline',
+    jobId: 'job-8'
   }
 ];
 
@@ -98,44 +108,44 @@ export const admitCardsAndResults = [
     organization: 'সোনালী ব্যাংক লিমিটেড',
     type: 'admit_card',
     status: 'অ্যাডমিট কার্ড পাওয়া যাচ্ছে',
-    date: '20 May 2024',
-    downloadLink: 'http://example.com/download/1'
+    date: '২০ মে ২০২৪',
+    downloadLink: '#'
   },
   {
     id: 'item-2',
-    examName: 'সাব-ইন্সপেক্টর (এসআই) চূড়ান্ত ফলাফল',
+    examName: 'কনস্টেবল নিয়োগ লিখিত পরীক্ষার ফলাফল',
     organization: 'বাংলাদেশ পুলিশ',
     type: 'result',
     status: 'ফলাফল প্রকাশিত',
-    date: '18 May 2024',
-    downloadLink: 'http://example.com/download/2'
+    date: '১৮ মে ২০২৪',
+    downloadLink: '#'
   },
   {
     id: 'item-3',
-    examName: 'সহকারী শিক্ষক নিয়োগ (১ম ধাপ)',
+    examName: 'সহকারী শিক্ষক পদের ভাইভা পরীক্ষা',
     organization: 'প্রাথমিক শিক্ষা অধিদপ্তর',
-    type: 'result',
-    status: 'ফলাফল প্রকাশিত',
-    date: '15 May 2024',
-    downloadLink: 'http://example.com/download/3'
+    type: 'admit_card',
+    status: 'অ্যাডমিট কার্ড পাওয়া যাচ্ছে',
+    date: '১৫ মে ২০২৪',
+    downloadLink: '#'
   },
   {
     id: 'item-4',
-    examName: 'অফিস সহায়ক লিখিত পরীক্ষা',
-    organization: 'খাদ্য মন্ত্রণালয়',
-    type: 'admit_card',
-    status: 'অ্যাডমিট কার্ড পাওয়া যাচ্ছে',
-    date: '12 May 2024',
-    downloadLink: 'http://example.com/download/4'
+    examName: 'প্রবেশনারি অফিসার প্রিলিমিনারি রেজাল্ট',
+    organization: 'ইসলামী ব্যাংক বাংলাদেশ',
+    type: 'result',
+    status: 'ফলাফল প্রকাশিত',
+    date: '১২ মে ২০২৪',
+    downloadLink: '#'
   },
   {
     id: 'item-5',
-    examName: 'সফটওয়্যার ইঞ্জিনিয়ার (টেকনিক্যাল টেস্ট)',
-    organization: 'গ্রামীণফোন',
-    type: 'admit_card',
-    status: 'অ্যাডমিট কার্ড পাওয়া যাচ্ছে',
-    date: '10 May 2024',
-    downloadLink: 'http://example.com/download/5'
+    examName: 'স্টাফ নার্স পদের নিয়োগ পরীক্ষার ফলাফল',
+    organization: 'স্বাস্থ্য অধিদপ্তর',
+    type: 'result',
+    status: 'ফলাফল প্রকাশিত',
+    date: '১০ মে ২০২৪',
+    downloadLink: '#'
   }
 ];
 

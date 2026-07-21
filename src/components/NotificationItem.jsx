@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Briefcase, Clock, FileText, BookmarkCheck } from './Icons';
 import { useAppContext } from '../context/AppContext';
 
@@ -38,11 +39,19 @@ const notifTypeConfig = {
 };
 
 export default function NotificationItem({ notification }) {
+  const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const isRead = state.readNotifications.includes(notification.id);
 
   const handleClick = () => {
     dispatch({ type: 'MARK_NOTIFICATION_READ', payload: notification.id });
+    if (notification.jobId) {
+      navigate(`/job/${notification.jobId}`);
+    } else if (notification.type === 'admit_card' || notification.type === 'result') {
+      navigate('/admit-card');
+    } else {
+      navigate('/job/job-1');
+    }
   };
 
   const config = notifTypeConfig[notification.type] || notifTypeConfig.new_job;
@@ -58,72 +67,65 @@ export default function NotificationItem({ notification }) {
         padding: '16px',
         marginBottom: '12px',
         borderRadius: '16px',
-        background: !isRead
-          ? 'linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)'
-          : 'var(--white)',
-        border: !isRead ? '1px solid #dbeafe' : '1px solid var(--border-light)',
-        borderLeft: !isRead ? '4px solid var(--primary)' : '4px solid transparent',
-        boxShadow: !isRead
-          ? '0 4px 18px rgba(26, 86, 219, 0.08)'
-          : '0 2px 8px rgba(15, 23, 42, 0.03)',
-        transition: 'all 0.25s ease',
-        cursor: 'pointer',
+        background: 'var(--white)',
+        border: isRead ? '1px solid var(--border-light)' : '1px solid #bfdbfe',
+        boxShadow: isRead ? '0 2px 8px rgba(15, 23, 42, 0.04)' : '0 4px 14px rgba(26, 86, 219, 0.1)',
         position: 'relative',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease',
         overflow: 'hidden'
       }}
     >
-      {/* Icon Badge Tile */}
+      {/* Left Active Border Accent Bar for Unread Notifications */}
+      {!isRead && (
+        <div style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: '4px',
+          background: 'var(--primary)'
+        }}></div>
+      )}
+
+      {/* 3D Gradient Icon Tile */}
       <div style={{
-        width: '42px',
-        height: '42px',
-        borderRadius: '12px',
+        width: '44px',
+        height: '44px',
+        borderRadius: '14px',
         background: config.bg,
         color: 'white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: `0 4px 12px ${config.shadow}`,
         flexShrink: 0,
-        position: 'relative'
+        boxShadow: `0 4px 12px ${config.shadow}`
       }}>
-        <IconComponent size={20} color="white" />
-        
-        {/* Pulsing Dot for Unread Notifications */}
-        {!isRead && (
-          <span
-            className="notification-badge-pulse"
-            style={{
-              position: 'absolute',
-              top: '-3px',
-              right: '-3px',
-              width: '9px',
-              height: '9px',
-              backgroundColor: '#ef4444',
-              borderRadius: '50%',
-              border: '2px solid white'
-            }}
-          ></span>
-        )}
+        <IconComponent size={22} />
       </div>
 
-      {/* Notification Body */}
+      {/* Notification Text Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px', gap: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', gap: '8px' }}>
           <h4 style={{
             fontSize: '14px',
-            fontWeight: !isRead ? 800 : 700,
+            fontWeight: isRead ? 700 : 800,
             color: 'var(--text-primary)',
-            lineHeight: 1.3
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
           }}>
             {notification.organization}
           </h4>
+
+          {/* Category Chip Badge */}
           <span style={{
-            fontSize: '9.5px',
+            fontSize: '10px',
             fontWeight: 700,
-            background: config.chipBg,
-            color: config.chipColor,
             padding: '2px 8px',
             borderRadius: '10px',
+            background: config.chipBg,
+            color: config.chipColor,
             whiteSpace: 'nowrap',
             flexShrink: 0
           }}>
@@ -132,20 +134,37 @@ export default function NotificationItem({ notification }) {
         </div>
 
         <p style={{
-          fontSize: '12.5px',
-          color: !isRead ? '#334155' : 'var(--text-secondary)',
-          fontWeight: !isRead ? 500 : 400,
-          lineHeight: 1.55,
-          marginBottom: '8px'
+          fontSize: '12px',
+          color: 'var(--text-secondary)',
+          lineHeight: 1.5,
+          marginBottom: '6px',
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden'
         }}>
           {notification.message}
         </p>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-muted)' }}>
-          <Clock size={11} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
+          <Clock size={12} />
           <span>{notification.time}</span>
         </div>
       </div>
+
+      {/* Pulsing Unread Indicator Dot */}
+      {!isRead && (
+        <div style={{
+          position: 'absolute',
+          top: '12px',
+          right: '12px',
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          background: 'var(--primary)',
+          boxShadow: '0 0 0 3px rgba(26, 86, 219, 0.2)'
+        }}></div>
+      )}
     </div>
   );
 }
