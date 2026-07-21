@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Bookmark, Globe } from '../components/Icons';
+import { Bookmark, Globe, Search } from '../components/Icons';
 import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
+import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
 import BottomNav from '../components/BottomNav';
 import { jobs } from '../data/jobs';
@@ -18,6 +19,7 @@ export default function SavedJobs() {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const [activeTab, setActiveTab] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Load jobs from localStorage if present (to reflect admin updates), fallback to static jobs data
   const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
@@ -26,9 +28,22 @@ export default function SavedJobs() {
 
   const filteredJobs = savedJobList.filter(job => {
     const isApplied = state.appliedJobs.includes(job.id);
-    if (activeTab === 'applied') return isApplied;
-    if (activeTab === 'exam_date') return isApplied; // Only show applied jobs under Exam Date tab
-    return true;
+    const matchesTab = activeTab === 'applied' ? isApplied :
+                       activeTab === 'exam_date' ? isApplied : true;
+    
+    if (!matchesTab) return false;
+
+    if (!searchQuery.trim()) return true;
+
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      (job.title && job.title.toLowerCase().includes(q)) ||
+      (job.titleEn && job.titleEn.toLowerCase().includes(q)) ||
+      (job.organization && job.organization.toLowerCase().includes(q)) ||
+      (job.organizationEn && job.organizationEn.toLowerCase().includes(q)) ||
+      (job.location && job.location.toLowerCase().includes(q)) ||
+      (job.type && job.type.toLowerCase().includes(q))
+    );
   });
 
   return (
@@ -38,10 +53,21 @@ export default function SavedJobs() {
       </div>
 
       <div className="page-content">
+        {/* Search Bar for Saved Jobs */}
+        <div style={{ marginBottom: 'var(--space-md)' }}>
+          <SearchBar
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search in saved jobs..."
+          />
+        </div>
+
+        {/* Filter Tabs */}
         <div style={{ marginBottom: 'var(--space-lg)' }}>
           <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
+        {/* Job List or Empty State */}
         {filteredJobs.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {filteredJobs.map(job => {
@@ -95,37 +121,35 @@ export default function SavedJobs() {
                       gap: '8px'
                     }}>
                       {job.examDate ? (
-                        <>
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
-                            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                              📅 Exam Date: {job.examDate}
-                            </span>
-                            {(job.examLink || job.applyLink) && (
-                              <a 
-                                href={job.examLink || job.applyLink} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                style={{ 
-                                  fontSize: '11px', 
-                                  color: '#ffffff', 
-                                  fontWeight: 700,
-                                  background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
-                                  padding: '6px 14px',
-                                  borderRadius: '20px',
-                                  boxShadow: '0 3px 10px rgba(26, 86, 219, 0.3)',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  gap: '5px',
-                                  textDecoration: 'none',
-                                  transition: 'all 0.2s ease'
-                                }}
-                              >
-                                <Globe size={13} color="#ffffff" />
-                                <span>Visit Website</span>
-                              </a>
-                            )}
-                          </div>
-                        </>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
+                          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            📅 Exam Date: {job.examDate}
+                          </span>
+                          {(job.examLink || job.applyLink) && (
+                            <a 
+                              href={job.examLink || job.applyLink} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              style={{ 
+                                fontSize: '11px', 
+                                color: '#ffffff', 
+                                fontWeight: 700,
+                                background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
+                                padding: '6px 14px',
+                                borderRadius: '20px',
+                                boxShadow: '0 3px 10px rgba(26, 86, 219, 0.3)',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '5px',
+                                textDecoration: 'none',
+                                transition: 'all 0.2s ease'
+                              }}
+                            >
+                              <Globe size={13} color="#ffffff" />
+                              <span>Visit Website</span>
+                            </a>
+                          )}
+                        </div>
                       ) : (
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <span style={{ 
@@ -152,12 +176,17 @@ export default function SavedJobs() {
           </div>
         ) : (
           <EmptyState
-            icon={Bookmark}
+            icon={searchQuery ? Search : Bookmark}
             title={
-              activeTab === 'exam_date' ? "No Exam Dates Available" : "No Saved Jobs"
+              searchQuery 
+                ? "No Matching Jobs Found" 
+                : activeTab === 'exam_date' 
+                  ? "No Exam Dates Available" 
+                  : "No Saved Jobs"
             }
-            actionText="Explore Jobs"
-            onAction={() => navigate('/search')}
+            description={searchQuery ? `No saved jobs match "${searchQuery}"` : undefined}
+            actionText={searchQuery ? "Clear Search" : "Explore Jobs"}
+            onAction={searchQuery ? () => setSearchQuery('') : () => navigate('/search')}
           />
         )}
       </div>
