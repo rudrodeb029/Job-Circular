@@ -48,7 +48,6 @@ export default function SavedJobs() {
           <EmptyState
             icon={Bookmark}
             title="No Saved Jobs"
-            description="You haven't saved any job yet. Save jobs to view here."
             actionText="Explore Jobs"
             onAction={() => navigate('/search')}
           />
