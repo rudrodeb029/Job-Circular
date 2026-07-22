@@ -80,7 +80,7 @@ export default function JobDetails() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1 style={{ flex: 1 }}>Job Details</h1>
+        <h1 style={{ flex: 1 }}>{job.examDate ? "Exam Details" : "Job Details"}</h1>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {/* Applied Icon Button in Header */}
@@ -139,12 +139,78 @@ export default function JobDetails() {
           {/* Chips Row: Job Type + Deadline Badge */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
             <span className="chip">{job.type}</span>
-            <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-              <Calendar size={12} /> Deadline: {job.deadline}
-            </span>
+            {job.examDate ? (
+              <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                📅 Exam Date: {job.examDate}
+              </span>
+            ) : (
+              <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                <Calendar size={12} /> Deadline: {job.deadline}
+              </span>
+            )}
             {isApplied && <span className="chip chip-success">✓ Applied</span>}
           </div>
         </div>
+
+        {/* If Exam Date exists, show Exam Details Card */}
+        {job.examDate && (
+          <div className="card animate-fade-in" style={{ marginBottom: 'var(--space-lg)', borderLeft: '4px solid #10b981' }}>
+            <h3 className="font-bold mb-xs" style={{ fontSize: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              📢 Exam Details / পরীক্ষার তথ্য
+            </h3>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
+              {job.examCenter && (
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  <strong>🏢 Center / কেন্দ্র:</strong> {job.examCenter}
+                </div>
+              )}
+              {job.examTime && (
+                <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  <strong>⏰ Time / সময়:</strong> {job.examTime}
+                </div>
+              )}
+            </div>
+
+            {/* Exam Subjects */}
+            {job.examSubjects && (
+              <div style={{ marginTop: '16px' }}>
+                <h4 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>
+                  📖 Exam Syllabus & Marks / বিষয়সমূহ ও নম্বর বণ্টন:
+                </h4>
+                <div style={{ background: 'var(--bg-secondary)', borderRadius: '12px', padding: '12px', border: '1px solid var(--border-light)' }}>
+                  {job.examSubjects.map((sub, idx) => (
+                    <div 
+                      key={idx} 
+                      style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        padding: '6px 0', 
+                        borderBottom: idx < job.examSubjects.length - 1 ? '1px solid var(--border-light)' : 'none', 
+                        fontSize: '12px' 
+                      }}
+                    >
+                      <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{sub.name}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{sub.marks} Marks</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Instructions */}
+            {job.examInstructions && (
+              <div style={{ marginTop: '16px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '12px' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#b45309', marginBottom: '4px' }}>
+                  ⚠️ Instructions / সাধারণ নির্দেশনাবলী:
+                </h4>
+                <p style={{ fontSize: '11px', color: '#92400e', lineHeight: 1.5, margin: 0 }}>
+                  {job.examInstructions}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>

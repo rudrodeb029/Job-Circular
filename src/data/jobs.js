@@ -18,6 +18,14 @@ export const jobs = [
     type: 'সরকারি',
     examDate: '15 June 2024',
     examCenter: 'Dhaka College, Dhaka',
+    examTime: '10:00 AM - 11:30 AM',
+    examSubjects: [
+      { name: 'বাংলা (Bengali)', marks: 20 },
+      { name: 'ইংরেজি (English)', marks: 20 },
+      { name: 'গণিত (Mathematics)', marks: 20 },
+      { name: 'সাধারণ জ্ঞান (General Knowledge)', marks: 10 }
+    ],
+    examInstructions: '১. প্রবেশপত্র অবশ্যই রঙিন প্রিন্ট করতে হবে। ২. পরীক্ষা শুরুর ৩০ মিনিট পূর্বে কেন্দ্রে উপস্থিত হতে হবে। ৩. মোবাইল বা কোনো ইলেকট্রনিক ডিভাইস আনা সম্পূর্ণ নিষিদ্ধ।',
     examLink: 'http://moedu.gov.bd'
   },
   {
@@ -39,6 +47,15 @@ export const jobs = [
     type: 'ব্যাংক',
     examDate: '20 June 2024',
     examCenter: 'Eden Mohila College, Dhaka',
+    examTime: '03:00 PM - 04:00 PM',
+    examSubjects: [
+      { name: 'বাংলা (Bengali)', marks: 20 },
+      { name: 'ইংরেজি (English)', marks: 20 },
+      { name: 'গণিত (Mathematics)', marks: 20 },
+      { name: 'সাধারণ জ্ঞান (General Knowledge)', marks: 20 },
+      { name: 'কম্পিউটার ও আইটি (Computer & IT)', marks: 20 }
+    ],
+    examInstructions: '১. এমসিকিউ (MCQ) পদ্ধতিতে পরীক্ষা অনুষ্ঠিত হবে। ২. ওএমআর (OMR) শিট কালো বলপয়েন্ট কলম দিয়ে পূরণ করতে হবে। ৩. কোনো প্রকার ক্যালকুলেটর ব্যবহার করা যাবে না।',
     examLink: 'http://sonalibank.com.bd'
   },
   {
