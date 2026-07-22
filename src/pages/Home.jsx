@@ -14,8 +14,15 @@ import Disclaimer from '../components/Disclaimer';
 export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
+  const [loading, setLoading] = useState(true);
   const [localJobs, setLocalJobs] = useState(() => {
-    return JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+    try {
+      const saved = localStorage.getItem('admin_jobs');
+      return saved ? JSON.parse(saved) : jobs;
+    } catch (e) {
+      console.error(e);
+      return jobs;
+    }
   });
 
   useEffect(() => {
