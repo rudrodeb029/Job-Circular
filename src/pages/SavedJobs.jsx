@@ -125,12 +125,14 @@ export default function SavedJobs() {
                   <div 
                     key={job.id} 
                     className="card animate-fade-in" 
+                    onClick={() => navigate(`/job/${job.id}`)}
                     style={{ 
                       padding: 'var(--space-md)', 
                       display: 'flex', 
                       flexDirection: 'column', 
                       gap: '12px',
-                      position: 'relative'
+                      position: 'relative',
+                      cursor: 'pointer'
                     }}
                   >
                     {/* Job Header */}
@@ -190,6 +192,7 @@ export default function SavedJobs() {
                             target="_blank" 
                             rel="noopener noreferrer" 
                             title="Download Admit Card"
+                            onClick={(e) => e.stopPropagation()}
                             style={{ 
                               display: 'flex',
                               alignItems: 'center',
