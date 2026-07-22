@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Briefcase } from '../components/Icons';
+import { ArrowLeft, Briefcase } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { jobs } from '../data/jobs';
 import JobCard from '../components/JobCard';
 import BottomNav from '../components/BottomNav';
+import SearchBar from '../components/SearchBar';
 
 export default function AllCirculars() {
   const navigate = useNavigate();
@@ -64,36 +65,13 @@ export default function AllCirculars() {
       </div>
 
       <div className="page-content animate-fade-in">
-        {/* Search Bar */}
-        <div style={{
-          position: 'relative',
-          marginBottom: 'var(--space-md)'
-        }}>
-          <input
-            type="text"
-            placeholder={isEn ? "Search circulars..." : "সার্কুলার খুঁজুন..."}
+        {/* Polished Modern Search Bar */}
+        <div style={{ marginBottom: 'var(--space-md)' }}>
+          <SearchBar
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '12px 16px 12px 40px',
-              borderRadius: '12px',
-              border: '1.5px solid var(--border-light)',
-              background: 'var(--white)',
-              color: 'var(--text-primary)',
-              fontSize: '14px',
-              fontWeight: 500,
-              outline: 'none',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
-            }}
+            placeholder={isEn ? "Search circulars..." : "সার্কুলার খুঁজুন..."}
           />
-          <Search size={18} style={{
-            position: 'absolute',
-            left: '14px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            color: 'var(--text-muted)'
-          }} />
         </div>
 
         {/* Jobs List */}
