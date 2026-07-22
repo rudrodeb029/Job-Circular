@@ -93,6 +93,13 @@ const orgIconsMap = {
   'স্বপ্ন সুপার শপ': '🛒'
 };
 
+const toBengaliNumber = (num) => {
+  if (num === undefined || num === null) return '';
+  const engNum = String(num);
+  const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+  return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
+
 export default function JobCard({ job, showBookmark = true }) {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
@@ -100,6 +107,14 @@ export default function JobCard({ job, showBookmark = true }) {
   const isSaved = state.savedJobs.includes(job.id);
   const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
   const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
+
+  const isEn = state.language === 'en';
+  const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
+  const titleName = isEn ? (job.titleEn || job.title) : job.title;
+  
+  const descriptionSentence = isEn
+    ? `Recruitment notice published for the post of ${titleName}${job.vacancy ? ` (${job.vacancy} vacancies)` : ''}. Apply today!`
+    : `${titleName} পদে ${job.vacancy ? `${toBengaliNumber(job.vacancy)} জনের ` : ''}নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে। আজই আবেদন করুন।`;
 
   const handleBookmark = (e) => {
     e.stopPropagation();
@@ -129,8 +144,20 @@ export default function JobCard({ job, showBookmark = true }) {
       </div>
 
       <div className="job-card-content">
-        <h4 className="job-card-title">{job.title}</h4>
-        <p className="job-card-org">{job.organization}</p>
+        <h4 className="job-card-title">{orgName}</h4>
+        <p className="job-card-org" style={{
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'normal',
+          lineHeight: '1.4',
+          marginBottom: '4px',
+          fontWeight: 400
+        }}>
+          {descriptionSentence}
+        </p>
         
         {/* Ultra-compact single-line metadata badge */}
         <div style={{ marginTop: '3px', overflow: 'hidden' }}>
