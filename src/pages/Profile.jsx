@@ -141,12 +141,12 @@ export default function Profile() {
         </div>
 
         {/* User Info */}
-        <h2 style={{ fontSize: '20px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
+        <h2 style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
           {state.user.name}
         </h2>
         <span style={{
           display: 'inline-block',
-          fontSize: '12px',
+          fontSize: '11px',
           background: 'rgba(255, 255, 255, 0.16)',
           backdropFilter: 'blur(4px)',
           padding: '3px 12px',
@@ -171,7 +171,7 @@ export default function Profile() {
           justifyContent: 'space-around',
           alignItems: 'center',
           background: 'var(--white)',
-          padding: '14px 10px',
+          padding: '12px 10px',
           borderRadius: '20px',
           boxShadow: '0 8px 25px -4px rgba(15, 23, 42, 0.08)',
           border: '1px solid var(--border-light)'
@@ -180,34 +180,34 @@ export default function Profile() {
             onClick={() => navigate('/saved')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '18px', fontWeight: 800, color: 'var(--primary)' }}>
+            <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)' }}>
               {state.savedJobs.length}
             </p>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               Saved Jobs
             </p>
           </div>
-          <div style={{ width: '1px', height: '28px', background: 'var(--border-light)' }}></div>
+          <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
           <div
             onClick={() => navigate('/saved')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '18px', fontWeight: 800, color: '#059669' }}>
+            <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669' }}>
               {state.appliedJobs.length}
             </p>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               Applied
             </p>
           </div>
-          <div style={{ width: '1px', height: '28px', background: 'var(--border-light)' }}></div>
+          <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
           <div
             onClick={() => navigate('/notifications')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '18px', fontWeight: 800, color: '#ea580c' }}>
+            <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c' }}>
               {state.readNotifications.length}
             </p>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               Notified
             </p>
           </div>
@@ -216,10 +216,10 @@ export default function Profile() {
 
       <div className="page-content" style={{ padding: '0 20px 80px 20px' }}>
         {/* Section 1: Account & Activity */}
-        <div style={{ marginBottom: '22px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', paddingLeft: '4px' }}>
-            <div style={{ width: '4px', height: '16px', borderRadius: '3px', background: 'var(--primary)' }}></div>
-            <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.2px' }}>
+        <div style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
+            <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
+            <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.1px' }}>
               Account & Activity
             </h3>
           </div>
@@ -237,47 +237,47 @@ export default function Profile() {
               onClick={() => setIsEditModalOpen(true)}
               style={{ borderBottom: '1px solid var(--border-light)' }}
             >
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', color: 'white', borderRadius: '12px' }}>
-                <Edit size={18} />
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', color: 'white' }}>
+                <Edit size={15} />
               </div>
-              <span className="menu-item-label" style={{ fontWeight: 700 }}>Edit Profile</span>
-              <ChevronRight size={18} className="menu-item-arrow" />
+              <span className="menu-item-label">Edit Profile</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
             {/* Saved Jobs */}
             <div className="menu-item" onClick={() => navigate('/saved')} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: 'white', borderRadius: '12px' }}>
-                <Bookmark size={18} />
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: 'white' }}>
+                <Bookmark size={15} />
               </div>
-              <span className="menu-item-label" style={{ fontWeight: 700 }}>Saved Jobs</span>
-              <ChevronRight size={18} className="menu-item-arrow" />
+              <span className="menu-item-label">Saved Jobs</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
             {/* Applied Jobs */}
             <div className="menu-item" onClick={() => navigate('/saved')} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #059669, #10b981)', color: 'white', borderRadius: '12px' }}>
-                <Briefcase size={18} />
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #059669, #10b981)', color: 'white' }}>
+                <Briefcase size={15} />
               </div>
-              <span className="menu-item-label" style={{ fontWeight: 700 }}>Applied Jobs</span>
-              <ChevronRight size={18} className="menu-item-arrow" />
+              <span className="menu-item-label">Applied Jobs</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
             {/* Admit Card & Result */}
             <div className="menu-item" onClick={() => navigate('/admit-card')}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', color: 'white', borderRadius: '12px' }}>
-                <FileText size={18} />
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', color: 'white' }}>
+                <FileText size={15} />
               </div>
-              <span className="menu-item-label" style={{ fontWeight: 700 }}>Admit Card & Result</span>
-              <ChevronRight size={18} className="menu-item-arrow" />
+              <span className="menu-item-label">Admit Card & Result</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
             </div>
           </div>
         </div>
 
         {/* Section 2: Preferences & System */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', paddingLeft: '4px' }}>
-            <div style={{ width: '4px', height: '16px', borderRadius: '3px', background: 'var(--primary)' }}></div>
-            <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.2px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
+            <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
+            <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.1px' }}>
               Preferences & System
             </h3>
           </div>
@@ -291,39 +291,39 @@ export default function Profile() {
           }}>
             {/* Notification Settings */}
             <div className="menu-item" onClick={() => navigate('/notifications')} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)', color: 'white', borderRadius: '12px' }}>
-                <Bell size={18} />
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)', color: 'white' }}>
+                <Bell size={15} />
               </div>
-              <span className="menu-item-label" style={{ fontWeight: 700 }}>Notification Settings</span>
-              <ChevronRight size={18} className="menu-item-arrow" />
+              <span className="menu-item-label">Notification Settings</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
             {/* Language Switcher */}
             <div className="menu-item" onClick={toggleLanguage} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #db2777, #ec4899)', color: 'white', borderRadius: '12px' }}>
-                <Globe size={18} />
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #db2777, #ec4899)', color: 'white' }}>
+                <Globe size={15} />
               </div>
-              <span className="menu-item-label" style={{ fontWeight: 700 }}>App Language</span>
+              <span className="menu-item-label">App Language</span>
               <span style={{
-                fontSize: '11px',
+                fontSize: '10px',
                 fontWeight: 800,
                 background: 'var(--primary-bg)',
                 color: 'var(--primary)',
-                padding: '4px 10px',
-                borderRadius: '12px',
+                padding: '2px 8px',
+                borderRadius: '8px',
                 marginRight: '6px'
               }}>
                 {state.language === 'bn' ? 'বাংলা (BN)' : 'English (EN)'}
               </span>
-              <ChevronRight size={18} className="menu-item-arrow" />
+              <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
             {/* Dark Mode Toggle */}
             <div className="menu-item" onClick={() => dispatch({ type: 'TOGGLE_THEME' })}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white', borderRadius: '12px' }}>
-                {state.theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white' }}>
+                {state.theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
               </div>
-              <span className="menu-item-label" style={{ fontWeight: 700 }}>Dark Mode</span>
+              <span className="menu-item-label">Dark Mode</span>
               <div className={`toggle ${state.theme === 'dark' ? 'active' : ''}`}></div>
             </div>
           </div>
