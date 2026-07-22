@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Bookmark, Globe, Search, Download, FileText } from '../components/Icons';
+import { Bookmark, BookmarkCheck, Calendar, Clock, Download, FileText, Search } from '../components/Icons';
 import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
 import SearchBar from '../components/SearchBar';
@@ -55,9 +55,16 @@ const orgIconsMap = {
   'স্বপ্ন সুপার শপ': '🛒'
 };
 
+const toBengaliNumber = (num) => {
+  if (num === undefined || num === null) return '';
+  const engNum = String(num);
+  const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+  return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
+
 export default function SavedJobs() {
   const navigate = useNavigate();
-  const { state } = useAppContext();
+  const { state, dispatch } = useAppContext();
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -122,98 +129,96 @@ export default function SavedJobs() {
               if (activeTab === 'result') {
                 const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
                 const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
+                const isSaved = state.savedJobs.includes(job.id);
+
+                const isEn = state.language === 'en';
+                const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
+                const titleName = isEn ? (job.titleEn || job.title) : job.title;
+                
+                const descriptionSentence = isEn
+                  ? `Written/Viva exam result published for the post of ${titleName}. View result now!`
+                  : `${titleName} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
 
                 return (
                   <div 
                     key={job.id} 
-                    className="card animate-fade-in" 
+                    className="job-card" 
                     onClick={() => navigate(`/exam-details/${job.id}`)}
-                    style={{ 
-                      padding: 'var(--space-md)', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: '12px',
-                      position: 'relative',
-                      cursor: 'pointer'
-                    }}
                   >
-                    {/* Job Header */}
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <div style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '10px',
-                        background: styleConfig.bg,
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        boxShadow: `0 4px 10px ${styleConfig.shadow || 'rgba(0,0,0,0.05)'}`
+                    <div className="job-card-content">
+                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                        <span>{orgName}</span>
+                      </h4>
+                      <p className="job-card-org" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'normal',
+                        lineHeight: '1.4',
+                        marginBottom: '4px',
+                        fontWeight: 400
                       }}>
-                        {displayIcon}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h4 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-                          {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
-                        </h4>
-                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                          {state.language === 'en' ? (job.titleEn || job.title) : job.title}
-                        </p>
+                        {descriptionSentence}
+                      </p>
+                      
+                      <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                        <span style={{
+                          fontSize: '8.5px',
+                          color: '#7e22ce',
+                          background: '#f3e8ff',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
+                        </span>
                       </div>
                     </div>
 
-                    {/* Result details section */}
-                    <div style={{
-                      background: 'var(--bg-secondary)',
-                      borderRadius: '12px',
-                      padding: '12px',
-                      border: '1px solid var(--border-light)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                        <span style={{ 
-                            fontSize: '12px', 
-                            fontWeight: 700, 
-                            color: '#7e22ce', 
-                            background: '#f3e8ff', 
-                            padding: '4px 10px', 
-                            borderRadius: '20px',
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
-                            gap: '4px' 
-                          }}>
-                          🏆 {state.language === 'en' ? 'Result Published' : 'পরীক্ষার ফলাফল প্রকাশিত'}
-                        </span>
-                        
-                        {job.examResult && (
-                          <a 
-                            href={job.examResult} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            title="View Result PDF"
-                            onClick={(e) => e.stopPropagation()}
-                            style={{ 
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '32px',
-                              height: '32px',
-                              borderRadius: '50%',
-                              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                              color: '#ffffff',
-                              textDecoration: 'none',
-                              boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
-                              transition: 'all 0.2s ease',
-                              flexShrink: 0
-                            }}
-                          >
-                            <FileText size={16} color="#ffffff" />
-                          </a>
-                        )}
-                      </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                      {job.examResult && (
+                        <a 
+                          href={job.examResult} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          title="View Result PDF"
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ 
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                            color: '#ffffff',
+                            textDecoration: 'none',
+                            boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
+                            transition: 'all 0.2s ease',
+                            flexShrink: 0
+                          }}
+                        >
+                          <FileText size={14} color="#ffffff" />
+                        </a>
+                      )}
+                      <button
+                        className={`job-card-bookmark ${isSaved ? 'saved' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({ type: 'TOGGLE_SAVE_JOB', payload: job.id });
+                        }}
+                        aria-label="Bookmark job"
+                        style={{ position: 'static', margin: 0, padding: 0 }}
+                      >
+                        {isSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
+                      </button>
                     </div>
                   </div>
                 );
@@ -222,98 +227,97 @@ export default function SavedJobs() {
               if (activeTab === 'exam_date') {
                 const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
                 const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
+                const isSaved = state.savedJobs.includes(job.id);
+
+                const isEn = state.language === 'en';
+                const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
+                const titleName = isEn ? (job.titleEn || job.title) : job.title;
+                
+                const descriptionSentence = isEn
+                  ? `Exam date published for the post of ${titleName}: ${job.examDate}.`
+                  : `${titleName} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে: ${toBengaliNumber(job.examDate) || job.examDate}।`;
 
                 return (
                   <div 
                     key={job.id} 
-                    className="card animate-fade-in" 
+                    className="job-card" 
                     onClick={() => navigate(`/exam-details/${job.id}`)}
-                    style={{ 
-                      padding: 'var(--space-md)', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      gap: '12px',
-                      position: 'relative',
-                      cursor: 'pointer'
-                    }}
                   >
-                    {/* Job Header */}
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                      <div style={{
-                        width: '44px',
-                        height: '44px',
-                        borderRadius: '10px',
-                        background: styleConfig.bg,
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '20px',
-                        boxShadow: `0 4px 10px ${styleConfig.shadow || 'rgba(0,0,0,0.05)'}`
+                    <div className="job-card-content">
+                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                        <span>{orgName}</span>
+                      </h4>
+                      <p className="job-card-org" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'normal',
+                        lineHeight: '1.4',
+                        marginBottom: '4px',
+                        fontWeight: 400
                       }}>
-                        {displayIcon}
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <h4 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
-                          {job.title}
-                        </h4>
-                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                          {job.organization}
-                        </p>
+                        {descriptionSentence}
+                      </p>
+                      
+                      <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                        <span style={{
+                          fontSize: '8.5px',
+                          color: '#059669',
+                          background: '#d1fae5',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          <Calendar size={10} /> 
+                          <span>{isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {job.examDate}</span>
+                        </span>
                       </div>
                     </div>
 
-                    {/* Exam details section */}
-                    <div style={{
-                      background: 'var(--bg-secondary)',
-                      borderRadius: '12px',
-                      padding: '12px',
-                      border: '1px solid var(--border-light)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                        <span style={{ 
-                            fontSize: '12px', 
-                            fontWeight: 700, 
-                            color: '#059669', 
-                            background: '#d1fae5', 
-                            padding: '4px 10px', 
-                            borderRadius: '20px',
-                            display: 'inline-flex', 
-                            alignItems: 'center', 
-                            gap: '4px' 
-                          }}>
-                          🎉 Exam Date Published
-                        </span>
-                        
-                        {(job.examLink || job.applyLink) && (
-                          <a 
-                            href={job.examLink || job.applyLink} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            title="Download Admit Card"
-                            onClick={(e) => e.stopPropagation()}
-                            style={{ 
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              width: '32px',
-                              height: '32px',
-                              borderRadius: '50%',
-                              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                              color: '#ffffff',
-                              textDecoration: 'none',
-                              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-                              transition: 'all 0.2s ease',
-                              flexShrink: 0
-                            }}
-                          >
-                            <Download size={16} color="#ffffff" />
-                          </a>
-                        )}
-                      </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                      {(job.examLink || job.applyLink) && (
+                        <a 
+                          href={job.examLink || job.applyLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          title="Download Admit Card"
+                          onClick={(e) => e.stopPropagation()}
+                          style={{ 
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '28px',
+                            height: '28px',
+                            borderRadius: '50%',
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            color: '#ffffff',
+                            textDecoration: 'none',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                            transition: 'all 0.2s ease',
+                            flexShrink: 0
+                          }}
+                        >
+                          <Download size={14} color="#ffffff" />
+                        </a>
+                      )}
+                      <button
+                        className={`job-card-bookmark ${isSaved ? 'saved' : ''}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          dispatch({ type: 'TOGGLE_SAVE_JOB', payload: job.id });
+                        }}
+                        aria-label="Bookmark job"
+                        style={{ position: 'static', margin: 0, padding: 0 }}
+                      >
+                        {isSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
+                      </button>
                     </div>
                   </div>
                 );
