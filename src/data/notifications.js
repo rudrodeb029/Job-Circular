@@ -105,46 +105,66 @@ export const admitCardsAndResults = [
   {
     id: 'item-1',
     examName: 'অফিসার (ক্যাশ) প্রিলিমিনারি পরীক্ষা',
+    examNameEn: 'Officer (Cash) Preliminary Exam',
     organization: 'সোনালী ব্যাংক লিমিটেড',
+    organizationEn: 'Sonali Bank Limited',
     type: 'admit_card',
     status: 'অ্যাডমিট কার্ড পাওয়া যাচ্ছে',
+    statusEn: 'Admit Card Available',
     date: '২০ মে ২০২৪',
+    dateEn: '20 May 2024',
     downloadLink: '#'
   },
   {
     id: 'item-2',
     examName: 'কনস্টেবল নিয়োগ লিখিত পরীক্ষার ফলাফল',
+    examNameEn: 'Constable Recruitment Written Exam Result',
     organization: 'বাংলাদেশ পুলিশ',
+    organizationEn: 'Bangladesh Police',
     type: 'result',
     status: 'ফলাফল প্রকাশিত',
+    statusEn: 'Result Published',
     date: '১৮ মে ২০২৪',
+    dateEn: '18 May 2024',
     downloadLink: '#'
   },
   {
     id: 'item-3',
     examName: 'সহকারী শিক্ষক পদের ভাইভা পরীক্ষা',
+    examNameEn: 'Assistant Teacher Viva Exam',
     organization: 'প্রাথমিক শিক্ষা অধিদপ্তর',
+    organizationEn: 'Directorate of Primary Education',
     type: 'admit_card',
     status: 'অ্যাডমিট কার্ড পাওয়া যাচ্ছে',
+    statusEn: 'Admit Card Available',
     date: '১৫ মে ২০২৪',
+    dateEn: '15 May 2024',
     downloadLink: '#'
   },
   {
     id: 'item-4',
     examName: 'প্রবেশনারি অফিসার প্রিলিমিনারি রেজাল্ট',
+    examNameEn: 'Probationary Officer Preliminary Result',
     organization: 'ইসলামী ব্যাংক বাংলাদেশ',
+    organizationEn: 'Islami Bank Bangladesh',
     type: 'result',
     status: 'ফলাফল প্রকাশিত',
+    statusEn: 'Result Published',
     date: '১২ মে ২০২৪',
+    dateEn: '12 May 2024',
     downloadLink: '#'
   },
   {
     id: 'item-5',
     examName: 'স্টাফ নার্স পদের নিয়োগ পরীক্ষার ফলাফল',
+    examNameEn: 'Staff Nurse Recruitment Exam Result',
     organization: 'স্বাস্থ্য অধিদপ্তর',
+    organizationEn: 'Directorate General of Health Services',
     type: 'result',
     status: 'ফলাফল প্রকাশিত',
+    statusEn: 'Result Published',
     date: '১০ মে ২০২৪',
+    dateEn: '10 May 2024',
     downloadLink: '#'
   }
 ];

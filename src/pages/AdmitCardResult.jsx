@@ -1,11 +1,41 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Eye, FileText } from '../components/Icons';
+import { ArrowLeft, Download, FileText } from '../components/Icons';
 import TabBar from '../components/TabBar';
 import BottomNav from '../components/BottomNav';
 import EmptyState from '../components/EmptyState';
 import { admitCards } from '../data/notifications';
 import { useAppContext } from '../context/AppContext';
+
+const orgIconsMap = {
+  'শিক্ষা মন্ত্রণালয়': '🏛️',
+  'সোনালী ব্যাংক লিমিটেড': '🏦',
+  'বাংলাদেশ পুলিশ': '👮',
+  'ব্র্যাক': '🤝',
+  'গ্রামীণফোন': '📱',
+  'বাংলাদেশ সেনাবাহিনী': '🛡️',
+  'ইসলামী ব্যাংক': '🕌',
+  'বাংলাদেশ রেলওয়ে': '🚂',
+  'ডাক ও টেলিযোগাযোগ মন্ত্রণালয়': '📡',
+  'স্বাস্থ্য অধিদপ্তর': '🏥',
+  'বাংলাদেশ ব্যাংক': '🏛️',
+  'ভিকারুননিসা নূন স্কুল এন্ড কলেজ': '🎓',
+  'এলজিইডি': '🏗️',
+  'বিকাশ লিমিটেড': '💸',
+  'আশা': '🌱',
+  'জনতা ব্যাংক': '🏦',
+  'স্কয়ার হাসপাতাল': '🩺',
+  'পাঠাও': '🚀',
+  'রাজউক উত্তরা মডেল কলেজ': '🏫',
+  'রূপালী ব্যাংক': '🏦',
+  'আকিক গ্রুপ': '🏭',
+  'ওয়াটারএইড বাংলাদেশ': '💧',
+  'টেন মিনিট স্কুল': '✍️',
+  'প্রাথমিক শিক্ষা অধিদপ্তর': '🏫',
+  'इस्लामी बैंक বাংলাদেশ': '🕌',
+  'ইসলামী ব্যাংক বাংলাদেশ': '🕌',
+  'প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়': '🏫'
+};
 
 export default function AdmitCardResult() {
   const navigate = useNavigate();
@@ -35,29 +65,164 @@ export default function AdmitCardResult() {
         </div>
 
         {filteredItems.length > 0 ? (
-          <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-            {filteredItems.map(item => (
-              <div key={item.id} className="admit-item">
-                <h4 className="admit-item-title">{item.examName}</h4>
-                <p className="admit-item-status">{item.status}</p>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-xs)' }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{item.date}</span>
-                  <a
-                    href={item.downloadLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="admit-item-action"
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            {filteredItems.map(item => {
+              const displayIcon = orgIconsMap[item.organization] || '🏛️';
+              const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
+              const examName = isEn ? (item.examNameEn || item.examName) : item.examName;
+              const itemDate = isEn ? (item.dateEn || item.date) : item.date;
+
+              if (activeTab === 'admit_card') {
+                const descriptionSentence = isEn
+                  ? `Exam notice published for: ${examName}`
+                  : `${examName}।`;
+
+                return (
+                  <div 
+                    key={item.id} 
+                    className="job-card animate-fade-in" 
+                    onClick={() => navigate(`/exam-details/${item.id}`)}
+                    style={{ cursor: 'pointer' }}
                   >
-                    {item.type === 'admit_card' ? (
-                      <>{isEn ? 'Download' : 'ডাউনলোড'} <Download size={14} /></>
-                    ) : (
-                      <>{isEn ? 'View Result' : 'ফলাফল দেখুন'} <Eye size={14} /></>
-                    )}
-                  </a>
+                    <div className="job-card-content">
+                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                        <span>{orgName}</span>
+                      </h4>
+                      <p className="job-card-org" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'normal',
+                        lineHeight: '1.4',
+                        marginBottom: '4px',
+                        fontWeight: 400
+                      }}>
+                        {descriptionSentence}
+                      </p>
+                      <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                        <span style={{
+                          fontSize: '8.5px',
+                          color: '#059669',
+                          background: '#d1fae5',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          <span>📅 {isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {itemDate}</span>
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                      <a 
+                        href={item.downloadLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        title="Download Admit Card"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: '#ffffff',
+                          textDecoration: 'none',
+                          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                          transition: 'all 0.2s ease',
+                          flexShrink: 0
+                        }}
+                      >
+                        <Download size={14} color="#ffffff" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Active tab is Result
+              const descriptionSentence = isEn
+                ? `Written/Viva exam result published for: ${examName}. View result now!`
+                : `${examName} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
+
+              return (
+                <div 
+                  key={item.id} 
+                  className="job-card animate-fade-in" 
+                  onClick={() => navigate(`/exam-details/${item.id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="job-card-content">
+                    <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                      <span>{orgName}</span>
+                    </h4>
+                    <p className="job-card-org" style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'normal',
+                      lineHeight: '1.4',
+                      marginBottom: '4px',
+                      fontWeight: 400
+                    }}>
+                      {descriptionSentence}
+                    </p>
+                    <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                      <span style={{
+                        fontSize: '8.5px',
+                        color: '#7e22ce',
+                        background: '#f3e8ff',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontWeight: 600,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                    <a 
+                      href={item.downloadLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      title="View Result PDF"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                        color: '#ffffff',
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
+                        transition: 'all 0.2s ease',
+                        flexShrink: 0
+                      }}
+                    >
+                      <FileText size={14} color="#ffffff" />
+                    </a>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <EmptyState
