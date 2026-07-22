@@ -9,7 +9,7 @@ const TabBar = ({ tabs, activeTab, onTabChange }) => {
           className={`tab ${activeTab === tab.id ? 'active' : ''}`}
           onClick={() => onTabChange(tab.id)}
           style={{
-            padding: '8px 16px',
+            padding: '8px 8px',
             background: 'none',
             border: 'none',
             borderBottom: activeTab === tab.id ? '2px solid #4CAF50' : '2px solid transparent',
@@ -17,7 +17,9 @@ const TabBar = ({ tabs, activeTab, onTabChange }) => {
             fontWeight: activeTab === tab.id ? 'bold' : 'normal',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
-            fontSize: '14px'
+            fontSize: '12px',
+            flex: 1,
+            textAlign: 'center'
           }}
         >
           {tab.label}
