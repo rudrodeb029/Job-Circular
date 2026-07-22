@@ -19,6 +19,26 @@
   --warning: #f59e0b;
   --danger: #ef4444;
 
+  /* Modern chips variables */
+  --chip-primary-bg: #eff6ff;
+  --chip-primary-color: var(--primary);
+  --chip-primary-border: #dbeafe;
+
+  --chip-success-bg: #ecfdf5;
+  --chip-success-color: #059669;
+  --chip-success-border: #a7f3d0;
+
+  --chip-warning-bg: #fffbeb;
+  --chip-warning-color: #d97706;
+  --chip-warning-border: #fde68a;
+
+  /* Unified Card variables */
+  --card-bg: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+  --card-border: 1px solid rgba(226, 232, 240, 0.9);
+
+  /* Glassmorphism Header variables */
+  --header-bg: rgba(255, 255, 255, 0.92);
+
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
   --shadow-md: 0 4px 14px -2px rgba(26, 86, 219, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
@@ -64,16 +84,46 @@
 }
 
 [data-theme='dark'] {
-  --bg: #0b1120;
-  --bg-secondary: #1e293b;
-  --white: #1e293b;
+  --bg: #090e1a; /* rich dark navy-black */
+  --bg-secondary: #0f172a; /* slate-900 */
+  --white: #151f32; /* slate-850, elegant card background */
   --text-primary: #f8fafc;
   --text-secondary: #cbd5e1;
   --text-muted: #64748b;
-  --border: #334155;
-  --border-light: #1e293b;
-  --primary-bg: #1e3a5f;
-  --primary-lightest: #1e293b;
+  --border: rgba(255, 255, 255, 0.08); /* glassmorphism borders */
+  --border-light: rgba(255, 255, 255, 0.04);
+  --primary-bg: rgba(26, 86, 219, 0.15); /* translucent blue */
+  --primary-lightest: rgba(26, 86, 219, 0.1);
+
+  /* Modern shadows for dark theme to prevent glowing border look */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.6);
+
+  /* Modern chips variables for dark theme */
+  --chip-primary-bg: rgba(59, 130, 246, 0.15);
+  --chip-primary-color: #60a5fa;
+  --chip-primary-border: rgba(59, 130, 246, 0.25);
+
+  --chip-success-bg: rgba(16, 185, 129, 0.15);
+  --chip-success-color: #34d399;
+  --chip-success-border: rgba(16, 185, 129, 0.25);
+
+  --chip-warning-bg: rgba(245, 158, 11, 0.15);
+  --chip-warning-color: #fbbf24;
+  --chip-warning-border: rgba(245, 158, 11, 0.25);
+
+  /* Unified Card variables */
+  --card-bg: linear-gradient(180deg, #151f32 0%, #0c1524 100%);
+  --card-border: 1px solid rgba(255, 255, 255, 0.07);
+
+  /* Glassmorphism Header variables */
+  --header-bg: rgba(21, 31, 50, 0.92);
+}
+
+[data-theme='dark'] body {
+  background: #050811;
 }
 
 /* Global reset and base styles */
@@ -173,16 +223,16 @@ ul, ol {
 .page-header {
   position: sticky;
   top: 0;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--header-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 50;
   padding: 12px 14px;
-  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.1);
 }
 
 .page-header h1 {

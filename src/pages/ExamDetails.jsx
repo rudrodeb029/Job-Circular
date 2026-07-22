@@ -140,11 +140,15 @@ export default function ExamDetails() {
 
         {/* Instructions */}
         {job.examInstructions && (
-          <div className="card" style={{ marginBottom: 'var(--space-lg)', borderLeft: '4px solid #fde68a', background: '#fffbeb' }}>
-            <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#b45309' }}>
+          <div className="card" style={{ 
+            marginBottom: 'var(--space-lg)', 
+            borderLeft: '4px solid var(--chip-warning-border)', 
+            background: 'var(--chip-warning-bg)' 
+          }}>
+            <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--chip-warning-color)' }}>
               ⚠️ Instructions / সাধারণ নির্দেশনাবলী
             </h3>
-            <p style={{ fontSize: '12px', color: '#92400e', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
               {job.examInstructions}
             </p>
           </div>

@@ -94,19 +94,19 @@
   border: 1px solid rgba(226, 232, 240, 0.6);
 }
 .chip-primary {
-  background: #eff6ff;
-  color: var(--primary);
-  border-color: #dbeafe;
+  background: var(--chip-primary-bg);
+  color: var(--chip-primary-color);
+  border-color: var(--chip-primary-border);
 }
 .chip-success {
-  background: #ecfdf5;
-  color: #059669;
-  border-color: #a7f3d0;
+  background: var(--chip-success-bg);
+  color: var(--chip-success-color);
+  border-color: var(--chip-success-border);
 }
 .chip-warning {
-  background: #fffbeb;
-  color: #d97706;
-  border-color: #fde68a;
+  background: var(--chip-warning-bg);
+  color: var(--chip-warning-color);
+  border-color: var(--chip-warning-border);
 }
 
 .badge {
@@ -202,7 +202,7 @@
   align-items: center;
   gap: 12px;
   background: var(--white);
-  border: 1.5px solid rgba(226, 232, 240, 0.9);
+  border: 1.5px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 8px 12px;
   box-shadow: 0 4px 20px -2px rgba(26, 86, 219, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
@@ -317,9 +317,9 @@
   align-items: center;
   gap: 14px;
   padding: 14px 16px;
-  background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+  background: var(--card-bg);
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(226, 232, 240, 0.9);
+  border: var(--card-border);
   box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 5px -1px rgba(15, 23, 42, 0.03);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
@@ -408,7 +408,7 @@
 }
 .job-card-bookmark.saved {
   color: var(--primary);
-  background: #eff6ff;
+  background: var(--primary-lightest);
 }
 
 /* Category Item List Card */
@@ -496,7 +496,7 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: #eff6ff;
+  background: var(--primary-lightest);
   color: var(--primary);
   display: flex;
   align-items: center;
@@ -542,7 +542,7 @@
 
 /* Skeleton Loader */
 .skeleton {
-  background: linear-gradient(90deg, var(--border-light) 25%, #e2e8f0 50%, var(--border-light) 75%);
+  background: linear-gradient(90deg, var(--border-light) 25%, var(--border) 50%, var(--border-light) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: var(--radius-md);
@@ -1004,7 +1004,7 @@
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background: #cbd5e1;
+  background: var(--border);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
