@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Bookmark, Globe, Search } from '../components/Icons';
+import { Bookmark, Globe, Search, Download } from '../components/Icons';
 import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
 import SearchBar from '../components/SearchBar';
@@ -29,7 +29,7 @@ export default function SavedJobs() {
   const filteredJobs = savedJobList.filter(job => {
     const isApplied = state.appliedJobs.includes(job.id);
     const matchesTab = activeTab === 'applied' ? isApplied :
-                       activeTab === 'exam_date' ? isApplied : true;
+                       activeTab === 'exam_date' ? !!job.examDate : true;
     
     if (!matchesTab) return false;
 
@@ -118,54 +118,52 @@ export default function SavedJobs() {
                       border: '1px solid var(--border-light)',
                       display: 'flex',
                       flexDirection: 'column',
-                      gap: '8px'
+                      gap: '12px'
                     }}>
-                      {job.examDate ? (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
-                          <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            📅 Exam Date: {job.examDate}
-                          </span>
-                          {(job.examLink || job.applyLink) && (
-                            <a 
-                              href={job.examLink || job.applyLink} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              style={{ 
-                                fontSize: '11px', 
-                                color: '#ffffff', 
-                                fontWeight: 700,
-                                background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
-                                padding: '6px 14px',
-                                borderRadius: '20px',
-                                boxShadow: '0 3px 10px rgba(26, 86, 219, 0.3)',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '5px',
-                                textDecoration: 'none',
-                                transition: 'all 0.2s ease'
-                              }}
-                            >
-                              <Globe size={13} color="#ffffff" />
-                              <span>Visit Website</span>
-                            </a>
-                          )}
-                        </div>
-                      ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ 
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                        <span style={{ 
                             fontSize: '12px', 
                             fontWeight: 700, 
-                            color: '#d97706', 
-                            background: '#fef3c7', 
+                            color: '#059669', 
+                            background: '#d1fae5', 
                             padding: '4px 10px', 
                             borderRadius: '20px',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px'
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '4px' 
                           }}>
-                            ⏳ Exam Date: Coming Soon
-                          </span>
-                        </div>
+                          🎉 Exam Date Published
+                        </span>
+                        <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                          📅 {job.examDate}
+                        </span>
+                      </div>
+                      {(job.examLink || job.applyLink) && (
+                        <a 
+                          href={job.examLink || job.applyLink} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{ 
+                            fontSize: '12px', 
+                            color: '#ffffff', 
+                            fontWeight: 700,
+                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                            padding: '10px 16px',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            textDecoration: 'none',
+                            transition: 'all 0.2s ease',
+                            width: '100%',
+                            boxSizing: 'border-box'
+                          }}
+                        >
+                          <Download size={15} color="#ffffff" />
+                          <span>Download Admit Card</span>
+                        </a>
                       )}
                     </div>
                   </div>
