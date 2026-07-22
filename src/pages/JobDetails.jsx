@@ -171,43 +171,47 @@ export default function JobDetails() {
         {/* Multi-Image Official Circular Notice Gallery Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           {/* Section Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-            <div>
-              <h3 className="font-bold" style={{ fontSize: 'var(--text-base)' }}>অফিসিয়াল নিয়োগ বিজ্ঞপ্তি</h3>
-              <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '8px' }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                অফিসিয়াল নিয়োগ বিজ্ঞপ্তি
+              </h3>
+              <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 Official Job Circular Notice ({circularImages.length} Page{circularImages.length > 1 ? 's' : ''})
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
               {/* Page Counter Badge */}
               <span style={{
-                fontSize: '11px',
+                fontSize: '10px',
                 fontWeight: 800,
                 background: 'var(--primary-bg)',
                 color: 'var(--primary)',
-                padding: '4px 10px',
-                borderRadius: '12px'
+                padding: '3px 8px',
+                borderRadius: '8px',
+                whiteSpace: 'nowrap'
               }}>
                 Page {activeImageIndex + 1} / {circularImages.length}
               </span>
               <button
                 onClick={() => setShowFullImage(!showFullImage)}
                 style={{
-                  fontSize: '11px',
+                  fontSize: '10px',
                   fontWeight: 700,
                   color: 'var(--text-secondary)',
                   background: 'var(--bg-secondary)',
-                  padding: '4px 10px',
-                  borderRadius: '12px',
+                  padding: '3px 8px',
+                  borderRadius: '8px',
                   border: 'none',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '4px',
-                  cursor: 'pointer'
+                  gap: '3px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <Eye size={12} /> {showFullImage ? 'Collapse' : 'Full'}
+                <Eye size={11} /> {showFullImage ? 'Collapse' : 'Full'}
               </button>
             </div>
           </div>
