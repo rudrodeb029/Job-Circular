@@ -310,7 +310,7 @@ export default function Home() {
                           whiteSpace: 'nowrap'
                         }}>
                           <Calendar size={10} />
-                          <span>{isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {isEn ? (item.examDateEn || item.examDate) : item.examDate}</span>
+                          <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                       </div>
                     </div>

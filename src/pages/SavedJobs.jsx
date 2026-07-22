@@ -265,7 +265,7 @@ export default function SavedJobs() {
                           whiteSpace: 'nowrap'
                         }}>
                           <Calendar size={10} /> 
-                          <span>{isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {job.examDate}</span>
+                          <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                       </div>
                     </div>

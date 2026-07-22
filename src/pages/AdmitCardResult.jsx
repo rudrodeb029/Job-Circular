@@ -148,7 +148,7 @@ export default function AdmitCardResult() {
                           gap: '3px',
                           whiteSpace: 'nowrap'
                         }}>
-                          <span>📅 {isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {itemDate}</span>
+                          <span>📅 {isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                       </div>
                     </div>
