@@ -202,16 +202,16 @@ export default function Home() {
               <p className="stats-label">{isEn ? 'Total Active Circulars' : 'মোট সক্রিয় সার্কুলার'}</p>
               <p className="stats-number">
                 {isEn 
-                  ? (12450 + (localJobs.length - jobs.length)).toLocaleString() 
-                  : toBengaliNumber((12450 + (localJobs.length - jobs.length)).toLocaleString())}+
+                  ? `${(12450 + Math.max(0, localJobs.length - 12)).toLocaleString()}+` 
+                  : `${toBengaliNumber((12450 + Math.max(0, localJobs.length - 12)).toLocaleString())}+`}
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <span className="stats-badge">{isEn ? 'This Week' : 'এই সপ্তাহে'}</span>
               <p style={{ fontSize: '15px', fontWeight: 800, marginTop: '4px' }}>
-                +{isEn 
-                  ? (320 + localJobs.filter(job => job.id.includes('_')).length).toLocaleString() 
-                  : toBengaliNumber((320 + localJobs.filter(job => job.id.includes('_')).length).toLocaleString())}
+                {isEn 
+                  ? `+${(320 + Math.max(0, localJobs.length - 12)).toLocaleString()}` 
+                  : `+${toBengaliNumber((320 + Math.max(0, localJobs.length - 12)).toLocaleString())}`}
               </p>
             </div>
           </div>
