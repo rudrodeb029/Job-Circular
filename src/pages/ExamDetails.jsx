@@ -157,7 +157,12 @@ export default function ExamDetails() {
 
         {/* Circular Notice Attachment Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: 'var(--text-base)' }}>নিয়োগ বিজ্ঞপ্তি / Official Notice</h3>
+          <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
+            অফিসিয়াল নোটিশ / Official Notice
+          </h3>
+          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '0 0 12px 0' }}>
+            Official Exam Notice ({circularImages.length} Page{circularImages.length > 1 ? 's' : ''})
+          </p>
           
           <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px' }}>
             <img
@@ -173,7 +178,7 @@ export default function ExamDetails() {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
             <a
               href={circularImages[activeImageIndex]}
               download={`${job.title || 'Job'}_Circular_Notice_Page_${activeImageIndex + 1}.png`}
@@ -182,21 +187,22 @@ export default function ExamDetails() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '6px',
-                padding: '12px 10px',
+                gap: '4px',
+                padding: '12px 6px',
                 borderRadius: '12px',
                 background: 'var(--primary-bg)',
                 color: 'var(--primary)',
                 fontWeight: 700,
-                fontSize: '13px',
+                fontSize: '12px',
                 border: '1.5px solid #dbeafe',
                 textDecoration: 'none',
                 boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
                 transition: 'all 0.2s ease',
-                textAlign: 'center'
+                textAlign: 'center',
+                whiteSpace: 'nowrap'
               }}
             >
-              <Download size={16} /> Notice {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
+              <Download size={15} /> Download Notice
             </a>
 
             <button
@@ -206,21 +212,22 @@ export default function ExamDetails() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '6px',
-                padding: '12px 10px',
+                gap: '4px',
+                padding: '12px 6px',
                 borderRadius: '12px',
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 color: '#fff',
                 fontWeight: 700,
-                fontSize: '14px',
+                fontSize: '12px',
                 border: 'none',
                 cursor: 'pointer',
                 boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
               }}
             >
-              <Download size={16} color="#ffffff" />
-              Download admit cards
+              <Download size={15} color="#ffffff" />
+              Download Admit Card
             </button>
           </div>
         </div>
