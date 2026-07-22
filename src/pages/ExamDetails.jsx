@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bookmark, BookmarkCheck, Calendar, Briefcase, Download } from '../components/Icons';
+import { ArrowLeft, Bookmark, BookmarkCheck, Calendar, Briefcase, Download, Eye } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
@@ -47,6 +47,7 @@ export default function ExamDetails() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showFullImage, setShowFullImage] = useState(false);
 
   // Load jobs from localStorage or static data
   const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
@@ -151,26 +152,176 @@ export default function ExamDetails() {
 
         {/* Circular Notice Attachment Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
-            অফিসিয়াল নোটিশ / Official Notice
-          </h3>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '0 0 12px 0' }}>
-            Official Exam Notice ({circularImages.length} Page{circularImages.length > 1 ? 's' : ''})
-          </p>
-          
-          <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
+                {state.language === 'en' ? 'Official Notice' : 'অফিসিয়াল নোটিশ'}
+              </h3>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+                {state.language === 'en' 
+                  ? `Official Exam Notice (${circularImages.length} Page${circularImages.length > 1 ? 's' : ''})` 
+                  : `অফিসিয়াল নোটিশ (${circularImages.length}টি পেজ)`}
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <span style={{
+                fontSize: '10px',
+                fontWeight: 800,
+                background: 'var(--primary-bg)',
+                color: 'var(--primary)',
+                padding: '3px 8px',
+                borderRadius: '8px',
+                whiteSpace: 'nowrap'
+              }}>
+                {state.language === 'en' ? 'Page' : 'পেজ'} {activeImageIndex + 1} / {circularImages.length}
+              </span>
+              <button
+                onClick={() => setShowFullImage(!showFullImage)}
+                style={{
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  color: 'var(--text-secondary)',
+                  background: 'var(--bg-secondary)',
+                  padding: '3px 8px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                <Eye size={11} /> {showFullImage ? (state.language === 'en' ? 'Collapse' : 'ছোট করুন') : (state.language === 'en' ? 'Full' : 'বড় করুন')}
+              </button>
+            </div>
+          </div>
+
+          {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
+          <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
             <img
               src={circularImages[activeImageIndex]}
               alt={`Circular Notice Page ${activeImageIndex + 1}`}
+              onClick={() => setShowFullImage(!showFullImage)}
               style={{
                 width: '100%',
-                maxHeight: '380px',
+                maxHeight: showFullImage ? 'none' : '380px',
                 objectFit: 'cover',
                 objectPosition: 'top',
-                display: 'block'
+                display: 'block',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
               }}
             />
+
+            {/* Prev & Next Floating Navigation Arrow Buttons */}
+            {circularImages.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveImageIndex(prev => (prev > 0 ? prev - 1 : circularImages.length - 1));
+                  }}
+                  title="Previous Page"
+                  style={{
+                    position: 'absolute',
+                    left: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.92)',
+                    backdropFilter: 'blur(4px)',
+                    border: '1px solid var(--border-light)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: 'var(--text-primary)',
+                    fontSize: '20px',
+                    fontWeight: 800,
+                    zIndex: 10
+                  }}
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveImageIndex(prev => (prev < circularImages.length - 1 ? prev + 1 : 0));
+                  }}
+                  title="Next Page"
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    background: 'rgba(255, 255, 255, 0.92)',
+                    backdropFilter: 'blur(4px)',
+                    border: '1px solid var(--border-light)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: 'var(--text-primary)',
+                    fontSize: '20px',
+                    fontWeight: 800,
+                    zIndex: 10
+                  }}
+                >
+                  ›
+                </button>
+              </>
+            )}
+
+            {!showFullImage && (
+              <div style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: '60px',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
+                pointerEvents: 'none'
+              }}></div>
+            )}
           </div>
+
+          {/* Thumbnail Strip / Page Selector Tabs */}
+          {circularImages.length > 1 && (
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {circularImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  style={{
+                    flex: '0 0 auto',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    padding: '8px 14px',
+                    borderRadius: '10px',
+                    border: idx === activeImageIndex ? '2px solid var(--primary)' : '1px solid var(--border)',
+                    background: idx === activeImageIndex ? 'var(--primary-bg)' : 'var(--white)',
+                    color: idx === activeImageIndex ? 'var(--primary)' : 'var(--text-secondary)',
+                    fontWeight: idx === activeImageIndex ? 800 : 600,
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <span>{state.language === 'en' ? 'Page' : 'পেজ'} {idx + 1}</span>
+                </button>
+              ))}
+            </div>
+          )}
 
           <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
             <a
@@ -196,7 +347,7 @@ export default function ExamDetails() {
                 whiteSpace: 'nowrap'
               }}
             >
-              <Download size={14} /> Notice
+              <Download size={14} /> {state.language === 'en' ? 'Notice' : 'নোটিশ'} {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
             </a>
 
             <button
@@ -221,7 +372,7 @@ export default function ExamDetails() {
               }}
             >
               <Download size={14} color="#ffffff" />
-              Admit Card
+              {state.language === 'en' ? 'Admit Card' : 'প্রবেশপত্র'}
             </button>
           </div>
         </div>
