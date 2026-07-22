@@ -184,7 +184,10 @@ export default function Home() {
         <div className="mb-lg">
           <div className="section-header">
             <h3 className="section-title">{isEn ? 'Categories' : 'ক্যাটাগরি'}</h3>
-            <Link to="/categories" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
+            <Link to="/categories" className="section-link">
+              <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
+              <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
+            </Link>
           </div>
           <div className="category-grid">
             {displayCategories.map(cat => (
@@ -215,7 +218,10 @@ export default function Home() {
         <div>
           <div className="section-header">
             <h3 className="section-title">{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
-            <Link to="/all-circulars" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
+            <Link to="/all-circulars" className="section-link">
+              <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
+              <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
+            </Link>
           </div>
 
 
