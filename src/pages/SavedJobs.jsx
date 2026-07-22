@@ -125,7 +125,7 @@ export default function SavedJobs() {
                   <div 
                     key={job.id} 
                     className="card animate-fade-in" 
-                    onClick={() => navigate(`/job/${job.id}`)}
+                    onClick={() => navigate(`/exam-details/${job.id}`)}
                     style={{ 
                       padding: 'var(--space-md)', 
                       display: 'flex', 

@@ -10,6 +10,7 @@ const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Cir
 import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
 import JobDetails from './pages/JobDetails'
+import ExamDetails from './pages/ExamDetails'
 import Categories from './pages/Categories'
 import SearchFilter from './pages/SearchFilter'
 import SavedJobs from './pages/SavedJobs'
@@ -102,6 +103,7 @@ function App() {
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/home" element={<Home />} />
         <Route path="/job/:id" element={<JobDetails />} />
+        <Route path="/exam-details/:id" element={<ExamDetails />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/search" element={<SearchFilter />} />
         <Route path="/saved" element={<SavedJobs />} />
