@@ -131,17 +131,17 @@ export default function JobDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: 'var(--space-md)' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
             {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
           </h2>
 
           {/* Chips Row: Job Type + Deadline Badge */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span className="chip">{job.type}</span>
-            <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-              <Calendar size={12} /> Deadline: {job.deadline}
+            <span className="chip" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>{job.type}</span>
+            <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600, fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>
+              <Calendar size={11} /> Deadline: {job.deadline}
             </span>
-            {isApplied && <span className="chip chip-success">✓ Applied</span>}
+            {isApplied && <span className="chip chip-success" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>✓ Applied</span>}
           </div>
         </div>
 
@@ -149,10 +149,12 @@ export default function JobDetails() {
 
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: 'var(--text-base)' }}>Job Description</h3>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {state.language === 'en' ? 'Job Description' : 'চাকরির বিবরণ'}
+          </h3>
           <p className="text-secondary" style={{
-            fontSize: 'var(--text-sm)',
-            lineHeight: 1.7,
+            fontSize: '13px',
+            lineHeight: 1.6,
             display: '-webkit-box',
             WebkitLineClamp: showMore ? 'unset' : 3,
             WebkitBoxOrient: 'vertical',
@@ -162,7 +164,7 @@ export default function JobDetails() {
           </p>
           <button
             onClick={() => setShowMore(!showMore)}
-            style={{ color: 'var(--primary)', fontWeight: 600, fontSize: 'var(--text-xs)', marginTop: '8px' }}
+            style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '11px', marginTop: '8px' }}
           >
             {showMore ? 'View Less ▲' : 'View More ▼'}
           </button>

@@ -130,7 +130,7 @@ export default function ExamDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: 'var(--space-md)' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
             {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
           </h2>
 
@@ -140,7 +140,7 @@ export default function ExamDetails() {
         {/* Instructions */}
         {job.examInstructions && (
           <div className="card" style={{ marginBottom: 'var(--space-lg)', borderLeft: '4px solid #fde68a', background: '#fffbeb' }}>
-            <h3 className="font-bold mb-xs" style={{ fontSize: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '6px', color: '#b45309' }}>
+            <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#b45309' }}>
               ⚠️ Instructions / সাধারণ নির্দেশনাবলী
             </h3>
             <p style={{ fontSize: '12px', color: '#92400e', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
