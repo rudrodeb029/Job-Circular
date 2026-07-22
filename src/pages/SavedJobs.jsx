@@ -208,17 +208,6 @@ export default function SavedJobs() {
                           <FileText size={14} color="#ffffff" />
                         </a>
                       )}
-                      <button
-                        className={`job-card-bookmark ${isSaved ? 'saved' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch({ type: 'TOGGLE_SAVE_JOB', payload: job.id });
-                        }}
-                        aria-label="Bookmark job"
-                        style={{ position: 'static', margin: 0, padding: 0 }}
-                      >
-                        {isSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
-                      </button>
                     </div>
                   </div>
                 );
@@ -307,17 +296,6 @@ export default function SavedJobs() {
                           <Download size={14} color="#ffffff" />
                         </a>
                       )}
-                      <button
-                        className={`job-card-bookmark ${isSaved ? 'saved' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          dispatch({ type: 'TOGGLE_SAVE_JOB', payload: job.id });
-                        }}
-                        aria-label="Bookmark job"
-                        style={{ position: 'static', margin: 0, padding: 0 }}
-                      >
-                        {isSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
-                      </button>
                     </div>
                   </div>
                 );
