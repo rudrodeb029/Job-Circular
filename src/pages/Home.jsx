@@ -132,6 +132,32 @@ export default function Home() {
               <JobCard key={job.id} job={job} />
             ))}
           </div>
+
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-lg)', marginBottom: 'var(--space-md)' }}>
+            <button
+              onClick={() => navigate('/search')}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                padding: '14px 20px',
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%)',
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(26, 86, 219, 0.25)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              <span>{state.language === 'en' ? 'See All Circulars' : 'সব সার্কুলার দেখুন'}</span>
+              <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center' }}>➔</span>
+            </button>
+          </div>
         </div>
         <Disclaimer />
       </div>
