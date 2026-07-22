@@ -1,15 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Bell, Search, LayoutGrid } from '../components/Icons';
+import { Bell, Search, LayoutGrid, Download, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import JobCard from '../components/JobCard';
 import SearchBar from '../components/SearchBar';
+import TabBar from '../components/TabBar';
 import { HomeSkeleton } from '../components/SkeletonLoader';
 import { jobs } from '../data/jobs';
 import { categories } from '../data/categories';
+import { admitCardsAndResults } from '../data/notifications';
 import Disclaimer from '../components/Disclaimer';
+
+const orgIconsMap = {
+  'শিক্ষা মন্ত্রণালয়': '🏛️',
+  'সোনালী ব্যাংক লিমিটেড': '🏦',
+  'বাংলাদেশ পুলিশ': '👮',
+  'ব্র্যাক': '🤝',
+  'গ্রামীণফোন': '📱',
+  'বাংলাদেশ সেনাবাহিনী': '🛡️',
+  'ইসলামী ব্যাংক': '🕌',
+  'বাংলাদেশ রেলওয়ে': '🚂',
+  'ডাক ও টেলিযোগাযোগ মন্ত্রণালয়': '📡',
+  'স্বাস্থ্য অধিদপ্তর': '🏥',
+  'বাংলাদেশ ব্যাংক': '🏛️',
+  'ভিকারুননিসা নূন স্কুল এন্ড কলেজ': '🎓',
+  'এলজিইডি': '🏗️',
+  'বিকাশ লিমিটেড': '💸',
+  'আশা': '🌱',
+  'জনতা ব্যাংক': '🏦',
+  'স্কয়ার হাসপাতাল': '🩺',
+  'পাঠাও': '🚀',
+  'রাজউক উত্তরা মডেল কলেজ': '🏫',
+  'রূপালী ব্যাংক': '🏦',
+  'আকিক গ্রুপ': '🏭',
+  'ওয়াটারএইড বাংলাদেশ': '💧',
+  'টেন মিনিট স্কুল': '✍️',
+  'প্রাথমিক শিক্ষা অধিদপ্তর': '🏫',
+  'ইসলামী ব্যাংক বাংলাদেশ': '🕌',
+  'প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়': '🏫'
+};
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -32,7 +63,9 @@ export default function Home() {
       return jobs;
     }
   });
+
   const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 20;
 
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -56,6 +89,51 @@ export default function Home() {
     };
   }, []);
 
+  // Merge circulars data based on feed types
+  const combinedFeedItems = useMemo(() => {
+    const jobItems = localJobs.map(job => ({
+      ...job,
+      feedType: 'job'
+    }));
+
+    const examItems = admitCardsAndResults.filter(item => item.type === 'admit_card').map(item => ({
+      id: item.id,
+      organization: item.organization,
+      organizationEn: item.organizationEn,
+      title: item.examName,
+      titleEn: item.examNameEn,
+      date: item.date,
+      dateEn: item.dateEn,
+      downloadLink: item.downloadLink,
+      feedType: 'exam_date'
+    }));
+
+    const resultItems = admitCardsAndResults.filter(item => item.type === 'result').map(item => ({
+      id: item.id,
+      organization: item.organization,
+      organizationEn: item.organizationEn,
+      title: item.examName,
+      titleEn: item.examNameEn,
+      date: item.date,
+      dateEn: item.dateEn,
+      downloadLink: item.downloadLink,
+      feedType: 'result'
+    }));
+
+    // Return all items mixed together
+    return [...jobItems, ...examItems, ...resultItems];
+  }, [localJobs]);
+
+  // Paginated feed items
+  const paginatedFeed = useMemo(() => {
+    const indexOfLastPost = currentPage * postsPerPage;
+    const indexOfFirstPost = indexOfLastPost - postsPerPage;
+    return combinedFeedItems.slice(indexOfFirstPost, indexOfLastPost);
+  }, [combinedFeedItems, currentPage]);
+
+  const totalPages = Math.ceil(combinedFeedItems.length / postsPerPage);
+  const displayCategories = categories.slice(0, 3);
+
   if (loading) {
     return (
       <div className="page">
@@ -65,17 +143,10 @@ export default function Home() {
     );
   }
 
-  const displayCategories = categories.slice(0, 3);
-  const postsPerPage = 20;
-  const indexOfLastPost = currentPage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentJobs = localJobs.slice(indexOfFirstPost, indexOfLastPost);
-  const totalPages = Math.ceil(localJobs.length / postsPerPage);
-
   return (
     <div className="page">
       <div className="page-content">
-        {/* BBC News Inspired Polished Top App Header */}
+        {/* Top App Header */}
         <AppHeader />
 
         {/* Advanced Modern Search Bar */}
@@ -133,23 +204,180 @@ export default function Home() {
               onClick={() => navigate('/categories')}
             >
               <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)' }}>
-                <LayoutGrid size={24} color="var(--text-secondary)" />
+                <LayoutGrid size={22} />
               </div>
               <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
             </div>
           </div>
         </div>
 
-        {/* Latest Jobs */}
+        {/* Dynamic Feed Segment */}
         <div>
           <div className="section-header">
             <h3 className="section-title">{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
             <Link to="/all-circulars" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
           </div>
+
+
+
+          {/* Paginated Combined Circulars List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            {currentJobs.map(job => (
-              <JobCard key={job.id} job={job} />
-            ))}
+            {paginatedFeed.map(item => {
+              if (item.feedType === 'job') {
+                return <JobCard key={item.id} job={item} />;
+              }
+
+              // Fallback variables for exam / result
+              const displayIcon = orgIconsMap[item.organization] || '🏛️';
+              const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
+              const examName = isEn ? (item.titleEn || item.title) : item.title;
+              const itemDate = isEn ? (item.dateEn || item.date) : item.date;
+
+              if (item.feedType === 'exam_date') {
+                return (
+                  <div 
+                    key={item.id} 
+                    className="job-card animate-fade-in" 
+                    onClick={() => navigate(`/exam-details/${item.id}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <div className="job-card-content">
+                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                        <span>{orgName}</span>
+                      </h4>
+                      <p className="job-card-org" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'normal',
+                        lineHeight: '1.4',
+                        marginBottom: '4px',
+                        fontWeight: 400
+                      }}>
+                        {isEn ? `Exam date published for: ${examName}.` : `${examName}।`}
+                      </p>
+                      <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                        <span style={{
+                          fontSize: '8.5px',
+                          color: '#059669',
+                          background: '#d1fae5',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          <span>📅 {isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {itemDate}</span>
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                      <a 
+                        href={item.downloadLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        title="Download Admit Card"
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: '#ffffff',
+                          textDecoration: 'none',
+                          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                          transition: 'all 0.2s ease',
+                          flexShrink: 0
+                        }}
+                      >
+                        <Download size={14} color="#ffffff" />
+                      </a>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Rendering Result Type (item.feedType === 'result')
+              return (
+                <div 
+                  key={item.id} 
+                  className="job-card animate-fade-in" 
+                  onClick={() => navigate(`/result-details/${item.id}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="job-card-content">
+                    <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                      <span>{orgName}</span>
+                    </h4>
+                    <p className="job-card-org" style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'normal',
+                      lineHeight: '1.4',
+                      marginBottom: '4px',
+                      fontWeight: 400
+                    }}>
+                      {isEn 
+                        ? `Written/Viva exam result published for: ${examName}.` 
+                        : `${examName} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`}
+                    </p>
+                    <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                      <span style={{
+                        fontSize: '8.5px',
+                        color: '#7e22ce',
+                        background: '#f3e8ff',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontWeight: 600,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                    <a 
+                      href={item.downloadLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      title="View Result PDF"
+                      onClick={(e) => e.stopPropagation()}
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                        color: '#ffffff',
+                        textDecoration: 'none',
+                        boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
+                        transition: 'all 0.2s ease',
+                        flexShrink: 0
+                      }}
+                    >
+                      <FileText size={14} color="#ffffff" />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Previous & Next Pagination Buttons Container */}
