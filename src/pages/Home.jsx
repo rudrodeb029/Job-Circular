@@ -139,7 +139,7 @@ export default function Home() {
         <div>
           <div className="section-header">
             <h3 className="section-title">{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
-            <Link to="/search" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
+            <Link to="/all-circulars" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {latestJobs.map(job => (
@@ -149,7 +149,7 @@ export default function Home() {
 
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-lg)', marginBottom: 'var(--space-md)' }}>
             <button
-              onClick={() => navigate('/search')}
+              onClick={() => navigate('/all-circulars')}
               style={{
                 width: '100%',
                 display: 'flex',
