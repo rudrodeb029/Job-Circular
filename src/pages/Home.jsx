@@ -56,11 +56,13 @@ export default function Home() {
           <div className="stats-card-row">
             <div>
               <p className="stats-label">Total Active Circulars</p>
-              <p className="stats-number">12,450+</p>
+              <p className="stats-number">{(12450 + (localJobs.length - jobs.length)).toLocaleString()}+</p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <span className="stats-badge">This Week</span>
-              <p style={{ fontSize: 'var(--text-xl)', fontWeight: 800, marginTop: '4px' }}>+320</p>
+              <p style={{ fontSize: 'var(--text-xl)', fontWeight: 800, marginTop: '4px' }}>
+                +{(320 + localJobs.filter(job => job.id.includes('_')).length).toLocaleString()}
+              </p>
             </div>
           </div>
         </div>
