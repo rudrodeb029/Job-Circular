@@ -223,8 +223,8 @@ export default function SavedJobs() {
                 const titleName = isEn ? (job.titleEn || job.title) : job.title;
                 
                 const descriptionSentence = isEn
-                  ? `Exam date published for the post of ${titleName}: ${job.examDate}.`
-                  : `${titleName} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে: ${toBengaliNumber(job.examDate) || job.examDate}।`;
+                  ? `Exam date published for the post of ${titleName}.`
+                  : `${titleName} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
 
                 return (
                   <div 
