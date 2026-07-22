@@ -88,3 +88,21 @@ npx cap sync
 ```
 
 Once synced, you can open the project in **Android Studio** (`npx cap open android`) and compile your production-ready `.aab` (Android App Bundle) for upload.
+
+---
+
+## 6. App Version Control System (Remote Update Checks)
+
+We have integrated a fully functional remote version checking system. On startup, the app calls:
+`https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json`
+
+To release a new update and trigger the update modal for all installed apps:
+1. Compile your new APK/Bundle and publish it to the Google Play Store.
+2. Edit the **`version.json`** file in the root of your repository:
+   - Change `"latestVersion"` to your new app version (e.g. `"1.0.1"`).
+   - Update the `"releaseNotes"` inside the English (`en`) and Bengali (`bn`) sections.
+   - If the update is critical and mandatory, set `"forceUpdate"` to `true` (this hides the "Later" button and forces the user to update).
+3. Commit and push the updated `version.json` file to the `master` branch on GitHub. 
+
+All installed apps will automatically read this file from the GitHub repository and prompt their users to download the update from your Play Store link!
+

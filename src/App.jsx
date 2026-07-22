@@ -1,7 +1,12 @@
+import { useState, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAppContext } from './context/AppContext'
 import { AdminProvider } from './context/AdminContext'
 import SplashScreen from './pages/SplashScreen'
+import VersionUpdateModal from './components/VersionUpdateModal'
+
+const CURRENT_VERSION = "1.0.0";
+const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
 import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
 import JobDetails from './pages/JobDetails'
@@ -27,9 +32,49 @@ import AdminSettings from './pages/admin/AdminSettings'
 function App() {
   const { state } = useAppContext()
   const location = useLocation()
+  
+  const [updateInfo, setUpdateInfo] = useState(null)
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
 
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
+
+  useEffect(() => {
+    const checkVersion = async () => {
+      try {
+        const response = await fetch(VERSION_CHECK_URL)
+        if (!response.ok) return
+        const data = await response.json()
+        
+        // Semantic version comparison: e.g., '1.0.1' > '1.0.0'
+        const latest = data.latestVersion.split('.').map(Number)
+        const current = CURRENT_VERSION.split('.').map(Number)
+        
+        let hasUpdate = false;
+        for (let i = 0; i < Math.max(latest.length, current.length); i++) {
+          const l = latest[i] || 0
+          const c = current[i] || 0
+          if (l > c) {
+            hasUpdate = true
+            break
+          } else if (l < c) {
+            break
+          }
+        }
+
+        if (hasUpdate) {
+          setUpdateInfo(data)
+          setShowUpdateModal(true)
+        }
+      } catch (error) {
+        console.error("Failed to check app version:", error)
+      }
+    }
+
+    if (!isAdminRoute) {
+      checkVersion()
+    }
+  }, [isAdminRoute])
 
   // Admin routes don't use the mobile container
   if (isAdminRoute) {
@@ -66,6 +111,12 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <VersionUpdateModal 
+        isOpen={showUpdateModal}
+        updateInfo={updateInfo}
+        currentVersion={CURRENT_VERSION}
+        onClose={() => setShowUpdateModal(false)}
+      />
     </div>
   )
 }

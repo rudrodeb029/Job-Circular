@@ -1,0 +1,10 @@
+{
+  "latestVersion": "1.0.0",
+  "minRequiredVersion": "1.0.0",
+  "updateUrl": "https://play.google.com/store/apps/details?id=com.jobcircular.app",
+  "forceUpdate": false,
+  "releaseNotes": {
+    "en": "We've improved compliance and optimized the Exam Date section with direct admit card download links.",
+    "bn": "আমরা অ্যাপের পারফরম্যান্স বৃদ্ধি করেছি এবং পরীক্ষার তারিখ সেকশনে সরাসরি প্রবেশপত্র ডাউনলোডের সুবিধা যুক্ত করেছি।"
+  }
+}
