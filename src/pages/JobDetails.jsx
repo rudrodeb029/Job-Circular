@@ -68,8 +68,9 @@ export default function JobDetails() {
   };
 
   const handleOfficialApply = () => {
-    if (job.applyLink) {
-      window.open(job.applyLink, '_blank');
+    const link = job.examDate ? (job.examLink || job.applyLink) : job.applyLink;
+    if (link) {
+      window.open(link, '_blank');
     }
   };
 
@@ -435,19 +436,21 @@ export default function JobDetails() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                gap: '6px',
                 padding: '12px 10px',
                 borderRadius: '12px',
-                background: isApplied ? '#059669' : 'var(--primary)',
+                background: job.examDate ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : (isApplied ? '#059669' : 'var(--primary)'),
                 color: '#fff',
                 fontWeight: 700,
                 fontSize: '14px',
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)',
+                boxShadow: job.examDate ? '0 4px 14px rgba(16,185,129,0.3)' : (isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)'),
                 transition: 'all 0.2s ease'
               }}
             >
-              {isApplied ? "✓ Applied" : "Apply Now"}
+              {job.examDate && <Download size={16} color="#ffffff" />}
+              {job.examDate ? "Download admit cards" : (isApplied ? "✓ Applied" : "Apply Now")}
             </button>
           </div>
         </div>
