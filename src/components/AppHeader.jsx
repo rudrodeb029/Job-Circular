@@ -229,7 +229,6 @@ export default function AppHeader() {
                 )}
                 <div>
                   <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>{state.user.name}</h4>
-                  <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{state.user.email}</p>
                 </div>
               </div>
               <button onClick={() => setDrawerOpen(false)} style={{ padding: '6px', color: 'var(--text-muted)', border: 'none', background: 'transparent' }}>
