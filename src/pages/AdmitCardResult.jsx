@@ -4,6 +4,7 @@ import { ArrowLeft, Download, FileText } from '../components/Icons';
 import TabBar from '../components/TabBar';
 import BottomNav from '../components/BottomNav';
 import EmptyState from '../components/EmptyState';
+import SearchBar from '../components/SearchBar';
 import { admitCards } from '../data/notifications';
 import { useAppContext } from '../context/AppContext';
 
@@ -32,7 +33,6 @@ const orgIconsMap = {
   'ওয়াটারএইড বাংলাদেশ': '💧',
   'টেন মিনিট স্কুল': '✍️',
   'প্রাথমিক শিক্ষা অধিদপ্তর': '🏫',
-  'इस्लामी बैंक বাংলাদেশ': '🕌',
   'ইসলামী ব্যাংক বাংলাদেশ': '🕌',
   'প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়': '🏫'
 };
@@ -42,13 +42,25 @@ export default function AdmitCardResult() {
   const { state } = useAppContext();
   const isEn = state.language === 'en';
   const [activeTab, setActiveTab] = useState('admit_card');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const tabs = useMemo(() => [
     { id: 'admit_card', label: isEn ? 'Exam Date' : 'পরীক্ষার তারিখ' },
     { id: 'result', label: isEn ? 'Result' : 'ফলাফল' }
   ], [isEn]);
 
-  const filteredItems = admitCards.filter(item => item.type === activeTab);
+  const searchedItems = useMemo(() => {
+    const items = admitCards.filter(item => item.type === activeTab);
+    if (!searchQuery.trim()) return items;
+    const query = searchQuery.toLowerCase();
+    return items.filter(item => {
+      const org = (item.organization || '').toLowerCase();
+      const orgEn = (item.organizationEn || '').toLowerCase();
+      const exam = (item.examName || '').toLowerCase();
+      const examEn = (item.examNameEn || '').toLowerCase();
+      return org.includes(query) || orgEn.includes(query) || exam.includes(query) || examEn.includes(query);
+    });
+  }, [activeTab, searchQuery]);
 
   return (
     <div className="page">
@@ -60,13 +72,34 @@ export default function AdmitCardResult() {
       </div>
 
       <div className="page-content">
-        <div style={{ marginBottom: 'var(--space-lg)' }}>
-          <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
+        {/* Modern Search Bar */}
+        <div style={{ marginBottom: 'var(--space-md)' }}>
+          <SearchBar
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={
+              activeTab === 'admit_card'
+                ? (isEn ? 'Search exam dates...' : 'পরীক্ষার তারিখ খুঁজুন...')
+                : (isEn ? 'Search results...' : 'ফলাফল খুঁজুন...')
+            }
+          />
         </div>
 
-        {filteredItems.length > 0 ? (
+        {/* Tab Switcher */}
+        <div style={{ marginBottom: 'var(--space-lg)' }}>
+          <TabBar 
+            tabs={tabs} 
+            activeTab={activeTab} 
+            onTabChange={(tab) => { 
+              setActiveTab(tab); 
+              setSearchQuery(''); 
+            }} 
+          />
+        </div>
+
+        {searchedItems.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            {filteredItems.map(item => {
+            {searchedItems.map(item => {
               const displayIcon = orgIconsMap[item.organization] || '🏛️';
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
               const examName = isEn ? (item.examNameEn || item.examName) : item.examName;
@@ -227,8 +260,16 @@ export default function AdmitCardResult() {
         ) : (
           <EmptyState
             icon={FileText}
-            title={activeTab === 'admit_card' ? (isEn ? 'No Exam Dates Available' : 'কোনো পরীক্ষার তারিখ পাওয়া যায়নি') : (isEn ? 'No Results Available' : 'কোনো ফলাফল পাওয়া যায়নি')}
-            description={isEn ? 'Check back later for new exam notices and results.' : 'নতুন পরীক্ষার নোটিশ এবং ফলাফলের জন্য পরবর্তীতে চেক করুন।'}
+            title={
+              activeTab === 'admit_card'
+                ? (isEn ? 'No Exam Dates Found' : 'কোনো পরীক্ষার তারিখ পাওয়া যায়নি')
+                : (isEn ? 'No Results Found' : 'কোনো ফলাফল পাওয়া যায়নি')
+            }
+            description={
+              searchQuery
+                ? (isEn ? 'Try searching with a different term.' : 'অন্য বিবরণ দিয়ে সার্চ করে দেখুন।')
+                : (isEn ? 'Check back later for new exam notices and results.' : 'নতুন পরীক্ষার নোটিশ এবং ফলাফলের জন্য পরবর্তীতে চেক করুন।')
+            }
           />
         )}
       </div>
