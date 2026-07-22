@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Bell, Search, LayoutGrid, Download, FileText } from '../components/Icons';
+import { Bell, Search, LayoutGrid, Download, FileText, Calendar } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
@@ -96,32 +96,61 @@ export default function Home() {
       feedType: 'job'
     }));
 
-    const examItems = admitCardsAndResults.filter(item => item.type === 'admit_card').map(item => ({
+    // Exam Date jobs from localJobs
+    const examJobs = localJobs.filter(job => job.examDate).map(job => ({
+      id: `exam_${job.id}`,
+      originalId: job.id,
+      organization: job.organization,
+      organizationEn: job.organizationEn,
+      postTitle: job.title,
+      postTitleEn: job.titleEn,
+      examDate: job.examDate,
+      examDateEn: job.examDateEn || job.examDate,
+      downloadLink: job.downloadLink || 'https://example.com/admit.pdf',
+      category: job.category,
+      feedType: 'exam_date'
+    }));
+
+    // Result jobs from localJobs
+    const resultJobs = localJobs.filter(job => job.examResult).map(job => ({
+      id: `result_${job.id}`,
+      originalId: job.id,
+      organization: job.organization,
+      organizationEn: job.organizationEn,
+      postTitle: job.title,
+      postTitleEn: job.titleEn,
+      examResult: job.examResult,
+      category: job.category,
+      feedType: 'result'
+    }));
+
+    // Notifications admit card items
+    const notifExamItems = admitCardsAndResults.filter(item => item.type === 'admit_card').map(item => ({
       id: item.id,
+      originalId: item.id.replace('admit-', 'job-'),
       organization: item.organization,
       organizationEn: item.organizationEn,
-      title: item.examName,
-      titleEn: item.examNameEn,
-      date: item.date,
-      dateEn: item.dateEn,
+      postTitle: item.examName,
+      postTitleEn: item.examNameEn,
+      examDate: item.date,
+      examDateEn: item.dateEn,
       downloadLink: item.downloadLink,
       feedType: 'exam_date'
     }));
 
-    const resultItems = admitCardsAndResults.filter(item => item.type === 'result').map(item => ({
+    // Notifications result items
+    const notifResultItems = admitCardsAndResults.filter(item => item.type === 'result').map(item => ({
       id: item.id,
+      originalId: item.id.replace('result-', 'job-'),
       organization: item.organization,
       organizationEn: item.organizationEn,
-      title: item.examName,
-      titleEn: item.examNameEn,
-      date: item.date,
-      dateEn: item.dateEn,
-      downloadLink: item.downloadLink,
+      postTitle: item.examName,
+      postTitleEn: item.examNameEn,
+      examResult: item.downloadLink,
       feedType: 'result'
     }));
 
-    // Return all items mixed together
-    return [...jobItems, ...examItems, ...resultItems];
+    return [...jobItems, ...examJobs, ...resultJobs, ...notifExamItems, ...notifResultItems];
   }, [localJobs]);
 
   // Paginated feed items
@@ -233,18 +262,20 @@ export default function Home() {
                 return <JobCard key={item.id} job={item} />;
               }
 
-              // Fallback variables for exam / result
-              const displayIcon = orgIconsMap[item.organization] || '🏛️';
+              const displayIcon = item.icon || orgIconsMap[item.organization] || '🏛️';
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
-              const examName = isEn ? (item.titleEn || item.title) : item.title;
-              const itemDate = isEn ? (item.dateEn || item.date) : item.date;
+              const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
 
               if (item.feedType === 'exam_date') {
+                const descriptionSentence = isEn
+                  ? `Exam date published for the post of ${postTitle}.`
+                  : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
+
                 return (
                   <div 
                     key={item.id} 
                     className="job-card animate-fade-in" 
-                    onClick={() => navigate(`/exam-details/${item.id}`)}
+                    onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)}
                     style={{ cursor: 'pointer' }}
                   >
                     <div className="job-card-content">
@@ -263,7 +294,7 @@ export default function Home() {
                         marginBottom: '4px',
                         fontWeight: 400
                       }}>
-                        {isEn ? `Exam date published for: ${examName}.` : `${examName}।`}
+                        {descriptionSentence}
                       </p>
                       <div style={{ marginTop: '3px', overflow: 'hidden' }}>
                         <span style={{
@@ -278,13 +309,14 @@ export default function Home() {
                           gap: '3px',
                           whiteSpace: 'nowrap'
                         }}>
-                          <span>📅 {isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {itemDate}</span>
+                          <Calendar size={10} />
+                          <span>{isEn ? 'Exam Date' : 'পরীক্ষার তারিখ'}: {isEn ? (item.examDateEn || item.examDate) : item.examDate}</span>
                         </span>
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
                       <a 
-                        href={item.downloadLink} 
+                        href={item.downloadLink || item.examResult} 
                         target="_blank" 
                         rel="noopener noreferrer" 
                         title="Download Admit Card"
@@ -311,12 +343,16 @@ export default function Home() {
                 );
               }
 
-              // Rendering Result Type (item.feedType === 'result')
+              // feedType === 'result'
+              const descriptionSentence = isEn
+                ? `Written/Viva exam result published for the post of ${postTitle}. View result now!`
+                : `${postTitle} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
+
               return (
                 <div 
                   key={item.id} 
                   className="job-card animate-fade-in" 
-                  onClick={() => navigate(`/result-details/${item.id}`)}
+                  onClick={() => navigate(`/result-details/${item.originalId || item.id}`)}
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="job-card-content">
@@ -335,9 +371,7 @@ export default function Home() {
                       marginBottom: '4px',
                       fontWeight: 400
                     }}>
-                      {isEn 
-                        ? `Written/Viva exam result published for: ${examName}.` 
-                        : `${examName} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`}
+                      {descriptionSentence}
                     </p>
                     <div style={{ marginTop: '3px', overflow: 'hidden' }}>
                       <span style={{
@@ -358,7 +392,7 @@ export default function Home() {
                   </div>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
                     <a 
-                      href={item.downloadLink} 
+                      href={item.examResult || item.downloadLink} 
                       target="_blank" 
                       rel="noopener noreferrer" 
                       title="View Result PDF"
