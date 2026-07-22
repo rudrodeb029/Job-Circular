@@ -143,63 +143,17 @@ export default function ExamDetails() {
           </div>
         </div>
 
-        {/* Exam Information Panel */}
-        <div className="card" style={{ marginBottom: 'var(--space-lg)', borderLeft: '4px solid #10b981' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            📢 Exam Schedule / পরীক্ষার বিবরণ
-          </h3>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
-            {job.examCenter && (
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <strong>🏢 Center / কেন্দ্র:</strong> {job.examCenter}
-              </div>
-            )}
-            {job.examTime && (
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <strong>⏰ Time / সময়:</strong> {job.examTime}
-              </div>
-            )}
+        {/* Instructions */}
+        {job.examInstructions && (
+          <div className="card" style={{ marginBottom: 'var(--space-lg)', borderLeft: '4px solid #fde68a', background: '#fffbeb' }}>
+            <h3 className="font-bold mb-xs" style={{ fontSize: 'var(--text-base)', display: 'flex', alignItems: 'center', gap: '6px', color: '#b45309' }}>
+              ⚠️ Instructions / সাধারণ নির্দেশনাবলী
+            </h3>
+            <p style={{ fontSize: '12px', color: '#92400e', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
+              {job.examInstructions}
+            </p>
           </div>
-
-          {/* Subjects Syllabus */}
-          {job.examSubjects && (
-            <div style={{ marginTop: '16px' }}>
-              <h4 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                📖 Exam Syllabus & Marks / বিষয়সমূহ ও নম্বর বণ্টন:
-              </h4>
-              <div style={{ background: 'var(--bg-secondary)', borderRadius: '12px', padding: '12px', border: '1px solid var(--border-light)' }}>
-                {job.examSubjects.map((sub, idx) => (
-                  <div 
-                    key={idx} 
-                    style={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between', 
-                      padding: '6px 0', 
-                      borderBottom: idx < job.examSubjects.length - 1 ? '1px solid var(--border-light)' : 'none', 
-                      fontSize: '12px' 
-                    }}
-                  >
-                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{sub.name}</span>
-                    <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{sub.marks} Marks</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Instructions */}
-          {job.examInstructions && (
-            <div style={{ marginTop: '16px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '12px' }}>
-              <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#b45309', marginBottom: '4px' }}>
-                ⚠️ Instructions / সাধারণ নির্দেশনাবলী:
-              </h4>
-              <p style={{ fontSize: '11px', color: '#92400e', lineHeight: 1.5, margin: 0 }}>
-                {job.examInstructions}
-              </p>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Circular Notice Attachment Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
