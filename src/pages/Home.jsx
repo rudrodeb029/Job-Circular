@@ -30,8 +30,11 @@ export default function Home() {
     );
   }
 
+  // Load jobs from localStorage if present (to reflect admin updates), fallback to static jobs data
+  const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+
   const displayCategories = categories.slice(0, 3);
-  const latestJobs = jobs.slice(0, 5);
+  const latestJobs = localJobs.slice(0, 20);
 
   return (
     <div className="page">
