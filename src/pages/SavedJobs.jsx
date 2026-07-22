@@ -180,7 +180,7 @@ export default function SavedJobs() {
                           🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
                         </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          • 🕒 {isEn ? (job.postedDateEn || job.postedTimeEn || 'Recent') : (job.postedDate || job.postedTime || 'সাম্প্রতিক')}
+                          • 🕒 {isEn ? (job.postedDateEn || job.postedDate || job.examDateEn || job.examDate || '1 day ago') : (job.postedDate || job.examDate || '১ দিন আগে')}
                         </span>
                       </div>
                     </div>
@@ -271,7 +271,7 @@ export default function SavedJobs() {
                           <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          • 🕒 {isEn ? (job.postedDateEn || job.postedTimeEn || 'Recent') : (job.postedDate || job.postedTime || 'সাম্প্রতিক')}
+                          • 🕒 {isEn ? (job.postedDateEn || job.postedDate || job.examDateEn || job.examDate || '1 day ago') : (job.postedDate || job.examDate || '১ দিন আগে')}
                         </span>
                       </div>
                     </div>

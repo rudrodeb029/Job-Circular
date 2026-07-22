@@ -108,6 +108,8 @@ export default function Home() {
       examDateEn: job.examDateEn || job.examDate,
       downloadLink: job.downloadLink || 'https://example.com/admit.pdf',
       category: job.category,
+      postedDate: job.postedDate || job.examDate || '১ দিন আগে',
+      postedDateEn: job.postedDateEn || job.examDateEn || job.examDate || '1 day ago',
       feedType: 'exam_date'
     }));
 
@@ -121,6 +123,8 @@ export default function Home() {
       postTitleEn: job.titleEn,
       examResult: job.examResult,
       category: job.category,
+      postedDate: job.postedDate || '১ দিন আগে',
+      postedDateEn: job.postedDateEn || '1 day ago',
       feedType: 'result'
     }));
 
@@ -135,6 +139,8 @@ export default function Home() {
       examDate: item.date,
       examDateEn: item.dateEn,
       downloadLink: item.downloadLink,
+      postedDate: item.date || '১ দিন আগে',
+      postedDateEn: item.dateEn || item.date || '1 day ago',
       feedType: 'exam_date'
     }));
 
@@ -147,6 +153,8 @@ export default function Home() {
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,
+      postedDate: item.date || '১ দিন আগে',
+      postedDateEn: item.dateEn || item.date || '1 day ago',
       feedType: 'result'
     }));
 
@@ -313,7 +321,7 @@ export default function Home() {
                           <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          • 🕒 {isEn ? (item.postedDateEn || item.postedTimeEn || 'Recent') : (item.postedDate || item.postedTime || 'সাম্প্রতিক')}
+                          • 🕒 {isEn ? (item.postedDateEn || item.postedDate || item.examDateEn || item.examDate || '1 day ago') : (item.postedDate || item.examDate || '১ দিন আগে')}
                         </span>
                       </div>
                     </div>
@@ -392,7 +400,7 @@ export default function Home() {
                         🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
                       </span>
                       <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                        • 🕒 {isEn ? (item.postedDateEn || item.postedTimeEn || 'Recent') : (item.postedDate || item.postedTime || 'সাম্প্রতিক')}
+                        • 🕒 {isEn ? (item.postedDateEn || item.postedDate || item.examDateEn || item.examDate || '1 day ago') : (item.postedDate || item.examDate || '১ দিন আগে')}
                       </span>
                     </div>
                   </div>
