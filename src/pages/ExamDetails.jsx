@@ -135,12 +135,7 @@ export default function ExamDetails() {
             {job.organization}
           </p>
 
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span className="chip">{job.type}</span>
-            <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-              📅 Exam Date: {job.examDate}
-            </span>
-          </div>
+
         </div>
 
         {/* Instructions */}
