@@ -26,7 +26,8 @@ export const jobs = [
       { name: 'সাধারণ জ্ঞান (General Knowledge)', marks: 10 }
     ],
     examInstructions: '১. প্রবেশপত্র অবশ্যই রঙিন প্রিন্ট করতে হবে। ২. পরীক্ষা শুরুর ৩০ মিনিট পূর্বে কেন্দ্রে উপস্থিত হতে হবে। ৩. মোবাইল বা কোনো ইলেকট্রনিক ডিভাইস আনা সম্পূর্ণ নিষিদ্ধ।',
-    examLink: 'http://moedu.gov.bd'
+    examLink: 'http://moedu.gov.bd',
+    examResult: 'https://moedu.gov.bd/results/office_assistant_2024.pdf'
   },
   {
     id: 'job-2',
@@ -56,7 +57,8 @@ export const jobs = [
       { name: 'কম্পিউটার ও আইটি (Computer & IT)', marks: 20 }
     ],
     examInstructions: '১. এমসিকিউ (MCQ) পদ্ধতিতে পরীক্ষা অনুষ্ঠিত হবে। ২. ওএমআর (OMR) শিট কালো বলপয়েন্ট কলম দিয়ে পূরণ করতে হবে। ৩. কোনো প্রকার ক্যালকুলেটর ব্যবহার করা যাবে না।',
-    examLink: 'http://sonalibank.com.bd'
+    examLink: 'http://sonalibank.com.bd',
+    examResult: 'https://sonalibank.com.bd/careers/results_senior_officer.pdf'
   },
   {
     id: 'job-3',

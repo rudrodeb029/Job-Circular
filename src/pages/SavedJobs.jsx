@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Bookmark, Globe, Search, Download } from '../components/Icons';
+import { Bookmark, Globe, Search, Download, FileText } from '../components/Icons';
 import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
 import SearchBar from '../components/SearchBar';
@@ -55,17 +55,18 @@ const orgIconsMap = {
   'স্বপ্ন সুপার শপ': '🛒'
 };
 
-const tabs = [
-  { id: 'all', label: 'All' },
-  { id: 'applied', label: 'Applied' },
-  { id: 'exam_date', label: 'Exam Date' }
-];
-
 export default function SavedJobs() {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  const tabs = [
+    { id: 'all', label: state.language === 'en' ? 'All' : 'সব' },
+    { id: 'applied', label: state.language === 'en' ? 'Applied' : 'আবেদনকৃত' },
+    { id: 'exam_date', label: state.language === 'en' ? 'Exam Date' : 'পরীক্ষার তারিখ' },
+    { id: 'result', label: state.language === 'en' ? 'Result' : 'ফলাফল' }
+  ];
 
   // Load jobs from localStorage if present (to reflect admin updates), fallback to static jobs data
   const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
@@ -75,7 +76,8 @@ export default function SavedJobs() {
   const filteredJobs = savedJobList.filter(job => {
     const isApplied = state.appliedJobs.includes(job.id);
     const matchesTab = activeTab === 'applied' ? isApplied :
-                       activeTab === 'exam_date' ? !!job.examDate : true;
+                       activeTab === 'exam_date' ? !!job.examDate :
+                       activeTab === 'result' ? !!job.examResult : true;
     
     if (!matchesTab) return false;
 
@@ -117,6 +119,106 @@ export default function SavedJobs() {
         {filteredJobs.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {filteredJobs.map(job => {
+              if (activeTab === 'result') {
+                const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
+                const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
+
+                return (
+                  <div 
+                    key={job.id} 
+                    className="card animate-fade-in" 
+                    onClick={() => navigate(`/exam-details/${job.id}`)}
+                    style={{ 
+                      padding: 'var(--space-md)', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '12px',
+                      position: 'relative',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {/* Job Header */}
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                      <div style={{
+                        width: '44px',
+                        height: '44px',
+                        borderRadius: '10px',
+                        background: styleConfig.bg,
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        boxShadow: `0 4px 10px ${styleConfig.shadow || 'rgba(0,0,0,0.05)'}`
+                      }}>
+                        {displayIcon}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>
+                          {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
+                        </h4>
+                        <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
+                          {state.language === 'en' ? (job.titleEn || job.title) : job.title}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Result details section */}
+                    <div style={{
+                      background: 'var(--bg-secondary)',
+                      borderRadius: '12px',
+                      padding: '12px',
+                      border: '1px solid var(--border-light)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+                        <span style={{ 
+                            fontSize: '12px', 
+                            fontWeight: 700, 
+                            color: '#7e22ce', 
+                            background: '#f3e8ff', 
+                            padding: '4px 10px', 
+                            borderRadius: '20px',
+                            display: 'inline-flex', 
+                            alignItems: 'center', 
+                            gap: '4px' 
+                          }}>
+                          🏆 {state.language === 'en' ? 'Result Published' : 'পরীক্ষার ফলাফল প্রকাশিত'}
+                        </span>
+                        
+                        {job.examResult && (
+                          <a 
+                            href={job.examResult} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            title="View Result PDF"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ 
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                              color: '#ffffff',
+                              textDecoration: 'none',
+                              boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
+                              transition: 'all 0.2s ease',
+                              flexShrink: 0
+                            }}
+                          >
+                            <FileText size={16} color="#ffffff" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
               if (activeTab === 'exam_date') {
                 const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
                 const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
@@ -227,7 +329,9 @@ export default function SavedJobs() {
                 ? "No Matching Jobs Found" 
                 : activeTab === 'exam_date' 
                   ? "No Exam Dates Available" 
-                  : "No Saved Jobs"
+                  : activeTab === 'result'
+                    ? "No Results Available"
+                    : "No Saved Jobs"
             }
             description={searchQuery ? `No saved jobs match "${searchQuery}"` : undefined}
             actionText={searchQuery ? "Clear Search" : "Explore Jobs"}
