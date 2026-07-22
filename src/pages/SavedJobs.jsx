@@ -300,7 +300,7 @@ export default function SavedJobs() {
                   </div>
                 );
               }
-              return <JobCard key={job.id} job={job} />;
+              return <JobCard key={job.id} job={job} isAppliedView={activeTab === 'applied'} />;
             })}
           </div>
         ) : (

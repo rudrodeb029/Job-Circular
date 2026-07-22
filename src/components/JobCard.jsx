@@ -100,7 +100,7 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-export default function JobCard({ job, showBookmark = true, showIcon = false }) {
+export default function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = false }) {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
 
@@ -189,13 +189,34 @@ export default function JobCard({ job, showBookmark = true, showIcon = false }) 
       </div>
 
       {showBookmark && (
-        <button
-          className={`job-card-bookmark ${isSaved ? 'saved' : ''}`}
-          onClick={handleBookmark}
-          aria-label="Bookmark job"
-        >
-          {isSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
-        </button>
+        isAppliedView ? (
+          <div
+            style={{
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: '#d1fae5',
+              color: '#059669',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              boxShadow: '0 2px 6px rgba(16, 185, 129, 0.15)',
+              marginRight: '6px'
+            }}
+            title="Applied"
+          >
+            <span style={{ fontSize: '15px', fontWeight: 800 }}>✓</span>
+          </div>
+        ) : (
+          <button
+            className={`job-card-bookmark ${isSaved ? 'saved' : ''}`}
+            onClick={handleBookmark}
+            aria-label="Bookmark job"
+          >
+            {isSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
+          </button>
+        )
       )}
     </div>
   );
