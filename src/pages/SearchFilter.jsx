@@ -47,8 +47,10 @@ export default function SearchFilter() {
     setActiveTab('all');
   };
 
+  const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+
   const filteredJobs = useMemo(() => {
-    return jobs.filter(job => {
+    return localJobs.filter(job => {
       // Query filter
       if (query) {
         const q = query.toLowerCase();

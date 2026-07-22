@@ -142,6 +142,7 @@ export default function ManageJobs() {
         `${jobData.organization}-এ "${jobData.title}" পদের বিজ্ঞপ্তিটি বিস্তারিত দেখুন।`
       );
     }
+    window.dispatchEvent(new Event('jobs_updated'));
     handleCloseModal();
   };
 
@@ -159,6 +160,7 @@ export default function ManageJobs() {
         payload: { id: `act_${Date.now()}`, action: 'Deleted circular', target: jobToDelete ? jobToDelete.title : 'Unknown', time: 'Just now' } 
       });
       showToast('Circular deleted successfully!');
+      window.dispatchEvent(new Event('jobs_updated'));
       setShowDeleteConfirm(false);
       setDeletingJobId(null);
     }
@@ -169,6 +171,7 @@ export default function ManageJobs() {
     const updatedJob = { ...job, status: newStatus };
     dispatch({ type: 'UPDATE_JOB', payload: updatedJob });
     showToast(`Circular status changed to ${newStatus}`);
+    window.dispatchEvent(new Event('jobs_updated'));
   };
 
   const filterBtnStyle = (isActive) => ({

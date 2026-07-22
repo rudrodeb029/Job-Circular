@@ -14,11 +14,30 @@ import Disclaimer from '../components/Disclaimer';
 export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
-  const [loading, setLoading] = useState(true);
+  const [localJobs, setLocalJobs] = useState(() => {
+    return JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+  });
 
   useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (!e || e.key === 'admin_jobs') {
+        const loadedJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+        setLocalJobs(loadedJobs);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('jobs_updated', handleStorageChange);
+
+    // Initial load
+    handleStorageChange();
+
     const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('jobs_updated', handleStorageChange);
+    };
   }, []);
 
   if (loading) {
@@ -29,9 +48,6 @@ export default function Home() {
       </div>
     );
   }
-
-  // Load jobs from localStorage if present (to reflect admin updates), fallback to static jobs data
-  const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
 
   const displayCategories = categories.slice(0, 3);
   const latestJobs = localJobs.slice(0, 20);
