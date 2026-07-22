@@ -131,10 +131,9 @@ export default function JobDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: '4px' }}>{job.title}</h2>
-          <p className="text-secondary" style={{ fontSize: 'var(--text-sm)', marginBottom: 'var(--space-md)' }}>
-            {job.organization}
-          </p>
+          <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, marginBottom: 'var(--space-md)' }}>
+            {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
+          </h2>
 
           {/* Chips Row: Job Type + Deadline Badge */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
