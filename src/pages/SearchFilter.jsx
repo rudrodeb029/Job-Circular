@@ -7,20 +7,31 @@ import BottomNav from '../components/BottomNav';
 import EmptyState from '../components/EmptyState';
 import { Search } from '../components/Icons';
 import { jobs } from '../data/jobs';
-
-const typeTabs = [
-  { id: 'all', label: 'All' },
-  { id: 'gov', label: 'Government' },
-  { id: 'bank', label: 'Bank' },
-  { id: 'ngo', label: 'NGO' }
-];
+import { categories } from '../data/categories';
+import { useAppContext } from '../context/AppContext';
 
 export default function SearchFilter() {
+  const { state } = useAppContext();
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || '';
 
   const [query, setQuery] = useState('');
   const [activeTab, setActiveTab] = useState('all');
+
+  const typeTabs = useMemo(() => {
+    const isEn = state.language === 'en';
+    const list = [
+      { id: 'all', label: isEn ? 'All' : 'সব' }
+    ];
+    categories.forEach(cat => {
+      let label = isEn ? (cat.nameEn || '') : cat.name;
+      if (isEn && label.endsWith(' Jobs')) {
+        label = label.replace(' Jobs', '');
+      }
+      list.push({ id: cat.id, label });
+    });
+    return list;
+  }, [state.language]);
   const [showFilter, setShowFilter] = useState(false);
 
   const [filters, setFilters] = useState({
