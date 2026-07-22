@@ -130,12 +130,9 @@ export default function ResultDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>
+           <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0' }}>
             {orgName}
           </h2>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-            {postName}
-          </p>
         </div>
 
         {/* Results Info Panel */}
