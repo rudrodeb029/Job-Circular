@@ -240,31 +240,31 @@ export default function AppHeader() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
               <Link to="/home" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Home size={20} /></div>
-                <span className="menu-item-label">Home</span>
+                <span className="menu-item-label">{state.language === 'en' ? 'Home' : 'হোম'}</span>
               </Link>
               <Link to="/categories" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><LayoutGrid size={20} /></div>
-                <span className="menu-item-label">Categories</span>
+                <span className="menu-item-label">{state.language === 'en' ? 'Categories' : 'ক্যাটাগরি'}</span>
               </Link>
               <Link to="/saved" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Bookmark size={20} /></div>
-                <span className="menu-item-label">Saved Jobs</span>
+                <span className="menu-item-label">{state.language === 'en' ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
               </Link>
               <Link to="/admit-card" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><FileText size={20} /></div>
-                <span className="menu-item-label">Admit Card & Result</span>
+                <span className="menu-item-label">{state.language === 'en' ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
               </Link>
               <Link to="/notifications" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Bell size={20} /></div>
-                <span className="menu-item-label">Notifications</span>
+                <span className="menu-item-label">{state.language === 'en' ? 'Notifications' : 'নোটিফিকেশন'}</span>
               </Link>
               <Link to="/profile" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><User size={20} /></div>
-                <span className="menu-item-label">Profile</span>
+                <span className="menu-item-label">{state.language === 'en' ? 'Profile' : 'প্রোফাইল'}</span>
               </Link>
               <Link to="/settings" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Settings size={20} /></div>
-                <span className="menu-item-label">Settings</span>
+                <span className="menu-item-label">{state.language === 'en' ? 'Settings' : 'সেটিংস'}</span>
               </Link>
             </div>
 
@@ -278,7 +278,9 @@ export default function AppHeader() {
               borderRadius: '12px',
               marginTop: 'auto'
             }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>Dark Mode</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
+                {state.language === 'en' ? 'Dark Mode' : 'ডার্ক মোড'}
+              </span>
               <button onClick={() => dispatch({ type: 'TOGGLE_THEME' })} style={{ color: 'var(--primary)', border: 'none', background: 'transparent' }}>
                 {state.theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>

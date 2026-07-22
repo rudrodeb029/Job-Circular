@@ -8,19 +8,21 @@ const BottomNav = () => {
   const { state } = useAppContext();
   const unreadCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
 
+  const isEn = state.language === 'en';
+
   return (
     <nav className="bottom-nav">
       <NavLink to="/home" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <Home size={22} />
-        <span>Home</span>
+        <span>{isEn ? 'Home' : 'হোম'}</span>
       </NavLink>
       <NavLink to="/categories" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <LayoutGrid size={22} />
-        <span>Categories</span>
+        <span>{isEn ? 'Categories' : 'ক্যাটাগরি'}</span>
       </NavLink>
       <NavLink to="/saved" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <Bookmark size={22} />
-        <span>Saved</span>
+        <span>{isEn ? 'Saved' : 'সংরক্ষিত'}</span>
       </NavLink>
       <NavLink to="/notifications" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <div style={{ position: 'relative' }}>
@@ -50,11 +52,11 @@ const BottomNav = () => {
             </span>
           )}
         </div>
-        <span>Notify</span>
+        <span>{isEn ? 'Notify' : 'নোটিফিকেশন'}</span>
       </NavLink>
       <NavLink to="/profile" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <User size={22} />
-        <span>Profile</span>
+        <span>{isEn ? 'Profile' : 'প্রোফাইল'}</span>
       </NavLink>
     </nav>
   );
