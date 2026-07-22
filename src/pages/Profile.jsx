@@ -5,9 +5,17 @@ import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
 import EditProfileModal from '../components/EditProfileModal';
 
+const toBengaliNumber = (num) => {
+  if (num === undefined || num === null) return '';
+  const engNum = String(num);
+  const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+  return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
+
 export default function Profile() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+  const isEn = state.language === 'en';
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const toggleLanguage = () => {
@@ -181,10 +189,10 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)' }}>
-              {state.savedJobs.length}
+              {isEn ? state.savedJobs.length : toBengaliNumber(state.savedJobs.length)}
             </p>
             <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-              Saved Jobs
+              {isEn ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}
             </p>
           </div>
           <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
@@ -193,10 +201,10 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669' }}>
-              {state.appliedJobs.length}
+              {isEn ? state.appliedJobs.length : toBengaliNumber(state.appliedJobs.length)}
             </p>
             <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-              Applied
+              {isEn ? 'Applied' : 'আবেদনকৃত'}
             </p>
           </div>
           <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
@@ -205,10 +213,10 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c' }}>
-              {state.readNotifications.length}
+              {isEn ? state.readNotifications.length : toBengaliNumber(state.readNotifications.length)}
             </p>
             <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-              Notified
+              {isEn ? 'Notified' : 'নোটিফিকেশন'}
             </p>
           </div>
         </div>
@@ -220,7 +228,7 @@ export default function Profile() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
             <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
             <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.1px' }}>
-              Account & Activity
+              {isEn ? 'Account & Activity' : 'অ্যাকাউন্ট এবং কার্যক্রম'}
             </h3>
           </div>
 
@@ -240,7 +248,7 @@ export default function Profile() {
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', color: 'white' }}>
                 <Edit size={15} />
               </div>
-              <span className="menu-item-label">Edit Profile</span>
+              <span className="menu-item-label">{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
@@ -249,7 +257,7 @@ export default function Profile() {
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: 'white' }}>
                 <Bookmark size={15} />
               </div>
-              <span className="menu-item-label">Saved Jobs</span>
+              <span className="menu-item-label">{isEn ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
@@ -258,7 +266,7 @@ export default function Profile() {
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #059669, #10b981)', color: 'white' }}>
                 <Briefcase size={15} />
               </div>
-              <span className="menu-item-label">Applied Jobs</span>
+              <span className="menu-item-label">{isEn ? 'Applied Jobs' : 'আবেদনকৃত চাকরি'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
@@ -267,7 +275,7 @@ export default function Profile() {
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', color: 'white' }}>
                 <FileText size={15} />
               </div>
-              <span className="menu-item-label">Admit Card & Result</span>
+              <span className="menu-item-label">{isEn ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
           </div>
@@ -278,7 +286,7 @@ export default function Profile() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
             <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
             <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.1px' }}>
-              Preferences & System
+              {isEn ? 'Preferences & System' : 'পছন্দ এবং সিস্টেম'}
             </h3>
           </div>
 
@@ -294,7 +302,7 @@ export default function Profile() {
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)', color: 'white' }}>
                 <Bell size={15} />
               </div>
-              <span className="menu-item-label">Notification Settings</span>
+              <span className="menu-item-label">{isEn ? 'Notification Settings' : 'নোটিফিকেশন সেটিংস'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
@@ -303,7 +311,7 @@ export default function Profile() {
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #db2777, #ec4899)', color: 'white' }}>
                 <Globe size={15} />
               </div>
-              <span className="menu-item-label">App Language</span>
+              <span className="menu-item-label">{isEn ? 'App Language' : 'অ্যাপের ভাষা'}</span>
               <span style={{
                 fontSize: '10px',
                 fontWeight: 800,
@@ -323,7 +331,7 @@ export default function Profile() {
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white' }}>
                 {state.theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
               </div>
-              <span className="menu-item-label">Dark Mode</span>
+              <span className="menu-item-label">{isEn ? 'Dark Mode' : 'ডার্ক মোড'}</span>
               <div className={`toggle ${state.theme === 'dark' ? 'active' : ''}`}></div>
             </div>
           </div>
