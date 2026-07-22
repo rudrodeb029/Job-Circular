@@ -9,6 +9,7 @@ const notifTypeConfig = {
     shadow: 'rgba(26, 86, 219, 0.25)',
     icon: Briefcase,
     label: 'নতুন সার্কুলার',
+    labelEn: 'New Circular',
     chipBg: '#dbeafe',
     chipColor: '#1d4ed8'
   },
@@ -17,6 +18,7 @@ const notifTypeConfig = {
     shadow: 'rgba(217, 119, 6, 0.25)',
     icon: Clock,
     label: 'ডেডলাইন',
+    labelEn: 'Deadline',
     chipBg: '#fef3c7',
     chipColor: '#b45309'
   },
@@ -25,6 +27,7 @@ const notifTypeConfig = {
     shadow: 'rgba(124, 58, 237, 0.25)',
     icon: FileText,
     label: 'অ্যাডমিট কার্ড',
+    labelEn: 'Admit Card',
     chipBg: '#f3e8ff',
     chipColor: '#6b21a8'
   },
@@ -33,6 +36,7 @@ const notifTypeConfig = {
     shadow: 'rgba(5, 150, 105, 0.25)',
     icon: BookmarkCheck,
     label: 'ফলাফল',
+    labelEn: 'Result',
     chipBg: '#d1fae5',
     chipColor: '#047857'
   }
@@ -41,21 +45,28 @@ const notifTypeConfig = {
 export default function NotificationItem({ notification }) {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+  const isEn = state.language === 'en';
   const isRead = state.readNotifications.includes(notification.id);
 
   const handleClick = () => {
     dispatch({ type: 'MARK_NOTIFICATION_READ', payload: notification.id });
-    if (notification.jobId) {
+    if (notification.type === 'admit_card' && notification.jobId) {
+      navigate(`/exam-details/${notification.jobId}`);
+    } else if (notification.type === 'result' && notification.jobId) {
+      navigate(`/result-details/${notification.jobId}`);
+    } else if (notification.jobId) {
       navigate(`/job/${notification.jobId}`);
-    } else if (notification.type === 'admit_card' || notification.type === 'result') {
-      navigate('/admit-card');
     } else {
-      navigate('/job/job-1');
+      navigate('/all-circulars');
     }
   };
 
   const config = notifTypeConfig[notification.type] || notifTypeConfig.new_job;
   const IconComponent = config.icon;
+
+  const orgName = isEn ? (notification.organizationEn || notification.organization) : notification.organization;
+  const notifMessage = isEn ? (notification.messageEn || notification.message) : notification.message;
+  const notifTime = isEn ? (notification.timeEn || notification.time) : notification.time;
 
   return (
     <div
@@ -115,7 +126,7 @@ export default function NotificationItem({ notification }) {
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap'
           }}>
-            {notification.organization}
+            {orgName}
           </h4>
 
           {/* Category Chip Badge */}
@@ -129,7 +140,7 @@ export default function NotificationItem({ notification }) {
             whiteSpace: 'nowrap',
             flexShrink: 0
           }}>
-            {config.label}
+            {isEn ? config.labelEn : config.label}
           </span>
         </div>
 
@@ -143,12 +154,12 @@ export default function NotificationItem({ notification }) {
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden'
         }}>
-          {notification.message}
+          {notifMessage}
         </p>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
           <Clock size={12} />
-          <span>{notification.time}</span>
+          <span>{notifTime}</span>
         </div>
       </div>
 
