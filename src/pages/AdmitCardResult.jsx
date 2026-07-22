@@ -156,12 +156,12 @@ export default function AdmitCardResult() {
                       </div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-                      <a 
-                        href={item.downloadLink} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        title="Download Admit Card"
-                        onClick={(e) => e.stopPropagation()}
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/exam-details/${item.id}`);
+                        }}
+                        title="View Exam Details"
                         style={{ 
                           display: 'flex',
                           alignItems: 'center',
@@ -171,14 +171,14 @@ export default function AdmitCardResult() {
                           borderRadius: '50%',
                           background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                           color: '#ffffff',
-                          textDecoration: 'none',
                           boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
                           transition: 'all 0.2s ease',
+                          cursor: 'pointer',
                           flexShrink: 0
                         }}
                       >
                         <Download size={14} color="#ffffff" />
-                      </a>
+                      </div>
                     </div>
                   </div>
                 );
@@ -235,12 +235,12 @@ export default function AdmitCardResult() {
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-                    <a 
-                      href={item.downloadLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      title="View Result PDF"
-                      onClick={(e) => e.stopPropagation()}
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/result-details/${item.id}`);
+                      }}
+                      title="View Result Details"
                       style={{ 
                         display: 'flex',
                         alignItems: 'center',
@@ -250,14 +250,14 @@ export default function AdmitCardResult() {
                         borderRadius: '50%',
                         background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
                         color: '#ffffff',
-                        textDecoration: 'none',
                         boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
                         transition: 'all 0.2s ease',
+                        cursor: 'pointer',
                         flexShrink: 0
                       }}
                     >
                       <FileText size={14} color="#ffffff" />
-                    </a>
+                    </div>
                   </div>
                 </div>
               );

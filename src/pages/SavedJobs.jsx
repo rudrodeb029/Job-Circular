@@ -186,31 +186,29 @@ export default function SavedJobs() {
                     </div>
 
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-                      {job.examResult && (
-                        <a 
-                          href={job.examResult} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          title="View Result PDF"
-                          onClick={(e) => e.stopPropagation()}
-                          style={{ 
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '28px',
-                            height: '28px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
-                            color: '#ffffff',
-                            textDecoration: 'none',
-                            boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
-                            transition: 'all 0.2s ease',
-                            flexShrink: 0
-                          }}
-                        >
-                          <FileText size={14} color="#ffffff" />
-                        </a>
-                      )}
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/result-details/${job.id}`);
+                        }}
+                        title="View Result Details"
+                        style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                          color: '#ffffff',
+                          boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
+                          transition: 'all 0.2s ease',
+                          cursor: 'pointer',
+                          flexShrink: 0
+                        }}
+                      >
+                        <FileText size={14} color="#ffffff" />
+                      </div>
                     </div>
                   </div>
                 );
@@ -277,31 +275,29 @@ export default function SavedJobs() {
                     </div>
 
                     <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
-                      {(job.examLink || job.applyLink) && (
-                        <a 
-                          href={job.examLink || job.applyLink} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          title="Download Admit Card"
-                          onClick={(e) => e.stopPropagation()}
-                          style={{ 
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            width: '28px',
-                            height: '28px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                            color: '#ffffff',
-                            textDecoration: 'none',
-                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-                            transition: 'all 0.2s ease',
-                            flexShrink: 0
-                          }}
-                        >
-                          <Download size={14} color="#ffffff" />
-                        </a>
-                      )}
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/exam-details/${job.id}`);
+                        }}
+                        title="View Exam Details"
+                        style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: '#ffffff',
+                          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                          transition: 'all 0.2s ease',
+                          cursor: 'pointer',
+                          flexShrink: 0
+                        }}
+                      >
+                        <Download size={14} color="#ffffff" />
+                      </div>
                     </div>
                   </div>
                 );
