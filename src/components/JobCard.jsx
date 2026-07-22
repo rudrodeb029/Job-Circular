@@ -146,7 +146,10 @@ export default function JobCard({ job, showBookmark = true, showIcon = false }) 
       )}
 
       <div className="job-card-content">
-        <h4 className="job-card-title">{orgName}</h4>
+        <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+          <span>{orgName}</span>
+        </h4>
         <p className="job-card-org" style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
