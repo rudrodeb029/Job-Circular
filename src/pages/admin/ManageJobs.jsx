@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
+import { triggerLocalNotification } from '../../utils/notifications';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -136,6 +137,10 @@ export default function ManageJobs() {
         payload: { id: `act_${Date.now()}`, action: 'Added new circular', target: jobData.title, time: 'Just now' } 
       });
       showToast('New circular added successfully!');
+      triggerLocalNotification(
+        'নতুন চাকুরির বিজ্ঞপ্তি! 🚀',
+        `${jobData.organization}-এ "${jobData.title}" পদের বিজ্ঞপ্তিটি বিস্তারিত দেখুন।`
+      );
     }
     handleCloseModal();
   };
