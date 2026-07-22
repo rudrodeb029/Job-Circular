@@ -11,9 +11,17 @@ import { jobs } from '../data/jobs';
 import { categories } from '../data/categories';
 import Disclaimer from '../components/Disclaimer';
 
+const toBengaliNumber = (num) => {
+  if (num === undefined || num === null) return '';
+  const engNum = String(num);
+  const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+  return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
+  const isEn = state.language === 'en';
   const [loading, setLoading] = useState(true);
   const [localJobs, setLocalJobs] = useState(() => {
     try {
@@ -78,13 +86,19 @@ export default function Home() {
         <div className="stats-card mb-lg">
           <div className="stats-card-row">
             <div>
-              <p className="stats-label">Total Active Circulars</p>
-              <p className="stats-number">{(12450 + (localJobs.length - jobs.length)).toLocaleString()}+</p>
+              <p className="stats-label">{isEn ? 'Total Active Circulars' : 'মোট সক্রিয় সার্কুলার'}</p>
+              <p className="stats-number">
+                {isEn 
+                  ? (12450 + (localJobs.length - jobs.length)).toLocaleString() 
+                  : toBengaliNumber((12450 + (localJobs.length - jobs.length)).toLocaleString())}+
+              </p>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <span className="stats-badge">This Week</span>
-              <p style={{ fontSize: 'var(--text-xl)', fontWeight: 800, marginTop: '4px' }}>
-                +{(320 + localJobs.filter(job => job.id.includes('_')).length).toLocaleString()}
+              <span className="stats-badge">{isEn ? 'This Week' : 'এই সপ্তাহে'}</span>
+              <p style={{ fontSize: '15px', fontWeight: 800, marginTop: '4px' }}>
+                +{isEn 
+                  ? (320 + localJobs.filter(job => job.id.includes('_')).length).toLocaleString() 
+                  : toBengaliNumber((320 + localJobs.filter(job => job.id.includes('_')).length).toLocaleString())}
               </p>
             </div>
           </div>
@@ -93,8 +107,8 @@ export default function Home() {
         {/* Categories */}
         <div className="mb-lg">
           <div className="section-header">
-            <h3 className="section-title">Categories</h3>
-            <Link to="/categories" className="section-link">See All</Link>
+            <h3 className="section-title">{isEn ? 'Categories' : 'ক্যাটাগরি'}</h3>
+            <Link to="/categories" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
           </div>
           <div className="category-grid">
             {displayCategories.map(cat => (
@@ -116,7 +130,7 @@ export default function Home() {
               <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)' }}>
                 <LayoutGrid size={24} color="var(--text-secondary)" />
               </div>
-              <span className="category-grid-label">More</span>
+              <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
             </div>
           </div>
         </div>
@@ -124,8 +138,8 @@ export default function Home() {
         {/* Latest Jobs */}
         <div>
           <div className="section-header">
-            <h3 className="section-title">Latest Job Circulars</h3>
-            <Link to="/search" className="section-link">See All</Link>
+            <h3 className="section-title">{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
+            <Link to="/search" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {latestJobs.map(job => (
