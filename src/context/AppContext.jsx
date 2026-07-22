@@ -18,7 +18,7 @@ const initialState = {
   appliedJobs: JSON.parse(localStorage.getItem('appliedJobs')) || [],
   readNotifications: JSON.parse(localStorage.getItem('readNotifications')) || [],
   theme: localStorage.getItem('theme') || 'light',
-  language: localStorage.getItem('language') || 'bn',
+  language: localStorage.getItem('language') || 'bn', // Default app language is Bengali (bn)
   hasSeenOnboarding: JSON.parse(localStorage.getItem('hasSeenOnboarding')) || false,
   searchQuery: '',
   activeFilters: {
