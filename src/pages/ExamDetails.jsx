@@ -196,7 +196,7 @@ export default function ExamDetails() {
                 whiteSpace: 'nowrap'
               }}
             >
-              <Download size={15} /> Download Notice
+              <Download size={15} /> Notice
             </a>
 
             <button
@@ -221,7 +221,7 @@ export default function ExamDetails() {
               }}
             >
               <Download size={15} color="#ffffff" />
-              Download Admit Card
+              Admit Card
             </button>
           </div>
         </div>
