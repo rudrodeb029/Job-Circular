@@ -103,7 +103,7 @@ export const notifications = [
 
 export const admitCardsAndResults = [
   {
-    id: 'item-1',
+    id: 'job-2',
     examName: 'অফিসার (ক্যাশ) প্রিলিমিনারি পরীক্ষা',
     examNameEn: 'Officer (Cash) Preliminary Exam',
     organization: 'সোনালী ব্যাংক লিমিটেড',
@@ -116,7 +116,7 @@ export const admitCardsAndResults = [
     downloadLink: '#'
   },
   {
-    id: 'item-2',
+    id: 'job-3',
     examName: 'কনস্টেবল নিয়োগ লিখিত পরীক্ষার ফলাফল',
     examNameEn: 'Constable Recruitment Written Exam Result',
     organization: 'বাংলাদেশ পুলিশ',
@@ -129,11 +129,11 @@ export const admitCardsAndResults = [
     downloadLink: '#'
   },
   {
-    id: 'item-3',
-    examName: 'সহকারী শিক্ষক পদের ভাইভা পরীক্ষা',
-    examNameEn: 'Assistant Teacher Viva Exam',
-    organization: 'প্রাথমিক শিক্ষা অধিদপ্তর',
-    organizationEn: 'Directorate of Primary Education',
+    id: 'job-1',
+    examName: 'অফিস সহায়ক পদের ভাইভা পরীক্ষা',
+    examNameEn: 'Office Assistant Viva Exam',
+    organization: 'শিক্ষা মন্ত্রণালয়',
+    organizationEn: 'Ministry of Education',
     type: 'admit_card',
     status: 'অ্যাডমিট কার্ড পাওয়া যাচ্ছে',
     statusEn: 'Admit Card Available',
@@ -142,11 +142,11 @@ export const admitCardsAndResults = [
     downloadLink: '#'
   },
   {
-    id: 'item-4',
-    examName: 'প্রবেশনারি অফিসার প্রিলিমিনারি রেজাল্ট',
-    examNameEn: 'Probationary Officer Preliminary Result',
-    organization: 'ইসলামী ব্যাংক বাংলাদেশ',
-    organizationEn: 'Islami Bank Bangladesh',
+    id: 'job-7',
+    examName: 'ক্যাশ অফিসার প্রিলিমিনারি রেজাল্ট',
+    examNameEn: 'Cash Officer Preliminary Result',
+    organization: 'ইসলামী ব্যাংক',
+    organizationEn: 'Islami Bank',
     type: 'result',
     status: 'ফলাফল প্রকাশিত',
     statusEn: 'Result Published',
@@ -155,11 +155,11 @@ export const admitCardsAndResults = [
     downloadLink: '#'
   },
   {
-    id: 'item-5',
-    examName: 'স্টাফ নার্স পদের নিয়োগ পরীক্ষার ফলাফল',
-    examNameEn: 'Staff Nurse Recruitment Exam Result',
+    id: 'job-10',
+    examName: 'সিনিয়র স্টাফ নার্স পদের নিয়োগ পরীক্ষার ফলাফল',
+    examNameEn: 'Senior Staff Nurse Exam Result',
     organization: 'স্বাস্থ্য অধিদপ্তর',
-    organizationEn: 'Directorate General of Health Services',
+    organizationEn: 'Health Directorate',
     type: 'result',
     status: 'ফলাফল প্রকাশিত',
     statusEn: 'Result Published',
