@@ -4,6 +4,7 @@ import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, 
 import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
 import EditProfileModal from '../components/EditProfileModal';
+import { notifications } from '../data/notifications';
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -17,6 +18,8 @@ export default function Profile() {
   const { state, dispatch } = useAppContext();
   const isEn = state.language === 'en';
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const unreadNotifCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
 
   const toggleLanguage = () => {
     const nextLang = state.language === 'bn' ? 'en' : 'bn';
@@ -213,7 +216,7 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c' }}>
-              {state.readNotifications.length}
+              {unreadNotifCount}
             </p>
             <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               Notified
