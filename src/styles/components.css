@@ -652,8 +652,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 12px 6px;
+  gap: 4px;
+  padding: 10px 4px;
   background: var(--white);
   border-radius: var(--radius-xl);
   border: 1px solid rgba(226, 232, 240, 0.8);
@@ -678,11 +678,13 @@
   box-shadow: 0 3px 8px rgba(0,0,0,0.05);
 }
 .category-grid-label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 9.5px;
+  font-weight: 700;
   text-align: center;
   color: var(--text-primary);
-  line-height: 1.2;
+  line-height: 1.25;
+  letter-spacing: -0.2px;
+  max-width: 100%;
 }
 
 /* Admit Card / Result Item Card */
