@@ -100,7 +100,7 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-export default function JobCard({ job, showBookmark = true }) {
+export default function JobCard({ job, showBookmark = true, showIcon = false }) {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
 
@@ -124,24 +124,26 @@ export default function JobCard({ job, showBookmark = true }) {
   return (
     <div className="job-card" onClick={() => navigate(`/job/${job.id}`)}>
       {/* Modern Glossy 3D Gradient Icon Tile */}
-      <div
-        className="job-card-icon"
-        style={{
-          background: styleConfig.bg,
-          color: 'white',
-          fontSize: '15px',
-          boxShadow: `0 4px 12px ${styleConfig.shadow}`,
-          borderRadius: '8px',
-          width: '32px',
-          height: '32px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0
-        }}
-      >
-        {displayIcon}
-      </div>
+      {showIcon && (
+        <div
+          className="job-card-icon"
+          style={{
+            background: styleConfig.bg,
+            color: 'white',
+            fontSize: '15px',
+            boxShadow: `0 4px 12px ${styleConfig.shadow}`,
+            borderRadius: '8px',
+            width: '32px',
+            height: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
+        >
+          {displayIcon}
+        </div>
+      )}
 
       <div className="job-card-content">
         <h4 className="job-card-title">{orgName}</h4>
