@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Shield, FileText, Share2, Star, Mail, Info, ChevronRight, X } from '../components/Icons';
 import BottomNav from '../components/BottomNav';
 import EditProfileModal from '../components/EditProfileModal';
+import Disclaimer from '../components/Disclaimer';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -508,6 +509,7 @@ export default function Settings() {
                     <li>Built-in candidate profile management</li>
                   </ul>
                 </div>
+                <Disclaimer />
               </div>
             </div>
           </div>

@@ -134,37 +134,32 @@ export default function SavedJobs() {
                           }}>
                           🎉 Exam Date Published
                         </span>
-                        <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)' }}>
-                          📅 {job.examDate}
-                        </span>
+                        
+                        {(job.examLink || job.applyLink) && (
+                          <a 
+                            href={job.examLink || job.applyLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            title="Download Admit Card"
+                            style={{ 
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                              color: '#ffffff',
+                              textDecoration: 'none',
+                              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                              transition: 'all 0.2s ease',
+                              flexShrink: 0
+                            }}
+                          >
+                            <Download size={16} color="#ffffff" />
+                          </a>
+                        )}
                       </div>
-                      {(job.examLink || job.applyLink) && (
-                        <a 
-                          href={job.examLink || job.applyLink} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          style={{ 
-                            fontSize: '12px', 
-                            color: '#ffffff', 
-                            fontWeight: 700,
-                            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                            padding: '10px 16px',
-                            borderRadius: '12px',
-                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '6px',
-                            textDecoration: 'none',
-                            transition: 'all 0.2s ease',
-                            width: '100%',
-                            boxSizing: 'border-box'
-                          }}
-                        >
-                          <Download size={15} color="#ffffff" />
-                          <span>Download Admit Card</span>
-                        </a>
-                      )}
                     </div>
                   </div>
                 );

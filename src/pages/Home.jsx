@@ -9,6 +9,7 @@ import SearchBar from '../components/SearchBar';
 import { HomeSkeleton } from '../components/SkeletonLoader';
 import { jobs } from '../data/jobs';
 import { categories } from '../data/categories';
+import Disclaimer from '../components/Disclaimer';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -104,6 +105,7 @@ export default function Home() {
             ))}
           </div>
         </div>
+        <Disclaimer />
       </div>
       <BottomNav />
     </div>

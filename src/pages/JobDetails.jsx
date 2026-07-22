@@ -4,6 +4,7 @@ import { ArrowLeft, Bookmark, BookmarkCheck, Calendar, Briefcase, Eye, Download 
 import { useAppContext } from '../context/AppContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
+import BottomNav from '../components/BottomNav';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
@@ -335,57 +336,57 @@ export default function JobDetails() {
             </div>
           )}
 
-          {/* Download Button for Active Circular Image */}
-          <a
-            href={circularImages[activeImageIndex]}
-            download={`${job.title || 'Job'}_Circular_Notice_Page_${activeImageIndex + 1}.png`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              padding: '12px 16px',
-              marginTop: '14px',
-              borderRadius: '12px',
-              background: 'var(--primary-bg)',
-              color: 'var(--primary)',
-              fontWeight: 700,
-              fontSize: 'var(--text-sm)',
-              border: '1.5px solid #dbeafe',
-              textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            <Download size={18} /> Download Notice {circularImages.length > 1 ? `(Page ${activeImageIndex + 1})` : ''}
-          </a>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+            <a
+              href={circularImages[activeImageIndex]}
+              download={`${job.title || 'Job'}_Circular_Notice_Page_${activeImageIndex + 1}.png`}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '12px 10px',
+                borderRadius: '12px',
+                background: 'var(--primary-bg)',
+                color: 'var(--primary)',
+                fontWeight: 700,
+                fontSize: '13px',
+                border: '1.5px solid #dbeafe',
+                textDecoration: 'none',
+                boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
+                transition: 'all 0.2s ease',
+                textAlign: 'center'
+              }}
+            >
+              <Download size={16} /> Notice {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
+            </a>
+
+            <button
+              onClick={handleOfficialApply}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '12px 10px',
+                borderRadius: '12px',
+                background: isApplied ? '#059669' : 'var(--primary)',
+                color: '#fff',
+                fontWeight: 700,
+                fontSize: '14px',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {isApplied ? "✓ Applied" : "Apply Now"}
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* Sticky Bottom Apply Action Bar */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: 'var(--white)',
-        padding: '12px 16px calc(12px + var(--safe-area-bottom))',
-        borderTop: '1px solid var(--border-light)',
-        zIndex: 90,
-        maxWidth: '430px',
-        margin: '0 auto'
-      }}>
-        <button
-          className="btn btn-primary btn-block btn-lg"
-          onClick={handleOfficialApply}
-          style={{
-            background: isApplied ? '#059669' : 'var(--primary)',
-            boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)'
-          }}
-        >
-          {isApplied ? "✓ Applied" : "Apply Now"}
-        </button>
-      </div>
+      <BottomNav />
     </div>
   );
 }
