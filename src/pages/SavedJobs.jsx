@@ -143,7 +143,7 @@ export default function SavedJobs() {
                   <div 
                     key={job.id} 
                     className="job-card" 
-                    onClick={() => navigate(`/exam-details/${job.id}`)}
+                    onClick={() => navigate(`/result-details/${job.id}`)}
                   >
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>

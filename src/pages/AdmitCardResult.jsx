@@ -157,7 +157,7 @@ export default function AdmitCardResult() {
                 <div 
                   key={item.id} 
                   className="job-card animate-fade-in" 
-                  onClick={() => navigate(`/exam-details/${item.id}`)}
+                  onClick={() => navigate(`/result-details/${item.id}`)}
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="job-card-content">

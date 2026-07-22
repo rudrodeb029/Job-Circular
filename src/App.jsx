@@ -11,6 +11,7 @@ import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
 import JobDetails from './pages/JobDetails'
 import ExamDetails from './pages/ExamDetails'
+import ResultDetails from './pages/ResultDetails'
 import Categories from './pages/Categories'
 import SearchFilter from './pages/SearchFilter'
 import SavedJobs from './pages/SavedJobs'
@@ -104,6 +105,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/job/:id" element={<JobDetails />} />
         <Route path="/exam-details/:id" element={<ExamDetails />} />
+        <Route path="/result-details/:id" element={<ResultDetails />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/search" element={<SearchFilter />} />
         <Route path="/saved" element={<SavedJobs />} />
