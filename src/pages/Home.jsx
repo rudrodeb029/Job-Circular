@@ -170,16 +170,15 @@ export default function Home() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 style={{
-                  padding: '10px 18px',
+                  padding: '10px 20px',
                   borderRadius: '12px',
-                  border: '1.5px solid var(--border-light)',
-                  background: currentPage === 1 ? 'var(--bg-secondary)' : 'var(--white)',
-                  color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text-primary)',
+                  border: 'none',
+                  background: currentPage === 1 ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                  color: currentPage === 1 ? '#94a3b8' : '#ffffff',
                   fontWeight: 700,
                   fontSize: '13px',
                   cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                  opacity: currentPage === 1 ? 0.6 : 1,
-                  boxShadow: currentPage === 1 ? 'none' : '0 2px 6px rgba(0,0,0,0.03)',
+                  boxShadow: currentPage === 1 ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
@@ -202,16 +201,15 @@ export default function Home() {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
                 style={{
-                  padding: '10px 18px',
+                  padding: '10px 20px',
                   borderRadius: '12px',
-                  border: '1.5px solid var(--border-light)',
-                  background: currentPage === totalPages ? 'var(--bg-secondary)' : 'var(--white)',
-                  color: currentPage === totalPages ? 'var(--text-muted)' : 'var(--text-primary)',
+                  border: 'none',
+                  background: currentPage === totalPages ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                  color: currentPage === totalPages ? '#94a3b8' : '#ffffff',
                   fontWeight: 700,
                   fontSize: '13px',
                   cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                  opacity: currentPage === totalPages ? 0.6 : 1,
-                  boxShadow: currentPage === totalPages ? 'none' : '0 2px 6px rgba(0,0,0,0.03)',
+                  boxShadow: currentPage === totalPages ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)',
                   transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
