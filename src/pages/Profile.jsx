@@ -189,10 +189,10 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)' }}>
-              {isEn ? state.savedJobs.length : toBengaliNumber(state.savedJobs.length)}
+              {state.savedJobs.length}
             </p>
             <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-              {isEn ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}
+              Saved Jobs
             </p>
           </div>
           <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
@@ -201,10 +201,10 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669' }}>
-              {isEn ? state.appliedJobs.length : toBengaliNumber(state.appliedJobs.length)}
+              {state.appliedJobs.length}
             </p>
             <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-              {isEn ? 'Applied' : 'আবেদনকৃত'}
+              Applied
             </p>
           </div>
           <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
@@ -213,10 +213,10 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c' }}>
-              {isEn ? state.readNotifications.length : toBengaliNumber(state.readNotifications.length)}
+              {state.readNotifications.length}
             </p>
             <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-              {isEn ? 'Notified' : 'নোটিফিকেশন'}
+              Notified
             </p>
           </div>
         </div>
