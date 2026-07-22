@@ -182,7 +182,7 @@ export default function ExamDetails() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '4px',
-                padding: '12px 6px',
+                padding: '10px 6px',
                 borderRadius: '12px',
                 background: 'var(--primary-bg)',
                 color: 'var(--primary)',
@@ -196,7 +196,7 @@ export default function ExamDetails() {
                 whiteSpace: 'nowrap'
               }}
             >
-              <Download size={15} /> Notice
+              <Download size={14} /> Notice
             </a>
 
             <button
@@ -207,7 +207,7 @@ export default function ExamDetails() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '4px',
-                padding: '12px 6px',
+                padding: '10px 6px',
                 borderRadius: '12px',
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                 color: '#fff',
@@ -220,7 +220,7 @@ export default function ExamDetails() {
                 whiteSpace: 'nowrap'
               }}
             >
-              <Download size={15} color="#ffffff" />
+              <Download size={14} color="#ffffff" />
               Admit Card
             </button>
           </div>

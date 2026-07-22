@@ -353,12 +353,12 @@ export default function JobDetails() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                padding: '12px 10px',
+                padding: '10px 10px',
                 borderRadius: '12px',
                 background: 'var(--primary-bg)',
                 color: 'var(--primary)',
                 fontWeight: 700,
-                fontSize: '13px',
+                fontSize: '12px',
                 border: '1.5px solid #dbeafe',
                 textDecoration: 'none',
                 boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
@@ -366,7 +366,7 @@ export default function JobDetails() {
                 textAlign: 'center'
               }}
             >
-              <Download size={16} /> Notice {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
+              <Download size={14} /> Notice {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
             </a>
 
             <button
@@ -376,12 +376,12 @@ export default function JobDetails() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: '12px 10px',
+                padding: '10px 10px',
                 borderRadius: '12px',
                 background: isApplied ? '#059669' : 'var(--primary)',
                 color: '#fff',
                 fontWeight: 700,
-                fontSize: '14px',
+                fontSize: '12px',
                 border: 'none',
                 cursor: 'pointer',
                 boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)',
