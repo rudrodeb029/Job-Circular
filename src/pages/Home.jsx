@@ -32,6 +32,7 @@ export default function Home() {
       return jobs;
     }
   });
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const handleStorageChange = (e) => {
@@ -65,7 +66,11 @@ export default function Home() {
   }
 
   const displayCategories = categories.slice(0, 3);
-  const latestJobs = localJobs.slice(0, 20);
+  const postsPerPage = 20;
+  const indexOfLastPost = currentPage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentJobs = localJobs.slice(indexOfFirstPost, indexOfLastPost);
+  const totalPages = Math.ceil(localJobs.length / postsPerPage);
 
   return (
     <div className="page">
@@ -142,36 +147,81 @@ export default function Home() {
             <Link to="/all-circulars" className="section-link">{isEn ? 'See All' : 'সব দেখুন'}</Link>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-            {latestJobs.map(job => (
+            {currentJobs.map(job => (
               <JobCard key={job.id} job={job} />
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-lg)', marginBottom: 'var(--space-md)' }}>
-            <button
-              onClick={() => navigate('/all-circulars')}
-              style={{
-                width: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                padding: '14px 20px',
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%)',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontWeight: 700,
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(26, 86, 219, 0.25)',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span>{state.language === 'en' ? 'See All Circulars' : 'সব সার্কুলার দেখুন'}</span>
-              <span style={{ fontSize: '16px', display: 'flex', alignItems: 'center' }}>➔</span>
-            </button>
-          </div>
+          {/* Previous & Next Pagination Buttons Container */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: '24px',
+              marginBottom: '10px',
+              padding: '12px 0',
+              borderTop: '1px solid var(--border-light)'
+            }}>
+              <button
+                disabled={currentPage === 1}
+                onClick={() => {
+                  setCurrentPage(prev => Math.max(prev - 1, 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  padding: '10px 18px',
+                  borderRadius: '12px',
+                  border: '1.5px solid var(--border-light)',
+                  background: currentPage === 1 ? 'var(--bg-secondary)' : 'var(--white)',
+                  color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text-primary)',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  opacity: currentPage === 1 ? 0.6 : 1,
+                  boxShadow: currentPage === 1 ? 'none' : '0 2px 6px rgba(0,0,0,0.03)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                ◀ {isEn ? 'Previous' : 'পূর্ববর্তী'}
+              </button>
+
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                {isEn 
+                  ? `Page ${currentPage} of ${totalPages}` 
+                  : `পৃষ্ঠা ${toBengaliNumber(currentPage)} / ${toBengaliNumber(totalPages)}`}
+              </span>
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => {
+                  setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  padding: '10px 18px',
+                  borderRadius: '12px',
+                  border: '1.5px solid var(--border-light)',
+                  background: currentPage === totalPages ? 'var(--bg-secondary)' : 'var(--white)',
+                  color: currentPage === totalPages ? 'var(--text-muted)' : 'var(--text-primary)',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                  opacity: currentPage === totalPages ? 0.6 : 1,
+                  boxShadow: currentPage === totalPages ? 'none' : '0 2px 6px rgba(0,0,0,0.03)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                {isEn ? 'Next' : 'পরবর্তী'} ▶
+              </button>
+            </div>
+          )}
         </div>
         <Disclaimer />
       </div>
