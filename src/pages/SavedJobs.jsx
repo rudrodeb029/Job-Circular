@@ -164,7 +164,7 @@ export default function SavedJobs() {
                         {descriptionSentence}
                       </p>
                       
-                      <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                      <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                         <span style={{
                           fontSize: '8.5px',
                           color: '#7e22ce',
@@ -178,6 +178,9 @@ export default function SavedJobs() {
                           whiteSpace: 'nowrap'
                         }}>
                           🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
+                        </span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          • 🕒 {isEn ? (job.postedDateEn || job.postedTimeEn || 'Recent') : (job.postedDate || job.postedTime || 'সাম্প্রতিক')}
                         </span>
                       </div>
                     </div>
@@ -251,7 +254,7 @@ export default function SavedJobs() {
                         {descriptionSentence}
                       </p>
                       
-                      <div style={{ marginTop: '3px', overflow: 'hidden' }}>
+                      <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                         <span style={{
                           fontSize: '8.5px',
                           color: '#059669',
@@ -266,6 +269,9 @@ export default function SavedJobs() {
                         }}>
                           <Calendar size={10} /> 
                           <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
+                        </span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          • 🕒 {isEn ? (job.postedDateEn || job.postedTimeEn || 'Recent') : (job.postedDate || job.postedTime || 'সাম্প্রতিক')}
                         </span>
                       </div>
                     </div>
