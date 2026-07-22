@@ -17,7 +17,7 @@ const initialState = {
   savedJobs: JSON.parse(localStorage.getItem('savedJobs')) || [],
   appliedJobs: JSON.parse(localStorage.getItem('appliedJobs')) || [],
   readNotifications: JSON.parse(localStorage.getItem('readNotifications')) || [],
-  theme: localStorage.getItem('theme') || 'light',
+  theme: localStorage.getItem('theme_v2') || 'light',
   language: localStorage.getItem('language') || 'bn', // Default app language is Bengali (bn)
   hasSeenOnboarding: JSON.parse(localStorage.getItem('hasSeenOnboarding')) || false,
   searchQuery: '',
@@ -75,7 +75,7 @@ function appReducer(state, action) {
     
     case 'TOGGLE_THEME': {
       const newTheme = state.theme === 'light' ? 'dark' : 'light';
-      localStorage.setItem('theme', newTheme);
+      localStorage.setItem('theme_v2', newTheme);
       document.documentElement.setAttribute('data-theme', newTheme);
       return { ...state, theme: newTheme };
     }
