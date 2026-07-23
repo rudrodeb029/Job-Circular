@@ -266,16 +266,29 @@ export default function LiveExams() {
                   )}
 
                   {status === 'upcoming' && (
-                    <span style={{
-                      fontSize: '10px',
-                      fontWeight: 800,
-                      color: '#d97706',
-                      background: 'rgba(245, 158, 11, 0.08)',
-                      padding: '5px 12px',
-                      borderRadius: '30px'
-                    }}>
-                      {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: '#d97706',
+                        background: 'rgba(245, 158, 11, 0.08)',
+                        padding: '5px 12px',
+                        borderRadius: '30px'
+                      }}>
+                        {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
+                      </span>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: 'var(--warning)',
+                        background: 'rgba(245, 158, 11, 0.08)',
+                        padding: '5px 12px',
+                        borderRadius: '30px',
+                        fontFamily: 'monospace'
+                      }}>
+                        {getCountdownString(startMs)}
+                      </span>
+                    </div>
                   )}
 
                   {status === 'completed' && (
@@ -395,17 +408,6 @@ export default function LiveExams() {
                       })}
                     </strong>
                   </span>
-
-                  {status === 'upcoming' && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px' }}>
-                      <span style={{ color: 'var(--text-muted)' }}>
-                        {isEn ? 'Starts in:' : 'বাকি:'}
-                      </span>
-                      <strong style={{ color: 'var(--warning)', fontFamily: 'monospace' }}>
-                        {getCountdownString(startMs)}
-                      </strong>
-                    </div>
-                  )}
                 </div>
 
                 {/* Bottom Actions */}
