@@ -108,6 +108,26 @@ export default function QuestionsHub() {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
+  // 1.5. Everyday Score History Data
+  const allResults = useMemo(() => {
+    try {
+      const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
+      return Object.keys(results).map(examId => {
+        const examMeta = liveExams.find(e => e.id === examId);
+        return {
+          id: examId,
+          title: examMeta ? examMeta.title : 'লাইভ পরীক্ষা',
+          titleEn: examMeta ? examMeta.titleEn : 'Live Exam',
+          score: results[examId].score,
+          total: results[examId].total,
+          date: examMeta ? examMeta.startTime : new Date().toISOString()
+        };
+      }).sort((a, b) => new Date(b.date) - new Date(a.date));
+    } catch (e) {
+      return [];
+    }
+  }, [liveExams, now]);
+
   // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {
     let list = questionsData;
@@ -181,6 +201,87 @@ export default function QuestionsHub() {
               <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
               <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
             </button>
+          </div>
+
+          {/* Live MCQ Exam Activity & Performance Dashboard */}
+          <div style={{
+            background: 'var(--white)',
+            border: '1px solid var(--border-light)',
+            borderRadius: '18px',
+            padding: '16px',
+            marginBottom: '16px',
+            boxShadow: '0 8px 20px -6px rgba(0, 0, 0, 0.02)'
+          }}>
+            {/* Top row: Joined Candidates stats */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span className="pulse-dot" style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', display: 'inline-block', animation: 'pulse 1.5s infinite' }}></span>
+                <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                  {isEn ? '12,450 Candidates Joined Today' : 'আজকে অংশগ্রহণ করছেন: ১২,৪৫০ জন'}
+                </span>
+              </div>
+              
+              {/* Stacked avatars */}
+              <div style={{ display: 'flex', alignItems: 'center', position: 'relative', height: '24px', width: '70px' }}>
+                {[
+                  'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80',
+                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80',
+                  'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80',
+                  'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80'
+                ].map((img, i) => (
+                  <img
+                    key={i}
+                    src={img}
+                    alt="User joined"
+                    style={{
+                      width: '22px',
+                      height: '22px',
+                      borderRadius: '50%',
+                      border: '1.5px solid var(--white)',
+                      position: 'absolute',
+                      left: `${i * 14}px`,
+                      zIndex: 10 - i,
+                      objectFit: 'cover'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Middle part: Recent performance or encouragement */}
+            {allResults.length > 0 ? (
+              <div style={{ borderTop: '1px dashed var(--border)', paddingTop: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <h4 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                    {isEn ? 'Recent Exam Performance' : 'পরীক্ষার ইতিহাস ও অগ্রগতি'}
+                  </h4>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--primary)', background: 'rgba(26, 86, 219, 0.05)', padding: '2px 8px', borderRadius: '12px' }}>
+                    {isEn ? 'History' : 'ইতিহাস'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {allResults.slice(0, 3).map(res => (
+                    <div key={res.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: '10px', fontSize: '11.5px', transition: 'transform 0.2s' }}>
+                      <span style={{ fontWeight: 700, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>
+                        🎯 {isEn ? res.titleEn : res.title}
+                      </span>
+                      <span style={{ fontWeight: 800, color: '#10b981', background: 'rgba(16, 185, 129, 0.06)', padding: '2px 8px', borderRadius: '6px', whiteSpace: 'nowrap' }}>
+                        {isEn ? `${res.score}/${res.total}` : `${toBengaliNumber(res.score)}/${toBengaliNumber(res.total)}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div style={{ borderTop: '1px dashed var(--border)', paddingTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(26, 86, 219, 0.02)', padding: '10px 12px', borderRadius: '10px' }}>
+                <span style={{ fontSize: '16px' }}>🏆</span>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+                  {isEn 
+                    ? "Participate in today's live exam to test your skills and check your daily rank list!" 
+                    : 'আজকের লাইভ পরীক্ষায় অংশ নিয়ে আপনার মেধা যাচাই করুন এবং লিডারবোর্ডে র‍্যাংক দেখুন!'}
+                </span>
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
