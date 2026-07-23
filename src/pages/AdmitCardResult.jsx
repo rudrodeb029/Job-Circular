@@ -49,8 +49,59 @@ export default function AdmitCardResult() {
     { id: 'result', label: isEn ? 'Result' : 'ফলাফল' }
   ], [isEn]);
 
+  const allAdmitCards = useMemo(() => {
+    const saved = localStorage.getItem('admin_jobs');
+    let localJobs = [];
+    if (saved) {
+      try {
+        localJobs = JSON.parse(saved);
+      } catch (e) {
+        localJobs = [];
+      }
+    }
+
+    const dynamicExamDates = localJobs.filter(j => j.examDate).map(j => ({
+      id: `dynamic-exam-${j.id}`,
+      examName: `${j.title} পরীক্ষা`,
+      examNameEn: `${j.titleEn || j.title} Exam`,
+      organization: j.organization,
+      organizationEn: j.organizationEn || j.organization,
+      type: 'admit_card',
+      status: 'পরীক্ষার তারিখ প্রকাশিত',
+      statusEn: 'Exam Date Published',
+      date: j.examDate,
+      dateEn: j.examDateEn || j.examDate,
+      downloadLink: j.applyLink || '#'
+    }));
+
+    const dynamicResults = localJobs.filter(j => j.examResult).map(j => ({
+      id: `dynamic-result-${j.id}`,
+      examName: `${j.title} পরীক্ষার ফলাফল`,
+      examNameEn: `${j.titleEn || j.title} Exam Result`,
+      organization: j.organization,
+      organizationEn: j.organizationEn || j.organization,
+      type: 'result',
+      status: 'ফলাফল প্রকাশিত',
+      statusEn: 'Result Published',
+      date: j.postedDate || '১ দিন আগে',
+      dateEn: j.postedDateEn || '1 day ago',
+      downloadLink: j.examResult || '#'
+    }));
+
+    const merged = [...admitCards, ...dynamicExamDates, ...dynamicResults];
+    const unique = [];
+    const seen = new Set();
+    for (const item of merged) {
+      if (!seen.has(item.id)) {
+        seen.add(item.id);
+        unique.push(item);
+      }
+    }
+    return unique;
+  }, []);
+
   const searchedItems = useMemo(() => {
-    const items = admitCards.filter(item => item.type === activeTab);
+    const items = allAdmitCards.filter(item => item.type === activeTab);
     if (!searchQuery.trim()) return items;
     const query = searchQuery.toLowerCase();
     return items.filter(item => {
@@ -60,7 +111,7 @@ export default function AdmitCardResult() {
       const examEn = (item.examNameEn || '').toLowerCase();
       return org.includes(query) || orgEn.includes(query) || exam.includes(query) || examEn.includes(query);
     });
-  }, [activeTab, searchQuery]);
+  }, [allAdmitCards, activeTab, searchQuery]);
 
   return (
     <div className="page">

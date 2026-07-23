@@ -21,7 +21,6 @@ export default function ManageJobs() {
   
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-
   const initialFormState = {
     title: '',
     titleEn: '',
@@ -37,7 +36,10 @@ export default function ManageJobs() {
     requirements: '',
     applyLink: '',
     status: 'Active',
-    images: ''
+    images: '',
+    circularType: 'regular',
+    examDate: '',
+    examResult: ''
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -82,8 +84,17 @@ export default function ManageJobs() {
   const handleOpenModal = (job = null) => {
     if (job) {
       setEditingJob(job);
+      let cType = 'regular';
+      if (job.examResult) {
+        cType = 'result';
+      } else if (job.examDate) {
+        cType = 'exam_date';
+      }
       setFormData({
         ...job,
+        circularType: cType,
+        examDate: job.examDate || '',
+        examResult: job.examResult || '',
         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : (job.requirements || ''),
         images: Array.isArray(job.images) ? job.images.join(', ') : (job.images || '')
       });
@@ -115,8 +126,18 @@ export default function ManageJobs() {
       ? formData.images.split(',').map(i => i.trim()).filter(i => i)
       : [];
       
+    let finalExamDate = '';
+    let finalExamResult = '';
+    if (formData.circularType === 'exam_date') {
+      finalExamDate = formData.examDate;
+    } else if (formData.circularType === 'result') {
+      finalExamResult = formData.examResult;
+    }
+
     const jobData = {
       ...formData,
+      examDate: finalExamDate,
+      examResult: finalExamResult,
       requirements: reqArray,
       images: imgArray,
       id: editingJob ? editingJob.id : `job_${Date.now()}`,
@@ -264,7 +285,22 @@ export default function ManageJobs() {
                     <td style={{ padding: '12px 16px', color: '#1e293b' }}>{actualIndex}</td>
                     <td style={{ padding: '12px 16px' }}>
                       <div className="job-title-bn" style={{ color: '#1e293b', fontWeight: '600', marginBottom: '4px' }}>{job.title}</div>
-                      <div className="job-title-en" style={{ color: '#64748b', fontSize: '0.875rem' }}>{job.titleEn}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span className="job-title-en" style={{ color: '#64748b', fontSize: '0.875rem' }}>{job.titleEn}</span>
+                        {job.examResult ? (
+                          <span style={{ backgroundColor: 'rgba(147, 51, 234, 0.08)', color: '#7e22ce', border: '1px solid rgba(147, 51, 234, 0.15)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: '700' }}>
+                            RESULT
+                          </span>
+                        ) : job.examDate ? (
+                          <span style={{ backgroundColor: 'rgba(245, 158, 11, 0.08)', color: '#d97706', border: '1px solid rgba(245, 158, 11, 0.15)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: '700' }}>
+                            EXAM DATE
+                          </span>
+                        ) : (
+                          <span style={{ backgroundColor: 'rgba(26, 86, 219, 0.08)', color: '#1a56db', border: '1px solid rgba(26, 86, 219, 0.15)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: '700' }}>
+                            REGULAR
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td style={{ padding: '12px 16px', color: '#1e293b' }}>{job.organization}</td>
                     <td style={{ padding: '12px 16px' }}>
@@ -416,6 +452,38 @@ export default function ManageJobs() {
                       <option value="Expired">Expired</option>
                     </select>
                   </div>
+                </div>
+
+                <div className="admin-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                  <div className="admin-form-group">
+                    <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Circular Type (সার্কুলার ক্যাটাগরি)</label>
+                    <select className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="circularType" value={formData.circularType || 'regular'} onChange={handleInputChange} required>
+                      <option value="regular">Regular Job Circular (সাধারণ নিয়োগ বিজ্ঞপ্তি)</option>
+                      <option value="exam_date">Exam Date Announcement (পরীক্ষার তারিখ ঘোষণা)</option>
+                      <option value="result">Exam Result Announcement (পরীক্ষার ফলাফল ঘোষণা)</option>
+                    </select>
+                  </div>
+
+                  {formData.circularType === 'exam_date' && (
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Exam Date (পরীক্ষার তারিখ)</label>
+                      <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examDate" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024" required />
+                    </div>
+                  )}
+
+                  {formData.circularType === 'result' && (
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Result Sheet Link / PDF URL (ফলাফল লিংক)</label>
+                      <input type="url" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examResult" value={formData.examResult || ''} onChange={handleInputChange} placeholder="e.g. https://example.com/result.pdf" required />
+                    </div>
+                  )}
+
+                  {formData.circularType !== 'exam_date' && formData.circularType !== 'result' && (
+                    <div className="admin-form-group" style={{ opacity: 0.5 }}>
+                      <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>No Special Type (সাধারণ সার্কুলার)</label>
+                      <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f1f5f9', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none', cursor: 'not-allowed' }} value="N/A" disabled />
+                    </div>
+                  )}
                 </div>
 
                 <div className="admin-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>
