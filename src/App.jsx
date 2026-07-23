@@ -34,6 +34,7 @@ import Dashboard from './pages/admin/Dashboard'
 import ManageJobs from './pages/admin/ManageJobs'
 import ManageNotifications from './pages/admin/ManageNotifications'
 import ManageLiveExams from './pages/admin/ManageLiveExams'
+import ManageQuestions from './pages/admin/ManageQuestions'
 import Statistics from './pages/admin/Statistics'
 import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
@@ -95,6 +96,7 @@ function App() {
             <Route index element={<Dashboard />} />
             <Route path="jobs" element={<ManageJobs />} />
             <Route path="live-exams" element={<ManageLiveExams />} />
+            <Route path="questions" element={<ManageQuestions />} />
             <Route path="notifications" element={<ManageNotifications />} />
             <Route path="stats" element={<Statistics />} />
             <Route path="reports" element={<Reports />} />

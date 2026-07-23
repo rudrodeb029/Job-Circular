@@ -220,9 +220,28 @@ export const questionsData = [
 ];
 
 export const getQuestionsByCategory = (category) => {
-  return questionsData.filter(q => q.category === category);
+  const all = getQuestionsData();
+  return all.filter(q => q.category === category);
 };
 
 export const getQuestionById = (id) => {
-  return questionsData.find(q => q.id === id);
+  const all = getQuestionsData();
+  return all.find(q => q.id === id);
+};
+
+export const getQuestionsData = () => {
+  try {
+    const saved = localStorage.getItem('questions_data');
+    return saved ? JSON.parse(saved) : questionsData;
+  } catch (e) {
+    return questionsData;
+  }
+};
+
+export const saveQuestionsData = (data) => {
+  try {
+    localStorage.setItem('questions_data', JSON.stringify(data));
+  } catch (e) {
+    console.error(e);
+  }
 };

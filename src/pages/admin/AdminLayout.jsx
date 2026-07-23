@@ -15,6 +15,7 @@ const AdminLayout = () => {
     if (path === '/admin') return 'Dashboard';
     if (path.includes('/admin/jobs')) return 'Manage Circulars';
     if (path.includes('/admin/live-exams')) return 'Manage Live Exams';
+    if (path.includes('/admin/questions')) return 'Manage Questions';
     if (path.includes('/admin/notifications')) return 'Notifications';
     if (path.includes('/admin/stats')) return 'Statistics';
     if (path.includes('/admin/reports')) return 'Reports';
@@ -47,6 +48,11 @@ const AdminLayout = () => {
             <line x1="8" y1="2" x2="8" y2="6"></line>
             <line x1="3" y1="10" x2="21" y2="10"></line>
             <circle cx="12" cy="14" r="2"></circle>
+          </svg>
+        )},
+        { name: 'Manage Questions', path: '/admin/questions', exact: false, icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
           </svg>
         )},
         { name: 'Notifications', path: '/admin/notifications', exact: false, icon: (
