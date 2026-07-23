@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, FileText } from '../components/Icons';
+import { ArrowLeft } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { getLiveExams } from '../data/liveExams';
 import BottomNav from '../components/BottomNav';
@@ -14,6 +14,7 @@ export default function LiveExams() {
   const [now, setNow] = useState(Date.now());
   const [registrations, setRegistrations] = useState({});
   const [toastMessage, setToastMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('live'); // 'live' | 'history'
 
   // Ticks the clock every second and reads databases
   useEffect(() => {
@@ -87,16 +88,69 @@ export default function LiveExams() {
     }
   };
 
+  // Filter exams based on selected Tab
+  const filteredExams = exams.filter(exam => {
+    const status = getExamStatus(exam);
+    if (activeTab === 'live') {
+      return status === 'running' || status === 'upcoming';
+    } else {
+      return status === 'completed';
+    }
+  });
+
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
       {/* Header */}
-      <div className="page-header" style={{ borderBottom: '1px solid var(--border-light)' }}>
+      <div className="page-header" style={{ borderBottom: 'none' }}>
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '18px', fontWeight: 800 }}>
           {isEn ? 'Live MCQ Exams' : 'লাইভ এমসিকিউ পরীক্ষা'}
         </h1>
+      </div>
+
+      {/* Tab Selector */}
+      <div style={{
+        display: 'flex',
+        background: 'var(--white)',
+        borderBottom: '1px solid var(--border-light)',
+        padding: '0 8px'
+      }}>
+        <button
+          onClick={() => setActiveTab('live')}
+          style={{
+            flex: 1,
+            padding: '14px 0',
+            background: 'transparent',
+            border: 'none',
+            borderBottom: activeTab === 'live' ? '3px solid var(--primary)' : '3px solid transparent',
+            color: activeTab === 'live' ? 'var(--primary)' : 'var(--text-secondary)',
+            fontWeight: 800,
+            fontSize: '13px',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+        >
+          {isEn ? 'Live & Upcoming' : 'লাইভ ও আসন্ন'}
+        </button>
+        <button
+          onClick={() => setActiveTab('history')}
+          style={{
+            flex: 1,
+            padding: '14px 0',
+            background: 'transparent',
+            border: 'none',
+            borderBottom: activeTab === 'history' ? '3px solid var(--primary)' : '3px solid transparent',
+            color: activeTab === 'history' ? 'var(--primary)' : 'var(--text-secondary)',
+            fontWeight: 800,
+            fontSize: '13px',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+        >
+          {isEn ? 'Exam History & Results' : 'পরীক্ষার ইতিহাস ও ফলাফল'}
+        </button>
       </div>
 
       {/* Floating Toast Notification */}
@@ -122,29 +176,31 @@ export default function LiveExams() {
 
       <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
         
-        {/* Sleek, Premium Regulations Card */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.09) 0%, rgba(220, 38, 38, 0.04) 100%)',
-          border: '1px solid rgba(239, 68, 68, 0.15)',
-          borderRadius: '20px',
-          padding: '18px',
-          marginBottom: '20px',
-          boxShadow: '0 4px 20px rgba(239, 68, 68, 0.03)'
-        }}>
-          <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>📢</span>
-            <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
-          </h3>
-          <p style={{ fontSize: '12px', lineHeight: 1.6, color: '#b91c1c', fontWeight: 500, margin: 0 }}>
-            {isEn 
-              ? 'Participate in real-time competitive exams. The exam starts exactly at the scheduled time. Results will be calculated instantly upon submission.'
-              : 'নির্ধারিত সময়ে সরাসরি লাইভ পরীক্ষায় অংশ নিন। পরীক্ষা শুরু হওয়ার পর সময়ের মধ্যে সাবমিট করতে হবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাবে।'}
-          </p>
-        </div>
+        {/* Sleek, Premium Regulations Card (Only shown in Live tab) */}
+        {activeTab === 'live' && (
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.09) 0%, rgba(220, 38, 38, 0.04) 100%)',
+            border: '1px solid rgba(239, 68, 68, 0.15)',
+            borderRadius: '20px',
+            padding: '18px',
+            marginBottom: '20px',
+            boxShadow: '0 4px 20px rgba(239, 68, 68, 0.03)'
+          }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span>📢</span>
+              <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
+            </h3>
+            <p style={{ fontSize: '12px', lineHeight: 1.6, color: '#b91c1c', fontWeight: 500, margin: 0 }}>
+              {isEn 
+                ? 'Participate in real-time competitive exams. The exam starts exactly at the scheduled time. Results will be calculated instantly upon submission.'
+                : 'নির্ধারিত সময়ে সরাসরি লাইভ পরীক্ষায় অংশ নিন। পরীক্ষা শুরু হওয়ার পর সময়ের মধ্যে সাবমিট করতে হবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাবে।'}
+            </p>
+          </div>
+        )}
 
         {/* Exams List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {exams.map(exam => {
+          {filteredExams.map(exam => {
             const status = getExamStatus(exam);
             const startMs = new Date(exam.startTime).getTime();
             const result = getExamResult(exam.id);
@@ -246,7 +302,7 @@ export default function LiveExams() {
                   {isEn ? exam.titleEn : exam.title}
                 </h4>
 
-                {/* Subjects & Topics (Before live MCQ details) */}
+                {/* Subjects & Topics */}
                 <div style={{
                   background: 'var(--bg-secondary)',
                   borderRadius: '14px',
@@ -258,7 +314,7 @@ export default function LiveExams() {
                 }}>
                   <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
                     <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, minWidth: '60px' }}>
-                      {isEn ? 'Subject:' : 'বিষয়:'}
+                      {isEn ? 'Subjects:' : 'বিষয়সমূহ:'}
                     </span>
                     <span style={{ fontSize: '11px', color: 'var(--text-primary)', fontWeight: 700 }}>
                       {isEn ? exam.subjectsEn : exam.subjects}
@@ -315,7 +371,6 @@ export default function LiveExams() {
                   
                   {status === 'upcoming' && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {/* Dynamic Registration State Toggler */}
                       <button
                         onClick={() => handleRegister(exam.id)}
                         style={{
@@ -385,8 +440,8 @@ export default function LiveExams() {
                       {result ? (
                         <div style={{ fontSize: '12px', color: 'var(--success)', fontWeight: 800 }}>
                           🏆 {isEn 
-                            ? `Your Score: ${result.score}/${result.total}`
-                            : `আপনার স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`}
+                            ? `Score: ${result.score}/${result.total}`
+                            : `স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`}
                         </div>
                       ) : (
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500 }}>
@@ -407,7 +462,7 @@ export default function LiveExams() {
                           cursor: 'pointer'
                         }}
                       >
-                        {isEn ? 'View Solutions' : 'সমাধান দেখুন'}
+                        {isEn ? 'Solutions & Leaderboard' : 'ফলাফল ও লিডারবোর্ড'}
                       </button>
                     </div>
                   )}
@@ -416,11 +471,13 @@ export default function LiveExams() {
             );
           })}
 
-          {exams.length === 0 && (
+          {filteredExams.length === 0 && (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
               <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
               <p style={{ fontSize: '14px', fontWeight: 600 }}>
-                {isEn ? 'No live exams scheduled' : 'কোনো লাইভ পরীক্ষা নির্ধারণ করা নেই'}
+                {activeTab === 'live'
+                  ? (isEn ? 'No live or upcoming exams' : 'কোনো লাইভ বা আসন্ন পরীক্ষা নেই')
+                  : (isEn ? 'No exam history found' : 'কোনো পরীক্ষার ইতিহাস পাওয়া যায়নি')}
               </p>
             </div>
           )}
