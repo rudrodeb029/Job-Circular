@@ -187,7 +187,11 @@ export default function LiveExams() {
             boxShadow: '0 4px 20px rgba(239, 68, 68, 0.03)'
           }}>
             <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <span>📢</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
               <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
             </h3>
             <p style={{ fontSize: '12px', lineHeight: 1.6, color: '#b91c1c', fontWeight: 500, margin: 0 }}>
@@ -270,7 +274,7 @@ export default function LiveExams() {
                       padding: '5px 12px',
                       borderRadius: '30px'
                     }}>
-                      ⏳ {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
+                      {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
                     </span>
                   )}
 
@@ -283,18 +287,22 @@ export default function LiveExams() {
                       padding: '5px 12px',
                       borderRadius: '30px'
                     }}>
-                      ✅ {isEn ? 'COMPLETED' : 'শেষ হয়েছে'}
+                      {isEn ? 'COMPLETED' : 'শেষ হয়েছে'}
                     </span>
                   )}
 
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)' }}>
-                    ⏱️ {isEn ? `${exam.duration} Mins` : `${toBengaliNumber(exam.duration)} মিনিট`}
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    {isEn ? `${exam.duration} Mins` : `${toBengaliNumber(exam.duration)} মিনিট`}
                   </span>
                 </div>
 
                 <h4 style={{
-                  fontSize: '16px',
-                  fontWeight: 800,
+                  fontSize: '14.5px',
+                  fontWeight: 700,
                   color: 'var(--text-primary)',
                   marginBottom: '14px',
                   lineHeight: '1.4'
@@ -314,9 +322,9 @@ export default function LiveExams() {
                 }}>
                   {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
                     exam.subjectTopics.map((st, idx) => (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-                          📚 {isEn ? st.subjectEn : st.subject}
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: '3px solid var(--primary)', paddingLeft: '8px' }}>
+                          {isEn ? st.subjectEn : st.subject}
                         </span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '4px' }}>
                           {(isEn ? st.topicsEn : st.topics)?.split(',').map((t, tIdx) => (
@@ -326,19 +334,19 @@ export default function LiveExams() {
                               background: 'var(--white)',
                               border: '1px solid var(--border-light)',
                               color: 'var(--text-secondary)',
-                              padding: '2px 8px',
+                              padding: '3px 8px',
                               borderRadius: '6px'
                             }}>
-                              📌 {t.trim()}
+                              {t.trim()}
                             </span>
                           ))}
                         </div>
                       </div>
                     ))
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 800 }}>
-                        📚 {isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ'}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, borderLeft: '3px solid var(--primary)', paddingLeft: '8px' }}>
+                        {isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ'}
                       </span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                         {(isEn ? exam.topicsEn : exam.topics)?.split(',').map((t, idx) => (
@@ -348,10 +356,10 @@ export default function LiveExams() {
                             background: 'var(--white)',
                             border: '1px solid var(--border-light)',
                             color: 'var(--text-secondary)',
-                            padding: '2px 8px',
+                            padding: '3px 8px',
                             borderRadius: '6px'
                           }}>
-                            📌 {t.trim()}
+                            {t.trim()}
                           </span>
                         ))}
                       </div>
@@ -370,8 +378,14 @@ export default function LiveExams() {
                   alignItems: 'center',
                   marginBottom: '16px'
                 }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                    📅 {isEn ? 'Starts At:' : 'শুরুর সময়:'}{' '}
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    {isEn ? 'Starts At:' : 'শুরুর সময়:'}{' '}
                     <strong style={{ color: 'var(--primary)' }}>
                       {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
                         month: 'short',
@@ -409,12 +423,16 @@ export default function LiveExams() {
                       >
                         {isRegistered ? (
                           <>
-                            <span>✅</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
+                              <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
                             <span>{isEn ? 'Registered & Participating' : 'অংশগ্রহণ নিশ্চিত করা হয়েছে'}</span>
                           </>
                         ) : (
                           <>
-                            <span>🎯</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
+                              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                            </svg>
                             <span>{isEn ? 'Participate in Exam' : 'পরীক্ষায় অংশগ্রহণ করুন'}</span>
                           </>
                         )}
