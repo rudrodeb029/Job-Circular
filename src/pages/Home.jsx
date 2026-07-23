@@ -264,8 +264,7 @@ export default function Home() {
             {[
               { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
               { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
-              { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
-              { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(236, 72, 153, 0.05)' }
+              { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' }
             ].map(cat => (
               <div
                 key={cat.id}
@@ -278,6 +277,15 @@ export default function Home() {
                 <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
               </div>
             ))}
+            <div
+              className="category-grid-item"
+              onClick={() => navigate('/questions-hub')}
+            >
+              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+                <LayoutGrid size={22} />
+              </div>
+              <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
+            </div>
           </div>
         </div>
 
