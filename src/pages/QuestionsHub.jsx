@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, FileText, ChevronRight, LayoutGrid } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
-import { defaultLiveExams, getLiveExams } from '../data/liveExams';
+import { getLiveExams } from '../data/liveExams';
 import { questionsData } from '../data/questionsData';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
@@ -23,40 +23,92 @@ export default function QuestionsHub() {
 
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
   const [searchQuery, setSearchQuery] = useState('');
-
-  // 1. Live Exams Data
-  const liveExams = useMemo(() => getLiveExams(), []);
   
-  // Format Countdown String
-  const getCountdownString = (startTimeStr) => {
-    const diff = new Date(startTimeStr) - new Date();
-    if (diff <= 0) return '';
-    const mins = Math.floor(diff / 60000);
-    const secs = Math.floor((diff % 60000) / 1000);
-    if (isEn) {
-      return `${mins}m ${secs}s`;
-    } else {
-      return `${toBengaliNumber(mins)}মি: ${toBengaliNumber(secs)}সে:`;
+  // Real-time states
+  const [liveExams, setLiveExams] = useState([]);
+  const [now, setNow] = useState(Date.now());
+  const [registrations, setRegistrations] = useState({});
+  const [toastMessage, setToastMessage] = useState('');
+
+  // Load state and setup clock ticker
+  useEffect(() => {
+    setLiveExams(getLiveExams());
+
+    // Load registrations
+    try {
+      const saved = JSON.parse(localStorage.getItem('registered_exams')) || {};
+      setRegistrations(saved);
+    } catch (e) {
+      console.error(e);
+    }
+
+    const interval = setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const getExamResult = (examId) => {
+    try {
+      const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
+      return results[examId];
+    } catch (e) {
+      return null;
     }
   };
 
   const getExamStatus = (exam) => {
-    const now = new Date();
-    const start = new Date(exam.startTime);
-    const end = new Date(start.getTime() + exam.duration * 60 * 1000);
+    const startMs = new Date(exam.startTime).getTime();
+    const endMs = startMs + exam.duration * 60 * 1000;
 
-    const isRegistered = state.registeredExams && state.registeredExams[exam.id];
-    const isCompleted = state.liveExamResults && state.liveExamResults[exam.id];
-
-    if (now >= end) return { type: 'ended', label: isEn ? 'Ended' : 'পরীক্ষা শেষ' };
-    if (now >= start && now < end) {
+    if (now >= startMs && now < endMs) {
+      const isCompleted = getExamResult(exam.id);
       if (isCompleted) return { type: 'submitted', label: isEn ? 'Submitted' : 'অংশগ্রহণ করেছেন' };
       return { type: 'live', label: isEn ? 'Live Now' : 'লাইভ চলছে' };
+    } else if (now < startMs) {
+      return { type: 'upcoming', label: isEn ? 'Upcoming' : 'আসন্ন পরীক্ষা' };
+    } else {
+      return { type: 'ended', label: isEn ? 'Ended' : 'পরীক্ষা শেষ' };
     }
-    return { type: 'upcoming', label: isEn ? 'Upcoming' : 'আসন্ন পরীক্ষা' };
   };
 
-  // 2. Filtered Question Papers Data
+  const getCountdownString = (startTimeStr) => {
+    const startMs = new Date(startTimeStr).getTime();
+    const diff = startMs - now;
+    if (diff <= 0) return '';
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const pad = (num) => String(num).padStart(2, '0');
+
+    if (hours > 0) {
+      return isEn 
+        ? `${hours}h ${pad(mins)}m ${pad(secs)}s` 
+        : `${toBengaliNumber(hours)}ঘণ্টা ${toBengaliNumber(mins)}মি: ${toBengaliNumber(secs)}সে:`;
+    } else {
+      return isEn
+        ? `${mins}m ${pad(secs)}s`
+        : `${toBengaliNumber(mins)}মি: ${toBengaliNumber(secs)}সে:`;
+    }
+  };
+
+  const handleRegister = (examId) => {
+    const next = { ...registrations, [examId]: !registrations[examId] };
+    setRegistrations(next);
+    localStorage.setItem('registered_exams', JSON.stringify(next));
+
+    const msg = next[examId]
+      ? (isEn ? 'Registration successful for the live exam!' : 'লাইভ পরীক্ষার জন্য রেজিস্ট্রেশন সম্পন্ন হয়েছে!')
+      : (isEn ? 'Registration cancelled.' : 'রেজিস্ট্রেশন বাতিল করা হয়েছে।');
+
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(''), 3000);
+  };
+
+  // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {
     let list = questionsData;
     if (activeCategory !== 'all') {
@@ -74,6 +126,27 @@ export default function QuestionsHub() {
 
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
+      {/* Toast Alert popup */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          top: '80px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'var(--primary)',
+          color: 'white',
+          padding: '12px 24px',
+          borderRadius: '30px',
+          boxShadow: '0 8px 30px rgba(26, 86, 219, 0.3)',
+          fontSize: '12.5px',
+          fontWeight: 700,
+          zIndex: 9999,
+          animation: 'slideDown 0.3s ease'
+        }}>
+          {toastMessage}
+        </div>
+      )}
+
       {/* Header */}
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate('/home')}>
@@ -113,8 +186,8 @@ export default function QuestionsHub() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {liveExams.slice(0, 2).map(exam => {
               const status = getExamStatus(exam);
-              const isRegistered = state.registeredExams && state.registeredExams[exam.id];
-              const isCompleted = state.liveExamResults && state.liveExamResults[exam.id];
+              const isRegistered = !!registrations[exam.id];
+              const result = getExamResult(exam.id);
 
               let statusBg = 'rgba(26, 86, 219, 0.05)';
               let statusColor = 'var(--primary)';
@@ -164,7 +237,7 @@ export default function QuestionsHub() {
                         alignItems: 'center',
                         gap: '4px'
                       }}>
-                        {status.type === 'live' && <span className="pulse-dot" style={{ width: '6px', height: '6px', background: '#ef4444', borderRadius: '50%', display: 'inline-block' }}></span>}
+                        {status.type === 'live' && <span className="pulse-dot" style={{ width: '6px', height: '6px', background: '#ef4444', borderRadius: '50%', display: 'inline-block', animation: 'pulse 1.5s infinite' }}></span>}
                         {status.label}
                       </span>
                       <span style={{
@@ -181,20 +254,37 @@ export default function QuestionsHub() {
                     </div>
 
                     {status.type === 'upcoming' && (
-                      <span style={{
-                        fontSize: '10px',
-                        fontWeight: 700,
-                        color: '#d97706',
-                        background: 'rgba(245, 158, 11, 0.06)',
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
-                        📅 {isEn ? 'Time: ' : 'পরীক্ষা: '}
-                        {new Date(exam.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          color: '#d97706',
+                          background: 'rgba(245, 158, 11, 0.06)',
+                          padding: '4px 10px',
+                          borderRadius: '20px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          📅 {isEn ? 'Time: ' : 'সময়: '}
+                          {new Date(exam.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        
+                        <span style={{
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          color: '#b45309',
+                          background: 'rgba(245, 158, 11, 0.12)',
+                          padding: '4px 10px',
+                          borderRadius: '20px',
+                          fontFamily: 'monospace',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          ⏱️ {getCountdownString(exam.startTime)}
+                        </span>
+                      </div>
                     )}
                   </div>
 
@@ -213,11 +303,19 @@ export default function QuestionsHub() {
                     </span>
                     <span>•</span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      ⚠ {isEn ? 'Negative Marks' : 'নেগেটিভ মার্কস আছে'}
+                      ⚠️ {isEn ? 'Negative Marks' : 'নেগেটিভ মার্কস আছে'}
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
+                    {status.type === 'completed' && result && (
+                      <div style={{ fontSize: '11.5px', color: 'var(--success)', fontWeight: 800, marginRight: 'auto' }}>
+                        🏆 {isEn 
+                          ? `Score: ${result.score}/${result.total}`
+                          : `স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`}
+                      </div>
+                    )}
+
                     {status.type === 'live' ? (
                       <button
                         onClick={() => navigate(`/live-exam-room/${exam.id}`)}
@@ -261,24 +359,28 @@ export default function QuestionsHub() {
                       </button>
                     ) : (
                       <button
+                        onClick={() => handleRegister(exam.id)}
                         style={{
                           width: 'auto',
                           padding: '8px 20px',
                           borderRadius: '30px',
-                          border: 'none',
-                          background: isRegistered ? '#e2e8f0' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-                          color: isRegistered ? 'var(--text-muted)' : '#ffffff',
+                          border: isRegistered ? '1.5px solid #10b981' : 'none',
+                          background: isRegistered ? 'rgba(16, 185, 129, 0.05)' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                          color: isRegistered ? '#047857' : '#ffffff',
                           fontWeight: 800,
                           fontSize: '11.5px',
-                          cursor: isRegistered ? 'default' : 'pointer',
+                          cursor: 'pointer',
                           boxShadow: isRegistered ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.2)',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '6px'
                         }}
-                        disabled={isRegistered}
                       >
-                        <span>{isRegistered ? (isEn ? 'Registered' : 'নিবন্ধিত') : (isEn ? 'Register Now' : 'রেজিস্ট্রেশন করুন')}</span>
+                        <span>
+                          {isRegistered 
+                            ? (isEn ? 'Registered & Participating' : 'অংশগ্রহণ নিশ্চিত করা হয়েছে') 
+                            : (isEn ? 'Register Now' : 'রেজিস্ট্রেশন করুন')}
+                        </span>
                       </button>
                     )}
                   </div>
