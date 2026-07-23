@@ -5,6 +5,15 @@ import BottomNav from '../components/BottomNav';
 import EditProfileModal from '../components/EditProfileModal';
 import Disclaimer from '../components/Disclaimer';
 
+const TrashIcon = ({ size = 20, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="3 6 5 6 21 6"></polyline>
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    <line x1="10" y1="11" x2="10" y2="17"></line>
+    <line x1="14" y1="11" x2="14" y2="17"></line>
+  </svg>
+);
+
 export default function Settings() {
   const navigate = useNavigate();
   const [activeModal, setActiveModal] = useState(null);
@@ -31,6 +40,7 @@ export default function Settings() {
     { icon: Star, label: 'Rate Us', key: 'rate' },
     { icon: Mail, label: 'Contact Us', key: 'contact' },
     { icon: Info, label: 'About App', key: 'about' },
+    { icon: TrashIcon, label: 'Delete Account & Data', key: 'delete' }
   ];
 
   const handleCopyLink = () => {
@@ -63,6 +73,17 @@ export default function Settings() {
     }, 2000);
   };
 
+  const handleDeleteAccount = () => {
+    const isConfirm = window.confirm(
+      "Are you sure you want to delete your profile and all local data? This action cannot be undone.\n\nআপনি কি আপনার প্রোফাইল এবং সকল তথ্য মুছে ফেলতে চান?"
+    );
+    if (isConfirm) {
+      localStorage.clear();
+      navigate('/');
+      window.location.reload();
+    }
+  };
+
   return (
     <div className="page" style={{ position: 'relative' }}>
       <div className="page-header">
@@ -78,13 +99,19 @@ export default function Settings() {
             <div 
               key={i} 
               className="menu-item"
-              onClick={() => setActiveModal(item.key)}
-              style={{ cursor: 'pointer' }}
+              onClick={() => {
+                if (item.key === 'delete') {
+                  handleDeleteAccount();
+                } else {
+                  setActiveModal(item.key);
+                }
+              }}
+              style={{ cursor: 'pointer', color: item.key === 'delete' ? '#ef4444' : 'inherit' }}
             >
-              <div className="menu-item-icon">
+              <div className="menu-item-icon" style={{ color: item.key === 'delete' ? '#ef4444' : 'inherit' }}>
                 <item.icon size={20} />
               </div>
-              <span className="menu-item-label">{item.label}</span>
+              <span className="menu-item-label" style={{ fontWeight: item.key === 'delete' ? 700 : 'inherit' }}>{item.label}</span>
               <ChevronRight size={18} className="menu-item-arrow" />
             </div>
           ))}
