@@ -251,6 +251,45 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Questions & Answers Categories */}
+        <div className="mb-lg">
+          <div className="section-header">
+            <h3 className="section-title">{isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}</h3>
+            <Link to="/questions-hub" className="section-link">
+              <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
+              <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
+            </Link>
+          </div>
+          <div className="category-grid">
+            {[
+              { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
+              { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
+              { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
+              { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(236, 72, 153, 0.05)' }
+            ].map(cat => (
+              <div
+                key={cat.id}
+                className="category-grid-item"
+                onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
+              >
+                <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {cat.icon}
+                </div>
+                <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
+              </div>
+            ))}
+            <div
+              className="category-grid-item"
+              onClick={() => navigate('/questions-hub')}
+            >
+              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)' }}>
+                <LayoutGrid size={22} />
+              </div>
+              <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Dynamic Feed Segment */}
         <div>
           <div className="section-header">
