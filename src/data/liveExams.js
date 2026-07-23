@@ -145,8 +145,8 @@ export const generate100Questions = (examIndex) => {
 export const defaultLiveExams = [
   {
     id: 'live-exam-1',
-    title: 'বিসিএস লাইভ মডেল টেস্ট - ০১ (১০০ প্রশ্নপত্র)',
-    titleEn: 'BCS Live Model Test - 01 (100 MCQ Paper)',
+    title: 'বিসিএস লাইভ পরীক্ষা - ০১ (১০০ প্রশ্নপত্র)',
+    titleEn: 'BCS Live Exam - 01 (100 MCQ Paper)',
     startTime: new Date(Date.now() + 2 * 60 * 1000).toISOString(), // Starts in 2 mins
     duration: 60, // 60 minutes
     subjectTopics: [
@@ -159,8 +159,8 @@ export const defaultLiveExams = [
   },
   {
     id: 'live-exam-2',
-    title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ মডেল টেস্ট - ০২',
-    titleEn: 'Primary Assistant Teacher Live Model Test - 02',
+    title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা - ০২',
+    titleEn: 'Primary Assistant Teacher Live Exam - 02',
     startTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // Starts in 1 hour
     duration: 80,
     subjectTopics: [
