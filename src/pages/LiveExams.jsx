@@ -239,14 +239,15 @@ export default function LiveExams() {
                       : 'linear-gradient(90deg, #94a3b8, #cbd5e1)'
                 }}></div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                {/* Card Header row 1: Badges */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                   {/* Status Badge */}
                   {status === 'running' && (
                     <span style={{
                       fontSize: '10px',
                       fontWeight: 800,
                       color: 'var(--primary)',
-                      background: 'var(--primary-bg)',
+                      background: 'rgba(26, 86, 219, 0.08)',
                       padding: '5px 12px',
                       borderRadius: '30px',
                       display: 'inline-flex',
@@ -266,39 +267,16 @@ export default function LiveExams() {
                   )}
 
                   {status === 'upcoming' && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px' }}>
-                      <span style={{
-                        fontSize: '9.5px',
-                        fontWeight: 800,
-                        color: '#d97706',
-                        background: 'rgba(245, 158, 11, 0.08)',
-                        padding: '5px 10px',
-                        borderRadius: '30px'
-                      }}>
-                        {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
-                      </span>
-                      <span style={{
-                        fontSize: '9.5px',
-                        fontWeight: 700,
-                        color: 'var(--text-secondary)',
-                        background: 'var(--bg-secondary)',
-                        padding: '5px 12px',
-                        borderRadius: '30px',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}>
-                        {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                        <span style={{ color: 'var(--warning)', fontWeight: 800, fontFamily: 'monospace', marginLeft: '4px' }}>
-                          ({isEn ? 'Left:' : 'বাকি:'} {getCountdownString(startMs)})
-                        </span>
-                      </span>
-                    </div>
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      color: '#b45309',
+                      background: 'rgba(245, 158, 11, 0.12)',
+                      padding: '5px 12px',
+                      borderRadius: '30px'
+                    }}>
+                      {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
+                    </span>
                   )}
 
                   {status === 'completed' && (
@@ -314,7 +292,19 @@ export default function LiveExams() {
                     </span>
                   )}
 
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  {/* Duration Badge */}
+                  <span style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    color: 'var(--primary)',
+                    background: 'rgba(26, 86, 219, 0.06)',
+                    padding: '5px 12px',
+                    borderRadius: '30px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    whiteSpace: 'nowrap'
+                  }}>
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10"></circle>
                       <polyline points="12 6 12 12 16 14"></polyline>
@@ -322,6 +312,43 @@ export default function LiveExams() {
                     {isEn ? `${exam.duration} Mins` : `${toBengaliNumber(exam.duration)} মিনিট`}
                   </span>
                 </div>
+
+                {/* Card Header row 2: Start Date & Countdown (Upcoming Only) */}
+                {status === 'upcoming' && (
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    background: 'var(--bg-secondary)',
+                    border: '1.5px solid var(--border-light)',
+                    borderRadius: '10px',
+                    padding: '8px 12px',
+                    marginBottom: '14px'
+                  }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                      {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--warning)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
+                        {isEn ? 'Left:' : 'বাকি:'}
+                      </span>
+                      <span style={{ fontFamily: 'monospace' }}>
+                        {getCountdownString(startMs)}
+                      </span>
+                    </span>
+                  </div>
+                )}
 
                 <h4 style={{
                   fontSize: '14.5px',
