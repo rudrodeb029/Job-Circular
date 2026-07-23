@@ -217,39 +217,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Categories */}
-        <div className="mb-lg">
-          <div className="section-header">
-            <h3 className="section-title">{isEn ? 'Categories' : 'ক্যাটাগরি'}</h3>
-            <Link to="/categories" className="section-link">
-              <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
-              <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
-            </Link>
-          </div>
-          <div className="category-grid">
-            {displayCategories.map(cat => (
-              <div
-                key={cat.id}
-                className="category-grid-item"
-                onClick={() => navigate(`/search?category=${cat.id}`)}
-              >
-                <div className="category-grid-icon" style={{ background: cat.color }}>
-                  {cat.icon}
-                </div>
-                <span className="category-grid-label">{cat.name}</span>
-              </div>
-            ))}
-            <div
-              className="category-grid-item"
-              onClick={() => navigate('/categories')}
-            >
-              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)' }}>
-                <LayoutGrid size={22} />
-              </div>
-              <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
-            </div>
-          </div>
-        </div>
+
 
         {/* Questions & Answers Categories */}
         <div className="mb-lg">
