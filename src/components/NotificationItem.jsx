@@ -101,18 +101,18 @@ export default function NotificationItem({ notification }) {
 
       {/* 3D Gradient Icon Tile */}
       <div style={{
-        width: '44px',
-        height: '44px',
-        borderRadius: '14px',
+        width: '36px',
+        height: '36px',
+        borderRadius: '10px',
         background: config.bg,
         color: 'white',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
-        boxShadow: `0 4px 12px ${config.shadow}`
+        boxShadow: `0 2px 8px ${config.shadow}`
       }}>
-        <IconComponent size={22} />
+        <IconComponent size={16} />
       </div>
 
       {/* Notification Text Content */}
