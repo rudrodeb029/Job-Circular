@@ -335,32 +335,71 @@ export default function AppHeader() {
                               display: 'flex', 
                               flexDirection: 'column', 
                               paddingLeft: '12px',
-                              borderLeft: '1px solid var(--border-light)',
+                              borderLeft: '1.5px solid var(--border-light)',
                               marginLeft: '26px',
-                              gap: '2px',
-                              marginTop: '2px',
-                              marginBottom: '6px'
+                              gap: '6px',
+                              marginTop: '6px',
+                              marginBottom: '8px'
                             }}>
-                              {papers.map(paper => (
-                                <Link
-                                  key={paper.id}
-                                  to={`/question-details/${paper.id}`}
-                                  onClick={() => setDrawerOpen(false)}
-                                  style={{
-                                    fontSize: '11px',
-                                    fontWeight: 500,
-                                    color: 'var(--text-secondary)',
-                                    textDecoration: 'none',
-                                    padding: '6px 8px',
-                                    borderRadius: '6px',
-                                    display: 'block',
-                                    lineHeight: '1.4'
-                                  }}
-                                  className="menu-sub-paper"
-                                >
-                                  📝 {state.language === 'en' ? paper.titleEn : paper.title}
-                                </Link>
-                              ))}
+                              {papers.map(paper => {
+                                const getYear = (dateStr) => {
+                                  if (!dateStr) return '';
+                                  const match = dateStr.match(/\d{4}/);
+                                  return match ? match[0] : '';
+                                };
+                                const year = getYear(state.language === 'en' ? paper.dateEn : paper.date);
+                                const rawTitle = state.language === 'en' ? paper.titleEn : paper.title;
+                                
+                                // Clean and shorten title professionally
+                                const cleanTitle = rawTitle
+                                  .replace(' Preliminary Question & Solution', '')
+                                  .replace(' প্রিলিমিনারি প্রশ্ন ও সমাধান', '')
+                                  .replace(' Question & Solution', '')
+                                  .replace(' Solution', '')
+                                  .replace(' সমাধান', '')
+                                  .replace(' পরীক্ষা', '')
+                                  .replace(' সহকারী শিক্ষক নিয়োগ', '');
+
+                                return (
+                                  <Link
+                                    key={paper.id}
+                                    to={`/question-details/${paper.id}`}
+                                    onClick={() => setDrawerOpen(false)}
+                                    style={{
+                                      fontSize: '12px',
+                                      fontWeight: 500,
+                                      color: 'var(--text-secondary)',
+                                      textDecoration: 'none',
+                                      padding: '8px 10px',
+                                      borderRadius: '8px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      gap: '8px',
+                                      background: 'var(--bg-secondary)',
+                                      border: '1px solid var(--border-light)',
+                                      transition: 'all 0.2s',
+                                      whiteSpace: 'nowrap',
+                                      overflow: 'hidden'
+                                    }}
+                                    className="menu-sub-paper"
+                                  >
+                                    <span style={{
+                                      fontSize: '10px',
+                                      fontWeight: 800,
+                                      color: 'var(--primary)',
+                                      background: 'rgba(26, 86, 219, 0.08)',
+                                      padding: '2px 6px',
+                                      borderRadius: '4px',
+                                      flexShrink: 0
+                                    }}>
+                                      {state.language === 'en' ? year : toBengaliNumber(year)}
+                                    </span>
+                                    <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                                      {cleanTitle}
+                                    </span>
+                                  </Link>
+                                );
+                              })}
                               {papers.length === 0 && (
                                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '6px 8px' }}>
                                   {state.language === 'en' ? 'No papers yet' : 'কোনো প্রশ্নপত্র নেই'}
@@ -424,3 +463,10 @@ export default function AppHeader() {
     </>
   );
 }
+
+const toBengaliNumber = (num) => {
+  if (num === undefined || num === null) return '';
+  const engNum = String(num);
+  const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+  return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
