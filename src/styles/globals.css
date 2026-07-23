@@ -239,7 +239,7 @@ ul, ol {
   font-size: 17px;
   font-weight: 800;
   letter-spacing: -0.3px;
-  color: var(--text-primary);
+  color: var(--text-secondary);
 }
 
 .page-header-blue {
