@@ -266,14 +266,6 @@ export default function AppHeader() {
                       {state.language === 'en' ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
                     </span>
                   </div>
-                  <ChevronRight 
-                    size={18} 
-                    style={{ 
-                      transform: questionsMenuOpen ? 'rotate(90deg)' : 'none',
-                      transition: 'transform 0.2s',
-                      color: 'var(--text-muted)'
-                    }} 
-                  />
                 </div>
 
                 {questionsMenuOpen && (
