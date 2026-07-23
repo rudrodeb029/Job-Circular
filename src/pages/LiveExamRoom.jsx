@@ -432,16 +432,20 @@ export default function LiveExamRoom() {
               border: '1px solid var(--border-light)',
               boxShadow: '0 4px 18px rgba(0,0,0,0.02)'
             }}>
-              <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                  <path d="M4 22h16"></path>
-                  <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path>
-                  <path d="M12 2a6 6 0 0 0-6 6v3.5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path>
-                </svg>
-                <span>{isEn ? 'Rank List' : 'র‍্যাংক তালিকা'}</span>
-              </h3>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                background: 'rgba(26, 86, 219, 0.05)',
+                borderLeft: '4px solid var(--primary)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                marginBottom: '18px'
+              }}>
+                <h3 style={{ fontSize: '14.5px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
+                  {isEn ? 'Rank List' : 'র‍্যাংক তালিকা'}
+                </h3>
+              </div>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 {leaderboardData.map((user, idx) => {
