@@ -238,7 +238,6 @@ export default function QuestionsHub() {
               alignItems: 'center',
               gap: '6px'
             }}>
-              <span>🔴</span>
               <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
             </h3>
           </div>
@@ -651,7 +650,6 @@ export default function QuestionsHub() {
               alignItems: 'center',
               gap: '6px'
             }}>
-              <span>📂</span>
               <span>{isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}</span>
             </h3>
           </div>
