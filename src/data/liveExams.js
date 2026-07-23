@@ -8,6 +8,10 @@ export const defaultLiveExams = [
     titleEn: 'BCS Live Model Test - 01 (General Knowledge)',
     startTime: new Date(now + 2 * 60 * 1000).toISOString(), // Starts in 2 minutes
     duration: 10, // 10 minutes
+    subjects: 'সাধারণ জ্ঞান (বাংলাদেশ ও আন্তর্জাতিক)',
+    subjectsEn: 'General Knowledge (Bangladesh & International)',
+    topics: 'ভাষা আন্দোলন, মুক্তিযুদ্ধ, ভৌগোলিক অবস্থান',
+    topicsEn: 'Language Movement, Liberation War, Geography',
     questions: [
       {
         question: 'বাংলা একাডেমি কত সালে প্রতিষ্ঠিত হয়?',
@@ -44,6 +48,10 @@ export const defaultLiveExams = [
     titleEn: 'Primary Assistant Teacher Live Exam - 02',
     startTime: new Date(now + 60 * 60 * 1000).toISOString(), // Starts in 1 hour
     duration: 15,
+    subjects: 'গণিত ও বাংলা',
+    subjectsEn: 'Mathematics & Bengali',
+    topics: 'মৌলিক সংখ্যা, শুদ্ধ বানান, এককথায় প্রকাশ',
+    topicsEn: 'Prime Numbers, Spelling, One Word Substitution',
     questions: [
       {
         question: 'কোনটি মৌলিক সংখ্যা?',

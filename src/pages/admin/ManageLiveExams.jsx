@@ -23,6 +23,10 @@ export default function ManageLiveExams() {
   const [titleEn, setTitleEn] = useState('');
   const [startTime, setStartTime] = useState('');
   const [duration, setDuration] = useState('10');
+  const [subjects, setSubjects] = useState('');
+  const [subjectsEn, setSubjectsEn] = useState('');
+  const [topics, setTopics] = useState('');
+  const [topicsEn, setTopicsEn] = useState('');
   const [questions, setQuestions] = useState([
     {
       question: '',
@@ -103,6 +107,10 @@ export default function ManageLiveExams() {
       titleEn,
       startTime: new Date(startTime).toISOString(),
       duration: parseInt(duration, 10),
+      subjects: subjects || 'সাধারণ জ্ঞান',
+      subjectsEn: subjectsEn || 'General Knowledge',
+      topics: topics || 'লাইভ এমসিকিউ',
+      topicsEn: topicsEn || 'Live MCQ',
       questions
     };
 
@@ -117,6 +125,10 @@ export default function ManageLiveExams() {
     setTitleEn('');
     setStartTime('');
     setDuration('10');
+    setSubjects('');
+    setSubjectsEn('');
+    setTopics('');
+    setTopicsEn('');
     setQuestions([
       {
         question: '',
@@ -225,6 +237,28 @@ export default function ManageLiveExams() {
                 <option value="30">30 Minutes</option>
                 <option value="60">60 Minutes</option>
               </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Subjects (Bangla)</label>
+              <input value={subjects} onChange={(e) => setSubjects(e.target.value)} type="text" placeholder="যেমন: সাধারণ জ্ঞান, বাংলা" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Subjects (English)</label>
+              <input value={subjectsEn} onChange={(e) => setSubjectsEn(e.target.value)} type="text" placeholder="e.g. General Knowledge, Bangla" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Topics (Bangla)</label>
+              <input value={topics} onChange={(e) => setTopics(e.target.value)} type="text" placeholder="যেমন: চর্যাপদ, মুক্তিযুদ্ধ, ভগ্নাংশ" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
+            </div>
+            <div>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Topics (English)</label>
+              <input value={topicsEn} onChange={(e) => setTopicsEn(e.target.value)} type="text" placeholder="e.g. Liberation War, Fractions" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
             </div>
           </div>
 
