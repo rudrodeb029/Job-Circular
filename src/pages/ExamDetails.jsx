@@ -131,7 +131,7 @@ export default function ExamDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#334155', marginBottom: '12px' }}>
             {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
           </h2>
 
@@ -158,7 +158,7 @@ export default function ExamDetails() {
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
                 {state.language === 'en' ? 'Official Notice' : 'অফিসিয়াল নোটিশ'}
               </h3>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>

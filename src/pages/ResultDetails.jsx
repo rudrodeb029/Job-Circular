@@ -137,7 +137,7 @@ export default function ResultDetails() {
           }}>
             {displayIcon}
           </div>
-           <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0' }}>
+           <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#334155', marginBottom: '0' }}>
             {orgName}
           </h2>
         </div>
@@ -163,7 +163,7 @@ export default function ResultDetails() {
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
                 {isEn ? 'Official Result Sheet' : 'অফিসিয়াল ফলাফল শিট'}
               </h3>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
