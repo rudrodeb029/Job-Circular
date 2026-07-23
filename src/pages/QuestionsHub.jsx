@@ -29,6 +29,7 @@ export default function QuestionsHub() {
   const [now, setNow] = useState(Date.now());
   const [registrations, setRegistrations] = useState({});
   const [toastMessage, setToastMessage] = useState('');
+  const [liveTab, setLiveTab] = useState('live'); // 'live' | 'history'
 
   // Load state and setup clock ticker
   useEffect(() => {
@@ -159,6 +160,18 @@ export default function QuestionsHub() {
     return baseList.sort((a, b) => b.score - a.score);
   }, [now]);
 
+  // Filtered Live Exams Data based on liveTab selector
+  const filteredLiveExams = useMemo(() => {
+    return liveExams.filter(exam => {
+      const status = getExamStatus(exam);
+      if (liveTab === 'live') {
+        return status.type === 'live' || status.type === 'upcoming';
+      } else {
+        return status.type === 'ended' || status.type === 'submitted';
+      }
+    });
+  }, [liveExams, liveTab, now]);
+
   // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {
     let list = questionsData;
@@ -228,36 +241,85 @@ export default function QuestionsHub() {
               <span>🔴</span>
               <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
             </h3>
-            <button onClick={() => navigate('/live-exams')} className="section-link" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, color: 'var(--primary)' }}>
-              <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
-              <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
+          </div>
+
+          {/* Tab Selector */}
+          <div style={{
+            display: 'flex',
+            background: 'var(--white)',
+            borderBottom: '1px solid var(--border-light)',
+            padding: '0 8px',
+            borderRadius: '12px',
+            marginBottom: '16px'
+          }}>
+            <button
+              onClick={() => setLiveTab('live')}
+              style={{
+                flex: 1,
+                padding: '12px 0',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: liveTab === 'live' ? '3px solid var(--primary)' : '3px solid transparent',
+                color: liveTab === 'live' ? 'var(--primary)' : 'var(--text-secondary)',
+                fontWeight: 800,
+                fontSize: '12.5px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              {isEn ? 'Live & Upcoming' : 'লাইভ ও আসন্ন'}
+            </button>
+            <button
+              onClick={() => setLiveTab('history')}
+              style={{
+                flex: 1,
+                padding: '12px 0',
+                background: 'transparent',
+                border: 'none',
+                borderBottom: liveTab === 'history' ? '3px solid var(--primary)' : '3px solid transparent',
+                color: liveTab === 'history' ? 'var(--primary)' : 'var(--text-secondary)',
+                fontWeight: 800,
+                fontSize: '12.5px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              {isEn ? 'Exam History & Results' : 'পরীক্ষার ইতিহাস ও ফলাফল'}
             </button>
           </div>
 
+          {/* Sleek Regulations Card (Only shown in Live tab) */}
+          {liveTab === 'live' && (
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.09) 0%, rgba(220, 38, 38, 0.04) 100%)',
+              border: '1px solid rgba(239, 68, 68, 0.15)',
+              borderRadius: '20px',
+              padding: '18px',
+              marginBottom: '20px',
+              boxShadow: '0 4px 20px rgba(239, 68, 68, 0.03)'
+            }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
+              </h3>
+              <p style={{ fontSize: '12px', lineHeight: 1.6, color: '#b91c1c', fontWeight: 500, margin: 0 }}>
+                {isEn 
+                  ? 'Participate in real-time competitive exams. The exam starts exactly at the scheduled time. Results will be calculated instantly upon submission.'
+                  : 'নির্ধারিত সময়ে সরাসরি লাইভ পরীক্ষায় অংশ নিন। পরীক্ষা শুরু হওয়ার পর সময়ের মধ্যে সাবমিট করতে হবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাবে।'}
+              </p>
+            </div>
+          )}
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {liveExams.slice(0, 2).map(exam => {
+          {/* Exams List Container */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
+            {filteredLiveExams.map(exam => {
               const status = getExamStatus(exam);
               const isRegistered = !!registrations[exam.id];
               const result = getExamResult(exam.id);
-
-              let statusBg = 'rgba(26, 86, 219, 0.05)';
-              let statusColor = 'var(--primary)';
-              let cardAccentBorder = '4px solid var(--primary)';
-              
-              if (status.type === 'live') {
-                statusBg = 'rgba(239, 68, 68, 0.06)';
-                statusColor = '#ef4444';
-                cardAccentBorder = '4px solid #ef4444';
-              } else if (status.type === 'ended') {
-                statusBg = 'rgba(100, 116, 139, 0.06)';
-                statusColor = 'var(--text-secondary)';
-                cardAccentBorder = '4px solid var(--text-muted)';
-              } else if (status.type === 'submitted') {
-                statusBg = 'rgba(16, 185, 129, 0.06)';
-                statusColor = '#10b981';
-                cardAccentBorder = '4px solid #10b981';
-              }
 
               return (
                 <div
@@ -265,175 +327,307 @@ export default function QuestionsHub() {
                   className="animate-slide-up"
                   style={{
                     background: 'var(--white)',
-                    border: '1px solid var(--border-light)',
-                    borderLeft: cardAccentBorder,
-                    borderRadius: '16px',
-                    padding: '18px',
-                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02)',
+                    border: status.type === 'live' 
+                      ? '1.5px solid var(--primary)' 
+                      : '1px solid var(--border-light)',
+                    borderRadius: '20px',
+                    padding: '20px',
+                    boxShadow: '0 4px 18px rgba(0, 0, 0, 0.03)',
                     position: 'relative',
-                    transition: 'all 0.3s ease'
+                    overflow: 'hidden'
                   }}
                 >
-                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '12px' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  {/* Visual Status Indicator Line */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '4px',
+                    background: status.type === 'live' 
+                      ? 'linear-gradient(90deg, #3b82f6, #2563eb)' 
+                      : status.type === 'upcoming' 
+                        ? 'linear-gradient(90deg, #f59e0b, #d97706)' 
+                        : 'linear-gradient(90deg, #94a3b8, #cbd5e1)'
+                  }}></div>
+
+                  {/* Card Header row 1: Badges */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                    {/* Status Badge */}
+                    {status.type === 'live' && (
                       <span style={{
-                        fontSize: '9.5px',
+                        fontSize: '10px',
                         fontWeight: 800,
-                        background: statusBg,
-                        color: statusColor,
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.3px',
+                        color: 'var(--primary)',
+                        background: 'rgba(26, 86, 219, 0.08)',
+                        padding: '5px 12px',
+                        borderRadius: '30px',
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '5px'
                       }}>
-                        {status.type === 'live' && <span className="pulse-dot" style={{ width: '6px', height: '6px', background: '#ef4444', borderRadius: '50%', display: 'inline-block', animation: 'pulse 1.5s infinite' }}></span>}
-                        {status.label}
+                        <span style={{
+                          width: '6px',
+                          height: '6px',
+                          borderRadius: '50%',
+                          background: 'var(--primary)',
+                          display: 'inline-block',
+                          animation: 'pulse 1.5s infinite'
+                        }}></span>
+                        {isEn ? 'LIVE NOW' : 'লাইভ চলছে'}
                       </span>
-                      <span style={{
-                        fontSize: '9.5px',
-                        fontWeight: 700,
-                        background: 'rgba(79, 70, 229, 0.05)',
-                        color: '#4f46e5',
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        whiteSpace: 'nowrap'
-                      }}>
-                        🕒 {isEn ? `${exam.duration} Mins` : `${toBengaliNumber(exam.duration)} মিনিট`}
-                      </span>
-                    </div>
+                    )}
 
                     {status.type === 'upcoming' && (
-                      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                        <span style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          color: '#d97706',
-                          background: 'rgba(245, 158, 11, 0.06)',
-                          padding: '4px 10px',
-                          borderRadius: '20px',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}>
-                          📅 {isEn ? 'Time: ' : 'সময়: '}
-                          {new Date(exam.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        
-                        <span style={{
-                          fontSize: '10px',
-                          fontWeight: 700,
-                          color: '#b45309',
-                          background: 'rgba(245, 158, 11, 0.12)',
-                          padding: '4px 10px',
-                          borderRadius: '20px',
-                          fontFamily: 'monospace',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '4px'
-                        }}>
-                          ⏱️ {getCountdownString(exam.startTime)}
-                        </span>
-                      </div>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: '#b45309',
+                        background: 'rgba(245, 158, 11, 0.12)',
+                        padding: '5px 12px',
+                        borderRadius: '30px'
+                      }}>
+                        {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
+                      </span>
                     )}
+
+                    {(status.type === 'ended' || status.type === 'submitted') && (
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 800,
+                        color: 'var(--text-muted)',
+                        background: 'var(--bg-secondary)',
+                        padding: '5px 12px',
+                        borderRadius: '30px'
+                      }}>
+                        {isEn ? 'COMPLETED' : 'শেষ হয়েছে'}
+                      </span>
+                    )}
+
+                    {/* Duration Badge */}
+                    <span style={{
+                      fontSize: '10px',
+                      fontWeight: 800,
+                      color: 'var(--primary)',
+                      background: 'rgba(26, 86, 219, 0.06)',
+                      padding: '5px 12px',
+                      borderRadius: '30px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                      </svg>
+                      {isEn ? `${exam.duration} Mins` : `${toBengaliNumber(exam.duration)} মিনিট`}
+                    </span>
                   </div>
 
-                  <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '14px', lineHeight: '1.4' }}>
+                  {/* Card Header row 2: Start Date & Countdown (Upcoming Only) */}
+                  {status.type === 'upcoming' && (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      background: 'var(--bg-secondary)',
+                      border: '1.5px solid var(--border-light)',
+                      borderRadius: '10px',
+                      padding: '8px 12px',
+                      marginBottom: '14px'
+                    }}>
+                      <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--warning)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
+                          {isEn ? 'Left:' : 'বাকি:'}
+                        </span>
+                        <span style={{ fontFamily: 'monospace' }}>
+                          {getCountdownString(exam.startTime)}
+                        </span>
+                      </span>
+                    </div>
+                  )}
+
+                  <h4 style={{
+                    fontSize: '14.5px',
+                    fontWeight: 700,
+                    color: 'var(--text-primary)',
+                    marginBottom: '14px',
+                    lineHeight: '1.4'
+                  }}>
                     {isEn ? exam.titleEn : exam.title}
-                  </h3>
+                  </h4>
 
-                  {/* Badges for counts */}
-                  <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', fontSize: '11px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      📝 {isEn ? '100 Questions' : '১০০টি প্রশ্ন'}
-                    </span>
-                    <span>•</span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      🎯 {isEn ? '100 Marks' : '১০০ পূর্ণমান'}
-                    </span>
-                    <span>•</span>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                      ⚠️ {isEn ? 'Negative Marks' : 'নেগেটিভ মার্কস আছে'}
-                    </span>
+                  {/* Subjects & Topics separately */}
+                  <div style={{
+                    background: 'var(--bg-secondary)',
+                    borderRadius: '14px',
+                    padding: '14px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '12px'
+                  }}>
+                    {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
+                      exam.subjectTopics.map((st, idx) => (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: '3px solid var(--primary)', paddingLeft: '8px' }}>
+                            {isEn ? st.subjectEn : st.subject}
+                          </span>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '4px' }}>
+                            {(isEn ? st.topicsEn : st.topics)?.split(',').map((t, tIdx) => (
+                              <span key={tIdx} style={{
+                                fontSize: '10px',
+                                fontWeight: 600,
+                                background: 'var(--white)',
+                                border: '1px solid var(--border-light)',
+                                color: 'var(--text-secondary)',
+                                padding: '3px 8px',
+                                borderRadius: '6px'
+                              }}>
+                                {t.trim()}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, borderLeft: '3px solid var(--primary)', paddingLeft: '8px' }}>
+                          {isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ'}
+                        </span>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                          {(isEn ? exam.topicsEn : exam.topics)?.split(',').map((t, idx) => (
+                            <span key={idx} style={{
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              background: 'var(--white)',
+                              border: '1px solid var(--border-light)',
+                              color: 'var(--text-secondary)',
+                              padding: '3px 8px',
+                              borderRadius: '6px'
+                            }}>
+                              {t.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px' }}>
-                    {status.type === 'completed' && result && (
-                      <div style={{ fontSize: '11.5px', color: 'var(--success)', fontWeight: 800, marginRight: 'auto' }}>
-                        🏆 {isEn 
-                          ? `Score: ${result.score}/${result.total}`
-                          : `স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`}
+                  {/* Bottom Actions */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    
+                    {status.type === 'upcoming' && (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+                        <button
+                          onClick={() => handleRegister(exam.id)}
+                          style={{
+                            width: 'auto',
+                            padding: '10px 24px',
+                            borderRadius: '12px',
+                            border: isRegistered ? '1.5px solid #10b981' : 'none',
+                            background: isRegistered ? 'rgba(16, 185, 129, 0.05)' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                            color: isRegistered ? '#047857' : 'white',
+                            fontWeight: 800,
+                            fontSize: '12.5px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            boxShadow: isRegistered ? 'none' : '0 4px 14px rgba(26, 86, 219, 0.15)'
+                          }}
+                        >
+                          {isRegistered ? (
+                            <>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                              </svg>
+                              <span>{isEn ? 'Registered & Participating' : 'অংশগ্রহণ নিশ্চিত করা হয়েছে'}</span>
+                            </>
+                          ) : (
+                            <>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                              </svg>
+                              <span>{isEn ? 'Participate in Exam' : 'পরীক্ষায় অংশগ্রহণ করুন'}</span>
+                            </>
+                          )}
+                        </button>
                       </div>
                     )}
 
-                    {status.type === 'live' ? (
-                      <button
-                        onClick={() => navigate(`/live-exam-room/${exam.id}`)}
-                        style={{
-                          width: 'auto',
-                          padding: '8px 20px',
-                          borderRadius: '30px',
-                          border: 'none',
-                          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                          color: '#ffffff',
-                          fontWeight: 800,
-                          fontSize: '11.5px',
-                          cursor: 'pointer',
-                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                      >
-                        🚀 <span>{isEn ? 'Enter Exam Room' : 'অংশগ্রহণ করুন'}</span>
-                      </button>
-                    ) : status.type === 'submitted' || status.type === 'ended' ? (
-                      <button
-                        onClick={() => navigate(`/live-exam-room/${exam.id}`)}
-                        style={{
-                          width: 'auto',
-                          padding: '8px 20px',
-                          borderRadius: '30px',
-                          border: '1px solid var(--border)',
-                          background: 'var(--bg-secondary)',
-                          color: 'var(--text-secondary)',
-                          fontWeight: 800,
-                          fontSize: '11.5px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                      >
-                        📊 <span>{isEn ? 'Results' : 'ফলাফল ও র্যাংক'}</span>
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleRegister(exam.id)}
-                        style={{
-                          width: 'auto',
-                          padding: '8px 20px',
-                          borderRadius: '30px',
-                          border: isRegistered ? '1.5px solid #10b981' : 'none',
-                          background: isRegistered ? 'rgba(16, 185, 129, 0.05)' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-                          color: isRegistered ? '#047857' : '#ffffff',
-                          fontWeight: 800,
-                          fontSize: '11.5px',
-                          cursor: 'pointer',
-                          boxShadow: isRegistered ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.2)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                      >
-                        <span>
-                          {isRegistered 
-                            ? (isEn ? 'Registered & Participating' : 'অংশগ্রহণ নিশ্চিত করা হয়েছে') 
-                            : (isEn ? 'Register Now' : 'রেজিস্ট্রেশন করুন')}
-                        </span>
-                      </button>
+                    {status.type === 'live' && (
+                      <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                        <button
+                          onClick={() => navigate(`/live-exam-room/${exam.id}`)}
+                          style={{
+                            width: 'auto',
+                            padding: '10px 28px',
+                            borderRadius: '12px',
+                            border: 'none',
+                            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                            color: 'white',
+                            fontWeight: 800,
+                            fontSize: '12.5px',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 14px rgba(239, 68, 68, 0.2)'
+                          }}
+                        >
+                          {isEn ? 'Enter Exam Room Now' : 'পরীক্ষায় অংশ নিন (লাইভ)'} ➔
+                        </button>
+                      </div>
+                    )}
+
+                    {(status.type === 'ended' || status.type === 'submitted') && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {result ? (
+                          <div style={{ fontSize: '12px', color: 'var(--success)', fontWeight: 800 }}>
+                            🏆 {isEn 
+                              ? `Score: ${result.score}/${result.total}`
+                              : `স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`}
+                          </div>
+                        ) : (
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                            {isEn ? 'You did not attend' : 'আপনি অংশ নেননি'}
+                          </span>
+                        )}
+
+                        <button
+                          onClick={() => navigate(`/live-exam-room/${exam.id}`)}
+                          style={{
+                            width: 'auto',
+                            padding: '8px 16px',
+                            borderRadius: '10px',
+                            border: '1px solid var(--border)',
+                            background: 'var(--white)',
+                            color: 'var(--text-secondary)',
+                            fontWeight: 800,
+                            fontSize: '11.5px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px'
+                          }}
+                        >
+                          <span>📊 {isEn ? 'Results' : 'ফলাফল ও র‍্যাংক'}</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
