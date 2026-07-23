@@ -1,9 +1,112 @@
 import React, { useState } from 'react';
-import { X, User, Edit } from './Icons';
+import { X, User, Edit, Mail, FileText, Globe, MapPin } from './Icons';
 import { useAppContext } from '../context/AppContext';
+
+const PhoneIcon = ({ size = 16, color = 'currentColor' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+  </svg>
+);
+
+function FormInput({ label, icon, type = 'text', value, onChange, placeholder, required = false }) {
+  const [isFocused, setIsFocused] = useState(false);
+  return (
+    <div style={{ marginBottom: '14px' }}>
+      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'block' }}>
+        {label}
+      </label>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          position: 'absolute',
+          left: '14px',
+          color: isFocused ? 'var(--primary)' : 'var(--text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          pointerEvents: 'none',
+          transition: 'color 0.2s'
+        }}>
+          {icon}
+        </div>
+        <input
+          type={type}
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          required={required}
+          placeholder={placeholder}
+          style={{
+            width: '100%',
+            padding: '12px 14px 12px 40px',
+            fontSize: '13px',
+            fontWeight: 600,
+            background: isFocused ? 'var(--white)' : '#f8fafc',
+            border: isFocused ? '1.5px solid var(--primary)' : '1.5px solid #e2e8f0',
+            borderRadius: '12px',
+            color: 'var(--text-secondary)',
+            boxShadow: isFocused ? '0 0 0 4px rgba(26, 86, 219, 0.08)' : 'none',
+            transition: 'all 0.2s',
+            outline: 'none'
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function FormSelect({ label, icon, value, onChange, children }) {
+  const [isFocused, setIsFocused] = useState(false);
+  return (
+    <div style={{ marginBottom: '14px' }}>
+      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'block' }}>
+        {label}
+      </label>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+        <div style={{
+          position: 'absolute',
+          left: '14px',
+          color: isFocused ? 'var(--primary)' : 'var(--text-muted)',
+          display: 'flex',
+          alignItems: 'center',
+          pointerEvents: 'none',
+          transition: 'color 0.2s'
+        }}>
+          {icon}
+        </div>
+        <select
+          value={value}
+          onChange={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          style={{
+            width: '100%',
+            padding: '12px 34px 12px 40px',
+            fontSize: '13px',
+            fontWeight: 600,
+            background: isFocused ? 'var(--white)' : '#f8fafc',
+            border: isFocused ? '1.5px solid var(--primary)' : '1.5px solid #e2e8f0',
+            borderRadius: '12px',
+            color: 'var(--text-secondary)',
+            boxShadow: isFocused ? '0 0 0 4px rgba(26, 86, 219, 0.08)' : 'none',
+            transition: 'all 0.2s',
+            outline: 'none',
+            appearance: 'none',
+            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 14px center',
+            backgroundSize: '14px'
+          }}
+        >
+          {children}
+        </select>
+      </div>
+    </div>
+  );
+}
 
 export default function EditProfileModal({ isOpen, onClose }) {
   const { state, dispatch } = useAppContext();
+  const isEn = state.language === 'en';
 
   const [formData, setFormData] = useState({
     name: state.user.name || '',
@@ -52,7 +155,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
       right: 0,
       bottom: 0,
       zIndex: 250,
-      background: 'rgba(15, 23, 42, 0.6)',
+      background: 'rgba(15, 23, 42, 0.4)',
       backdropFilter: 'blur(6px)',
       display: 'flex',
       alignItems: 'center',
@@ -60,17 +163,17 @@ export default function EditProfileModal({ isOpen, onClose }) {
       padding: '20px'
     }} onClick={onClose}>
       <div
+        className="animate-scale-in"
         style={{
           width: '100%',
-          maxWidth: '420px',
+          maxWidth: '400px',
           maxHeight: '90vh',
           background: 'var(--white)',
           borderRadius: '24px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
           display: 'flex',
           flexDirection: 'column',
-          overflow: 'hidden',
-          animation: 'scaleIn 0.25s ease'
+          overflow: 'hidden'
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -79,43 +182,65 @@ export default function EditProfileModal({ isOpen, onClose }) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '18px 20px',
+          padding: '16px 20px',
           borderBottom: '1px solid var(--border-light)',
-          background: 'var(--bg-secondary)'
+          background: 'var(--white)'
         }}>
-          <h3 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)' }}>
-            Edit Profile
+          <h3 style={{
+            fontSize: '15px',
+            fontWeight: 800,
+            color: 'var(--text-secondary)',
+            background: 'rgba(26, 86, 219, 0.04)',
+            borderLeft: '4px solid var(--primary)',
+            padding: '4px 12px',
+            borderRadius: '6px',
+            margin: 0
+          }}>
+            {isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}
           </h3>
           <button
             onClick={onClose}
             aria-label="Close"
             style={{
-              width: '32px',
-              height: '32px',
+              width: '30px',
+              height: '30px',
               borderRadius: '50%',
               background: 'var(--white)',
-              border: '1px solid var(--border-light)',
+              border: '1.5px solid var(--border-light)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer'
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
             }}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Modal Content / Form */}
         <form onSubmit={handleSubmit} style={{ padding: '20px', overflowY: 'auto' }}>
           {/* Avatar Upload Section */}
-          <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <div style={{
               position: 'relative',
-              width: '90px',
-              height: '90px',
-              margin: '0 auto 10px auto'
+              width: '84px',
+              height: '84px',
+              margin: '0 auto 8px auto'
             }}>
+              {/* Outer Decorative Ring */}
+              <div style={{
+                position: 'absolute',
+                top: '-4px',
+                left: '-4px',
+                right: '-4px',
+                bottom: '-4px',
+                borderRadius: '50%',
+                border: '2px dashed var(--primary)',
+                opacity: 0.35
+              }}></div>
+
               {formData.avatar ? (
                 <img
                   src={formData.avatar}
@@ -125,8 +250,8 @@ export default function EditProfileModal({ isOpen, onClose }) {
                     height: '100%',
                     borderRadius: '50%',
                     objectFit: 'cover',
-                    border: '3px solid var(--primary)',
-                    boxShadow: '0 4px 14px rgba(26,86,219,0.25)'
+                    border: '3px solid var(--white)',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.08)'
                   }}
                 />
               ) : (
@@ -134,14 +259,14 @@ export default function EditProfileModal({ isOpen, onClose }) {
                   width: '100%',
                   height: '100%',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
+                  background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
                   color: 'white',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '34px',
+                  fontSize: '30px',
                   fontWeight: 800,
-                  boxShadow: '0 4px 14px rgba(26,86,219,0.25)'
+                  boxShadow: '0 4px 14px rgba(26,86,219,0.2)'
                 }}>
                   {formData.name ? formData.name[0] : 'S'}
                 </div>
@@ -150,21 +275,21 @@ export default function EditProfileModal({ isOpen, onClose }) {
               {/* Upload Trigger Camera Badge */}
               <label htmlFor="avatar-upload-input" style={{
                 position: 'absolute',
-                bottom: '0px',
-                right: '0px',
-                width: '30px',
-                height: '30px',
+                bottom: '-2px',
+                right: '-2px',
+                width: '26px',
+                height: '26px',
                 borderRadius: '50%',
-                background: 'var(--primary)',
+                background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                border: '2px solid white',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                border: '2px solid var(--white)',
+                boxShadow: '0 2px 8px rgba(26,86,219,0.35)'
               }}>
-                <Edit size={14} />
+                <Edit size={12} />
               </label>
               <input
                 id="avatar-upload-input"
@@ -174,109 +299,93 @@ export default function EditProfileModal({ isOpen, onClose }) {
                 style={{ display: 'none' }}
               />
             </div>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-              Click pencil icon to upload profile photo
+            <p style={{ fontSize: '10.5px', color: 'var(--primary)', fontWeight: 700, margin: 0 }}>
+              {isEn ? 'Click pencil icon to upload profile photo' : 'পেন্সিল আইকন ক্লিক করে ছবি পরিবর্তন করুন'}
             </p>
           </div>
 
           {/* Form Input Fields */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            {/* Full Name */}
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px', display: 'block' }}>
-                Full Name
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-                required
-                className="input"
-                placeholder="Enter full name"
-              />
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <FormInput
+              label={isEn ? 'Full Name' : 'পূর্ণ নাম'}
+              icon={<User size={16} />}
+              value={formData.name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              placeholder={isEn ? 'Enter full name' : 'আপনার নাম লিখুন'}
+              required
+            />
 
-            {/* Email Address */}
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px', display: 'block' }}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                required
-                className="input"
-                placeholder="Enter email address"
-              />
-            </div>
+            <FormInput
+              label={isEn ? 'Email Address' : 'ইমেইল ঠিকানা'}
+              icon={<Mail size={16} />}
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              placeholder={isEn ? 'Enter email address' : 'ইমেইল ঠিকানা লিখুন'}
+              required
+            />
 
-            {/* Phone Number */}
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px', display: 'block' }}>
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                className="input"
-                placeholder="Enter phone number"
-              />
-            </div>
+            <FormInput
+              label={isEn ? 'Phone Number' : 'মোবাইল নম্বর'}
+              icon={<PhoneIcon size={16} />}
+              type="tel"
+              value={formData.phone}
+              onChange={(e) => handleChange('phone', e.target.value)}
+              placeholder={isEn ? 'Enter phone number' : 'মোবাইল নম্বর লিখুন'}
+            />
 
-            {/* Qualification Select */}
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px', display: 'block' }}>
-                Education Qualification
-              </label>
-              <select
-                value={formData.qualification}
-                onChange={(e) => handleChange('qualification', e.target.value)}
-                className="input select"
-              >
-                <option value="স্নাতক (Bachelor)">স্নাতক (Bachelor)</option>
-                <option value="স্নাতকোত্তর (Master)">স্নাতকোত্তর (Master)</option>
-                <option value="এইচএসসি (HSC)">এইচএসসি (HSC)</option>
-                <option value="এসএসসি (SSC)">এসএসসি (SSC)</option>
-                <option value="ডিপ্লোমা (Diploma)">ডিপ্লোমা (Diploma)</option>
-              </select>
-            </div>
+            <FormSelect
+              label={isEn ? 'Education Qualification' : 'শিক্ষাগত যোগ্যতা'}
+              icon={<FileText size={16} />}
+              value={formData.qualification}
+              onChange={(e) => handleChange('qualification', e.target.value)}
+            >
+              <option value="স্নাতক (Bachelor)">{isEn ? 'Bachelor (স্নাতক)' : 'স্নাতক (Bachelor)'}</option>
+              <option value="স্নাতকোত্তর (Master)">{isEn ? 'Master (স্নাতকোত্তর)' : 'স্নাতকোত্তর (Master)'}</option>
+              <option value="এইচএসসি (HSC)">{isEn ? 'HSC (এইচএসসি)' : 'এইচএসসি (HSC)'}</option>
+              <option value="এসএসসি (SSC)">{isEn ? 'SSC (এসএসসি)' : 'এসএসসি (SSC)'}</option>
+              <option value="ডিপ্লোমা (Diploma)">{isEn ? 'Diploma (ডিপ্লোমা)' : 'ডিপ্লোমা (Diploma)'}</option>
+            </FormSelect>
 
-            {/* Location */}
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px', display: 'block' }}>
-                City / Location
-              </label>
-              <select
-                value={formData.location}
-                onChange={(e) => handleChange('location', e.target.value)}
-                className="input select"
-              >
-                <option value="ঢাকা">ঢাকা (Dhaka)</option>
-                <option value="চট্টগ্রাম">চট্টগ্রাম (Chattogram)</option>
-                <option value="রাজশাহী">রাজশাহী (Rajshahi)</option>
-                <option value="খুলনা">খুলনা (Khulna)</option>
-                <option value="সিলেট">সিলেট (Sylhet)</option>
-                <option value="বরিশাল">বরিশাল (Barishal)</option>
-                <option value="রংপুর">রংপুর (Rangpur)</option>
-                <option value="ময়মনসিংহ">ময়মনসিংহ (Mymensingh)</option>
-              </select>
-            </div>
+            <FormSelect
+              label={isEn ? 'City / Location' : 'জেলা / অবস্থান'}
+              icon={<MapPin size={16} />}
+              value={formData.location}
+              onChange={(e) => handleChange('location', e.target.value)}
+            >
+              <option value="ঢাকা">{isEn ? 'Dhaka (ঢাকা)' : 'ঢাকা (Dhaka)'}</option>
+              <option value="চট্টগ্রাম">{isEn ? 'Chattogram (চট্টগ্রাম)' : 'চট্টগ্রাম (Chattogram)'}</option>
+              <option value="রাজশাহী">{isEn ? 'Rajshahi (রাজশাহী)' : 'রাজশাহী (Rajshahi)'}</option>
+              <option value="খুলনা">{isEn ? 'Khulna (খুলনা)' : 'খুলনা (Khulna)'}</option>
+              <option value="সিলেট">{isEn ? 'Sylhet (সিলেট)' : 'সিলেট (Sylhet)'}</option>
+              <option value="বরিশাল">{isEn ? 'Barishal (বরিশাল)' : 'বরিশাল (Barishal)'}</option>
+              <option value="রংপুর">{isEn ? 'Rangpur (রংপুর)' : 'রংপুর (Rangpur)'}</option>
+              <option value="ময়মনসিংহ">{isEn ? 'Mymensingh (ময়মনসিংহ)' : 'ময়মনসিংহ (Mymensingh)'}</option>
+            </FormSelect>
           </div>
 
           {/* Submit Button */}
-          <div style={{ marginTop: '24px' }}>
+          <div style={{ marginTop: '20px' }}>
             <button
               type="submit"
-              className="btn btn-primary btn-block btn-lg"
+              className="btn btn-primary btn-block"
               style={{
-                background: savedSuccess ? '#10b981' : 'var(--primary)',
-                boxShadow: savedSuccess ? '0 4px 14px rgba(16,185,129,0.35)' : '0 4px 14px rgba(26,86,219,0.35)',
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: '12px',
+                fontWeight: 800,
+                fontSize: '13px',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'white',
+                background: savedSuccess ? '#10b981' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                boxShadow: savedSuccess ? '0 4px 14px rgba(16,185,129,0.3)' : '0 4px 14px rgba(26,86,219,0.2)',
                 transition: 'all 0.3s ease'
               }}
             >
-              {savedSuccess ? '✓ Profile Saved Successfully!' : 'Save Profile Changes'}
+              {savedSuccess 
+                ? (isEn ? '✓ Profile Saved!' : '✓ সফলভাবে সংরক্ষণ করা হয়েছে!') 
+                : (isEn ? 'Save Profile Changes' : 'পরিবর্তন সংরক্ষণ করুন')}
             </button>
           </div>
         </form>
