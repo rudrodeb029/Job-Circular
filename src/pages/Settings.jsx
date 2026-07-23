@@ -529,7 +529,7 @@ const modalOverlayStyle = {
   right: 0,
   bottom: 0,
   zIndex: 250,
-  background: 'rgba(15, 23, 42, 0.6)',
+  background: 'rgba(15, 23, 42, 0.4)',
   backdropFilter: 'blur(6px)',
   display: 'flex',
   alignItems: 'center',
@@ -539,11 +539,11 @@ const modalOverlayStyle = {
 
 const modalContentStyle = {
   width: '100%',
-  maxWidth: '420px',
+  maxWidth: '400px',
   maxHeight: '85vh',
   background: 'var(--white)',
   borderRadius: '24px',
-  boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+  boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
@@ -554,29 +554,34 @@ const modalHeaderStyle = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '18px 20px',
+  padding: '16px 20px',
   borderBottom: '1px solid var(--border-light)',
-  background: 'var(--bg-secondary)'
+  background: 'var(--white)'
 };
 
 const modalTitleStyle = {
-  fontSize: '16px',
+  fontSize: '15px',
   fontWeight: 800,
-  color: 'var(--text-primary)',
+  color: 'var(--text-secondary)',
+  background: 'rgba(26, 86, 219, 0.04)',
+  borderLeft: '4px solid var(--primary)',
+  padding: '4px 12px',
+  borderRadius: '6px',
   margin: 0
 };
 
 const closeBtnStyle = {
-  width: '32px',
-  height: '32px',
+  width: '30px',
+  height: '30px',
   borderRadius: '50%',
   background: 'var(--white)',
-  border: '1px solid var(--border-light)',
+  border: '1.5px solid var(--border-light)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: 'var(--text-secondary)',
-  cursor: 'pointer'
+  color: 'var(--text-muted)',
+  cursor: 'pointer',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
 };
 
 const modalBodyStyle = {
@@ -593,13 +598,14 @@ const shareIconWrapperStyle = {
 };
 
 const shareIconStyle = {
-  width: '50px',
-  height: '50px',
-  borderRadius: '14px',
+  width: '46px',
+  height: '46px',
+  borderRadius: '12px',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: 'transform 0.2s ease'
+  transition: 'all 0.2s ease',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
 };
 
 const shareLabelStyle = {

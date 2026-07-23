@@ -13,8 +13,8 @@ export default function VersionUpdateModal({ isOpen, updateInfo, currentVersion,
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(15, 23, 42, 0.75)',
-      backdropFilter: 'blur(8px)',
+      background: 'rgba(15, 23, 42, 0.4)',
+      backdropFilter: 'blur(6px)',
       zIndex: 9999,
       display: 'flex',
       alignItems: 'center',
@@ -26,7 +26,7 @@ export default function VersionUpdateModal({ isOpen, updateInfo, currentVersion,
         width: '100%',
         maxWidth: '380px',
         borderRadius: '24px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.12)',
         padding: '24px',
         textAlign: 'center',
         border: '1px solid var(--border-light)',
@@ -36,13 +36,13 @@ export default function VersionUpdateModal({ isOpen, updateInfo, currentVersion,
         <div style={{
           width: '72px',
           height: '72px',
-          background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+          background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
           borderRadius: '50%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 16px auto',
-          boxShadow: '0 10px 20px rgba(29, 78, 216, 0.3)',
+          boxShadow: '0 8px 20px rgba(26, 86, 219, 0.25)',
           color: '#ffffff',
           fontSize: '32px'
         }}>
@@ -58,12 +58,12 @@ export default function VersionUpdateModal({ isOpen, updateInfo, currentVersion,
           New Update Available!
         </h3>
         <p style={{
-          fontSize: '14px',
+          fontSize: '13px',
           fontWeight: 700,
           color: '#10b981',
           margin: '0 0 16px 0',
-          background: '#d1fae5',
-          padding: '4px 12px',
+          background: 'rgba(16, 185, 129, 0.08)',
+          padding: '6px 14px',
           borderRadius: '20px',
           display: 'inline-block'
         }}>
@@ -72,7 +72,7 @@ export default function VersionUpdateModal({ isOpen, updateInfo, currentVersion,
 
         {/* Release Notes */}
         <div style={{
-          background: 'var(--bg-secondary)',
+          background: '#f8fafc',
           border: '1px solid var(--border-light)',
           borderRadius: '16px',
           padding: '14px',
@@ -81,13 +81,13 @@ export default function VersionUpdateModal({ isOpen, updateInfo, currentVersion,
           maxHeight: '140px',
           overflowY: 'auto'
         }}>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '6px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', display: 'block', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             What's New / নতুন কি আছে:
           </span>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 8px 0' }}>
+          <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 8px 0', fontWeight: 600 }}>
             • {releaseNotes?.en || "Bug fixes and performance improvements."}
           </p>
-          <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+          <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0, fontWeight: 600 }}>
             • {releaseNotes?.bn || "বাগ সংশোধন ও পারফরম্যান্স উন্নত করা হয়েছে।"}
           </p>
         </div>
@@ -103,14 +103,14 @@ export default function VersionUpdateModal({ isOpen, updateInfo, currentVersion,
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
+              background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
               color: '#ffffff',
               padding: '14px',
               borderRadius: '14px',
               fontWeight: 700,
               fontSize: '14px',
               textDecoration: 'none',
-              boxShadow: '0 4px 14px rgba(29, 78, 216, 0.35)',
+              boxShadow: '0 4px 14px rgba(26, 86, 219, 0.2)',
               transition: 'all 0.2s ease'
             }}
           >
