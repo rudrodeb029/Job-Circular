@@ -49,7 +49,9 @@ export default function LiveExams() {
 
   const getCountdownString = (startTimeMs) => {
     const diff = startTimeMs - now;
-    if (diff <= 0) return '00:00';
+    if (diff <= 0) {
+      return isEn ? '0m 00s' : '০মি: ০০সে:';
+    }
 
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -59,10 +61,12 @@ export default function LiveExams() {
 
     if (hours > 0) {
       return isEn 
-        ? `${hours}h ${mins}m ${secs}s` 
-        : `${toBengaliNumber(hours)} ঘণ্টা ${toBengaliNumber(mins)} মিনিট`;
+        ? `${hours}h ${pad(mins)}m ${pad(secs)}s` 
+        : `${toBengaliNumber(hours)}ঘণ্টা ${toBengaliNumber(mins)}মি: ${toBengaliNumber(secs)}সে:`;
     } else {
-      return `${pad(mins)}:${pad(secs)}`;
+      return isEn
+        ? `${mins}m ${pad(secs)}s`
+        : `${toBengaliNumber(mins)}মি: ${toBengaliNumber(secs)}সে:`;
     }
   };
 
