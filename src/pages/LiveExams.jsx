@@ -395,6 +395,17 @@ export default function LiveExams() {
                       })}
                     </strong>
                   </span>
+
+                  {status === 'upcoming' && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>
+                        {isEn ? 'Starts in:' : 'বাকি:'}
+                      </span>
+                      <strong style={{ color: 'var(--warning)', fontFamily: 'monospace' }}>
+                        {getCountdownString(startMs)}
+                      </strong>
+                    </div>
+                  )}
                 </div>
 
                 {/* Bottom Actions */}
@@ -437,16 +448,6 @@ export default function LiveExams() {
                           </>
                         )}
                       </button>
-
-                      {/* Ticking countdown */}
-                      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                          {isEn ? 'Starts in:' : 'শুরু হতে বাকি:'}
-                        </span>
-                        <strong style={{ fontSize: '13px', color: 'var(--warning)', fontFamily: 'monospace' }}>
-                          {getCountdownString(startMs)}
-                        </strong>
-                      </div>
                     </div>
                   )}
 
