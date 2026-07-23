@@ -128,6 +128,37 @@ export default function QuestionsHub() {
     }
   }, [liveExams, now]);
 
+  // Today's Live Leaderboard Data
+  const todayLeaderboard = useMemo(() => {
+    const baseList = [
+      { name: 'সাদিয়া তাসনিম', nameEn: 'Sadia Tasnim', score: 94, avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100' },
+      { name: 'মেহেদী হাসান', nameEn: 'Mehedi Hasan', score: 91, avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100' },
+      { name: 'তন্ময় রায়', nameEn: 'Tonmoy Roy', score: 88, avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100' }
+    ];
+
+    try {
+      const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
+      const keys = Object.keys(results);
+      if (keys.length > 0) {
+        const latestKey = keys[keys.length - 1];
+        const latestResult = results[latestKey];
+        const scaledScore = Math.round((latestResult.score / latestResult.total) * 100);
+        
+        baseList.push({
+          name: 'সুব্রত দাস (আপনি)',
+          nameEn: 'Suvro (You)',
+          score: scaledScore,
+          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100',
+          isCurrentUser: true
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+
+    return baseList.sort((a, b) => b.score - a.score);
+  }, [now]);
+
   // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {
     let list = questionsData;
@@ -248,40 +279,110 @@ export default function QuestionsHub() {
               </div>
             </div>
 
-            {/* Middle part: Recent performance or encouragement */}
-            {allResults.length > 0 ? (
-              <div style={{ borderTop: '1px dashed var(--border)', paddingTop: '12px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                  <h4 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
-                    {isEn ? 'Recent Exam Performance' : 'পরীক্ষার ইতিহাস ও অগ্রগতি'}
-                  </h4>
-                  <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--primary)', background: 'rgba(26, 86, 219, 0.05)', padding: '2px 8px', borderRadius: '12px' }}>
-                    {isEn ? 'History' : 'ইতিহাস'}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {allResults.slice(0, 3).map(res => (
-                    <div key={res.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: '10px', fontSize: '11.5px', transition: 'transform 0.2s' }}>
-                      <span style={{ fontWeight: 700, color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '200px' }}>
-                        🎯 {isEn ? res.titleEn : res.title}
-                      </span>
-                      <span style={{ fontWeight: 800, color: '#10b981', background: 'rgba(16, 185, 129, 0.06)', padding: '2px 8px', borderRadius: '6px', whiteSpace: 'nowrap' }}>
-                        {isEn ? `${res.score}/${res.total}` : `${toBengaliNumber(res.score)}/${toBengaliNumber(res.total)}`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div style={{ borderTop: '1px dashed var(--border)', paddingTop: '12px', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(26, 86, 219, 0.02)', padding: '10px 12px', borderRadius: '10px' }}>
-                <span style={{ fontSize: '16px' }}>🏆</span>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                  {isEn 
-                    ? "Participate in today's live exam to test your skills and check your daily rank list!" 
-                    : 'আজকের লাইভ পরীক্ষায় অংশ নিয়ে আপনার মেধা যাচাই করুন এবং লিডারবোর্ডে র‍্যাংক দেখুন!'}
+            {/* Leaderboard Style List */}
+            <div style={{ borderTop: '1px dashed var(--border)', paddingTop: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <h4 style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span>🏆</span>
+                  <span>{isEn ? "Today's Live Leaderboard" : 'আজকের লাইভ লিডারবোর্ড'}</span>
+                </h4>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--primary)', background: 'rgba(26, 86, 219, 0.05)', padding: '2px 8px', borderRadius: '12px' }}>
+                  {isEn ? 'Top Participants' : 'মেধা তালিকা'}
                 </span>
               </div>
-            )}
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {todayLeaderboard.map((user, idx) => {
+                  const rank = idx + 1;
+                  const isGold = rank === 1;
+                  const isSilver = rank === 2;
+                  const isBronze = rank === 3;
+                  const displayName = isEn ? user.nameEn : user.name;
+
+                  return (
+                    <div
+                      key={idx}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '8px 12px',
+                        borderRadius: '10px',
+                        background: user.isCurrentUser ? 'rgba(26, 86, 219, 0.04)' : 'var(--bg-secondary)',
+                        border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
+                        borderLeft: user.isCurrentUser ? '4px solid var(--primary)' : undefined,
+                        boxShadow: user.isCurrentUser ? '0 4px 12px rgba(26, 86, 219, 0.05)' : 'none'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
+                        {/* Rank Circle */}
+                        <span style={{
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          background: isGold 
+                            ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' 
+                            : isSilver 
+                              ? 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' 
+                              : isBronze 
+                                ? 'linear-gradient(135deg, #ca8a04 0%, #a16207 100%)' 
+                                : 'rgba(0,0,0,0.05)',
+                          color: (isGold || isSilver || isBronze) ? '#ffffff' : 'var(--text-secondary)',
+                          fontSize: '10px',
+                          fontWeight: 800,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0
+                        }}>
+                          {isEn ? rank : toBengaliNumber(rank)}
+                        </span>
+
+                        {/* Profile Image */}
+                        <img
+                          src={user.avatar}
+                          alt={displayName}
+                          style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            flexShrink: 0
+                          }}
+                        />
+
+                        {/* Name */}
+                        <span style={{
+                          fontSize: '12px',
+                          fontWeight: user.isCurrentUser ? 700 : 600,
+                          color: 'var(--text-secondary)',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          {displayName}
+                        </span>
+                      </div>
+
+                      {/* Score Badge */}
+                      <span style={{
+                        fontSize: '11px',
+                        fontWeight: 800,
+                        color: user.isCurrentUser ? 'var(--primary)' : '#10b981',
+                        background: user.isCurrentUser ? 'rgba(26, 86, 219, 0.05)' : 'rgba(16, 185, 129, 0.05)',
+                        padding: '2px 8px',
+                        borderRadius: '6px',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {isEn 
+                          ? `${user.score}/100` 
+                          : `${toBengaliNumber(user.score)}/${toBengaliNumber(100)}`}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
