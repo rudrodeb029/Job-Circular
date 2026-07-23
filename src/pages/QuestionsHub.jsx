@@ -88,17 +88,29 @@ export default function QuestionsHub() {
         
         {/* SECTION 1: Live MCQ Exam */}
         <div style={{ marginBottom: '24px' }}>
-          <div className="section-header" style={{ marginBottom: '12px' }}>
-            <h3 className="section-title" style={{ color: 'var(--text-secondary)' }}>
-              🔴 {isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}
+          <div className="section-header" style={{ marginBottom: '16px' }}>
+            <h3 className="section-title" style={{
+              color: 'var(--text-secondary)',
+              background: 'rgba(26, 86, 219, 0.04)',
+              borderLeft: '4px solid var(--primary)',
+              padding: '6px 14px',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '13.5px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <span>🔴</span>
+              <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
             </h3>
-            <button onClick={() => navigate('/live-exams')} className="section-link" style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+            <button onClick={() => navigate('/live-exams')} className="section-link" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, color: 'var(--primary)' }}>
               <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
               <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
             </button>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {liveExams.slice(0, 2).map(exam => {
               const status = getExamStatus(exam);
               const isRegistered = state.registeredExams && state.registeredExams[exam.id];
@@ -106,32 +118,41 @@ export default function QuestionsHub() {
 
               let statusBg = 'rgba(26, 86, 219, 0.05)';
               let statusColor = 'var(--primary)';
+              let cardAccentBorder = '4px solid var(--primary)';
+              
               if (status.type === 'live') {
-                statusBg = 'rgba(239, 68, 68, 0.05)';
+                statusBg = 'rgba(239, 68, 68, 0.06)';
                 statusColor = '#ef4444';
+                cardAccentBorder = '4px solid #ef4444';
               } else if (status.type === 'ended') {
-                statusBg = 'rgba(100, 116, 139, 0.05)';
+                statusBg = 'rgba(100, 116, 139, 0.06)';
                 statusColor = 'var(--text-secondary)';
+                cardAccentBorder = '4px solid var(--text-muted)';
               } else if (status.type === 'submitted') {
-                statusBg = 'rgba(16, 185, 129, 0.05)';
+                statusBg = 'rgba(16, 185, 129, 0.06)';
                 statusColor = '#10b981';
+                cardAccentBorder = '4px solid #10b981';
               }
 
               return (
                 <div
                   key={exam.id}
+                  className="animate-slide-up"
                   style={{
                     background: 'var(--white)',
                     border: '1px solid var(--border-light)',
+                    borderLeft: cardAccentBorder,
                     borderRadius: '16px',
-                    padding: '16px',
-                    boxShadow: '0 4px 14px rgba(15, 23, 42, 0.02)'
+                    padding: '18px',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02)',
+                    position: 'relative',
+                    transition: 'all 0.3s ease'
                   }}
                 >
-                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '12px' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{
-                        fontSize: '10px',
+                        fontSize: '9.5px',
                         fontWeight: 800,
                         background: statusBg,
                         color: statusColor,
@@ -143,11 +164,11 @@ export default function QuestionsHub() {
                         alignItems: 'center',
                         gap: '4px'
                       }}>
-                        {status.type === 'live' && <span className="pulse-dot"></span>}
+                        {status.type === 'live' && <span className="pulse-dot" style={{ width: '6px', height: '6px', background: '#ef4444', borderRadius: '50%', display: 'inline-block' }}></span>}
                         {status.label}
                       </span>
                       <span style={{
-                        fontSize: '10px',
+                        fontSize: '9.5px',
                         fontWeight: 700,
                         background: 'rgba(79, 70, 229, 0.05)',
                         color: '#4f46e5',
@@ -155,82 +176,109 @@ export default function QuestionsHub() {
                         borderRadius: '20px',
                         whiteSpace: 'nowrap'
                       }}>
-                        {isEn ? `${exam.duration} Mins` : `${toBengaliNumber(exam.duration)} মিনিট`}
+                        🕒 {isEn ? `${exam.duration} Mins` : `${toBengaliNumber(exam.duration)} মিনিট`}
                       </span>
                     </div>
 
                     {status.type === 'upcoming' && (
                       <span style={{
-                        fontSize: '10.5px',
+                        fontSize: '10px',
                         fontWeight: 700,
                         color: '#d97706',
                         background: 'rgba(245, 158, 11, 0.06)',
                         padding: '4px 10px',
-                        borderRadius: '20px'
+                        borderRadius: '20px',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
                       }}>
-                        {isEn ? 'Start Time: ' : 'পরীক্ষার সময়: '}
+                        📅 {isEn ? 'Time: ' : 'পরীক্ষা: '}
                         {new Date(exam.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     )}
                   </div>
 
-                  <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '12px' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)', marginBottom: '14px', lineHeight: '1.4' }}>
                     {isEn ? exam.titleEn : exam.title}
                   </h3>
 
-                  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '4px' }}>
+                  {/* Badges for counts */}
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', fontSize: '11px', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      📝 {isEn ? '100 Questions' : '১০০টি প্রশ্ন'}
+                    </span>
+                    <span>•</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      🎯 {isEn ? '100 Marks' : '১০০ পূর্ণমান'}
+                    </span>
+                    <span>•</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                      ⚠ {isEn ? 'Negative Marks' : 'নেগেটিভ মার্কস আছে'}
+                    </span>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     {status.type === 'live' ? (
                       <button
                         onClick={() => navigate(`/live-exam-room/${exam.id}`)}
                         style={{
                           width: 'auto',
-                          padding: '10px 24px',
-                          borderRadius: '20px',
+                          padding: '8px 20px',
+                          borderRadius: '30px',
                           border: 'none',
                           background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                           color: '#ffffff',
                           fontWeight: 800,
-                          fontSize: '12px',
+                          fontSize: '11.5px',
                           cursor: 'pointer',
-                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)'
+                          boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
                         }}
                       >
-                        🚀 {isEn ? 'Enter Exam Room' : 'পরীক্ষায় অংশগ্রহণ করুন'}
+                        🚀 <span>{isEn ? 'Enter Exam Room' : 'অংশগ্রহণ করুন'}</span>
                       </button>
                     ) : status.type === 'submitted' || status.type === 'ended' ? (
                       <button
                         onClick={() => navigate(`/live-exam-room/${exam.id}`)}
                         style={{
                           width: 'auto',
-                          padding: '10px 24px',
-                          borderRadius: '20px',
+                          padding: '8px 20px',
+                          borderRadius: '30px',
                           border: '1px solid var(--border)',
                           background: 'var(--bg-secondary)',
                           color: 'var(--text-secondary)',
                           fontWeight: 800,
-                          fontSize: '12px',
-                          cursor: 'pointer'
+                          fontSize: '11.5px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
                         }}
                       >
-                        📊 {isEn ? 'View Result & Leaderboard' : 'ফলাফল ও লিডারবোর্ড দেখুন'}
+                        📊 <span>{isEn ? 'Results' : 'ফলাফল ও র্যাংক'}</span>
                       </button>
                     ) : (
                       <button
                         style={{
                           width: 'auto',
-                          padding: '10px 24px',
-                          borderRadius: '20px',
+                          padding: '8px 20px',
+                          borderRadius: '30px',
                           border: 'none',
-                          background: isRegistered ? 'var(--bg-secondary)' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-                          color: isRegistered ? 'var(--text-secondary)' : '#ffffff',
+                          background: isRegistered ? '#e2e8f0' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                          color: isRegistered ? 'var(--text-muted)' : '#ffffff',
                           fontWeight: 800,
-                          fontSize: '12px',
-                          cursor: 'pointer',
-                          boxShadow: isRegistered ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.2)'
+                          fontSize: '11.5px',
+                          cursor: isRegistered ? 'default' : 'pointer',
+                          boxShadow: isRegistered ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.2)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px'
                         }}
                         disabled={isRegistered}
                       >
-                        {isRegistered ? (isEn ? 'Registered' : 'রেজিস্ট্রেশন সম্পন্ন') : (isEn ? 'Register Now' : 'পরীক্ষার জন্য রেজিস্ট্রেশন করুন')}
+                        <span>{isRegistered ? (isEn ? 'Registered' : 'নিবন্ধিত') : (isEn ? 'Register Now' : 'রেজিস্ট্রেশন করুন')}</span>
                       </button>
                     )}
                   </div>
@@ -241,23 +289,42 @@ export default function QuestionsHub() {
         </div>
 
         {/* SECTION 2: Q&A Categories (Same Grid Style as Job Categories) */}
-        <div style={{ marginBottom: '20px' }}>
-          <div className="section-header" style={{ marginBottom: '12px' }}>
-            <h3 className="section-title" style={{ color: 'var(--text-secondary)' }}>
-              📂 {isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}
+        <div style={{ marginBottom: '24px' }}>
+          <div className="section-header" style={{ marginBottom: '14px' }}>
+            <h3 className="section-title" style={{
+              color: 'var(--text-secondary)',
+              background: 'rgba(26, 86, 219, 0.04)',
+              borderLeft: '4px solid var(--primary)',
+              padding: '6px 14px',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '13.5px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <span>📂</span>
+              <span>{isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}</span>
             </h3>
           </div>
 
           <div className="category-grid">
             <div
               className="category-grid-item"
-              style={{ background: activeCategory === 'all' ? 'var(--primary-lightest)' : 'transparent', border: activeCategory === 'all' ? '1px solid var(--primary)' : '1px solid transparent' }}
+              style={{
+                background: activeCategory === 'all' ? 'var(--primary-lightest)' : 'var(--white)',
+                border: activeCategory === 'all' ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
+                borderRadius: '14px',
+                padding: '12px 8px',
+                boxShadow: activeCategory === 'all' ? '0 4px 12px rgba(26, 86, 219, 0.08)' : 'none',
+                transition: 'all 0.2s ease'
+              }}
               onClick={() => setActiveCategory('all')}
             >
-              <div className="category-grid-icon" style={{ background: 'rgba(26, 86, 219, 0.05)', color: 'var(--primary)' }}>
-                <LayoutGrid size={20} />
+              <div className="category-grid-icon" style={{ background: 'rgba(26, 86, 219, 0.06)', color: 'var(--primary)', width: '36px', height: '36px', borderRadius: '10px' }}>
+                <LayoutGrid size={18} />
               </div>
-              <span className="category-grid-label" style={{ fontWeight: activeCategory === 'all' ? 700 : 500 }}>
+              <span className="category-grid-label" style={{ fontWeight: activeCategory === 'all' ? 700 : 500, fontSize: '11px', color: 'var(--text-secondary)' }}>
                 {isEn ? 'All' : 'সব প্রশ্ন'}
               </span>
             </div>
@@ -269,13 +336,20 @@ export default function QuestionsHub() {
                 <div
                   key={key}
                   className="category-grid-item"
-                  style={{ background: isActive ? 'var(--primary-lightest)' : 'transparent', border: isActive ? '1px solid var(--primary)' : '1px solid transparent' }}
+                  style={{
+                    background: isActive ? 'var(--primary-lightest)' : 'var(--white)',
+                    border: isActive ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
+                    borderRadius: '14px',
+                    padding: '12px 8px',
+                    boxShadow: isActive ? '0 4px 12px rgba(26, 86, 219, 0.08)' : 'none',
+                    transition: 'all 0.2s ease'
+                  }}
                   onClick={() => setActiveCategory(key)}
                 >
-                  <div className="category-grid-icon" style={{ background: cat.color, color: 'var(--primary)', fontSize: '18px' }}>
+                  <div className="category-grid-icon" style={{ background: cat.color, color: 'var(--primary)', fontSize: '16px', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {cat.icon}
                   </div>
-                  <span className="category-grid-label" style={{ fontWeight: isActive ? 700 : 500 }}>
+                  <span className="category-grid-label" style={{ fontWeight: isActive ? 700 : 500, fontSize: '11px', color: 'var(--text-secondary)' }}>
                     {isEn ? cat.nameEn : cat.name}
                   </span>
                 </div>
