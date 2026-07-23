@@ -314,19 +314,14 @@ export default function AppHeader() {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 borderRadius: '6px',
-                                background: isExpanded ? 'rgba(26, 86, 219, 0.1)' : 'transparent',
+                                background: isExpanded ? 'rgba(26, 86, 219, 0.12)' : 'rgba(15, 23, 42, 0.05)',
                                 color: isExpanded ? 'var(--primary)' : 'var(--text-muted)',
                                 transition: 'all 0.2s',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                transform: isExpanded ? 'rotate(90deg)' : 'none'
                               }}
                             >
-                              <ChevronRight 
-                                size={14} 
-                                style={{ 
-                                  transform: isExpanded ? 'rotate(90deg)' : 'none',
-                                  transition: 'transform 0.2s' 
-                                }} 
-                              />
+                              <ChevronRight size={14} />
                             </div>
                           </div>
 
