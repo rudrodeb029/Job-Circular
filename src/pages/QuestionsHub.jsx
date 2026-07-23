@@ -326,21 +326,21 @@ export default function QuestionsHub() {
                   className="animate-slide-up"
                   style={{
                     background: status.type === 'live'
-                      ? 'linear-gradient(135deg, #f4f8ff 0%, #ffffff 100%)'
+                      ? 'linear-gradient(135deg, #fff5f5 0%, #ffffff 100%)'
                       : status.type === 'upcoming'
-                        ? 'linear-gradient(135deg, #fffdf8 0%, #ffffff 100%)'
+                        ? 'linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%)'
                         : 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
                     border: status.type === 'live' 
-                      ? '1.5px solid rgba(26, 86, 219, 0.2)' 
+                      ? '1.5px solid rgba(239, 68, 68, 0.18)' 
                       : status.type === 'upcoming'
-                        ? '1.5px solid rgba(245, 158, 11, 0.2)'
+                        ? '1.5px solid rgba(37, 99, 235, 0.18)'
                         : '1.5px solid #e2e8f0',
                     borderRadius: '20px',
                     padding: '20px',
                     boxShadow: status.type === 'live'
-                      ? '0 8px 24px rgba(26, 86, 219, 0.06)'
+                      ? '0 8px 24px rgba(239, 68, 68, 0.04)'
                       : status.type === 'upcoming'
-                        ? '0 8px 24px rgba(245, 158, 11, 0.04)'
+                        ? '0 8px 24px rgba(37, 99, 235, 0.04)'
                         : '0 4px 12px rgba(0, 0, 0, 0.02)',
                     position: 'relative',
                     overflow: 'hidden'
@@ -440,13 +440,13 @@ export default function QuestionsHub() {
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'center',
-                      background: 'rgba(245, 158, 11, 0.04)',
-                      border: '1px solid rgba(245, 158, 11, 0.12)',
+                      background: 'rgba(37, 99, 235, 0.04)',
+                      border: '1px solid rgba(37, 99, 235, 0.12)',
                       borderRadius: '10px',
                       padding: '8px 12px',
                       marginBottom: '14px'
                     }}>
-                      <span style={{ fontSize: '11px', color: '#b45309', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontSize: '11px', color: '#1e3a8a', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                           <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -460,8 +460,8 @@ export default function QuestionsHub() {
                           minute: '2-digit'
                         })}
                       </span>
-                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--warning)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ color: '#b45309', fontWeight: 500 }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--primary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ color: '#2563eb', fontWeight: 500 }}>
                           {isEn ? 'Left:' : 'বাকি:'}
                         </span>
                         <span style={{ fontFamily: 'monospace' }}>
