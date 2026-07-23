@@ -145,8 +145,8 @@ export const generate100Questions = (examIndex) => {
 export const defaultLiveExams = [
   {
     id: 'live-exam-1',
-    title: 'বিসিএস লাইভ পরীক্ষা - ০১ (১০০ প্রশ্নপত্র)',
-    titleEn: 'BCS Live Exam - 01 (100 MCQ Paper)',
+    title: 'বিসিএস লাইভ পরীক্ষা (১০০ প্রশ্নপত্র)',
+    titleEn: 'BCS Live Exam (100 MCQ Paper)',
     startTime: new Date(Date.now() + 2 * 60 * 1000).toISOString(), // Starts in 2 mins
     duration: 60, // 60 minutes
     subjectTopics: [
@@ -159,8 +159,8 @@ export const defaultLiveExams = [
   },
   {
     id: 'live-exam-2',
-    title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা - ০২',
-    titleEn: 'Primary Assistant Teacher Live Exam - 02',
+    title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা',
+    titleEn: 'Primary Assistant Teacher Live Exam',
     startTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // Starts in 1 hour
     duration: 80,
     subjectTopics: [
@@ -176,7 +176,26 @@ export const defaultLiveExams = [
 export const getLiveExams = () => {
   try {
     const saved = localStorage.getItem('admin_live_exams');
-    if (saved) return JSON.parse(saved);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return parsed.map(exam => {
+        if (exam.id === 'live-exam-1') {
+          return {
+            ...exam,
+            title: 'বিসিএস লাইভ পরীক্ষা (১০০ প্রশ্নপত্র)',
+            titleEn: 'BCS Live Exam (100 MCQ Paper)'
+          };
+        }
+        if (exam.id === 'live-exam-2') {
+          return {
+            ...exam,
+            title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা',
+            titleEn: 'Primary Assistant Teacher Live Exam'
+          };
+        }
+        return exam;
+      });
+    }
   } catch (e) {
     console.error(e);
   }
