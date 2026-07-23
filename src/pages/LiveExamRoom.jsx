@@ -173,7 +173,7 @@ export default function LiveExamRoom() {
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
       {/* Header */}
       <div className="page-header flex-between" style={{ borderBottom: 'none' }}>
-        <button className="back-btn" onClick={() => navigate('/live-exams')}>
+        <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
