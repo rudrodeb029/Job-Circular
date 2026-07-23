@@ -440,7 +440,7 @@ export default function LiveExamRoom() {
                   <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path>
                   <path d="M12 2a6 6 0 0 0-6 6v3.5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path>
                 </svg>
-                <span>{isEn ? 'Daily Competitive Ranks' : 'দৈনিক প্রতিযোগিতামূলক র‍্যাংক তালিকা'}</span>
+                <span>{isEn ? 'Rank List' : 'র‍্যাংক তালিকা'}</span>
               </h3>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
