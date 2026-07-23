@@ -64,14 +64,14 @@ export default function LiveExamRoom() {
   // Generate dynamic Daily Leaderboard list ranking mock and user scores out of 100
   const leaderboardData = useMemo(() => {
     const mockUsers = [
-      { name: 'সাদিয়া তাসনিম', nameEn: 'Sadia Tasnim', score: 94, time: '38m 12s', avatar: '👩' },
-      { name: 'মেহেদী হাসান', nameEn: 'Mehedi Hasan', score: 91, time: '41m 05s', avatar: '👨' },
-      { name: 'তন্ময় রায়', nameEn: 'Tonmoy Roy', score: 88, time: '44m 30s', avatar: '👨' },
-      { name: 'নুসরাত জাহান', nameEn: 'Nusrat Jahan', score: 85, time: '36m 50s', avatar: '👩' },
-      { name: 'আরিফুর রহমান', nameEn: 'Arifur Rahman', score: 81, time: '49m 12s', avatar: '👨' },
-      { name: 'ফারজানা আক্তার', nameEn: 'Farjana Akter', score: 79, time: '42m 18s', avatar: '👩' },
-      { name: 'জাকির হোসেন', nameEn: 'Zakir Hossain', score: 75, time: '51m 40s', avatar: '👨' },
-      { name: 'শামীমা ইয়াসমিন', nameEn: 'Shamima Yasmin', score: 72, time: '46m 10s', avatar: '👩' }
+      { name: 'সাদিয়া তাসনিম', nameEn: 'Sadia Tasnim', score: 94, time: '38m 12s', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
+      { name: 'মেহেদী হাসান', nameEn: 'Mehedi Hasan', score: 91, time: '41m 05s', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
+      { name: 'তন্ময় রায়', nameEn: 'Tonmoy Roy', score: 88, time: '44m 30s', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
+      { name: 'নুসরাত জাহান', nameEn: 'Nusrat Jahan', score: 85, time: '36m 50s', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
+      { name: 'আরিফুর রহমান', nameEn: 'Arifur Rahman', score: 81, time: '49m 12s', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
+      { name: 'ফারজানা আক্তার', nameEn: 'Farjana Akter', score: 79, time: '42m 18s', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
+      { name: 'জাকির হোসেন', nameEn: 'Zakir Hossain', score: 75, time: '51m 40s', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' },
+      { name: 'শামীমা ইয়াসমিন', nameEn: 'Shamima Yasmin', score: 72, time: '46m 10s', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' }
     ];
 
     const currentResult = savedResult || (submitted ? getExamResultLocal() : null);
@@ -85,7 +85,7 @@ export default function LiveExamRoom() {
         nameEn: 'Suvro (You)',
         score: scaledScore,
         time: isEn ? '45m 00s' : '৪৫মি: ০০সে:',
-        avatar: '🎓',
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
         isCurrentUser: true
       });
     }
@@ -524,23 +524,18 @@ export default function LiveExamRoom() {
                           {isEn ? rank : toBengaliNumber(rank)}
                         </span>
 
-                        {/* Styled Initials Avatar */}
-                        <div style={{
-                          width: '36px',
-                          height: '36px',
-                          borderRadius: '50%',
-                          background: avatarStyle.bg,
-                          color: avatarStyle.text,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontWeight: 700,
-                          fontSize: '13px',
-                          textTransform: 'uppercase',
-                          border: `1.5px solid ${avatarStyle.text}`
-                        }}>
-                          {initial}
-                        </div>
+                        {/* Profile Picture */}
+                        <img 
+                          src={user.avatar} 
+                          alt={displayName}
+                          style={{
+                            width: '36px',
+                            height: '36px',
+                            borderRadius: '50%',
+                            objectFit: 'cover',
+                            border: `1.5px solid ${avatarStyle.text}`
+                          }} 
+                        />
                         
                         <div>
                           <strong style={{ fontSize: '13px', color: 'var(--text-primary)', display: 'block' }}>
