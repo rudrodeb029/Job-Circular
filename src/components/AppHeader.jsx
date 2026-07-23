@@ -371,6 +371,26 @@ export default function AppHeader() {
                         </div>
                       );
                     })}
+
+                    {/* Live Exam link */}
+                    <Link
+                      to="/live-exams"
+                      onClick={() => setDrawerOpen(false)}
+                      style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        borderRadius: '8px',
+                        padding: '8px 10px 8px 16px',
+                        cursor: 'pointer',
+                        textDecoration: 'none'
+                      }}
+                      className="menu-item-sub"
+                    >
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span>🔴</span>
+                        <span>{state.language === 'en' ? 'Live Exam' : 'লাইভ এক্সাম'}</span>
+                      </span>
+                    </Link>
                   </div>
                 )}
               </div>

@@ -23,6 +23,8 @@ import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 import QuestionsList from './pages/QuestionsList'
 import QuestionDetails from './pages/QuestionDetails'
+import LiveExams from './pages/LiveExams'
+import LiveExamRoom from './pages/LiveExamRoom'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -30,6 +32,7 @@ import AdminLayout from './pages/admin/AdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import ManageJobs from './pages/admin/ManageJobs'
 import ManageNotifications from './pages/admin/ManageNotifications'
+import ManageLiveExams from './pages/admin/ManageLiveExams'
 import Statistics from './pages/admin/Statistics'
 import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
@@ -90,6 +93,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="jobs" element={<ManageJobs />} />
+            <Route path="live-exams" element={<ManageLiveExams />} />
             <Route path="notifications" element={<ManageNotifications />} />
             <Route path="stats" element={<Statistics />} />
             <Route path="reports" element={<Reports />} />
@@ -119,6 +123,8 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/questions/:category" element={<QuestionsList />} />
         <Route path="/question-details/:id" element={<QuestionDetails />} />
+        <Route path="/live-exams" element={<LiveExams />} />
+        <Route path="/live-exam-room/:id" element={<LiveExamRoom />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <VersionUpdateModal 
