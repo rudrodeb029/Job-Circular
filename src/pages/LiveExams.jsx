@@ -401,24 +401,24 @@ export default function LiveExams() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   
                   {status === 'upcoming' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
                       <button
                         onClick={() => handleRegister(exam.id)}
                         style={{
-                          width: '100%',
-                          padding: '12px',
+                          width: 'auto',
+                          padding: '10px 24px',
                           borderRadius: '12px',
                           border: isRegistered ? '1.5px solid #10b981' : 'none',
                           background: isRegistered ? 'rgba(16, 185, 129, 0.05)' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
                           color: isRegistered ? '#047857' : 'white',
                           fontWeight: 800,
-                          fontSize: '13px',
+                          fontSize: '12.5px',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '6px',
-                          boxShadow: isRegistered ? 'none' : '0 4px 14px rgba(26, 86, 219, 0.2)'
+                          boxShadow: isRegistered ? 'none' : '0 4px 14px rgba(26, 86, 219, 0.15)'
                         }}
                       >
                         {isRegistered ? (
@@ -451,23 +451,25 @@ export default function LiveExams() {
                   )}
 
                   {status === 'running' && (
-                    <button
-                      onClick={() => navigate(`/live-exam-room/${exam.id}`)}
-                      style={{
-                        width: '100%',
-                        padding: '14px',
-                        borderRadius: '12px',
-                        border: 'none',
-                        background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                        color: 'white',
-                        fontWeight: 800,
-                        fontSize: '13px',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 14px rgba(239, 68, 68, 0.3)'
-                      }}
-                    >
-                      {isEn ? 'Enter Exam Room Now' : 'পরীক্ষায় অংশ নিন (লাইভ)'} ➔
-                    </button>
+                    <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                      <button
+                        onClick={() => navigate(`/live-exam-room/${exam.id}`)}
+                        style={{
+                          width: 'auto',
+                          padding: '10px 28px',
+                          borderRadius: '12px',
+                          border: 'none',
+                          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                          color: 'white',
+                          fontWeight: 800,
+                          fontSize: '12.5px',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 14px rgba(239, 68, 68, 0.2)'
+                        }}
+                      >
+                        {isEn ? 'Enter Exam Room Now' : 'পরীক্ষায় অংশ নিন (লাইভ)'} ➔
+                      </button>
+                    </div>
                   )}
 
                   {status === 'completed' && (
