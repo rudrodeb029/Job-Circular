@@ -106,7 +106,7 @@ export default function LiveExams() {
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '18px', fontWeight: 800 }}>
-          {isEn ? 'Live MCQ Exams' : 'লাইভ এমসিকিউ পরীক্ষা'}
+          Live MCQ Exam
         </h1>
       </div>
 
