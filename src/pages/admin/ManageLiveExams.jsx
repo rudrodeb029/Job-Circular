@@ -23,10 +23,30 @@ export default function ManageLiveExams() {
   const [titleEn, setTitleEn] = useState('');
   const [startTime, setStartTime] = useState('');
   const [duration, setDuration] = useState('10');
-  const [subjects, setSubjects] = useState('');
-  const [subjectsEn, setSubjectsEn] = useState('');
-  const [topics, setTopics] = useState('');
-  const [topicsEn, setTopicsEn] = useState('');
+  const [subjectTopics, setSubjectTopics] = useState([
+    { subject: '', subjectEn: '', topics: '', topicsEn: '' }
+  ]);
+
+  const handleAddSubjectTopicRow = () => {
+    setSubjectTopics(prev => [
+      ...prev,
+      { subject: '', subjectEn: '', topics: '', topicsEn: '' }
+    ]);
+  };
+
+  const handleRemoveSubjectTopicRow = (index) => {
+    if (subjectTopics.length <= 1) return;
+    setSubjectTopics(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubjectTopicFieldChange = (index, field, value) => {
+    setSubjectTopics(prev => prev.map((st, i) => {
+      if (i === index) {
+        return { ...st, [field]: value };
+      }
+      return st;
+    }));
+  };
   const [questions, setQuestions] = useState([
     {
       question: '',
@@ -107,10 +127,7 @@ export default function ManageLiveExams() {
       titleEn,
       startTime: new Date(startTime).toISOString(),
       duration: parseInt(duration, 10),
-      subjects: subjects || 'সাধারণ জ্ঞান',
-      subjectsEn: subjectsEn || 'General Knowledge',
-      topics: topics || 'লাইভ এমসিকিউ',
-      topicsEn: topicsEn || 'Live MCQ',
+      subjectTopics,
       questions
     };
 
@@ -125,10 +142,9 @@ export default function ManageLiveExams() {
     setTitleEn('');
     setStartTime('');
     setDuration('10');
-    setSubjects('');
-    setSubjectsEn('');
-    setTopics('');
-    setTopicsEn('');
+    setSubjectTopics([
+      { subject: '', subjectEn: '', topics: '', topicsEn: '' }
+    ]);
     setQuestions([
       {
         question: '',
@@ -240,26 +256,66 @@ export default function ManageLiveExams() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Subjects (Bangla)</label>
-              <input value={subjects} onChange={(e) => setSubjects(e.target.value)} type="text" placeholder="যেমন: সাধারণ জ্ঞান, বাংলা" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Subjects (English)</label>
-              <input value={subjectsEn} onChange={(e) => setSubjectsEn(e.target.value)} type="text" placeholder="e.g. General Knowledge, Bangla" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
-            </div>
-          </div>
+          <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#334155', margin: '0 0 12px 0' }}>
+              Subjects & Topics Coverage
+            </h4>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {subjectTopics.map((st, sIdx) => (
+                <div key={sIdx} style={{ background: 'white', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0', position: 'relative' }}>
+                  {subjectTopics.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveSubjectTopicRow(sIdx)}
+                      style={{ position: 'absolute', top: '10px', right: '10px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: 600, cursor: 'pointer', fontSize: '11px' }}
+                    >
+                      ✕ Remove
+                    </button>
+                  )}
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '10px' }}>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Subject (Bangla)</label>
+                      <input value={st.subject} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'subject', e.target.value)} type="text" placeholder="যেমন: বাংলা" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Subject (English)</label>
+                      <input value={st.subjectEn} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'subjectEn', e.target.value)} type="text" placeholder="e.g. Bengali" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
+                    </div>
+                  </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Topics (Bangla)</label>
-              <input value={topics} onChange={(e) => setTopics(e.target.value)} type="text" placeholder="যেমন: চর্যাপদ, মুক্তিযুদ্ধ, ভগ্নাংশ" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Topics (Bangla)</label>
+                      <input value={st.topics} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'topics', e.target.value)} type="text" placeholder="যেমন: চর্যাপদ, ব্যাকরণ" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Topics (English)</label>
+                      <input value={st.topicsEn} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'topicsEn', e.target.value)} type="text" placeholder="e.g. Charyapada, Grammar" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Topics (English)</label>
-              <input value={topicsEn} onChange={(e) => setTopicsEn(e.target.value)} type="text" placeholder="e.g. Liberation War, Fractions" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
-            </div>
+
+            <button
+              type="button"
+              onClick={handleAddSubjectTopicRow}
+              style={{
+                marginTop: '12px',
+                padding: '8px 12px',
+                background: '#eff6ff',
+                color: '#1a56db',
+                fontWeight: 700,
+                fontSize: '12px',
+                border: '1px dashed #1a56db',
+                borderRadius: '6px',
+                cursor: 'pointer'
+              }}
+            >
+              ➕ Add Subject & Topics Row
+            </button>
           </div>
 
           <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', marginBottom: '18px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>

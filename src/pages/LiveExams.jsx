@@ -302,7 +302,7 @@ export default function LiveExams() {
                   {isEn ? exam.titleEn : exam.title}
                 </h4>
 
-                {/* Subjects & Topics */}
+                {/* Subjects & Topics separately */}
                 <div style={{
                   background: 'var(--bg-secondary)',
                   borderRadius: '14px',
@@ -310,36 +310,53 @@ export default function LiveExams() {
                   marginBottom: '16px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '8px'
+                  gap: '12px'
                 }}>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, minWidth: '60px' }}>
-                      {isEn ? 'Subjects:' : 'বিষয়সমূহ:'}
-                    </span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-primary)', fontWeight: 700 }}>
-                      {isEn ? exam.subjectsEn : exam.subjects}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'flex-start' }}>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600, minWidth: '60px' }}>
-                      {isEn ? 'Topics:' : 'টপিকস:'}
-                    </span>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                      {(isEn ? exam.topicsEn : exam.topics)?.split(',').map((t, idx) => (
-                        <span key={idx} style={{
-                          fontSize: '10px',
-                          fontWeight: 600,
-                          background: 'var(--white)',
-                          border: '1px solid var(--border-light)',
-                          color: 'var(--text-secondary)',
-                          padding: '2px 8px',
-                          borderRadius: '6px'
-                        }}>
-                          {t.trim()}
+                  {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
+                    exam.subjectTopics.map((st, idx) => (
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+                          📚 {isEn ? st.subjectEn : st.subject}
                         </span>
-                      ))}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '4px' }}>
+                          {(isEn ? st.topicsEn : st.topics)?.split(',').map((t, tIdx) => (
+                            <span key={tIdx} style={{
+                              fontSize: '10px',
+                              fontWeight: 600,
+                              background: 'var(--white)',
+                              border: '1px solid var(--border-light)',
+                              color: 'var(--text-secondary)',
+                              padding: '2px 8px',
+                              borderRadius: '6px'
+                            }}>
+                              📌 {t.trim()}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 800 }}>
+                        📚 {isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ'}
+                      </span>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {(isEn ? exam.topicsEn : exam.topics)?.split(',').map((t, idx) => (
+                          <span key={idx} style={{
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            background: 'var(--white)',
+                            border: '1px solid var(--border-light)',
+                            color: 'var(--text-secondary)',
+                            padding: '2px 8px',
+                            borderRadius: '6px'
+                          }}>
+                            📌 {t.trim()}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
 
                 {/* Start Date & Time details */}

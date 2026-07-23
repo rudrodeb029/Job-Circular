@@ -149,10 +149,12 @@ export const defaultLiveExams = [
     titleEn: 'BCS Live Model Test - 01 (100 MCQ Paper)',
     startTime: new Date(Date.now() + 2 * 60 * 1000).toISOString(), // Starts in 2 mins
     duration: 60, // 60 minutes
-    subjects: 'বাংলা, ইংরেজি, গণিত, সাধারণ জ্ঞান, আইসিটি',
-    subjectsEn: 'Bengali, English, Math, General Knowledge, ICT',
-    topics: 'চর্যাপদ, লাভ-ক্ষতি, ব্যাকরণ, মুক্তিযুদ্ধ, ইনপুট ডিভাইস',
-    topicsEn: 'Charyapada, Profit-Loss, Grammar, Liberation War, Input Devices',
+    subjectTopics: [
+      { subject: 'বাংলা', subjectEn: 'Bengali', topics: 'চর্যাপদ, ব্যাকরণ', topicsEn: 'Charyapada, Grammar' },
+      { subject: 'গণিত', subjectEn: 'Mathematics', topics: 'লাভ-ক্ষতি', topicsEn: 'Profit & Loss' },
+      { subject: 'সাধারণ জ্ঞান', subjectEn: 'General Knowledge', topics: 'মুক্তিযুদ্ধ, ইতিহাস', topicsEn: 'Liberation War, History' },
+      { subject: 'আইসিটি', subjectEn: 'ICT', topics: 'ইনপুট ডিভাইস', topicsEn: 'Input Devices' }
+    ],
     questions: generate100Questions(1)
   },
   {
@@ -161,10 +163,12 @@ export const defaultLiveExams = [
     titleEn: 'Primary Assistant Teacher Live Model Test - 02',
     startTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // Starts in 1 hour
     duration: 80,
-    subjects: 'গণিত, বিজ্ঞান, বাংলা সাহিত্য, গ্রামার',
-    subjectsEn: 'Math, Science, Bengali Literature, Grammar',
-    topics: 'মৌলিক সংখ্যা, রক্তকণিকা, বিপরীত শব্দ, বিপরীত অর্থ',
-    topicsEn: 'Prime Numbers, Blood Cells, Antonyms, Syntaxes',
+    subjectTopics: [
+      { subject: 'গণিত', subjectEn: 'Mathematics', topics: 'মৌলিক সংখ্যা, লাভ-ক্ষতি', topicsEn: 'Prime Numbers, Profit-Loss' },
+      { subject: 'বিজ্ঞান', subjectEn: 'Science', topics: 'রক্তকণিকা, রক্তচাপ', topicsEn: 'Blood Cells, Blood Pressure' },
+      { subject: 'বাংলা', subjectEn: 'Bengali', topics: 'বিপরীত শব্দ, এককথায় প্রকাশ', topicsEn: 'Antonyms, Conversions' },
+      { subject: 'ইংরেজি', subjectEn: 'English', topics: 'Grammar, Synonyms', topicsEn: 'Grammar, Synonyms' }
+    ],
     questions: generate100Questions(2)
   }
 ];
