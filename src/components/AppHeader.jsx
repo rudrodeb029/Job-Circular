@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun } from './Icons';
+import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { notifications } from '../data/notifications';
+import { questionsData } from '../data/questionsData';
 
 export default function AppHeader() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [questionsMenuOpen, setQuestionsMenuOpen] = useState(true); // Default open for better discoverability
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   const unreadCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
 
@@ -237,31 +240,149 @@ export default function AppHeader() {
             </div>
 
             {/* Drawer Menu Links */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, overflowY: 'auto' }}>
               <Link to="/home" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Home size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Home' : 'হোম'}</span>
               </Link>
-              <Link to="/categories" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><LayoutGrid size={20} /></div>
-                <span className="menu-item-label">{state.language === 'en' ? 'Categories' : 'ক্যাটাগরি'}</span>
-              </Link>
-              <Link to="/saved" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Bookmark size={20} /></div>
-                <span className="menu-item-label">{state.language === 'en' ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
-              </Link>
-              <Link to="/admit-card" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><FileText size={20} /></div>
-                <span className="menu-item-label">{state.language === 'en' ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
-              </Link>
-              <Link to="/notifications" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Bell size={20} /></div>
-                <span className="menu-item-label">{state.language === 'en' ? 'Notifications' : 'নোটিফিকেশন'}</span>
-              </Link>
-              <Link to="/profile" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><User size={20} /></div>
-                <span className="menu-item-label">{state.language === 'en' ? 'Profile' : 'প্রোফাইল'}</span>
-              </Link>
+
+              {/* Collapsible Question Paper & Answer Section */}
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div 
+                  onClick={() => setQuestionsMenuOpen(!questionsMenuOpen)}
+                  className="menu-item" 
+                  style={{ 
+                    borderRadius: '10px', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    cursor: 'pointer',
+                    borderBottom: questionsMenuOpen ? 'none' : '1px solid var(--border-light)'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div className="menu-item-icon"><FileText size={20} /></div>
+                    <span className="menu-item-label" style={{ fontWeight: 700 }}>
+                      {state.language === 'en' ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
+                    </span>
+                  </div>
+                  <ChevronRight 
+                    size={18} 
+                    style={{ 
+                      transform: questionsMenuOpen ? 'rotate(90deg)' : 'none',
+                      transition: 'transform 0.2s',
+                      color: 'var(--text-muted)'
+                    }} 
+                  />
+                </div>
+
+                {questionsMenuOpen && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '8px' }}>
+                    {[
+                      { id: 'bcs', label: 'বিসিএস', labelEn: 'BCS', icon: '🎓' },
+                      { id: 'bank', label: 'ব্যাংক', labelEn: 'Bank', icon: '🏦' },
+                      { id: 'ntrca', label: 'NTRCA', labelEn: 'NTRCA', icon: '📜' },
+                      { id: 'primary', label: 'প্রাইমারি', labelEn: 'Primary', icon: '🏫' },
+                      { id: 'ministry', label: 'বিভিন্ন মন্ত্রনালয়', labelEn: 'Ministries', icon: '🏛️' }
+                    ].map(cat => {
+                      const isExpanded = expandedCategory === cat.id;
+                      const papers = questionsData.filter(p => p.category === cat.id);
+
+                      return (
+                        <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                          <div 
+                            style={{ 
+                              display: 'flex', 
+                              alignItems: 'center', 
+                              justifyContent: 'space-between',
+                              borderRadius: '8px',
+                              padding: '8px 10px 8px 16px',
+                              cursor: 'pointer',
+                              background: isExpanded ? 'var(--primary-bg)' : 'transparent'
+                            }}
+                            className="menu-item-sub"
+                            onClick={() => {
+                              setDrawerOpen(false);
+                              navigate(`/questions/${cat.id}`);
+                            }}
+                          >
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span>{cat.icon}</span>
+                              <span>{state.language === 'en' ? cat.labelEn : cat.label}</span>
+                            </span>
+
+                            <div 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExpandedCategory(isExpanded ? null : cat.id);
+                              }}
+                              style={{
+                                padding: '4px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '6px',
+                                background: isExpanded ? 'rgba(26, 86, 219, 0.1)' : 'transparent',
+                                color: isExpanded ? 'var(--primary)' : 'var(--text-muted)',
+                                transition: 'all 0.2s',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <ChevronRight 
+                                size={14} 
+                                style={{ 
+                                  transform: isExpanded ? 'rotate(90deg)' : 'none',
+                                  transition: 'transform 0.2s' 
+                                }} 
+                              />
+                            </div>
+                          </div>
+
+                          {isExpanded && (
+                            <div style={{ 
+                              display: 'flex', 
+                              flexDirection: 'column', 
+                              paddingLeft: '12px',
+                              borderLeft: '1px solid var(--border-light)',
+                              marginLeft: '26px',
+                              gap: '2px',
+                              marginTop: '2px',
+                              marginBottom: '6px'
+                            }}>
+                              {papers.map(paper => (
+                                <Link
+                                  key={paper.id}
+                                  to={`/question-details/${paper.id}`}
+                                  onClick={() => setDrawerOpen(false)}
+                                  style={{
+                                    fontSize: '11px',
+                                    fontWeight: 500,
+                                    color: 'var(--text-secondary)',
+                                    textDecoration: 'none',
+                                    padding: '6px 8px',
+                                    borderRadius: '6px',
+                                    display: 'block',
+                                    lineHeight: '1.4'
+                                  }}
+                                  className="menu-sub-paper"
+                                >
+                                  📝 {state.language === 'en' ? paper.titleEn : paper.title}
+                                </Link>
+                              ))}
+                              {papers.length === 0 && (
+                                <span style={{ fontSize: '11px', color: 'var(--text-muted)', padding: '6px 8px' }}>
+                                  {state.language === 'en' ? 'No papers yet' : 'কোনো প্রশ্নপত্র নেই'}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
               <Link to="/settings" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Settings size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Settings' : 'সেটিংস'}</span>

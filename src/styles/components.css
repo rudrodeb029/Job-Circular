@@ -1146,3 +1146,22 @@
 .hamburger-btn.open .hamburger-line-3 {
   transform: translateX(2px);
 }
+
+/* Collapsible Question Menu Styles */
+.menu-item-sub {
+  transition: var(--transition-fast);
+  text-decoration: none;
+}
+.menu-item-sub:hover {
+  background: var(--border-light);
+}
+
+.menu-sub-paper {
+  transition: var(--transition-fast);
+}
+.menu-sub-paper:hover {
+  background: var(--primary-bg);
+  color: var(--primary) !important;
+  padding-left: 12px !important;
+}
+

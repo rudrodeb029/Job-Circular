@@ -21,6 +21,8 @@ import AdmitCardResult from './pages/AdmitCardResult'
 import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
+import QuestionsList from './pages/QuestionsList'
+import QuestionDetails from './pages/QuestionDetails'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -115,6 +117,8 @@ function App() {
         <Route path="/admit-card" element={<AdmitCardResult />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/questions/:category" element={<QuestionsList />} />
+        <Route path="/question-details/:id" element={<QuestionDetails />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <VersionUpdateModal 
