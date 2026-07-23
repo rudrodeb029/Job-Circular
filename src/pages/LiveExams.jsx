@@ -266,27 +266,37 @@ export default function LiveExams() {
                   )}
 
                   {status === 'upcoming' && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px' }}>
                       <span style={{
-                        fontSize: '10px',
+                        fontSize: '9.5px',
                         fontWeight: 800,
                         color: '#d97706',
                         background: 'rgba(245, 158, 11, 0.08)',
-                        padding: '5px 12px',
+                        padding: '5px 10px',
                         borderRadius: '30px'
                       }}>
                         {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
                       </span>
                       <span style={{
-                        fontSize: '10px',
-                        fontWeight: 800,
-                        color: 'var(--warning)',
-                        background: 'rgba(245, 158, 11, 0.08)',
+                        fontSize: '9.5px',
+                        fontWeight: 700,
+                        color: 'var(--text-secondary)',
+                        background: 'var(--bg-secondary)',
                         padding: '5px 12px',
                         borderRadius: '30px',
-                        fontFamily: 'monospace'
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px'
                       }}>
-                        {getCountdownString(startMs)}
+                        {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                        <span style={{ color: 'var(--warning)', fontWeight: 800, fontFamily: 'monospace', marginLeft: '4px' }}>
+                          ({isEn ? 'Left:' : 'বাকি:'} {getCountdownString(startMs)})
+                        </span>
                       </span>
                     </div>
                   )}
@@ -378,36 +388,6 @@ export default function LiveExams() {
                       </div>
                     </div>
                   )}
-                </div>
-
-                {/* Start Date & Time details */}
-                <div style={{
-                  background: 'rgba(26, 86, 219, 0.03)',
-                  border: '1px dashed rgba(26, 86, 219, 0.15)',
-                  borderRadius: '12px',
-                  padding: '10px 14px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '16px'
-                }}>
-                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                      <line x1="16" y1="2" x2="16" y2="6"></line>
-                      <line x1="8" y1="2" x2="8" y2="6"></line>
-                      <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    {isEn ? 'Starts At:' : 'শুরুর সময়:'}{' '}
-                    <strong style={{ color: 'var(--primary)' }}>
-                      {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </strong>
-                  </span>
                 </div>
 
                 {/* Bottom Actions */}
