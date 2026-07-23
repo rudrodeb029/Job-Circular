@@ -278,15 +278,6 @@ export default function Home() {
                 <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
               </div>
             ))}
-            <div
-              className="category-grid-item"
-              onClick={() => navigate('/questions-hub')}
-            >
-              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)' }}>
-                <LayoutGrid size={22} />
-              </div>
-              <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
-            </div>
           </div>
         </div>
 
