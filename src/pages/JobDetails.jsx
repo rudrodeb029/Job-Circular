@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bookmark, BookmarkCheck, Calendar, Briefcase, Eye, Download } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
-import { jobs } from '../data/jobs';
+import { useAdminContext } from '../context/AdminContext';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
 
@@ -50,7 +50,10 @@ export default function JobDetails() {
   const [showFullImage, setShowFullImage] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const job = jobs.find(j => j.id === id);
+  const { state: adminState } = useAdminContext();
+  const localJobs = adminState.jobs || [];
+
+  const job = localJobs.find(j => j.id === id);
   if (!job) return <NotFoundPage />;
 
   const circularImages = job.circularImages && job.circularImages.length > 0 
