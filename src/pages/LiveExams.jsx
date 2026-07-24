@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from '../components/Icons';
+import { ArrowLeft, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { getLiveExams } from '../data/liveExams';
 import BottomNav from '../components/BottomNav';
@@ -109,8 +109,9 @@ export default function LiveExams() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1 style={{ flex: 1, fontSize: '18px', fontWeight: 800 }}>
-          Live MCQ Exam
+        <h1 style={{ flex: 1, fontSize: '18px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FileText size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+          <span>Live MCQ Exam</span>
         </h1>
       </div>
 

@@ -113,7 +113,10 @@ export default function AdmitCardResult() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1>{isEn ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FileText size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+          <span>{isEn ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
+        </h1>
       </div>
 
       <div className="page-content">

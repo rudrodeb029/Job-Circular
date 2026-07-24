@@ -162,7 +162,10 @@ export default function AllCirculars() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1 style={{ flex: 1 }}>{isEn ? 'All Circulars' : 'সব সার্কুলার'}</h1>
+        <h1 style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Briefcase size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+          <span>{isEn ? 'All Circulars' : 'সব সার্কুলার'}</span>
+        </h1>
       </div>
 
       <div className="page-content animate-fade-in">

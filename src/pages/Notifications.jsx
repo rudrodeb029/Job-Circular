@@ -22,7 +22,10 @@ export default function Notifications() {
   return (
     <div className="page">
       <div className="page-header flex-between">
-        <h1>{isEn ? 'Notifications' : 'নোটিফিকেশন'}</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Bell size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+          <span>{isEn ? 'Notifications' : 'নোটিফিকেশন'}</span>
+        </h1>
         {notificationsList.length > 0 && (
           <button
             onClick={handleMarkAllRead}

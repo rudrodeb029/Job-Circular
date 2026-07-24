@@ -216,8 +216,9 @@ export default function QuestionsHub() {
         <button className="back-btn" onClick={() => navigate('/home')}>
           <ArrowLeft size={22} />
         </button>
-        <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
-          {isEn ? 'Live MCQ Exam & Questions' : 'Live MCQ Exam ও প্রশ্নব্যাংক'}
+        <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FileText size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
+          <span>{isEn ? 'Live MCQ Exam & Questions' : 'Live MCQ Exam ও প্রশ্নব্যাংক'}</span>
         </h1>
       </div>
 

@@ -66,6 +66,7 @@ const toBengaliNumber = (num) => {
 export default function SavedJobs() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+  const isEn = state.language === 'en';
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -106,7 +107,10 @@ export default function SavedJobs() {
   return (
     <div className="page">
       <div className="page-header">
-        <h1>Saved Jobs</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Bookmark size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+          <span>{isEn ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
+        </h1>
       </div>
 
       <div className="page-content">
