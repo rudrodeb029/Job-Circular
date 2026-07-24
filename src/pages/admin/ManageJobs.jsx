@@ -37,9 +37,11 @@ export default function ManageJobs() {
     applyLink: '',
     status: 'Active',
     images: '',
-    circularType: 'regular',
     examDate: '',
-    examResult: ''
+    examResult: '',
+    showInExamDate: false,
+    showInResult: false,
+    linkedCircularId: ''
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -84,17 +86,11 @@ export default function ManageJobs() {
   const handleOpenModal = (job = null) => {
     if (job) {
       setEditingJob(job);
-      let cType = 'regular';
-      if (job.examResult) {
-        cType = 'result';
-      } else if (job.examDate) {
-        cType = 'exam_date';
-      }
       setFormData({
         ...job,
-        circularType: cType,
-        examDate: job.examDate || '',
-        examResult: job.examResult || '',
+        showInExamDate: !!job.examDate,
+        showInResult: !!job.examResult,
+        linkedCircularId: job.linkedCircularId || '',
         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : (job.requirements || ''),
         images: Array.isArray(job.images) ? job.images.join(', ') : (job.images || '')
       });
@@ -126,31 +122,49 @@ export default function ManageJobs() {
       ? formData.images.split(',').map(i => i.trim()).filter(i => i)
       : [];
       
-    let finalExamDate = '';
-    let finalExamResult = '';
-    if (formData.circularType === 'exam_date') {
-      finalExamDate = formData.examDate;
-    } else if (formData.circularType === 'result') {
-      finalExamResult = formData.examResult;
-    }
+    const finalExamDate = formData.showInExamDate ? formData.examDate : '';
+    const finalExamResult = formData.showInResult ? formData.examResult : '';
+
+    const targetId = editingJob 
+      ? editingJob.id 
+      : (formData.linkedCircularId ? formData.linkedCircularId : `job_${Date.now()}`);
 
     const jobData = {
       ...formData,
+      id: targetId,
       examDate: finalExamDate,
       examResult: finalExamResult,
       requirements: reqArray,
       images: imgArray,
-      id: editingJob ? editingJob.id : `job_${Date.now()}`,
-      postedAt: editingJob ? editingJob.postedAt : new Date().toISOString().split('T')[0]
+      postedAt: editingJob 
+        ? editingJob.postedAt 
+        : (formData.linkedCircularId 
+            ? (jobs.find(j => j.id === formData.linkedCircularId)?.postedAt || new Date().toISOString().split('T')[0]) 
+            : new Date().toISOString().split('T')[0])
     };
 
-    if (editingJob) {
+    if (editingJob || formData.linkedCircularId) {
       dispatch({ type: 'UPDATE_JOB', payload: jobData });
       dispatch({ 
         type: 'ADD_ACTIVITY', 
         payload: { id: `act_${Date.now()}`, action: 'Updated circular', target: jobData.title, time: 'Just now' } 
       });
-      showToast('Circular updated successfully!');
+      showToast(formData.linkedCircularId ? 'Linked Circular updated with exam/result info!' : 'Circular updated successfully!');
+      
+      if (formData.linkedCircularId) {
+        if (formData.showInExamDate && finalExamDate) {
+          triggerLocalNotification(
+            'পরীক্ষার তারিখ ঘোষণা! 📅',
+            `"${jobData.title}" পরীক্ষার তারিখ ঘোষণা করা হয়েছে: ${finalExamDate}`
+          );
+        }
+        if (formData.showInResult && finalExamResult) {
+          triggerLocalNotification(
+            'পরীক্ষার ফলাফল প্রকাশিত! 🏆',
+            `"${jobData.title}" পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`
+          );
+        }
+      }
     } else {
       dispatch({ type: 'ADD_JOB', payload: jobData });
       dispatch({ 
@@ -401,6 +415,44 @@ export default function ManageJobs() {
             </div>
             <div className="admin-modal-content" style={{ padding: '20px' }}>
               <form onSubmit={handleSaveJob}>
+                {/* Link to Existing Job Circular (Optional) */}
+                {!editingJob && (
+                  <div className="admin-form-group" style={{ marginBottom: '16px' }}>
+                    <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>
+                      Link to Existing Circular / Post Update (ঐচ্ছিক - পরীক্ষার তারিখ বা ফলাফলের তথ্য যোগ করতে বিদ্যমান সার্কুলারটি সিলেক্ট করুন)
+                    </label>
+                    <select
+                      className="admin-form-input"
+                      style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }}
+                      value={formData.linkedCircularId || ''}
+                      onChange={(e) => {
+                        const selectedId = e.target.value;
+                        if (selectedId) {
+                          const matchedJob = jobs.find(j => j.id === selectedId);
+                          if (matchedJob) {
+                            setFormData({
+                              ...initialFormState,
+                              ...matchedJob,
+                              linkedCircularId: selectedId,
+                              showInExamDate: !!matchedJob.examDate,
+                              showInResult: !!matchedJob.examResult,
+                              requirements: Array.isArray(matchedJob.requirements) ? matchedJob.requirements.join('\n') : (matchedJob.requirements || ''),
+                              images: Array.isArray(matchedJob.images) ? matchedJob.images.join(', ') : (matchedJob.images || '')
+                            });
+                          }
+                        } else {
+                          setFormData(initialFormState);
+                        }
+                      }}
+                    >
+                      <option value="">-- Select Existing Circular to update --</option>
+                      {jobs.map(j => (
+                        <option key={j.id} value={j.id}>{j.organization} - {j.title}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 <div className="admin-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                   <div className="admin-form-group">
                     <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Title (Bengali)</label>
@@ -455,35 +507,45 @@ export default function ManageJobs() {
                 </div>
 
                 <div className="admin-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div className="admin-form-group">
-                    <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Circular Type (সার্কুলার ক্যাটাগরি)</label>
-                    <select className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="circularType" value={formData.circularType || 'regular'} onChange={handleInputChange} required>
-                      <option value="regular">Regular Job Circular (সাধারণ নিয়োগ বিজ্ঞপ্তি)</option>
-                      <option value="exam_date">Exam Date Announcement (পরীক্ষার তারিখ ঘোষণা)</option>
-                      <option value="result">Exam Result Announcement (পরীক্ষার ফলাফল ঘোষণা)</option>
-                    </select>
+                  <div className="admin-form-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <label className="admin-form-label" style={{ color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Options (বিকল্পসমূহ)</label>
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center', height: '100%', padding: '10px 0' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', cursor: 'pointer', color: '#334155', fontWeight: '500' }}>
+                        <input
+                          type="checkbox"
+                          name="showInExamDate"
+                          checked={!!formData.showInExamDate}
+                          onChange={(e) => setFormData(prev => ({ ...prev, showInExamDate: e.target.checked }))}
+                        />
+                        <span>Exam Date (পরীক্ষার তারিখ)</span>
+                      </label>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', cursor: 'pointer', color: '#334155', fontWeight: '500' }}>
+                        <input
+                          type="checkbox"
+                          name="showInResult"
+                          checked={!!formData.showInResult}
+                          onChange={(e) => setFormData(prev => ({ ...prev, showInResult: e.target.checked }))}
+                        />
+                        <span>Result (ফলাফল)</span>
+                      </label>
+                    </div>
                   </div>
 
-                  {formData.circularType === 'exam_date' && (
-                    <div className="admin-form-group">
-                      <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Exam Date (পরীক্ষার তারিখ)</label>
-                      <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examDate" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024" required />
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {formData.showInExamDate && (
+                      <div className="admin-form-group">
+                        <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Exam Date (পরীক্ষার তারিখ)</label>
+                        <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examDate" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024" required />
+                      </div>
+                    )}
 
-                  {formData.circularType === 'result' && (
-                    <div className="admin-form-group">
-                      <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Result Sheet Link / PDF URL (ফলাফল লিংক)</label>
-                      <input type="url" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examResult" value={formData.examResult || ''} onChange={handleInputChange} placeholder="e.g. https://example.com/result.pdf" required />
-                    </div>
-                  )}
-
-                  {formData.circularType !== 'exam_date' && formData.circularType !== 'result' && (
-                    <div className="admin-form-group" style={{ opacity: 0.5 }}>
-                      <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>No Special Type (সাধারণ সার্কুলার)</label>
-                      <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f1f5f9', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none', cursor: 'not-allowed' }} value="N/A" disabled />
-                    </div>
-                  )}
+                    {formData.showInResult && (
+                      <div className="admin-form-group">
+                        <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Result Sheet Link / PDF URL (ফলাফল লিংক)</label>
+                        <input type="url" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examResult" value={formData.examResult || ''} onChange={handleInputChange} placeholder="e.g. https://example.com/result.pdf" required />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div className="admin-form-row" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', marginBottom: '16px' }}>

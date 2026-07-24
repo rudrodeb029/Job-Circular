@@ -156,7 +156,14 @@ export default function LiveExamRoom() {
     return `${pad(mins)}:${pad(secs)}`;
   };
 
-  const currentResult = savedResult || (submitted ? getExamResultLocal() : null);
+  const isCompleted = useMemo(() => {
+    if (!exam) return false;
+    const startMs = new Date(exam.startTime).getTime();
+    const endMs = startMs + exam.duration * 60 * 1000;
+    return Date.now() >= endMs;
+  }, [exam]);
+
+  const currentResult = savedResult || (submitted ? getExamResultLocal() : null) || (isCompleted ? { score: 0, total: exam.questions.length, answers: {}, didNotAttend: true } : null);
 
   function getExamResultLocal() {
     try {
@@ -257,17 +264,21 @@ export default function LiveExamRoom() {
             boxShadow: '0 4px 18px rgba(0,0,0,0.03)',
             textAlign: 'center'
           }}>
-            <span style={{ fontSize: '40px', display: 'block', marginBottom: '8px' }}>🏆</span>
+            <span style={{ fontSize: '40px', display: 'block', marginBottom: '8px' }}>{currentResult.didNotAttend ? '⏳' : '🏆'}</span>
             <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>
-              {isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল'}
+              {currentResult.didNotAttend 
+                ? (isEn ? 'Exam Closed' : 'পরীক্ষা শেষ হয়েছে')
+                : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
             <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-              {isEn ? 'Congratulations! You have completed the live test.' : 'অভিনন্দন! আপনি লাইভ পরীক্ষা সম্পন্ন করেছেন।'}
+              {currentResult.didNotAttend
+                ? (isEn ? 'This exam has ended. You can view the correct answers and leaderboard.' : 'এই পরীক্ষাটি শেষ হয়ে গেছে। আপনি এখন সঠিক উত্তর ও লিডারবোর্ড দেখতে পারেন।')
+                : (isEn ? 'Congratulations! You have completed the live test.' : 'অভিনন্দন! আপনি লাইভ পরীক্ষা সম্পন্ন করেছেন।')}
             </p>
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: currentResult.didNotAttend ? '1fr' : '1fr 1fr',
               gap: '12px',
               background: 'var(--bg-secondary)',
               padding: '14px',
@@ -281,14 +292,16 @@ export default function LiveExamRoom() {
                   {isEn ? currentResult.total : toBengaliNumber(currentResult.total)}
                 </strong>
               </div>
-              <div>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
-                  {isEn ? 'Your Score' : 'প্রাপ্ত নম্বর'}
-                </span>
-                <strong style={{ fontSize: '18px', color: 'var(--success)', fontWeight: 800 }}>
-                  {isEn ? currentResult.score : toBengaliNumber(currentResult.score)}
-                </strong>
-              </div>
+              {!currentResult.didNotAttend && (
+                <div>
+                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
+                    {isEn ? 'Your Score' : 'প্রাপ্ত নম্বর'}
+                  </span>
+                  <strong style={{ fontSize: '18px', color: 'var(--success)', fontWeight: 800 }}>
+                    {isEn ? currentResult.score : toBengaliNumber(currentResult.score)}
+                  </strong>
+                </div>
+              )}
             </div>
           </div>
         )}

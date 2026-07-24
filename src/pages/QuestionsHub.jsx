@@ -23,6 +23,7 @@ export default function QuestionsHub() {
 
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [papers, setPapers] = useState([]);
   
   // Real-time states
   const [liveExams, setLiveExams] = useState([]);
@@ -31,9 +32,30 @@ export default function QuestionsHub() {
   const [toastMessage, setToastMessage] = useState('');
   const [liveTab, setLiveTab] = useState('live'); // 'live' | 'history'
 
+  const allCategories = useMemo(() => {
+    const config = { ...categoryConfig };
+    papers.forEach(p => {
+      if (p.category && !config[p.category]) {
+        config[p.category] = {
+          name: p.categoryName || p.category,
+          nameEn: p.categoryNameEn || p.category,
+          color: 'rgba(139, 92, 246, 0.05)',
+          icon: '📝'
+        };
+      }
+    });
+    return config;
+  }, [papers]);
+ 
   // Load state and setup clock ticker
   useEffect(() => {
     setLiveExams(getLiveExams());
+    setPapers(getQuestionsData());
+
+    const handleUpdate = () => {
+      setPapers(getQuestionsData());
+    };
+    window.addEventListener('questions_updated', handleUpdate);
 
     // Load registrations
     try {
@@ -42,12 +64,15 @@ export default function QuestionsHub() {
     } catch (e) {
       console.error(e);
     }
-
+ 
     const interval = setInterval(() => {
       setNow(Date.now());
     }, 1000);
-
-    return () => clearInterval(interval);
+ 
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('questions_updated', handleUpdate);
+    };
   }, []);
 
   const getExamResult = (examId) => {
@@ -174,7 +199,7 @@ export default function QuestionsHub() {
 
   // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {
-    let list = getQuestionsData();
+    let list = papers;
     if (activeCategory !== 'all') {
       list = list.filter(p => p.category === activeCategory);
     }
@@ -186,7 +211,7 @@ export default function QuestionsHub() {
       );
     }
     return list;
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, papers]);
 
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
@@ -687,8 +712,8 @@ export default function QuestionsHub() {
               </span>
             </div>
 
-            {Object.keys(categoryConfig).map(key => {
-              const cat = categoryConfig[key];
+            {Object.keys(allCategories).map(key => {
+              const cat = allCategories[key];
               const isActive = activeCategory === key;
               return (
                 <div

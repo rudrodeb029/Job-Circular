@@ -13,6 +13,8 @@ export default function ManageQuestions() {
   const [title, setTitle] = useState('');
   const [titleEn, setTitleEn] = useState('');
   const [category, setCategory] = useState('bcs');
+  const [customCategory, setCustomCategory] = useState('');
+  const [customCategoryEn, setCustomCategoryEn] = useState('');
   const [date, setDate] = useState('');
   const [dateEn, setDateEn] = useState('');
   const [timeLimit, setTimeLimit] = useState('১০ মিনিট');
@@ -46,6 +48,8 @@ export default function ManageQuestions() {
     setTitle('');
     setTitleEn('');
     setCategory('bcs');
+    setCustomCategory('');
+    setCustomCategoryEn('');
     setDate('');
     setDateEn('');
     setTimeLimit('১০ মিনিট');
@@ -69,7 +73,10 @@ export default function ManageQuestions() {
     setCurrentPaper(paper);
     setTitle(paper.title || '');
     setTitleEn(paper.titleEn || '');
-    setCategory(paper.category || 'bcs');
+    const isExisting = ['bcs', 'bank', 'ntrca', 'primary', 'ministry'].includes(paper.category);
+    setCategory(isExisting ? paper.category : 'new_category');
+    setCustomCategory(isExisting ? '' : (paper.categoryName || ''));
+    setCustomCategoryEn(isExisting ? '' : (paper.categoryNameEn || ''));
     setDate(paper.date || '');
     setDateEn(paper.dateEn || '');
     setTimeLimit(paper.timeLimit || '১০ মিনিট');
@@ -134,6 +141,17 @@ export default function ManageQuestions() {
     }));
   };
 
+  const getCategoryLabelEn = (cat) => {
+    const labels = {
+      bcs: 'BCS',
+      bank: 'Bank',
+      ntrca: 'NTRCA',
+      primary: 'Primary',
+      ministry: 'Ministries'
+    };
+    return labels[cat] || cat;
+  };
+
   const handleSave = (e) => {
     e.preventDefault();
 
@@ -142,9 +160,25 @@ export default function ManageQuestions() {
       return;
     }
 
+    let finalCategory = category;
+    let finalCategoryName = getCategoryLabel(category);
+    let finalCategoryNameEn = getCategoryLabelEn(category);
+
+    if (category === 'new_category') {
+      if (!customCategory.trim() || !customCategoryEn.trim()) {
+        triggerToast('Custom category name in both languages is required.', 'error');
+        return;
+      }
+      finalCategory = customCategoryEn.toLowerCase().replace(/[^a-z0-9]/g, '');
+      finalCategoryName = customCategory;
+      finalCategoryNameEn = customCategoryEn;
+    }
+
     const newPaper = {
       id: currentPaper ? currentPaper.id : `paper-${Date.now()}`,
-      category,
+      category: finalCategory,
+      categoryName: finalCategoryName,
+      categoryNameEn: finalCategoryNameEn,
       title,
       titleEn,
       date,
@@ -166,6 +200,7 @@ export default function ManageQuestions() {
 
     setPapers(updatedPapers);
     saveQuestionsData(updatedPapers);
+    window.dispatchEvent(new Event('questions_updated'));
     setShowModal(false);
   };
 
@@ -394,6 +429,7 @@ export default function ManageQuestions() {
                       <option value="ntrca">NTRCA</option>
                       <option value="primary">প্রাইমারি (Primary)</option>
                       <option value="ministry">বিভিন্ন মন্ত্রনালয় (Ministries)</option>
+                      <option value="new_category">-- Add New Category --</option>
                     </select>
                   </div>
                   <div className="admin-form-group">
@@ -408,6 +444,33 @@ export default function ManageQuestions() {
                     />
                   </div>
                 </div>
+
+                {category === 'new_category' && (
+                  <div className="admin-form-row animate-fade-in" style={{ border: '1.5px dashed var(--primary)', borderRadius: '8px', padding: '12px', marginBottom: '16px', backgroundColor: 'rgba(26, 86, 219, 0.02)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>New Category Name (Bengali)</label>
+                      <input
+                        type="text"
+                        className="admin-form-input"
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        placeholder="যেমন: রেলওয়ে"
+                        required
+                      />
+                    </div>
+                    <div className="admin-form-group">
+                      <label className="admin-form-label" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>New Category Name (English)</label>
+                      <input
+                        type="text"
+                        className="admin-form-input"
+                        value={customCategoryEn}
+                        onChange={(e) => setCustomCategoryEn(e.target.value)}
+                        placeholder="e.g. Railway"
+                        required
+                      />
+                    </div>
+                  </div>
+                )}
 
                 <div className="admin-form-row">
                   <div className="admin-form-group">
