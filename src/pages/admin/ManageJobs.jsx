@@ -46,6 +46,53 @@ export default function ManageJobs() {
 
   const [formData, setFormData] = useState(initialFormState);
 
+  const [cloudinaryCloud, setCloudinaryCloud] = useState(localStorage.getItem('cloudinary_cloud') || '');
+  const [cloudinaryPreset, setCloudinaryPreset] = useState(localStorage.getItem('cloudinary_preset') || '');
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleCloudinaryUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!cloudinaryCloud.trim() || !cloudinaryPreset.trim()) {
+      showToast('Please enter Cloud Name and Upload Preset first!', 'error');
+      return;
+    }
+
+    setUploadingImage(true);
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', cloudinaryPreset);
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryCloud}/image/upload`, {
+        method: 'POST',
+        body: data
+      });
+      const fileData = await res.json();
+      if (fileData.secure_url) {
+        setFormData(prev => {
+          const currentImages = prev.images ? prev.images.split(',').map(i => i.trim()).filter(i => i) : [];
+          currentImages.push(fileData.secure_url);
+          return {
+            ...prev,
+            images: currentImages.join(', ')
+          };
+        });
+        showToast('Image uploaded to Cloudinary successfully!');
+      } else {
+        console.error(fileData);
+        showToast(fileData.error?.message || 'Upload failed.', 'error');
+      }
+    } catch (err) {
+      console.error(err);
+      showToast('Upload failed. Check settings and network.', 'error');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
+    }
+  };
+
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
     setTimeout(() => {
@@ -573,14 +620,45 @@ export default function ManageJobs() {
                   <textarea className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', resize: 'vertical', outline: 'none' }} name="requirements" rows="4" value={formData.requirements} onChange={handleInputChange}></textarea>
                 </div>
 
+                <div className="admin-form-group" style={{ marginBottom: '24px' }}>
+                   <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Circular Images (URLs)</label>
+                   <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none', marginBottom: '8px' }} name="images" value={formData.images} onChange={handleInputChange} placeholder="Comma-separated image URLs or upload below" />
+                   
+                   {/* Cloudinary direct upload panel */}
+                   <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '8px', padding: '12px' }}>
+                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
+                       <input 
+                         type="text" 
+                         placeholder="Cloudinary Cloud Name" 
+                         value={cloudinaryCloud} 
+                         onChange={(e) => { setCloudinaryCloud(e.target.value); localStorage.setItem('cloudinary_cloud', e.target.value); }} 
+                         style={{ padding: '6px 10px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '4px', width: '150px', outline: 'none', backgroundColor: '#ffffff', color: '#1e293b' }} 
+                       />
+                       <input 
+                         type="text" 
+                         placeholder="Upload Preset" 
+                         value={cloudinaryPreset} 
+                         onChange={(e) => { setCloudinaryPreset(e.target.value); localStorage.setItem('cloudinary_preset', e.target.value); }} 
+                         style={{ padding: '6px 10px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '4px', width: '150px', outline: 'none', backgroundColor: '#ffffff', color: '#1e293b' }} 
+                       />
+                       <span style={{ fontSize: '11.5px', color: '#4b5563', fontWeight: '500' }}>Cloudinary settings</span>
+                     </div>
+                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                       <input 
+                         type="file" 
+                         accept="image/*" 
+                         onChange={handleCloudinaryUpload} 
+                         disabled={uploadingImage}
+                         style={{ fontSize: '12px', color: '#4b5563' }} 
+                       />
+                       {uploadingImage && <span style={{ fontSize: '12px', color: '#1a56db', fontWeight: 'bold' }}>Uploading...</span>}
+                     </div>
+                   </div>
+                 </div>
+
                 <div className="admin-form-group" style={{ marginBottom: '16px' }}>
                   <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Apply Link</label>
                   <input type="url" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="applyLink" value={formData.applyLink} onChange={handleInputChange} />
-                </div>
-
-                <div className="admin-form-group" style={{ marginBottom: '24px' }}>
-                  <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Circular Images (Comma-separated URLs)</label>
-                  <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="images" value={formData.images} onChange={handleInputChange} />
                 </div>
 
                 <div className="admin-modal-footer" style={{ borderTop: '1px solid #e2e8f0', paddingTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>

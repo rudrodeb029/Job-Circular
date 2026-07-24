@@ -65,3 +65,9 @@ The Android APK generation is completely automated to prevent manual build error
 - **AppContext**: Manages global UI states like dark mode, language preference (En/Bn), saved jobs, and applied jobs.
 - **AdminContext**: Fetches and caches data (exams, circulars) from Firestore to avoid redundant network requests.
 
+## ☁️ 7. Cloudinary Image Upload
+- The Admin Panel provides a client-side direct upload integration to Cloudinary.
+- **Unsigned Upload**: The admin configures their Cloudinary Cloud Name and an Unsigned Upload Preset in the input fields.
+- **Dynamic Save**: The uploaded image's secure URL is automatically appended to the Circular Images field and stored in Firestore.
+- **App Rendering**: The mobile application loads these secure URLs directly from Cloudinary.
+
