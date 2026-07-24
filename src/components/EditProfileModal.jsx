@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, User, Edit, Mail, FileText, Globe, MapPin } from './Icons';
 import { useAppContext } from '../context/AppContext';
+import { CLOUDINARY_CONFIG } from '../cloudinary';
 
 const PhoneIcon = ({ size = 16, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -118,6 +119,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
   });
 
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   if (!isOpen) return null;
 
@@ -125,14 +127,39 @@ export default function EditProfileModal({ isOpen, onClose }) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, avatar: reader.result }));
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const cloudName = CLOUDINARY_CONFIG.cloudName;
+    const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
+
+    if (!cloudName || !uploadPreset || cloudName === 'dqy39gghx') {
+      alert('Cloudinary is not connected yet. Please configure it in src/cloudinary.js');
+      return;
+    }
+
+    setUploadingImage(true);
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', uploadPreset);
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: data
+      });
+      const fileData = await res.json();
+      if (fileData.secure_url) {
+        setFormData(prev => ({ ...prev, avatar: fileData.secure_url }));
+      } else {
+        alert(fileData.error?.message || 'Upload failed.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Upload failed. Please check network.');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -250,7 +277,8 @@ export default function EditProfileModal({ isOpen, onClose }) {
                     borderRadius: '50%',
                     objectFit: 'cover',
                     border: '3px solid var(--white)',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.08)'
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.08)',
+                    opacity: uploadingImage ? 0.5 : 1
                   }}
                 />
               ) : (
@@ -265,9 +293,32 @@ export default function EditProfileModal({ isOpen, onClose }) {
                   justifyContent: 'center',
                   fontSize: '30px',
                   fontWeight: 800,
-                  boxShadow: '0 4px 14px rgba(26,86,219,0.2)'
+                  boxShadow: '0 4px 14px rgba(26,86,219,0.2)',
+                  opacity: uploadingImage ? 0.5 : 1
                 }}>
                   {formData.name ? formData.name[0].toUpperCase() : 'U'}
+                </div>
+              )}
+
+              {uploadingImage && (
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  background: 'rgba(15, 23, 42, 0.6)',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#ffffff',
+                  fontSize: '9.5px',
+                  fontWeight: 800,
+                  letterSpacing: '0.2px',
+                  zIndex: 5
+                }}>
+                  UPLOADING...
                 </div>
               )}
 
