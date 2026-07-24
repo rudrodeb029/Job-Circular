@@ -73,7 +73,7 @@ export default function ResultDetails() {
   }
 
   if (circularImages.length === 0) {
-    circularImages = [job.circularImage || '/job_circular_notice.png'];
+    circularImages = [job.circularImage || './job_circular_notice.png'];
   }
 
   const isSaved = state.savedJobs.includes(job.id);
