@@ -15,6 +15,9 @@
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.2.1",
+    "@capacitor/android": "^8.2.1",
+    "@capacitor/core": "^8.2.1",
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^5.4.11"
   },

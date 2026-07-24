@@ -38,13 +38,14 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Install Capacitor Core & Android CLI
-        run: |
-          npm install -D @capacitor/cli @capacitor/android
-
       - name: Sync Capacitor Android Platform
         run: |
           npx cap sync android
+
+      - name: Generate Gradle Wrapper
+        run: |
+          cd android
+          gradle wrapper
 
       - name: Build Android Debug APK
         run: |

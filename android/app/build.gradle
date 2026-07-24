@@ -33,3 +33,9 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$rootProject.ext.androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$rootProject.ext.coreSplashScreenVersion"
 }
+
+try {
+    apply from: '../node_modules/@capacitor/android/capacitor.build.gradle'
+} catch (e) {
+    logger.warn("Could not import @capacitor/android/capacitor.build.gradle: " + e.message)
+}
