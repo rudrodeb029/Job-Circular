@@ -122,7 +122,7 @@ export default function Profile() {
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
               border: '3.5px solid rgba(255, 255, 255, 0.85)'
             }}>
-              {state.user.name ? state.user.name[0] : 'S'}
+              {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
             </div>
           )}
 
@@ -153,20 +153,8 @@ export default function Profile() {
 
         {/* User Info */}
         <h2 style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
-          {state.user.name}
+          {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
         </h2>
-        <span style={{
-          display: 'inline-block',
-          fontSize: '11px',
-          background: 'rgba(255, 255, 255, 0.16)',
-          backdropFilter: 'blur(4px)',
-          padding: '3px 12px',
-          borderRadius: '20px',
-          color: 'rgba(255, 255, 255, 0.95)',
-          fontWeight: 500
-        }}>
-          {state.user.email}
-        </span>
       </div>
 
       {/* Floating Activity Stats Bar */}

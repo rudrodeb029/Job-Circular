@@ -110,7 +110,6 @@ export default function EditProfileModal({ isOpen, onClose }) {
 
   const [formData, setFormData] = useState({
     name: state.user.name || '',
-    email: state.user.email || '',
     phone: state.user.phone || '01712345678',
     qualification: state.user.qualification || 'স্নাতক (Bachelor)',
     category: state.user.category || 'gov',
@@ -268,7 +267,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
                   fontWeight: 800,
                   boxShadow: '0 4px 14px rgba(26,86,219,0.2)'
                 }}>
-                  {formData.name ? formData.name[0] : 'S'}
+                  {formData.name ? formData.name[0].toUpperCase() : 'U'}
                 </div>
               )}
 
@@ -315,15 +314,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
               required
             />
 
-            <FormInput
-              label={isEn ? 'Email Address' : 'ইমেইল ঠিকানা'}
-              icon={<Mail size={16} />}
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange('email', e.target.value)}
-              placeholder={isEn ? 'Enter email address' : 'ইমেইল ঠিকানা লিখুন'}
-              required
-            />
+
 
             <FormInput
               label={isEn ? 'Phone Number' : 'মোবাইল নম্বর'}

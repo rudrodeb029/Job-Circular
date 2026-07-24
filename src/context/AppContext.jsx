@@ -3,8 +3,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react';
 const AppContext = createContext();
 
 const savedUser = JSON.parse(localStorage.getItem('job_user')) || {
-  name: 'Suvro Rahman',
-  email: 'suvro100@gmail.com',
+  name: '',
   phone: '01712345678',
   qualification: 'স্নাতক (Bachelor)',
   category: 'gov',

@@ -154,7 +154,7 @@ export default function AppHeader() {
                 fontWeight: 800,
                 fontSize: '15px'
               }}>
-                {state.user.name ? state.user.name[0] : 'S'}
+                {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
               </div>
             )}
 
@@ -227,11 +227,13 @@ export default function AppHeader() {
                     fontWeight: 800,
                     fontSize: '17px'
                   }}>
-                    {state.user.name ? state.user.name[0] : 'S'}
+                    {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
                   </div>
                 )}
                 <div>
-                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>{state.user.name}</h4>
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                    {state.user.name || (state.language === 'en' ? 'Set Your Name' : 'নাম সেট করুন')}
+                  </h4>
                 </div>
               </div>
               <button onClick={() => setDrawerOpen(false)} style={{ padding: '6px', color: 'var(--text-muted)', border: 'none', background: 'transparent' }}>
