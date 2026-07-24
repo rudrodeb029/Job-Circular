@@ -74,7 +74,7 @@ export default function QuestionDetails() {
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
-          {isEn ? paper.titleEn : paper.title}
+          {isEn ? 'Questions & Solutions' : 'প্রশ্ন ও সমাধান'}
         </h1>
       </div>
 
