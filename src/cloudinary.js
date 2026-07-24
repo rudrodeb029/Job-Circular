@@ -3,6 +3,6 @@
 // 1. Cloud Name (found on your Cloudinary dashboard)
 // 2. Upload Preset (must be created as "Unsigned" in your Cloudinary upload settings)
 export const CLOUDINARY_CONFIG = {
-  cloudName: 'dqy39gghx',
-  uploadPreset: 'job_circular_preset'
+  cloudName: 'job-circular-app',
+  uploadPreset: 'job-circular-app'
 };
