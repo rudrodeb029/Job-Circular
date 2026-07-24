@@ -58,15 +58,19 @@ export default function ExamDetails() {
   if (!job) return <NotFoundPage />;
 
   let circularImages = [];
-  if (job.images) {
+  if (job.images && job.images.length > 0) {
     if (Array.isArray(job.images)) {
-      circularImages = job.images;
+      circularImages = job.images.filter(img => img && img.trim());
     } else if (typeof job.images === 'string') {
       circularImages = job.images.split(',').map(img => img.trim()).filter(img => img);
     }
-  } else if (job.circularImages && job.circularImages.length > 0) {
+  }
+
+  if (circularImages.length === 0 && job.circularImages && job.circularImages.length > 0) {
     circularImages = job.circularImages;
-  } else {
+  }
+
+  if (circularImages.length === 0) {
     circularImages = [job.circularImage || '/job_circular_notice.png'];
   }
 
