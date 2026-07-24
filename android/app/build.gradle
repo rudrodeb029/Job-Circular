@@ -35,7 +35,7 @@ dependencies {
 }
 
 try {
-    apply from: '../node_modules/@capacitor/android/capacitor.build.gradle'
+    apply from: '../../node_modules/@capacitor/android/capacitor.build.gradle'
 } catch (e) {
     logger.warn("Could not import @capacitor/android/capacitor.build.gradle: " + e.message)
 }
