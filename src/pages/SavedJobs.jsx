@@ -314,15 +314,6 @@ export default function SavedJobs() {
         ) : (
           <EmptyState
             icon={searchQuery ? Search : Bookmark}
-            title={
-              searchQuery 
-                ? "No Matching Jobs Found" 
-                : activeTab === 'exam_date' 
-                  ? "No Exam Dates Available" 
-                  : activeTab === 'result'
-                    ? "No Results Available"
-                    : "No Saved Jobs"
-            }
             description={searchQuery ? `No saved jobs match "${searchQuery}"` : undefined}
             actionText={searchQuery ? "Clear Search" : "Explore Jobs"}
             onAction={searchQuery ? () => setSearchQuery('') : () => navigate('/search')}
