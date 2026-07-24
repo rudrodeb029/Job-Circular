@@ -314,8 +314,41 @@ export default function ResultDetails() {
                 right: 0,
                 height: '60px',
                 background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
-                pointerEvents: 'none'
+                pointerEvents: 'none',
+                zIndex: 6
               }}></div>
+            )}
+
+            {/* Indicator Dots (Mark Options) */}
+            {circularImages.length > 1 && (
+              <div style={{
+                position: 'absolute',
+                bottom: '16px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                gap: '6px',
+                background: 'rgba(15, 23, 42, 0.45)',
+                padding: '6px 10px',
+                borderRadius: '20px',
+                backdropFilter: 'blur(4px)',
+                zIndex: 12
+              }}>
+                {circularImages.map((_, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      background: activeImageIndex === idx ? 'var(--white)' : 'rgba(255, 255, 255, 0.5)',
+                      transition: 'all 0.2s',
+                      cursor: 'pointer'
+                    }}
+                  />
+                ))}
+              </div>
             )}
           </div>
 
