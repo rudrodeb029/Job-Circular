@@ -177,7 +177,7 @@ export default function LiveExamRoom() {
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
-          {isEn ? exam.titleEn : exam.title}
+          {isEn ? 'Live Exam' : 'লাইভ পরীক্ষা'}
         </h1>
 
         {/* Ticking Timer Badge */}
