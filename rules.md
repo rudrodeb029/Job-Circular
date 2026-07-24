@@ -15,7 +15,7 @@ The application is built using a modern web-to-mobile architecture:
 - Users can participate in real-time or simulated live exams.
 - **Timer**: Exams feature a strictly enforced countdown timer. Once the timer ends, the exam is automatically submitted.
 - **Scoring**: Scores are calculated instantly upon submission based on the selected answers versus the correct answers stored in the database.
-- **Local Storage**: Exam progression and results are saved in the device's `localStorage`. Users can review their results even after leaving the exam room.
+- **Database Storage**: Exam progression and results are saved directly to the Firebase database. Users can review their past results securely from their profile at any time.
 - **Dynamic Header**: When entering a live exam room, the header clearly indicates "Questions & Solutions" (প্রশ্ন ও সমাধান) or "Live Exam" (লাইভ পরীক্ষা) to minimize clutter.
 
 ### B. Job Circulars (চাকরির খবর)
