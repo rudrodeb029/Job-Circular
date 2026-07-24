@@ -1,34 +1,53 @@
-# Job Circular - Rules & Instructions
+# Job Circular & Live Exam - Android App Rules
 
-Welcome to the **Job Circular** application. This document outlines the core instructions and features of the platform, detailing how everything works.
+This document outlines the core logic, functionality, and operational rules for the **Job Circular & Live Exam** Android application.
 
-## 1. Job Circulars & Browsing
-- **Categories**: Jobs are divided into specific categories such as Government (সরকারি), Bank (ব্যাংক), Private (প্রাইভেট), NGO (এনজিও), IT (আইটি), Defense (প্রতিরক্ষা), Health (স্বাস্থ্য সেবা), etc.
-- **Home Feed**: The homepage provides quick access to recent job circulars, upcoming exams, and major categories.
-- **Job Details**: Users can click on a job circular to view full details including organization name, deadlines, vacancy count, and the official circular image.
-- **Save & Apply**: Users can bookmark (Save) jobs for later reading and mark jobs they have applied for. These are accessible in the "Saved Jobs" or "Profile" sections.
+## 📱 1. Architecture Overview
+The application is built using a modern web-to-mobile architecture:
+- **Core Framework**: React (Vite) + JavaScript.
+- **Mobile Wrapper**: [Capacitor](https://capacitorjs.com/) is used to package the web application into a native Android application.
+- **Backend & Database**: Firebase (Firestore for real-time database, Firebase Hosting for the web distribution).
+- **Styling**: Vanilla CSS with modern aesthetics, glassmorphism, and smooth animations.
 
-## 2. Questions Hub & Live Exams
-- **Live Exams (লাইভ পরীক্ষা)**:
-  - Users can participate in scheduled live exams.
-  - A countdown timer tracks the remaining time. 
-  - Once the time expires or the user submits, the exam ends, and results are instantly calculated.
-- **Model Tests & Past Questions**:
-  - **Practice Mode (অনুশীলন মোড)**: Users can take the exam as a mock test. Answers are hidden until selected.
-  - **Read Mode (পড়া মোড)**: Users can directly read the questions along with the correct answers highlighted.
-- **Results tracking**: Exam scores and participation are tracked locally so users can monitor their preparation progress.
+## 🚀 2. How the App Works (Core Features)
 
-## 3. General Navigation
-- **Bottom Navigation Bar**: Provides quick access to Home, Categories, Saved Jobs, Notifications, and Profile.
-- **Language Switcher**: The app supports bilingual interfaces (English and Bengali). The language can be toggled from the Settings/Profile menu.
-- **Notifications**: Alerts users about new jobs, exam results, and upcoming deadlines.
+### A. Live Exams (লাইভ পরীক্ষা)
+- Users can participate in real-time or simulated live exams.
+- **Timer**: Exams feature a strictly enforced countdown timer. Once the timer ends, the exam is automatically submitted.
+- **Scoring**: Scores are calculated instantly upon submission based on the selected answers versus the correct answers stored in the database.
+- **Local Storage**: Exam progression and results are saved in the device's `localStorage`. Users can review their results even after leaving the exam room.
+- **Dynamic Header**: When entering a live exam room, the header clearly indicates "Questions & Solutions" (প্রশ্ন ও সমাধান) or "Live Exam" (লাইভ পরীক্ষা) to minimize clutter.
 
-## 4. Admin Features (If Applicable)
-- **Data Source**: Content such as Jobs, Exams, and Questions are managed and loaded via Firebase Firestore.
-- **Updates**: Admin can add new circulars and exams dynamically through the connected database, which will automatically reflect on the user's end.
+### B. Job Circulars (চাকরির খবর)
+- Circulars are categorized (e.g., Govt Jobs, Bank Jobs, NGO Jobs) and loaded dynamically from Firebase Firestore.
+- Each circular contains key details (deadline, organization, position) and high-quality images.
+- Users can save/bookmark jobs, which are stored locally using React Context/localStorage for offline access.
 
-## 5. Technical Stack & Deployment
-- **Frontend**: React + Vite (Web), Capacitor (Android APK).
-- **Backend & Database**: Firebase Firestore for dynamic data.
-- **Hosting**: Deployed on Firebase Hosting (`job-circular-75dbb.web.app`).
-- **CI/CD**: GitHub Actions automatically builds the Android APK upon pushing to the `master` branch.
+### C. Question Papers & Solutions (প্রশ্ন ও সমাধান)
+- **Practice Mode (অনুশীলন মোড)**: Users can interactively select answers and see if they are correct/incorrect immediately.
+- **Read Mode (পড়া মোড)**: Correct answers are pre-highlighted in green for quick reading and memorization.
+
+## 🛠 3. CI/CD & Build Rules (GitHub Actions)
+The Android APK generation is completely automated to prevent manual build errors and missing local dependencies.
+
+- **Trigger**: Pushing code to the `master` branch triggers the GitHub Action workflow automatically.
+- **Process**:
+  1. Sets up Node.js and installs dependencies (`npm install`).
+  2. Builds the production web assets (`npm run build`).
+  3. Uses Capacitor to sync web assets to the Android folder (`npx cap sync android`).
+  4. Builds the debug APK using Gradle (`./gradlew assembleDebug`).
+- **Artifacts**: Once the workflow finishes, the compiled `app-debug.apk` is available in the **Artifacts** section of the GitHub Actions run.
+
+## 🎨 4. Design Guidelines
+- **Responsive Web UI**: Because it's a Capacitor app, the web UI must act strictly like a mobile app. 
+- **Bottom Navigation**: Must always be anchored to the bottom.
+- **Soft UI**: Colors should be soft, readable, and modern (e.g., using slate grays instead of pitch black, reducing harsh contrasts).
+- **Interactive Feedback**: Every button must have a visual click state (active state scaling or ripple effect).
+
+## 📡 5. Synchronization & Deployments
+- **Web App**: `firebase deploy --only hosting` deploys the web version immediately to `job-circular-75dbb.web.app`.
+- **Android App (Over The Air)**: Since the Android app wraps the web content, any changes that do not require native plugin updates (like UI changes, new pages, logic updates) are immediately available in the web build. However, for native changes (like new app icons, splash screens, or Capacitor plugins), a new APK must be built via GitHub Actions and re-installed by the user.
+
+## 💾 6. State Management
+- **AppContext**: Manages global UI states like dark mode, language preference (En/Bn), saved jobs, and applied jobs.
+- **AdminContext**: Fetches and caches data (exams, circulars) from Firestore to avoid redundant network requests.
