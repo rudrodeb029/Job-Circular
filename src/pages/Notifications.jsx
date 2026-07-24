@@ -26,23 +26,6 @@ export default function Notifications() {
           <Bell size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
           <span>{isEn ? 'Notifications' : 'নোটিফিকেশন'}</span>
         </h1>
-        {notificationsList.length > 0 && (
-          <button
-            onClick={handleMarkAllRead}
-            style={{
-              fontSize: 'var(--text-xs)',
-              color: 'var(--primary)',
-              fontWeight: 700,
-              background: 'var(--primary-bg)',
-              border: 'none',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              cursor: 'pointer'
-            }}
-          >
-            {isEn ? 'Mark all as read' : 'সব পঠিত হিসেবে চিহ্নিত করুন'}
-          </button>
-        )}
       </div>
 
       <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
