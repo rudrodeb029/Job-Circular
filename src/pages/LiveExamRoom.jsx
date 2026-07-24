@@ -314,8 +314,8 @@ export default function LiveExamRoom() {
                   {/* Question Text */}
                   <h4 style={{
                     fontSize: '15px',
-                    fontWeight: 800,
-                    color: 'var(--text-primary)',
+                    fontWeight: 700,
+                    color: 'var(--text-secondary)',
                     marginBottom: '16px',
                     lineHeight: '1.5',
                     display: 'flex',
