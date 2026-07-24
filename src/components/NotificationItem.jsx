@@ -120,8 +120,8 @@ export default function NotificationItem({ notification }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', gap: '8px' }}>
           <h4 style={{
             fontSize: '14px',
-            fontWeight: isRead ? 700 : 800,
-            color: 'var(--text-primary)',
+            fontWeight: isRead ? 600 : 700,
+            color: isRead ? 'var(--text-muted)' : 'var(--text-secondary)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap'
