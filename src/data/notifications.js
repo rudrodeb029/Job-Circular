@@ -11,6 +11,7 @@ export const getNotifications = () => {
   })();
 
   const jobNotifs = localJobs.map(job => ({
+    ...job,
     id: `notif_job_${job.id}`,
     title: 'নতুন চাকরির খবর',
     titleEn: 'New Job Circular',
@@ -25,6 +26,7 @@ export const getNotifications = () => {
   }));
 
   const examNotifs = localJobs.filter(job => job.examDate).map(job => ({
+    ...job,
     id: `notif_exam_${job.id}`,
     title: 'অ্যাডমিট কার্ড',
     titleEn: 'Exam Date Notice',
@@ -39,6 +41,7 @@ export const getNotifications = () => {
   }));
 
   const resultNotifs = localJobs.filter(job => job.examResult).map(job => ({
+    ...job,
     id: `notif_result_${job.id}`,
     title: 'ফলাফল প্রকাশিত',
     titleEn: 'Result Published',
@@ -52,7 +55,24 @@ export const getNotifications = () => {
     jobId: job.id
   }));
 
-  return [...jobNotifs, ...examNotifs, ...resultNotifs];
+  const getItemTimestamp = (item) => {
+    if (item.createdAt) {
+      const ms = new Date(item.createdAt).getTime();
+      if (!isNaN(ms)) return ms;
+    }
+    if (item.id) {
+      const matches = item.id.match(/\d{10,13}/);
+      if (matches) return parseInt(matches[0], 10);
+    }
+    if (item.postedAt) {
+      const ms = new Date(item.postedAt).getTime();
+      if (!isNaN(ms)) return ms;
+    }
+    return 0;
+  };
+
+  return [...jobNotifs, ...examNotifs, ...resultNotifs]
+    .sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
 };
 
 export const notifications = getNotifications();
