@@ -81,7 +81,25 @@ export default function SavedJobs() {
   const { state: adminState } = useAdminContext();
   const localJobs = adminState.jobs;
 
-  const savedJobList = localJobs.filter(j => state.savedJobs.includes(j.id));
+  const savedJobList = useMemo(() => {
+    const list = localJobs.filter(j => state.savedJobs.includes(j.id));
+    const getItemTimestamp = (item) => {
+      if (item.createdAt) {
+        const ms = new Date(item.createdAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      if (item.id) {
+        const matches = item.id.match(/\d{10,13}/);
+        if (matches) return parseInt(matches[0], 10);
+      }
+      if (item.postedAt) {
+        const ms = new Date(item.postedAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      return 0;
+    };
+    return list.sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+  }, [localJobs, state.savedJobs]);
 
   const filteredJobs = savedJobList.filter(job => {
     const isApplied = state.appliedJobs.includes(job.id);

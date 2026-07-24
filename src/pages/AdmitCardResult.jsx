@@ -55,6 +55,7 @@ export default function AdmitCardResult() {
     const localJobs = adminState.jobs;
 
     const dynamicExamDates = localJobs.filter(j => j.examDate).map(j => ({
+      ...j,
       id: `dynamic-exam-${j.id}`,
       examName: `${j.title} পরীক্ষা`,
       examNameEn: `${j.titleEn || j.title} Exam`,
@@ -69,6 +70,7 @@ export default function AdmitCardResult() {
     }));
 
     const dynamicResults = localJobs.filter(j => j.examResult).map(j => ({
+      ...j,
       id: `dynamic-result-${j.id}`,
       examName: `${j.title} পরীক্ষার ফলাফল`,
       examNameEn: `${j.titleEn || j.title} Exam Result`,
@@ -91,8 +93,25 @@ export default function AdmitCardResult() {
         unique.push(item);
       }
     }
-    return unique;
-  }, []);
+
+    const getItemTimestamp = (item) => {
+      if (item.createdAt) {
+        const ms = new Date(item.createdAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      if (item.id) {
+        const matches = item.id.match(/\d{10,13}/);
+        if (matches) return parseInt(matches[0], 10);
+      }
+      if (item.postedAt) {
+        const ms = new Date(item.postedAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      return 0;
+    };
+
+    return unique.sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+  }, [adminState.jobs]);
 
   const searchedItems = useMemo(() => {
     const items = allAdmitCards.filter(item => item.type === activeTab);

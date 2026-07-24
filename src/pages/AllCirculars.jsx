@@ -67,6 +67,7 @@ export default function AllCirculars() {
 
     // Exam Date jobs from localJobs
     const examJobs = localJobs.filter(job => job.examDate).map(job => ({
+      ...job,
       id: `exam_${job.id}`,
       originalId: job.id,
       organization: job.organization,
@@ -84,6 +85,7 @@ export default function AllCirculars() {
 
     // Result jobs from localJobs
     const resultJobs = localJobs.filter(job => job.examResult).map(job => ({
+      ...job,
       id: `result_${job.id}`,
       originalId: job.id,
       organization: job.organization,
@@ -99,15 +101,12 @@ export default function AllCirculars() {
 
     // Notifications admit card items
     const notifExamItems = admitCardsAndResults.filter(item => item.type === 'admit_card').map(item => ({
-      id: item.id,
+      ...item,
       originalId: item.id.replace('admit-', 'job-'),
-      organization: item.organization,
-      organizationEn: item.organizationEn,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examDate: item.date,
       examDateEn: item.dateEn,
-      downloadLink: item.downloadLink,
       postedDate: item.date || '১ দিন আগে',
       postedDateEn: item.dateEn || item.date || '1 day ago',
       feedType: 'exam_date'
@@ -115,10 +114,8 @@ export default function AllCirculars() {
 
     // Notifications result items
     const notifResultItems = admitCardsAndResults.filter(item => item.type === 'result').map(item => ({
-      id: item.id,
+      ...item,
       originalId: item.id.replace('result-', 'job-'),
-      organization: item.organization,
-      organizationEn: item.organizationEn,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,
@@ -127,8 +124,25 @@ export default function AllCirculars() {
       feedType: 'result'
     }));
 
-    return [...jobItems, ...examJobs, ...resultJobs, ...notifExamItems, ...notifResultItems];
-  }, []);
+    const getItemTimestamp = (item) => {
+      if (item.createdAt) {
+        const ms = new Date(item.createdAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      if (item.id) {
+        const matches = item.id.match(/\d{10,13}/);
+        if (matches) return parseInt(matches[0], 10);
+      }
+      if (item.postedAt) {
+        const ms = new Date(item.postedAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      return 0;
+    };
+
+    return [...jobItems, ...examJobs, ...resultJobs, ...notifExamItems, ...notifResultItems]
+      .sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+  }, [adminState.jobs]);
 
   // Filter jobs based on search query
   const filteredJobs = useMemo(() => {
