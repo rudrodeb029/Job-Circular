@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
 import { triggerLocalNotification } from '../../utils/notifications';
+import { CLOUDINARY_CONFIG } from '../../cloudinary';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -46,26 +47,27 @@ export default function ManageJobs() {
 
   const [formData, setFormData] = useState(initialFormState);
 
-  const [cloudinaryCloud, setCloudinaryCloud] = useState(localStorage.getItem('cloudinary_cloud') || '');
-  const [cloudinaryPreset, setCloudinaryPreset] = useState(localStorage.getItem('cloudinary_preset') || '');
   const [uploadingImage, setUploadingImage] = useState(false);
 
   const handleCloudinaryUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!cloudinaryCloud.trim() || !cloudinaryPreset.trim()) {
-      showToast('Please enter Cloud Name and Upload Preset first!', 'error');
+    const cloudName = CLOUDINARY_CONFIG.cloudName;
+    const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
+
+    if (!cloudName || !uploadPreset || cloudName === 'dqy39gghx') {
+      showToast('Cloudinary is not connected yet! Please configure cloudName and uploadPreset in src/cloudinary.js', 'error');
       return;
     }
 
     setUploadingImage(true);
     const data = new FormData();
     data.append('file', file);
-    data.append('upload_preset', cloudinaryPreset);
+    data.append('upload_preset', uploadPreset);
 
     try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudinaryCloud}/image/upload`, {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: 'POST',
         body: data
       });
@@ -626,23 +628,6 @@ export default function ManageJobs() {
                    
                    {/* Cloudinary direct upload panel */}
                    <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '8px', padding: '12px' }}>
-                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '10px', flexWrap: 'wrap' }}>
-                       <input 
-                         type="text" 
-                         placeholder="Cloudinary Cloud Name" 
-                         value={cloudinaryCloud} 
-                         onChange={(e) => { setCloudinaryCloud(e.target.value); localStorage.setItem('cloudinary_cloud', e.target.value); }} 
-                         style={{ padding: '6px 10px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '4px', width: '150px', outline: 'none', backgroundColor: '#ffffff', color: '#1e293b' }} 
-                       />
-                       <input 
-                         type="text" 
-                         placeholder="Upload Preset" 
-                         value={cloudinaryPreset} 
-                         onChange={(e) => { setCloudinaryPreset(e.target.value); localStorage.setItem('cloudinary_preset', e.target.value); }} 
-                         style={{ padding: '6px 10px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '4px', width: '150px', outline: 'none', backgroundColor: '#ffffff', color: '#1e293b' }} 
-                       />
-                       <span style={{ fontSize: '11.5px', color: '#4b5563', fontWeight: '500' }}>Cloudinary settings</span>
-                     </div>
                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                        <input 
                          type="file" 
