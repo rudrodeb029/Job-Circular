@@ -40,15 +40,15 @@ export default function CategoryCard({ category }) {
       {/* Glossy 3D Gradient Icon Badge Tile */}
       <div
         style={{
-          width: '50px',
-          height: '50px',
-          borderRadius: '14px',
+          width: '42px',
+          height: '42px',
+          borderRadius: '12px',
           background: theme.bg,
           boxShadow: `0 6px 16px ${theme.shadow}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: '24px',
+          fontSize: '20px',
           color: 'white',
           flexShrink: 0
         }}
@@ -60,8 +60,8 @@ export default function CategoryCard({ category }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <h4 style={{
           fontSize: '15px',
-          fontWeight: 800,
-          color: 'var(--text-primary)',
+          fontWeight: 700,
+          color: '#475569',
           marginBottom: '4px'
         }}>
           {category.name}
