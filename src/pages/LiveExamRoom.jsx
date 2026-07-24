@@ -343,18 +343,32 @@ export default function LiveExamRoom() {
                           bg = '#d1fae5';
                           color = '#065f46';
                           border = '1px solid #34d399';
-                          trailingIcon = '✅';
+                          trailingIcon = (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          );
                         } else if (oIndex === chosenIndex) {
                           bg = '#fee2e2';
                           color = '#991b1b';
                           border = '1px solid #f87171';
-                          trailingIcon = '❌';
+                          trailingIcon = (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <line x1="18" y1="6" x2="6" y2="18" />
+                              <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                          );
                         }
                       } else {
                         if (oIndex === chosenIndex) {
                           bg = 'var(--primary-lightest)';
                           color = 'var(--primary)';
                           border = '1.5px solid var(--primary)';
+                          trailingIcon = (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          );
                         }
                       }
 
@@ -392,7 +406,7 @@ export default function LiveExamRoom() {
                             {prefix}
                           </span>
                           <span style={{ flex: 1 }}>{optText}</span>
-                          {trailingIcon && <span style={{ fontSize: '14px' }}>{trailingIcon}</span>}
+                          {trailingIcon && <span style={{ display: 'inline-flex', alignItems: 'center' }}>{trailingIcon}</span>}
                         </div>
                       );
                     })}
