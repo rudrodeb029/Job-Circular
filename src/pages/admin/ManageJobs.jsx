@@ -47,11 +47,11 @@ export default function ManageJobs() {
 
   const [formData, setFormData] = useState(initialFormState);
 
-  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState('');
 
   const handleCloudinaryUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
     const cloudName = CLOUDINARY_CONFIG.cloudName;
     const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
@@ -61,38 +61,50 @@ export default function ManageJobs() {
       return;
     }
 
-    setUploadingImage(true);
-    const data = new FormData();
-    data.append('file', file);
-    data.append('upload_preset', uploadPreset);
+    const uploadedUrls = [];
+    let successCount = 0;
 
-    try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body: data
-      });
-      const fileData = await res.json();
-      if (fileData.secure_url) {
-        setFormData(prev => {
-          const currentImages = prev.images ? prev.images.split(',').map(i => i.trim()).filter(i => i) : [];
-          currentImages.push(fileData.secure_url);
-          return {
-            ...prev,
-            images: currentImages.join(', ')
-          };
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setUploadProgress(files.length === 1 ? 'Uploading...' : `Uploading ${i + 1} of ${files.length}...`);
+
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', uploadPreset);
+
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: data
         });
-        showToast('Image uploaded to Cloudinary successfully!');
-      } else {
-        console.error(fileData);
-        showToast(fileData.error?.message || 'Upload failed.', 'error');
+        const fileData = await res.json();
+        if (fileData.secure_url) {
+          uploadedUrls.push(fileData.secure_url);
+          successCount++;
+        } else {
+          console.error(fileData);
+          showToast(`File ${i + 1} upload failed: ` + (fileData.error?.message || 'Unknown error'), 'error');
+        }
+      } catch (err) {
+        console.error(err);
+        showToast(`File ${i + 1} upload failed due to network/configuration.`, 'error');
       }
-    } catch (err) {
-      console.error(err);
-      showToast('Upload failed. Check settings and network.', 'error');
-    } finally {
-      setUploadingImage(false);
-      e.target.value = '';
     }
+
+    if (uploadedUrls.length > 0) {
+      setFormData(prev => {
+        const currentImages = prev.images ? prev.images.split(',').map(img => img.trim()).filter(img => img) : [];
+        const mergedImages = [...currentImages, ...uploadedUrls];
+        return {
+          ...prev,
+          images: mergedImages.join(', ')
+        };
+      });
+      showToast(`Successfully uploaded ${successCount} image(s) to Cloudinary!`);
+    }
+
+    setUploadProgress('');
+    e.target.value = '';
   };
 
   const showToast = (message, type = 'success') => {
@@ -631,12 +643,13 @@ export default function ManageJobs() {
                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                        <input 
                          type="file" 
+                         multiple
                          accept="image/*" 
                          onChange={handleCloudinaryUpload} 
-                         disabled={uploadingImage}
+                         disabled={!!uploadProgress}
                          style={{ fontSize: '12px', color: '#4b5563' }} 
                        />
-                       {uploadingImage && <span style={{ fontSize: '12px', color: '#1a56db', fontWeight: 'bold' }}>Uploading...</span>}
+                       {uploadProgress && <span style={{ fontSize: '12px', color: '#1a56db', fontWeight: 'bold' }}>{uploadProgress}</span>}
                      </div>
                    </div>
                  </div>
