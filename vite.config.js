@@ -7,12 +7,12 @@ export default defineConfig({
     port: 3000,
     open: true
   },
-  optimizeDeps: {
-    exclude: ['firebase/app', 'firebase/firestore']
-  },
   build: {
     rollupOptions: {
-      external: ['firebase/app', 'firebase/firestore']
+      external: [
+        'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',
+        'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'
+      ]
     }
   }
 })
