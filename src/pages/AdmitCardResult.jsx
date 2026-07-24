@@ -7,6 +7,7 @@ import EmptyState from '../components/EmptyState';
 import SearchBar from '../components/SearchBar';
 import { admitCards } from '../data/notifications';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -49,16 +50,9 @@ export default function AdmitCardResult() {
     { id: 'result', label: isEn ? 'Result' : 'ফলাফল' }
   ], [isEn]);
 
+  const { state: adminState } = useAdminContext();
   const allAdmitCards = useMemo(() => {
-    const saved = localStorage.getItem('admin_jobs');
-    let localJobs = [];
-    if (saved) {
-      try {
-        localJobs = JSON.parse(saved);
-      } catch (e) {
-        localJobs = [];
-      }
-    }
+    const localJobs = adminState.jobs;
 
     const dynamicExamDates = localJobs.filter(j => j.examDate).map(j => ({
       id: `dynamic-exam-${j.id}`,

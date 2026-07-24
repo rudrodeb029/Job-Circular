@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, FileText, ChevronRight, LayoutGrid } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { getLiveExams } from '../data/liveExams';
-import { questionsData } from '../data/questionsData';
+import { getQuestionsData } from '../data/questionsData';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 
@@ -174,7 +174,7 @@ export default function QuestionsHub() {
 
   // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {
-    let list = questionsData;
+    let list = getQuestionsData();
     if (activeCategory !== 'all') {
       list = list.filter(p => p.category === activeCategory);
     }

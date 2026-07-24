@@ -173,39 +173,72 @@ export const defaultLiveExams = [
   }
 ];
 
-export const getLiveExams = () => {
+import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/firestoreService';
+
+// Initialize cache with local storage or static fallback
+let cachedLiveExams = (() => {
   try {
     const saved = localStorage.getItem('admin_live_exams');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      return parsed.map(exam => {
-        if (exam.id === 'live-exam-1') {
-          return {
-            ...exam,
-            title: 'বিসিএস লাইভ পরীক্ষা (১০০ প্রশ্নপত্র)',
-            titleEn: 'BCS Live Exam (100 MCQ Paper)'
-          };
-        }
-        if (exam.id === 'live-exam-2') {
-          return {
-            ...exam,
-            title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা',
-            titleEn: 'Primary Assistant Teacher Live Exam'
-          };
-        }
-        return exam;
-      });
-    }
+    return saved ? JSON.parse(saved) : defaultLiveExams;
   } catch (e) {
-    console.error(e);
+    return defaultLiveExams;
   }
-  return defaultLiveExams;
+})();
+
+// Real-time Firestore sync
+try {
+  onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => {
+    if (data && data.length > 0) {
+      cachedLiveExams = data;
+      localStorage.setItem('admin_live_exams', JSON.stringify(data));
+    }
+  });
+} catch (err) {
+  console.error('Failed to subscribe to live exams Firestore:', err);
+}
+
+export const getLiveExams = () => {
+  const exams = cachedLiveExams;
+  return exams.map(exam => {
+    if (exam.id === 'live-exam-1') {
+      return {
+        ...exam,
+        title: 'বিসিএস লাইভ পরীক্ষা (১০০ প্রশ্নপত্র)',
+        titleEn: 'BCS Live Exam (100 MCQ Paper)'
+      };
+    }
+    if (exam.id === 'live-exam-2') {
+      return {
+        ...exam,
+        title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা',
+        titleEn: 'Primary Assistant Teacher Live Exam'
+      };
+    }
+    return exam;
+  });
 };
 
-export const saveLiveExams = (exams) => {
+export const saveLiveExams = async (exams) => {
+  cachedLiveExams = exams;
   try {
     localStorage.setItem('admin_live_exams', JSON.stringify(exams));
-  } catch (e) {
-    console.error(e);
+  } catch (e) {}
+
+  // Sync to Firestore
+  try {
+    for (const exam of exams) {
+      const { id, ...payload } = exam;
+      await setDocument(COLLECTIONS.LIVE_EXAMS, id, payload);
+    }
+    const currentIds = exams.map(e => e.id);
+    const firestoreData = await getCollection(COLLECTIONS.LIVE_EXAMS);
+    for (const doc of firestoreData) {
+      if (!currentIds.includes(doc.id)) {
+        await deleteDocument(COLLECTIONS.LIVE_EXAMS, doc.id);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to save live exams to Firestore:', err);
   }
 };
+

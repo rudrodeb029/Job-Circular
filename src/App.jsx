@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAppContext } from './context/AppContext'
-import { AdminProvider } from './context/AdminContext'
 import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
 
@@ -89,21 +88,19 @@ function App() {
   // Admin routes don't use the mobile container
   if (isAdminRoute) {
     return (
-      <AdminProvider>
-        <Routes location={location}>
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="jobs" element={<ManageJobs />} />
-            <Route path="live-exams" element={<ManageLiveExams />} />
-            <Route path="questions" element={<ManageQuestions />} />
-            <Route path="notifications" element={<ManageNotifications />} />
-            <Route path="stats" element={<Statistics />} />
-            <Route path="reports" element={<Reports />} />
-            <Route path="settings" element={<AdminSettings />} />
-          </Route>
-        </Routes>
-      </AdminProvider>
+      <Routes location={location}>
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="jobs" element={<ManageJobs />} />
+          <Route path="live-exams" element={<ManageLiveExams />} />
+          <Route path="questions" element={<ManageQuestions />} />
+          <Route path="notifications" element={<ManageNotifications />} />
+          <Route path="stats" element={<Statistics />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+      </Routes>
     )
   }
 

@@ -5,12 +5,14 @@ import NotificationItem from '../components/NotificationItem';
 import EmptyState from '../components/EmptyState';
 import BottomNav from '../components/BottomNav';
 import { getNotifications } from '../data/notifications';
+import { useAdminContext } from '../context/AdminContext';
 
 export default function Notifications() {
   const { state, dispatch } = useAppContext();
+  const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
 
-  const notificationsList = useMemo(() => getNotifications(), []);
+  const notificationsList = useMemo(() => getNotifications(), [adminState.jobs]);
 
   const handleMarkAllRead = () => {
     const allIds = notificationsList.map(n => n.id);

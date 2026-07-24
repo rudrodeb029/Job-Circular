@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useAdminContext } from '../context/AdminContext';
 import SearchBar from '../components/SearchBar';
 import FilterPanel from '../components/FilterPanel';
 import JobCard from '../components/JobCard';
@@ -58,7 +59,8 @@ export default function SearchFilter() {
     setActiveTab('all');
   };
 
-  const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+  const { state: adminState } = useAdminContext();
+  const localJobs = adminState.jobs;
 
   const filteredJobs = useMemo(() => {
     return localJobs.filter(job => {

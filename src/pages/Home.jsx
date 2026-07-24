@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Bell, Search, LayoutGrid, Download, FileText, Calendar } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import JobCard from '../components/JobCard';
@@ -53,40 +54,15 @@ export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const isEn = state.language === 'en';
+  const { state: adminState } = useAdminContext();
+  const localJobs = adminState.jobs;
   const [loading, setLoading] = useState(true);
-  const [localJobs, setLocalJobs] = useState(() => {
-    try {
-      const saved = localStorage.getItem('admin_jobs');
-      return saved ? JSON.parse(saved) : jobs;
-    } catch (e) {
-      console.error(e);
-      return jobs;
-    }
-  });
-
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 20;
 
   useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (!e || e.key === 'admin_jobs') {
-        const loadedJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
-        setLocalJobs(loadedJobs);
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('jobs_updated', handleStorageChange);
-
-    // Initial load
-    handleStorageChange();
-
     const timer = setTimeout(() => setLoading(false), 800);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('jobs_updated', handleStorageChange);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   // Merge circulars data based on feed types

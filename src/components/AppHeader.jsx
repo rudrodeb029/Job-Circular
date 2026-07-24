@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { notifications } from '../data/notifications';
-import { questionsData } from '../data/questionsData';
+import { getQuestionsData } from '../data/questionsData';
 
 export default function AppHeader() {
   const navigate = useNavigate();
@@ -278,7 +278,7 @@ export default function AppHeader() {
                       { id: 'ministry', label: 'বিভিন্ন মন্ত্রনালয়', labelEn: 'Ministries', icon: '🏛️' }
                     ].map(cat => {
                       const isExpanded = expandedCategory === cat.id;
-                      const papers = questionsData.filter(p => p.category === cat.id);
+                      const papers = getQuestionsData().filter(p => p.category === cat.id);
 
                       return (
                         <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>

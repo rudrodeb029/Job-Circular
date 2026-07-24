@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 import { Bookmark, BookmarkCheck, Calendar, Clock, Download, FileText, Search } from '../components/Icons';
 import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
@@ -75,8 +76,9 @@ export default function SavedJobs() {
     { id: 'result', label: state.language === 'en' ? 'Result' : 'ফলাফল' }
   ];
 
-  // Load jobs from localStorage if present (to reflect admin updates), fallback to static jobs data
-  const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+  // Load jobs from AdminContext
+  const { state: adminState } = useAdminContext();
+  const localJobs = adminState.jobs;
 
   const savedJobList = localJobs.filter(j => state.savedJobs.includes(j.id));
 

@@ -219,6 +219,30 @@ export const questionsData = [
   }
 ];
 
+import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/firestoreService';
+
+// Initialize cache with local storage or static fallback
+let cachedQuestionsData = (() => {
+  try {
+    const saved = localStorage.getItem('questions_data');
+    return saved ? JSON.parse(saved) : questionsData;
+  } catch (e) {
+    return questionsData;
+  }
+})();
+
+// Real-time Firestore sync
+try {
+  onCollectionSnapshot(COLLECTIONS.QUESTIONS, (data) => {
+    if (data && data.length > 0) {
+      cachedQuestionsData = data;
+      localStorage.setItem('questions_data', JSON.stringify(data));
+    }
+  });
+} catch (err) {
+  console.error('Failed to subscribe to questions Firestore:', err);
+}
+
 export const getQuestionsByCategory = (category) => {
   const all = getQuestionsData();
   return all.filter(q => q.category === category);
@@ -230,18 +254,32 @@ export const getQuestionById = (id) => {
 };
 
 export const getQuestionsData = () => {
+  return cachedQuestionsData;
+};
+
+export const saveQuestionsData = async (data) => {
+  cachedQuestionsData = data;
   try {
-    const saved = localStorage.getItem('questions_data');
-    return saved ? JSON.parse(saved) : questionsData;
-  } catch (e) {
-    return questionsData;
+    localStorage.setItem('questions_data', JSON.stringify(data));
+  } catch (e) {}
+
+  // Sync to Firestore
+  try {
+    // Write all papers
+    for (const paper of data) {
+      const { id, ...payload } = paper;
+      await setDocument(COLLECTIONS.QUESTIONS, id, payload);
+    }
+    // Clean up deleted papers
+    const currentIds = data.map(p => p.id);
+    const firestoreData = await getCollection(COLLECTIONS.QUESTIONS);
+    for (const doc of firestoreData) {
+      if (!currentIds.includes(doc.id)) {
+        await deleteDocument(COLLECTIONS.QUESTIONS, doc.id);
+      }
+    }
+  } catch (err) {
+    console.error('Failed to save questions to Firestore:', err);
   }
 };
 
-export const saveQuestionsData = (data) => {
-  try {
-    localStorage.setItem('questions_data', JSON.stringify(data));
-  } catch (e) {
-    console.error(e);
-  }
-};

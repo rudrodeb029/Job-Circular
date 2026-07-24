@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Briefcase, Calendar, Download, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { admitCardsAndResults } from '../data/notifications';
 import JobCard from '../components/JobCard';
@@ -55,8 +56,9 @@ export default function AllCirculars() {
   };
 
   // Combine all circulars, exam dates, and results
+  const { state: adminState } = useAdminContext();
   const allFeedItems = useMemo(() => {
-    const localJobs = JSON.parse(localStorage.getItem('admin_jobs')) || jobs;
+    const localJobs = adminState.jobs;
 
     const jobItems = localJobs.map(job => ({
       ...job,
