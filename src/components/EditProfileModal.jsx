@@ -153,11 +153,11 @@ export default function EditProfileModal({ isOpen, onClose }) {
       if (fileData.secure_url) {
         setFormData(prev => ({ ...prev, avatar: fileData.secure_url }));
       } else {
-        alert(fileData.error?.message || 'Upload failed.');
+        alert('Cloudinary upload error: ' + (fileData.error?.message || JSON.stringify(fileData)));
       }
     } catch (err) {
       console.error(err);
-      alert('Upload failed. Please check network.');
+      alert('Upload failed: ' + err.message);
     } finally {
       setUploadingImage(false);
     }
