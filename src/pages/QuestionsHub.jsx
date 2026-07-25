@@ -73,12 +73,12 @@ export default function QuestionsHub() {
       return 0;
     };
 
-    // Sort FIFO
+    // Sort LIFO
     return [...list].sort((a, b) => {
       const tsA = getItemTimestamp(a);
       const tsB = getItemTimestamp(b);
-      if (tsA !== tsB) return tsA - tsB; // Oldest first (FIFO)
-      return String(a.id || '').localeCompare(String(b.id || ''));
+      if (tsA !== tsB) return tsB - tsA; // Newest first (LIFO)
+      return String(b.id || '').localeCompare(String(a.id || ''));
     });
   }, [activeCategory, searchQuery, papers]);
 
@@ -220,14 +220,27 @@ export default function QuestionsHub() {
                 key={paper.id}
                 style={{
                   background: 'var(--white)',
-                  border: '1px solid var(--border-light)',
+                  border: '1px solid rgba(37, 99, 235, 0.12)',
                   borderRadius: '14px',
                   padding: '14px',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+                  position: 'relative',
+                  overflow: 'hidden'
                 }}
                 onClick={() => navigate(`/question-details/${paper.id}`)}
               >
+                {/* Professional Accent Border */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  bottom: 0,
+                  width: '4px',
+                  background: 'linear-gradient(to bottom, var(--primary), #60a5fa)',
+                  borderRadius: '4px 0 0 4px'
+                }}></div>
+
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {categoryConfig[paper.category]?.icon || '📚'}

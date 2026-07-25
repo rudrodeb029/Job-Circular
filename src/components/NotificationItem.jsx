@@ -87,17 +87,16 @@ export default function NotificationItem({ notification }) {
         overflow: 'hidden'
       }}
     >
-      {/* Left Active Border Accent Bar for Unread Notifications */}
-      {!isRead && (
-        <div style={{
-          position: 'absolute',
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: '4px',
-          background: 'var(--primary)'
-        }}></div>
-      )}
+      {/* Left Active Border Accent Bar */}
+      <div style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: '4px',
+        background: isRead ? '#e2e8f0' : 'linear-gradient(to bottom, var(--primary), #60a5fa)',
+        borderRadius: '4px 0 0 4px'
+      }}></div>
 
       {/* 3D Gradient Icon Tile */}
       <div style={{
