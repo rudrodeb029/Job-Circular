@@ -185,37 +185,66 @@ export default function QuestionsHub() {
     return baseList.sort((a, b) => b.score - a.score);
   }, [now]);
 
-  // Filtered Live Exams Data based on liveTab selector
-  const filteredLiveExams = useMemo(() => {
-    const list = liveExams.filter(exam => {
-      const status = getExamStatus(exam);
-      if (liveTab === 'live') {
-        return status.type === 'live' || status.type === 'upcoming';
-      } else {
-        return status.type === 'ended' || status.type === 'submitted';
-      }
-    });
+        {/* SECTION 1: Live MCQ Exam (Moved to separate page) */}
+        <div style={{ marginBottom: '24px' }}>
+          <div className="section-header" style={{ marginBottom: '16px' }}>
+            <h3 className="section-title" style={{
+              color: 'var(--text-secondary)',
+              background: 'rgba(26, 86, 219, 0.04)',
+              borderLeft: '4px solid var(--primary)',
+              padding: '6px 14px',
+              borderRadius: '8px',
+              fontWeight: 800,
+              fontSize: '13.5px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
+            </h3>
+            <button
+              onClick={() => navigate('/live-exams-list')}
+              style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                color: 'var(--primary)',
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}
+            >
+              <span>{isEn ? 'View All' : 'সব দেখুন'}</span>
+              <span>➔</span>
+            </button>
+          </div>
 
-    const getItemTimestamp = (item) => {
-      if (item.createdAt) {
-        const ms = new Date(item.createdAt).getTime();
-        if (!isNaN(ms)) return ms;
-      }
-      if (item.id) {
-        const matches = String(item.id).match(/\d{10,13}/);
-        if (matches) return parseInt(matches[0], 10);
-      }
-      return 0;
-    };
-
-    // Sort LIFO
-    return [...list].sort((a, b) => {
-      const tsA = getItemTimestamp(a);
-      const tsB = getItemTimestamp(b);
-      if (tsB !== tsA) return tsB - tsA;
-      return String(b.id || '').localeCompare(String(a.id || ''));
-    });
-  }, [liveExams, liveTab, now]);
+          {/* Quick link card for Live Exam */}
+          <div
+            onClick={() => navigate('/live-exams-list')}
+            style={{
+              background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+              borderRadius: '16px',
+              padding: '20px',
+              color: 'white',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              boxShadow: '0 8px 24px rgba(30, 64, 175, 0.2)'
+            }}
+          >
+            <div>
+              <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800 }}>{isEn ? 'Participate in Live Exams' : 'লাইভ পরীক্ষায় অংশ নিন'}</h4>
+              <p style={{ margin: '4px 0 0 0', fontSize: '11px', opacity: 0.9 }}>{isEn ? 'Daily routine mock tests and ranking' : 'প্রতিদিনের রুটিন ভিত্তিক লাইভ পরীক্ষা'}</p>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.2)', padding: '10px', borderRadius: '12px' }}>
+              <Clock size={20} color="white" />
+            </div>
+          </div>
+        </div>
 
   // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {

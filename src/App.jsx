@@ -23,6 +23,7 @@ import NotFound from './pages/NotFound'
 import QuestionsList from './pages/QuestionsList'
 import QuestionDetails from './pages/QuestionDetails'
 import LiveExams from './pages/LiveExams'
+import LiveExamsPage from './pages/LiveExamsPage'
 import LiveExamRoom from './pages/LiveExamRoom'
 import QuestionsHub from './pages/QuestionsHub'
 
@@ -125,6 +126,7 @@ function App() {
         <Route path="/question-details/:id" element={<QuestionDetails />} />
         <Route path="/questions-hub" element={<QuestionsHub />} />
         <Route path="/live-exams" element={<LiveExams />} />
+        <Route path="/live-exams-list" element={<LiveExamsPage />} />
         <Route path="/live-exam-room/:id" element={<LiveExamRoom />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
