@@ -306,14 +306,18 @@ export const AdminProvider = ({ children }) => {
             const mapped = mapJobs(data);
             dispatch({ type: 'SET_JOBS', payload: mapped });
 
-            // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
-            const needsFix = data.some(j => !j.createdAt);
-            if (data.length > 0 && needsFix) {
-              console.log('Auto-repairing missing job timestamps in Firestore...');
-              mapped.forEach(j => {
-                const { id, ...payload } = j;
-                setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
-              });
+            if (data.length === 0) {
+              localStorage.removeItem('admin_jobs');
+            } else {
+              // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
+              const needsFix = data.some(j => !j.createdAt);
+              if (needsFix) {
+                console.log('Auto-repairing missing job timestamps in Firestore...');
+                mapped.forEach(j => {
+                  const { id, ...payload } = j;
+                  setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
+                });
+              }
             }
           })
         );
@@ -321,18 +325,16 @@ export const AdminProvider = ({ children }) => {
         // Notifications collection
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (data) => {
-            if (data.length > 0) {
-              dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(data) });
-            }
+            dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(data) });
+            if (data.length === 0) localStorage.removeItem('admin_notifications');
           })
         );
 
         // Admits collection
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => {
-            if (data.length > 0) {
-              dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(data) });
-            }
+            dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(data) });
+            if (data.length === 0) localStorage.removeItem('admin_admits');
           })
         );
 
