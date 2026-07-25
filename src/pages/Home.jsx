@@ -156,8 +156,8 @@ export default function Home() {
       .sort((a, b) => {
         const tsA = getItemTimestamp(a);
         const tsB = getItemTimestamp(b);
-        if (tsA !== tsB) return tsA - tsB; // FIFO (Oldest first)
-        return String(a.id || '').localeCompare(String(b.id || ''));
+        if (tsA !== tsB) return tsB - tsA; // LIFO (Newest first)
+        return String(b.id || '').localeCompare(String(a.id || ''));
       });
   }, [localJobs]);
 
