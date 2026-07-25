@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Briefcase, Calendar, Download, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
-import { jobs } from '../data/jobs';
-import { admitCardsAndResults } from '../data/notifications';
 import JobCard from '../components/JobCard';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
@@ -60,6 +58,7 @@ export default function AllCirculars() {
   const { state: adminState } = useAdminContext();
   const allFeedItems = useMemo(() => {
     const localJobs = adminState.jobs;
+    const localAdmits = adminState.admits || [];
 
     const jobItems = localJobs.map(job => ({
       ...job,
@@ -100,10 +99,10 @@ export default function AllCirculars() {
       feedType: 'result'
     }));
 
-    // Notifications admit card items
-    const notifExamItems = admitCardsAndResults.filter(item => item.type === 'admit_card').map(item => ({
+    // Notifications admit card items from database
+    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
       ...item,
-      originalId: item.id.replace('admit-', 'job-'),
+      originalId: String(item.id).replace('admit-', 'job-'),
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examDate: item.date,
@@ -113,10 +112,10 @@ export default function AllCirculars() {
       feedType: 'exam_date'
     }));
 
-    // Notifications result items
-    const notifResultItems = admitCardsAndResults.filter(item => item.type === 'result').map(item => ({
+    // Notifications result items from database
+    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
       ...item,
-      originalId: item.id.replace('result-', 'job-'),
+      originalId: String(item.id).replace('result-', 'job-'),
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,

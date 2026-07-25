@@ -9,9 +9,7 @@ import JobCard from '../components/JobCard';
 import SearchBar from '../components/SearchBar';
 import TabBar from '../components/TabBar';
 import { HomeSkeleton } from '../components/SkeletonLoader';
-import { jobs } from '../data/jobs';
 import { categories } from '../data/categories';
-import { admitCardsAndResults } from '../data/notifications';
 import Disclaimer from '../components/Disclaimer';
 import { formatTimeAgo } from '../utils/timeUtils';
 
@@ -57,6 +55,7 @@ export default function Home() {
   const isEn = state.language === 'en';
   const { state: adminState, loading: adminLoading } = useAdminContext();
   const localJobs = adminState.jobs;
+  const localAdmits = adminState.admits || [];
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 20;
@@ -112,10 +111,10 @@ export default function Home() {
       feedType: 'result'
     }));
 
-    // Notifications admit card items
-    const notifExamItems = admitCardsAndResults.filter(item => item.type === 'admit_card').map(item => ({
+    // Notifications admit card items from database
+    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
       ...item,
-      originalId: item.id.replace('admit-', 'job-'),
+      originalId: String(item.id).replace('admit-', 'job-'),
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examDate: item.date,
@@ -125,10 +124,10 @@ export default function Home() {
       feedType: 'exam_date'
     }));
 
-    // Notifications result items
-    const notifResultItems = admitCardsAndResults.filter(item => item.type === 'result').map(item => ({
+    // Notifications result items from database
+    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
       ...item,
-      originalId: item.id.replace('result-', 'job-'),
+      originalId: String(item.id).replace('result-', 'job-'),
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,

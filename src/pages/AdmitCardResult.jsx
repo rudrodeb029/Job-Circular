@@ -5,7 +5,6 @@ import TabBar from '../components/TabBar';
 import BottomNav from '../components/BottomNav';
 import EmptyState from '../components/EmptyState';
 import SearchBar from '../components/SearchBar';
-import { admitCards } from '../data/notifications';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { formatTimeAgo } from '../utils/timeUtils';
@@ -54,6 +53,7 @@ export default function AdmitCardResult() {
   const { state: adminState } = useAdminContext();
   const allAdmitCards = useMemo(() => {
     const localJobs = adminState.jobs;
+    const localAdmits = adminState.admits || [];
 
     const dynamicExamDates = localJobs.filter(j => j.examDate).map(j => ({
       ...j,
@@ -85,12 +85,13 @@ export default function AdmitCardResult() {
       downloadLink: j.examResult || '#'
     }));
 
-    const merged = [...admitCards, ...dynamicExamDates, ...dynamicResults];
+    const merged = [...localAdmits, ...dynamicExamDates, ...dynamicResults];
     const unique = [];
     const seen = new Set();
     for (const item of merged) {
-      if (!seen.has(item.id)) {
-        seen.add(item.id);
+      const uniqueId = String(item.id);
+      if (!seen.has(uniqueId)) {
+        seen.add(uniqueId);
         unique.push(item);
       }
     }
