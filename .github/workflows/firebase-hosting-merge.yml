@@ -34,12 +34,13 @@ jobs:
           projectId: job-circular-75dbb
 
       - name: Deploy Firestore Rules and Indexes
-        uses: w9jds/firebase-action@master
-        continue-on-error: true # Allow APK build and Hosting to finish even if this fails
-        with:
-          args: deploy --only firestore
-        env:
-          GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JOB_CIRCULAR_75DBB }}
+        run: |
+          npm install -g firebase-tools
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_JOB_CIRCULAR_75DBB }}' > service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=service-account.json
+          firebase deploy --only firestore --project job-circular-75dbb
+          rm service-account.json
+
 
 
 
