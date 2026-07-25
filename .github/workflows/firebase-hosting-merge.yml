@@ -33,11 +33,11 @@ jobs:
           channelId: live
           projectId: job-circular-75dbb
 
-      - name: Deploy Firestore Rules and Indexes
+      - name: Deploy Firestore Indexes
         uses: w9jds/firebase-action@master
         continue-on-error: true # Allow APK build and Hosting to finish even if this fails
         with:
-          args: deploy --only firestore
+          args: deploy --only firestore:indexes
         env:
           GCP_SA_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JOB_CIRCULAR_75DBB }}
 
