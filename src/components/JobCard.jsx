@@ -123,7 +123,18 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
   };
 
   return (
-    <div className="job-card" onClick={() => navigate(`/job/${job.id}`)}>
+    <div className="job-card" onClick={() => navigate(`/job/${job.id}`)} style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* Professional Accent Border */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        bottom: 0,
+        width: '4px',
+        background: 'linear-gradient(to bottom, var(--primary), #60a5fa)',
+        borderRadius: '4px 0 0 4px'
+      }}></div>
+
       {/* Modern Glossy 3D Gradient Icon Tile */}
       {showIcon && (
         <div

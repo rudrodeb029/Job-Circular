@@ -241,14 +241,15 @@ export default function LiveExamsPage() {
                   overflow: 'hidden'
                 }}
               >
-                 {/* Visual Status Indicator Line */}
+                 {/* Professional Accent Border */}
                 <div style={{
                   position: 'absolute',
                   top: 0,
                   left: 0,
-                  right: 0,
-                  height: '4px',
-                  background: status.type === 'live' ? 'linear-gradient(90deg, #ef4444, #dc2626)' : status.type === 'upcoming' ? 'linear-gradient(90deg, #f59e0b, #d97706)' : '#cbd5e1'
+                  bottom: 0,
+                  width: '4px',
+                  background: status.type === 'live' ? 'linear-gradient(to bottom, #ef4444, #f87171)' : 'linear-gradient(to bottom, var(--primary), #60a5fa)',
+                  borderRadius: '4px 0 0 4px'
                 }}></div>
 
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>

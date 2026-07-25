@@ -273,8 +273,19 @@ export default function Home() {
                     key={item.id} 
                     className="job-card animate-fade-in" 
                     onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)}
-                    style={{ cursor: 'pointer' }}
+                    style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
                   >
+                    {/* Professional Accent Border */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      bottom: 0,
+                      width: '4px',
+                      background: 'linear-gradient(to bottom, #10b981, #34d399)',
+                      borderRadius: '4px 0 0 4px'
+                    }}></div>
+
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
@@ -353,8 +364,19 @@ export default function Home() {
                   key={item.id} 
                   className="job-card animate-fade-in" 
                   onClick={() => navigate(`/result-details/${item.originalId || item.id}`)}
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
                 >
+                  {/* Professional Accent Border */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    width: '4px',
+                    background: 'linear-gradient(to bottom, #7c3aed, #a78bfa)',
+                    borderRadius: '4px 0 0 4px'
+                  }}></div>
+
                   <div className="job-card-content">
                     <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
