@@ -92,8 +92,8 @@ const adminReducer = (state, action) => {
   const sortByCreatedAt = (a, b) => {
     const tsA = getItemTimestamp(a);
     const tsB = getItemTimestamp(b);
-    if (tsB !== tsA) return tsB - tsA;
-    return String(b.id || '').localeCompare(String(a.id || ''));
+    if (tsA !== tsB) return tsA - tsB; // Oldest first (FIFO)
+    return String(a.id || '').localeCompare(String(b.id || ''));
   };
 
   switch (action.type) {

@@ -73,11 +73,12 @@ export default function QuestionsHub() {
       return 0;
     };
 
+    // Sort FIFO
     return [...list].sort((a, b) => {
       const tsA = getItemTimestamp(a);
       const tsB = getItemTimestamp(b);
-      if (tsB !== tsA) return tsB - tsA;
-      return String(b.id || '').localeCompare(String(a.id || ''));
+      if (tsA !== tsB) return tsA - tsB; // Oldest first (FIFO)
+      return String(a.id || '').localeCompare(String(b.id || ''));
     });
   }, [activeCategory, searchQuery, papers]);
 
