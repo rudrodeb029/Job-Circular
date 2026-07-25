@@ -64,16 +64,17 @@
 
 /* Cards - General */
 .card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
+  background: #ffffff;
+  border-radius: 20px;
   padding: var(--space-lg);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  box-shadow: 0 6px 24px -4px rgba(15, 23, 42, 0.06), 0 3px 10px -2px rgba(15, 23, 42, 0.03);
   border: 1px solid rgba(226, 232, 240, 0.9);
-  transition: var(--transition-base);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .card:hover {
-  box-shadow: 0 8px 25px -4px rgba(26, 86, 219, 0.1), 0 3px 10px -2px rgba(15, 23, 42, 0.04);
-  border-color: rgba(26, 86, 219, 0.2);
+  box-shadow: 0 12px 32px -4px rgba(26, 86, 219, 0.12), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+  border-color: rgba(26, 86, 219, 0.25);
+  transform: translateY(-2px);
 }
 .card-flat {
   box-shadow: none;
@@ -316,12 +317,12 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 16px;
-  background: var(--card-bg);
-  border-radius: var(--radius-xl);
-  border: var(--card-border);
-  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05), 0 2px 5px -1px rgba(15, 23, 42, 0.03);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 16px 18px;
+  background: #ffffff;
+  border-radius: 18px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 8px -1px rgba(15, 23, 42, 0.03);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -331,16 +332,16 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 4px;
+  width: 5px;
   height: 100%;
-  background: var(--primary);
+  background: linear-gradient(180deg, var(--primary) 0%, #60a5fa 100%);
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.3s ease;
 }
 .job-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(26, 86, 219, 0.14), 0 3px 10px -2px rgba(15, 23, 42, 0.04);
-  border-color: rgba(26, 86, 219, 0.25);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 28px -4px rgba(26, 86, 219, 0.15), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
+  border-color: rgba(26, 86, 219, 0.35);
 }
 .job-card:hover::before {
   opacity: 1;
@@ -415,21 +416,21 @@
 .category-item {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  margin-bottom: 10px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
-  transition: var(--transition-base);
+  gap: 16px;
+  padding: 16px 18px;
+  background: #ffffff;
+  border-radius: 18px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.7);
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: pointer;
 }
 .category-item:hover {
-  background: var(--primary-bg);
-  transform: translateY(-1px);
-  border-color: rgba(26, 86, 219, 0.2);
-  box-shadow: 0 6px 18px rgba(26, 86, 219, 0.08);
+  background: linear-gradient(135deg, #ffffff 0%, var(--primary-lightest) 100%);
+  transform: translateY(-3px) scale(1.01);
+  border-color: rgba(26, 86, 219, 0.3);
+  box-shadow: 0 10px 24px -4px rgba(26, 86, 219, 0.12);
 }
 .category-icon {
   width: 48px;
@@ -449,18 +450,19 @@
 /* Notification Item Card */
 .notification-item {
   display: flex;
-  gap: 14px;
-  padding: 14px 16px;
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  margin-bottom: 10px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.03);
-  transition: var(--transition-fast);
+  gap: 16px;
+  padding: 16px 18px;
+  background: #ffffff;
+  border-radius: 18px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(226, 232, 240, 0.7);
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .notification-item.unread {
-  background: linear-gradient(180deg, #f4f8ff 0%, #eff6ff 100%);
-  border-color: rgba(26, 86, 219, 0.2);
+  background: linear-gradient(135deg, #f4f8ff 0%, #e0f2fe 100%);
+  border-color: rgba(26, 86, 219, 0.3);
+  box-shadow: 0 4px 16px -2px rgba(26, 86, 219, 0.08);
 }
 .notification-dot {
   width: 10px;
