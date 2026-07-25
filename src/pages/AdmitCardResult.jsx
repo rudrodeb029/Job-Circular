@@ -52,7 +52,41 @@ export default function AdmitCardResult() {
 
   const { state: adminState } = useAdminContext();
   const allAdmitCards = useMemo(() => {
+    const localJobs = adminState.jobs;
     const localAdmits = adminState.admits || [];
+
+    // Map checkboxes from Circulars to Admit Card / Result objects
+    const dynamicExamDates = localJobs.filter(j => j.showInExamDate).map(j => ({
+      ...j,
+      id: `dynamic-exam-${j.id}`,
+      examName: `${j.title} পরীক্ষা`,
+      examNameEn: `${j.titleEn || j.title} Exam`,
+      organization: j.organization,
+      organizationEn: j.organizationEn || j.organization,
+      type: 'admit_card',
+      status: 'পরীক্ষার তারিখ প্রকাশিত',
+      statusEn: 'Exam Date Published',
+      date: j.examDate || j.deadline,
+      dateEn: j.examDateEn || j.deadline,
+      downloadLink: j.applyLink || '#',
+      createdAt: j.createdAt
+    }));
+
+    const dynamicResults = localJobs.filter(j => j.showInResult).map(j => ({
+      ...j,
+      id: `dynamic-result-${j.id}`,
+      examName: `${j.title} পরীক্ষার ফলাফল`,
+      examNameEn: `${j.titleEn || j.title} Exam Result`,
+      organization: j.organization,
+      organizationEn: j.organizationEn || j.organization,
+      type: 'result',
+      status: 'ফলাফল প্রকাশিত',
+      statusEn: 'Result Published',
+      date: j.postedAt || new Date().toISOString().split('T')[0],
+      dateEn: j.postedAt || 'Recently',
+      downloadLink: j.examResult || j.applyLink || '#',
+      createdAt: j.createdAt
+    }));
 
     const getItemTimestamp = (item) => {
       if (item.createdAt) {
@@ -66,8 +100,9 @@ export default function AdmitCardResult() {
       return 0;
     };
 
-    return [...localAdmits].sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
-  }, [adminState.admits]);
+    const merged = [...localAdmits, ...dynamicExamDates, ...dynamicResults];
+    return merged.sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+  }, [adminState.jobs, adminState.admits]);
 
   const searchedItems = useMemo(() => {
     const items = allAdmitCards.filter(item => item.type === activeTab);

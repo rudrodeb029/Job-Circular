@@ -77,38 +77,23 @@ export default function Home() {
       feedType: 'job'
     }));
 
-    // Exam Date jobs from localJobs
-    const examJobs = localJobs.filter(job => job.examDate).map(job => ({
-      ...job,
-      id: `exam_${job.id}`,
-      originalId: job.id,
-      organization: job.organization,
-      organizationEn: job.organizationEn,
-      postTitle: job.title,
-      postTitleEn: job.titleEn,
-      examDate: job.examDate,
-      examDateEn: job.examDateEn || job.examDate,
-      downloadLink: job.downloadLink || 'https://example.com/admit.pdf',
-      category: job.category,
-      postedDate: job.postedDate || job.examDate || '১ দিন আগে',
-      postedDateEn: job.postedDateEn || job.examDateEn || job.examDate || '1 day ago',
-      feedType: 'exam_date'
+    // Special Filter: Also include Exam Date and Result markers as separate items in feed
+    const examMarkerItems = localJobs.filter(j => j.showInExamDate).map(j => ({
+      ...j,
+      id: `home-exam-${j.id}`,
+      feedType: 'exam_date',
+      postTitle: j.title,
+      postTitleEn: j.titleEn,
+      examDate: j.examDate || j.deadline,
+      examDateEn: j.examDateEn || j.deadline
     }));
 
-    // Result jobs from localJobs
-    const resultJobs = localJobs.filter(job => job.examResult).map(job => ({
-      ...job,
-      id: `result_${job.id}`,
-      originalId: job.id,
-      organization: job.organization,
-      organizationEn: job.organizationEn,
-      postTitle: job.title,
-      postTitleEn: job.titleEn,
-      examResult: job.examResult,
-      category: job.category,
-      postedDate: job.postedDate || '১ দিন আগে',
-      postedDateEn: job.postedDateEn || '1 day ago',
-      feedType: 'result'
+    const resultMarkerItems = localJobs.filter(j => j.showInResult).map(j => ({
+      ...j,
+      id: `home-result-${j.id}`,
+      feedType: 'result',
+      postTitle: j.title,
+      postTitleEn: j.titleEn
     }));
 
     // Notifications admit card items from database
@@ -145,14 +130,10 @@ export default function Home() {
         const matches = String(item.id).match(/\d{10,13}/);
         if (matches) return parseInt(matches[0], 10);
       }
-      if (item.postedAt && item.postedAt.includes('-')) {
-        const ms = new Date(item.postedAt).getTime();
-        if (!isNaN(ms)) return ms;
-      }
       return 0;
     };
 
-    return [...jobItems, ...examJobs, ...resultJobs, ...notifExamItems, ...notifResultItems]
+    return [...jobItems, ...examMarkerItems, ...resultMarkerItems, ...notifExamItems, ...notifResultItems]
       .sort((a, b) => {
         const tsA = getItemTimestamp(a);
         const tsB = getItemTimestamp(b);
