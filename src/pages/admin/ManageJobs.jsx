@@ -73,7 +73,7 @@ export default function ManageJobs() {
       data.append('upload_preset', uploadPreset);
 
       try {
-        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
           method: 'POST',
           body: data
         });
@@ -100,7 +100,7 @@ export default function ManageJobs() {
           images: mergedImages.join(', ')
         };
       });
-      showToast(`Successfully uploaded ${successCount} image(s) to Cloudinary!`);
+      showToast(`Successfully uploaded ${successCount} file(s) to Cloudinary!`);
     }
 
     setUploadProgress('');
@@ -647,13 +647,6 @@ export default function ManageJobs() {
                         <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examDate" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024" required />
                       </div>
                     )}
-
-                    {formData.showInResult && (
-                      <div className="admin-form-group">
-                        <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Result Sheet Link / PDF URL (ফলাফল লিংক)</label>
-                        <input type="url" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none' }} name="examResult" value={formData.examResult || ''} onChange={handleInputChange} placeholder="e.g. https://example.com/result.pdf" required />
-                      </div>
-                    )}
                   </div>
                 </div>
 
@@ -683,8 +676,8 @@ export default function ManageJobs() {
                 </div>
 
                 <div className="admin-form-group" style={{ marginBottom: '24px' }}>
-                  <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Circular Images (URLs)</label>
-                  <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none', marginBottom: '8px' }} name="images" value={formData.images} onChange={handleInputChange} placeholder="Comma-separated image URLs or upload below" />
+                  <label className="admin-form-label" style={{ display: 'block', marginBottom: '8px', color: '#334155', fontWeight: '500', fontSize: '0.875rem' }}>Circular Images / PDF (URLs)</label>
+                  <input type="text" className="admin-form-input" style={{ width: '100%', padding: '10px', backgroundColor: '#f8fafc', color: '#1e293b', border: '1px solid #e2e8f0', borderRadius: '6px', outline: 'none', marginBottom: '8px' }} name="images" value={formData.images} onChange={handleInputChange} placeholder="Comma-separated image/PDF URLs or upload below" />
                   
                   {/* Cloudinary direct upload panel */}
                   <div style={{ background: '#f8fafc', border: '1px dashed #cbd5e1', borderRadius: '8px', padding: '12px', marginBottom: '10px' }}>
@@ -692,7 +685,7 @@ export default function ManageJobs() {
                       <input 
                         type="file" 
                         multiple
-                        accept="image/*" 
+                        accept="image/*,application/pdf"
                         onChange={handleCloudinaryUpload} 
                         disabled={!!uploadProgress}
                         style={{ fontSize: '12px', color: '#4b5563' }} 
@@ -701,43 +694,53 @@ export default function ManageJobs() {
                     </div>
                   </div>
 
-                  {/* Image Previews Grid */}
+                  {/* Image/PDF Previews Grid */}
                   {formData.images && formData.images.split(',').map(i => i.trim()).filter(i => i).length > 0 && (
                     <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px', background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      {formData.images.split(',').map(i => i.trim()).filter(i => i).map((imgUrl, index) => (
-                        <div key={index} style={{ position: 'relative', width: '60px', height: '60px', borderRadius: '6px', border: '1px solid #cbd5e1', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
-                          <img src={imgUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
-                              current.splice(index, 1);
-                              setFormData(prev => ({ ...prev, images: current.join(', ') }));
-                            }}
-                            style={{
-                              position: 'absolute',
-                              top: '2px',
-                              right: '2px',
-                              width: '16px',
-                              height: '16px',
-                              borderRadius: '50%',
-                              background: '#ef4444',
-                              color: '#ffffff',
-                              border: 'none',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '10px',
-                              fontWeight: 'bold',
-                              cursor: 'pointer',
-                              padding: 0
-                            }}
-                            title="Remove Image"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
+                      {formData.images.split(',').map(i => i.trim()).filter(i => i).map((fileUrl, index) => {
+                        const isPdf = fileUrl.toLowerCase().endsWith('.pdf');
+                        return (
+                          <div key={index} style={{ position: 'relative', width: '60px', height: '60px', borderRadius: '6px', border: '1px solid #cbd5e1', overflow: 'hidden', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', background: 'white' }}>
+                            {isPdf ? (
+                              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fee2e2', color: '#dc2626', fontSize: '10px', fontWeight: 'bold' }}>
+                                PDF
+                              </div>
+                            ) : (
+                              <img src={fileUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
+                                current.splice(index, 1);
+                                setFormData(prev => ({ ...prev, images: current.join(', ') }));
+                              }}
+                              style={{
+                                position: 'absolute',
+                                top: '2px',
+                                right: '2px',
+                                width: '16px',
+                                height: '16px',
+                                borderRadius: '50%',
+                                background: '#ef4444',
+                                color: '#ffffff',
+                                border: 'none',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '10px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                padding: 0,
+                                zIndex: 5
+                              }}
+                              title="Remove"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
