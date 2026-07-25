@@ -2,10 +2,26 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
+import { runDatabaseMigration } from '../../utils/dbMigration';
 
 const Dashboard = () => {
   const { jobs = [], activities = [] } = useAdminContext();
   const navigate = useNavigate();
+  const [migrating, setMigrating] = useState(false);
+
+  const handleMigration = async () => {
+    if (window.confirm('This will update all old posts with a creation time to fix the "Just now" display. Proceed?')) {
+      setMigrating(true);
+      try {
+        await runDatabaseMigration();
+        alert('Database migration successful! All old posts now have timestamps.');
+      } catch (err) {
+        alert('Migration failed: ' + err.message);
+      } finally {
+        setMigrating(false);
+      }
+    }
+  };
 
   const formatNumber = (n) => {
     return n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
@@ -52,9 +68,28 @@ const Dashboard = () => {
 
   return (
     <div className="admin-dashboard-page">
-      <div className="admin-page-header">
-        <h1 className="admin-page-title" style={{ color: '#1e293b' }}>Dashboard</h1>
-        <p className="admin-page-subtitle" style={{ color: '#64748b' }}>Welcome back, Admin</p>
+      <div className="admin-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div>
+          <h1 className="admin-page-title" style={{ color: '#1e293b' }}>Dashboard</h1>
+          <p className="admin-page-subtitle" style={{ color: '#64748b' }}>Welcome back, Admin</p>
+        </div>
+        <button
+          onClick={handleMigration}
+          disabled={migrating}
+          style={{
+            padding: '10px 16px',
+            background: migrating ? '#94a3b8' : '#1a56db',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: migrating ? 'not-allowed' : 'pointer',
+            fontSize: '13px',
+            fontWeight: 700,
+            boxShadow: '0 4px 12px rgba(26, 86, 219, 0.15)'
+          }}
+        >
+          {migrating ? '🔄 Updating Database...' : '🧹 Fix Old Post Times'}
+        </button>
       </div>
 
       <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
