@@ -55,19 +55,24 @@ export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const isEn = state.language === 'en';
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, loading: adminLoading } = useAdminContext();
   const localJobs = adminState.jobs;
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 20;
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+    // Wait for AdminContext to finish its initial Firestore sync
+    if (!adminLoading) {
+      const timer = setTimeout(() => setLoading(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [adminLoading]);
 
   // Merge circulars data based on feed types
   const combinedFeedItems = useMemo(() => {
+    if (localJobs.length === 0) return [];
+
     const jobItems = localJobs.map(job => ({
       ...job,
       feedType: 'job'

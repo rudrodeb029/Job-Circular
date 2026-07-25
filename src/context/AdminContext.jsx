@@ -44,13 +44,13 @@ const loadLocalState = (key, defaultData) => {
 };
 
 const initialState = {
-  jobs: loadLocalState('jobs', mapJobs(initialJobs)),
-  notifications: loadLocalState('notifications', initialNotifications),
-  admits: loadLocalState('admits', initialAdmits),
+  jobs: loadLocalState('jobs', []),
+  notifications: loadLocalState('notifications', []),
+  admits: loadLocalState('admits', []),
   categories: categories,
   activities: loadLocalState('activities', []),
   adminUser: loadLocalState('user', null),
-  firestoreReady: false // tracks if Firestore data has loaded
+  firestoreReady: false
 };
 
 const adminReducer = (state, action) => {
@@ -266,13 +266,16 @@ export const AdminProvider = ({ children }) => {
     };
 
     const setupListeners = () => {
-      seedInitialData();
+      // Don't call seedInitialData() here to avoid race conditions
       try {
         // Jobs collection
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.JOBS, (data) => {
             if (data.length > 0) {
               dispatch({ type: 'SET_JOBS', payload: mapJobs(data) });
+            } else {
+               // Only seed if Firestore is truly empty
+               seedInitialData();
             }
           })
         );
