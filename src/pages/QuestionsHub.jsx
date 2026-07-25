@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Clock, LayoutGrid } from '../components/Icons';
+import { ArrowLeft, Clock, LayoutGrid, FileText, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { getQuestionsData } from '../data/questionsData';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const categoryConfig = {
   bcs: { name: 'বিসিএস', nameEn: 'BCS', color: 'rgba(26, 86, 219, 0.05)', icon: '🎓' },
@@ -50,7 +51,6 @@ export default function QuestionsHub() {
     };
   }, []);
 
-  // Filtered Question Papers Data
   const filteredPapers = useMemo(() => {
     let list = papers;
     if (activeCategory !== 'all') {
@@ -73,7 +73,6 @@ export default function QuestionsHub() {
       return 0;
     };
 
-    // Sort LIFO
     return [...list].sort((a, b) => {
       const tsA = getItemTimestamp(a);
       const tsB = getItemTimestamp(b);
@@ -84,12 +83,12 @@ export default function QuestionsHub() {
 
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
-      {/* Header */}
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate('/home')}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FileText size={18} color="var(--primary)" />
           <span>{isEn ? 'MCQ Exam & Questions' : 'MCQ Exam ও প্রশ্নব্যাংক'}</span>
         </h1>
       </div>
@@ -112,14 +111,7 @@ export default function QuestionsHub() {
             </h3>
             <button
               onClick={() => navigate('/live-exams-list')}
-              style={{
-                fontSize: '12px',
-                fontWeight: 700,
-                color: 'var(--primary)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer'
-              }}
+              style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
               <span>{isEn ? 'View All' : 'সব দেখুন'} ➔</span>
             </button>
@@ -186,22 +178,23 @@ export default function QuestionsHub() {
 
             {Object.keys(allCategories).map(key => {
               const cat = allCategories[key];
+              const isActive = activeCategory === key;
               return (
                 <div
                   key={key}
                   className="category-grid-item"
                   style={{
-                    background: activeCategory === key ? 'var(--primary-lightest)' : 'var(--white)',
-                    border: activeCategory === key ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
+                    background: isActive ? 'var(--primary-lightest)' : 'var(--white)',
+                    border: isActive ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
                     borderRadius: '14px',
                     padding: '12px 8px'
                   }}
                   onClick={() => setActiveCategory(key)}
                 >
-                  <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', width: '36px', height: '36px', borderRadius: '10px' }}>
+                  <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {cat.icon}
                   </div>
-                  <span className="category-grid-label" style={{ fontWeight: activeCategory === key ? 700 : 500, fontSize: '11px' }}>
+                  <span className="category-grid-label" style={{ fontWeight: isActive ? 700 : 500, fontSize: '11px' }}>
                     {isEn ? cat.nameEn : cat.name}
                   </span>
                 </div>
@@ -229,26 +222,41 @@ export default function QuestionsHub() {
                   border: '1px solid var(--border-light)',
                   borderRadius: '14px',
                   padding: '14px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
                 }}
                 onClick={() => navigate(`/question-details/${paper.id}`)}
               >
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                     {categoryConfig[paper.category]?.icon || '📚'}
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '6px', lineHeight: '1.4' }}>
                       {isEn ? paper.titleEn : paper.title}
                     </h3>
-                    <div style={{ display: 'flex', gap: '8px', fontSize: '10px', color: 'var(--text-muted)' }}>
-                       <span>📅 {isEn ? paper.dateEn : paper.date}</span>
-                       <span>📝 {isEn ? `${paper.questions.length} Items` : `${toBengaliNumber(paper.questions.length)}টি প্রশ্ন`}</span>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#f8fafc', padding: '2px 8px', borderRadius: '6px' }}>
+                        📅 {isEn ? paper.dateEn : paper.date}
+                      </span>
+                      <span style={{ fontSize: '10.5px', color: 'var(--primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        ⏱️ {isEn ? paper.timeLimitEn : paper.timeLimit}
+                      </span>
+                      <span style={{ fontSize: '10.5px', color: '#059669', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        📝 {isEn ? `${paper.questions.length} Items` : `${toBengaliNumber(paper.questions.length)}টি প্রশ্ন`}
+                      </span>
                     </div>
                   </div>
+                  <ChevronRight size={18} color="var(--border)" style={{ marginTop: '4px' }} />
                 </div>
               </div>
             ))}
+            {filteredPapers.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                <p>{isEn ? 'No question papers found' : 'কোনো প্রশ্নপত্র পাওয়া যায়নি'}</p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -260,6 +268,7 @@ export default function QuestionsHub() {
 }
 
 const toBengaliNumber = (num) => {
+  if (num === undefined || num === null) return '';
   const engNum = String(num);
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');

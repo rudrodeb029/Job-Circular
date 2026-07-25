@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, FileText } from '../components/Icons';
+import { ArrowLeft, Clock, FileText, Calendar, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { getLiveExams } from '../data/liveExams';
 import BottomNav from '../components/BottomNav';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 export default function LiveExamsPage() {
   const navigate = useNavigate();
@@ -220,7 +221,7 @@ export default function LiveExamsPage() {
         )}
 
         {/* Exams List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {filteredLiveExams.map(exam => {
             const status = getExamStatus(exam);
             const isRegistered = !!registrations[exam.id];
@@ -229,60 +230,75 @@ export default function LiveExamsPage() {
             return (
               <div
                 key={exam.id}
-                className="job-card animate-slide-up"
+                className="animate-slide-up"
                 style={{
                   background: 'var(--white)',
                   border: status.type === 'live' ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
                   padding: '20px',
                   borderRadius: '20px',
+                  boxShadow: '0 4px 18px rgba(0,0,0,0.03)',
                   position: 'relative',
                   overflow: 'hidden'
                 }}
               >
+                 {/* Visual Status Indicator Line */}
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '4px',
+                  background: status.type === 'live' ? 'linear-gradient(90deg, #ef4444, #dc2626)' : status.type === 'upcoming' ? 'linear-gradient(90deg, #f59e0b, #d97706)' : '#cbd5e1'
+                }}></div>
+
                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                     <span style={{
                       fontSize: '10px',
                       fontWeight: 800,
-                      color: status.type === 'live' ? 'var(--primary)' : status.type === 'upcoming' ? '#b45309' : 'var(--text-muted)',
-                      background: status.type === 'live' ? 'rgba(26, 86, 219, 0.08)' : status.type === 'upcoming' ? 'rgba(245, 158, 11, 0.12)' : 'var(--bg-secondary)',
+                      color: status.type === 'live' ? '#dc2626' : status.type === 'upcoming' ? '#b45309' : 'var(--text-muted)',
+                      background: status.type === 'live' ? 'rgba(239, 68, 68, 0.08)' : status.type === 'upcoming' ? 'rgba(245, 158, 11, 0.12)' : 'var(--bg-secondary)',
                       padding: '5px 12px',
                       borderRadius: '30px',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '5px'
                     }}>
-                      {status.type === 'live' && <span className="pulse-dot"></span>}
+                      {status.type === 'live' && (
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444', display: 'inline-block', animation: 'pulse 1.5s infinite' }}></span>
+                      )}
                       {status.label.toUpperCase()}
                     </span>
-                    <span style={{ fontSize: '10px', fontWeight: 800, color: 'var(--primary)', background: 'rgba(26, 86, 219, 0.06)', padding: '5px 12px', borderRadius: '30px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: 800, color: 'var(--primary)', background: 'rgba(26, 86, 219, 0.06)', padding: '5px 12px', borderRadius: '30px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                        ⏱️ {isEn ? `${exam.duration}m` : `${toBengaliNumber(exam.duration)}মি:`}
                     </span>
                  </div>
 
                  {status.type === 'upcoming' && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: '10px' }}>
-                       <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)' }}>
-                          📅 {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '14px', background: 'var(--bg-secondary)', padding: '8px 12px', borderRadius: '10px', alignItems: 'center' }}>
+                       <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Calendar size={12} />
+                          {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                        </span>
-                       <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--primary)' }}>
-                          ⏳ {getCountdownString(exam.startTime)}
+                       <span style={{ fontSize: '11px', fontWeight: 700, color: '#d97706', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span>⏳</span>
+                          <span style={{ fontFamily: 'monospace' }}>{getCountdownString(exam.startTime)}</span>
                        </span>
                     </div>
                  )}
 
-                 <h4 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '12px' }}>
+                 <h4 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '14px', lineHeight: '1.4' }}>
                     {isEn ? exam.titleEn : exam.title}
                  </h4>
 
-                 <div style={{ background: 'var(--bg-secondary)', borderRadius: '14px', padding: '12px', marginBottom: '16px' }}>
+                 <div style={{ background: 'var(--bg-secondary)', borderRadius: '14px', padding: '14px', marginBottom: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                     {exam.subjectTopics?.map((st, idx) => (
-                      <div key={idx} style={{ marginBottom: idx === exam.subjectTopics.length - 1 ? 0 : '8px' }}>
-                         <div style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, marginBottom: '4px' }}>
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                         <div style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: '3px solid var(--primary)', paddingLeft: '8px' }}>
                             {isEn ? st.subjectEn : st.subject}
                          </div>
-                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', paddingLeft: '4px' }}>
                             {(isEn ? st.topicsEn : st.topics)?.split(',').map((t, tIdx) => (
-                               <span key={tIdx} style={{ fontSize: '9px', background: 'var(--white)', padding: '2px 8px', borderRadius: '6px', color: 'var(--text-secondary)', border: '1px solid var(--border-light)' }}>
+                               <span key={tIdx} style={{ fontSize: '10px', fontWeight: 600, background: 'var(--white)', padding: '3px 10px', borderRadius: '8px', color: 'var(--text-secondary)', border: '1px solid var(--border-light)' }}>
                                   {t.trim()}
                                </span>
                             ))}
@@ -293,20 +309,67 @@ export default function LiveExamsPage() {
 
                  <div style={{ display: 'flex', justifyContent: 'center' }}>
                     {status.type === 'upcoming' ? (
-                      <button onClick={() => handleRegister(exam.id)} className={`admin-btn ${isRegistered ? 'admin-btn-secondary' : 'admin-btn-primary'}`} style={{ width: '100%', borderRadius: '12px', height: '42px' }}>
-                        {isRegistered ? (isEn ? '✓ Registered' : '✅ অংশগ্রহণ নিশ্চিত') : (isEn ? 'Participate' : 'অংশগ্রহণ করুন')}
+                      <button
+                        onClick={() => handleRegister(exam.id)}
+                        style={{
+                          width: '100%',
+                          borderRadius: '14px',
+                          height: '46px',
+                          border: isRegistered ? '1.5px solid #10b981' : 'none',
+                          background: isRegistered ? 'rgba(16, 185, 129, 0.05)' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                          color: isRegistered ? '#047857' : 'white',
+                          fontWeight: 800,
+                          fontSize: '13.5px',
+                          cursor: 'pointer',
+                          boxShadow: isRegistered ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)',
+                          transition: 'all 0.2s'
+                        }}
+                      >
+                        {isRegistered ? (isEn ? '✓ Registered' : '✅ অংশগ্রহণ নিশ্চিত') : (isEn ? 'Participate Now' : 'পরীক্ষায় অংশ নিন')}
                       </button>
                     ) : status.type === 'live' ? (
-                      <button onClick={() => navigate(`/live-exam-room/${exam.id}`)} className="admin-btn admin-btn-primary" style={{ width: '100%', borderRadius: '12px', height: '42px', background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' }}>
-                        {isEn ? 'Enter Room Now' : 'পরীক্ষায় অংশ নিন'} ➔
+                      <button
+                        onClick={() => navigate(`/live-exam-room/${exam.id}`)}
+                        style={{
+                          width: '100%',
+                          borderRadius: '14px',
+                          height: '46px',
+                          border: 'none',
+                          background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                          color: 'white',
+                          fontWeight: 800,
+                          fontSize: '13.5px',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 14px rgba(239, 68, 68, 0.2)'
+                        }}
+                      >
+                        {isEn ? 'Enter Exam Room Now' : 'পরীক্ষায় অংশ নিন (লাইভ)'} ➔
                       </button>
                     ) : (
                       <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-                         <span style={{ fontSize: '12px', color: 'var(--success)', fontWeight: 700 }}>
-                            {result ? (isEn ? `Score: ${result.score}/${result.total}` : `স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`) : (isEn ? 'Did not attend' : 'অংশ নেননি')}
-                         </span>
-                         <button onClick={() => navigate(`/live-exam-room/${exam.id}`)} className="admin-btn admin-btn-secondary" style={{ padding: '6px 16px', borderRadius: '10px' }}>
-                            {isEn ? 'Ranking' : 'র‍্যাংক ও ফলাফল'}
+                         <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600 }}>{isEn ? 'YOUR SCORE' : 'আপনার স্কোর'}</span>
+                            <span style={{ fontSize: '14px', color: result ? 'var(--success)' : 'var(--text-muted)', fontWeight: 800 }}>
+                               {result ? (isEn ? `${result.score}/${result.total}` : `${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`) : (isEn ? 'Did not attend' : 'অংশ নেননি')}
+                            </span>
+                         </div>
+                         <button
+                           onClick={() => navigate(`/live-exam-room/${exam.id}`)}
+                           style={{
+                             padding: '10px 18px',
+                             borderRadius: '12px',
+                             background: 'var(--white)',
+                             border: '1.5px solid var(--border-light)',
+                             color: 'var(--text-secondary)',
+                             fontSize: '12.5px',
+                             fontWeight: 800,
+                             cursor: 'pointer',
+                             display: 'flex',
+                             alignItems: 'center',
+                             gap: '6px'
+                           }}
+                         >
+                            <span>📊 {isEn ? 'Results' : 'ফলাফল ও র‍্যাংক'}</span>
                          </button>
                       </div>
                     )}
@@ -317,8 +380,8 @@ export default function LiveExamsPage() {
 
           {filteredLiveExams.length === 0 && (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-               <span style={{ fontSize: '40px' }}>📅</span>
-               <p style={{ fontWeight: 600, marginTop: '10px' }}>{isEn ? 'No exams found' : 'কোনো পরীক্ষা পাওয়া যায়নি'}</p>
+               <span style={{ fontSize: '48px', display: 'block', marginBottom: '16px' }}>📅</span>
+               <p style={{ fontSize: '14px', fontWeight: 600 }}>{isEn ? 'No live exams found at the moment' : 'বর্তমানে কোনো লাইভ পরীক্ষা পাওয়া যায়নি'}</p>
             </div>
           )}
         </div>
