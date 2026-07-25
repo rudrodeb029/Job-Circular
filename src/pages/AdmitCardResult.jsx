@@ -52,49 +52,7 @@ export default function AdmitCardResult() {
 
   const { state: adminState } = useAdminContext();
   const allAdmitCards = useMemo(() => {
-    const localJobs = adminState.jobs;
     const localAdmits = adminState.admits || [];
-
-    const dynamicExamDates = localJobs.filter(j => j.examDate).map(j => ({
-      ...j,
-      id: `dynamic-exam-${j.id}`,
-      examName: `${j.title} পরীক্ষা`,
-      examNameEn: `${j.titleEn || j.title} Exam`,
-      organization: j.organization,
-      organizationEn: j.organizationEn || j.organization,
-      type: 'admit_card',
-      status: 'পরীক্ষার তারিখ প্রকাশিত',
-      statusEn: 'Exam Date Published',
-      date: j.examDate,
-      dateEn: j.examDateEn || j.examDate,
-      downloadLink: j.applyLink || '#'
-    }));
-
-    const dynamicResults = localJobs.filter(j => j.examResult).map(j => ({
-      ...j,
-      id: `dynamic-result-${j.id}`,
-      examName: `${j.title} পরীক্ষার ফলাফল`,
-      examNameEn: `${j.titleEn || j.title} Exam Result`,
-      organization: j.organization,
-      organizationEn: j.organizationEn || j.organization,
-      type: 'result',
-      status: 'ফলাফল প্রকাশিত',
-      statusEn: 'Result Published',
-      date: j.postedDate || '১ দিন আগে',
-      dateEn: j.postedDateEn || '1 day ago',
-      downloadLink: j.examResult || '#'
-    }));
-
-    const merged = [...localAdmits, ...dynamicExamDates, ...dynamicResults];
-    const unique = [];
-    const seen = new Set();
-    for (const item of merged) {
-      const uniqueId = String(item.id);
-      if (!seen.has(uniqueId)) {
-        seen.add(uniqueId);
-        unique.push(item);
-      }
-    }
 
     const getItemTimestamp = (item) => {
       if (item.createdAt) {
@@ -102,18 +60,14 @@ export default function AdmitCardResult() {
         if (!isNaN(ms)) return ms;
       }
       if (item.id) {
-        const matches = item.id.match(/\d{10,13}/);
+        const matches = String(item.id).match(/\d{10,13}/);
         if (matches) return parseInt(matches[0], 10);
-      }
-      if (item.postedAt) {
-        const ms = new Date(item.postedAt).getTime();
-        if (!isNaN(ms)) return ms;
       }
       return 0;
     };
 
-    return unique.sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
-  }, [adminState.jobs]);
+    return [...localAdmits].sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+  }, [adminState.admits]);
 
   const searchedItems = useMemo(() => {
     const items = allAdmitCards.filter(item => item.type === activeTab);
