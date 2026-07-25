@@ -9,6 +9,7 @@ import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
 import BottomNav from '../components/BottomNav';
 import { jobs } from '../data/jobs';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.3)', defaultIcon: '🏛️' },
@@ -204,7 +205,7 @@ export default function SavedJobs() {
                           🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
                         </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          • 🕒 {isEn ? (job.postedDateEn || job.postedDate || job.examDateEn || job.examDate || '1 day ago') : (job.postedDate || job.examDate || '১ দিন আগে')}
+                          • 🕒 {formatTimeAgo(job.createdAt, isEn)}
                         </span>
                       </div>
                     </div>
@@ -293,7 +294,7 @@ export default function SavedJobs() {
                           <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          • 🕒 {isEn ? (job.postedDateEn || job.postedDate || job.examDateEn || job.examDate || '1 day ago') : (job.postedDate || job.examDate || '১ দিন আগে')}
+                          • 🕒 {formatTimeAgo(job.createdAt, isEn)}
                         </span>
                       </div>
                     </div>

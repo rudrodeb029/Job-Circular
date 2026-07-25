@@ -8,6 +8,7 @@ import SearchBar from '../components/SearchBar';
 import { admitCards } from '../data/notifications';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -218,7 +219,7 @@ export default function AdmitCardResult() {
                           <span>📅 {isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          • 🕒 {isEn ? (item.dateEn || '1 day ago') : (item.date || '১ দিন আগে')}
+                          • 🕒 {formatTimeAgo(item.createdAt, isEn)}
                         </span>
                       </div>
                     </div>

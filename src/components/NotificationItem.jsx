@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Briefcase, Clock, FileText, BookmarkCheck } from './Icons';
 import { useAppContext } from '../context/AppContext';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const notifTypeConfig = {
   new_job: {
@@ -66,7 +67,6 @@ export default function NotificationItem({ notification }) {
 
   const orgName = isEn ? (notification.organizationEn || notification.organization) : notification.organization;
   const notifMessage = isEn ? (notification.messageEn || notification.message) : notification.message;
-  const notifTime = isEn ? (notification.timeEn || notification.time) : notification.time;
 
   return (
     <div
@@ -159,7 +159,7 @@ export default function NotificationItem({ notification }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
           <Clock size={12} />
-          <span>{notifTime}</span>
+          <span>{formatTimeAgo(notification.createdAt, isEn)}</span>
         </div>
       </div>
 
