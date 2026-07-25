@@ -73,9 +73,7 @@ export default function SavedJobs() {
 
   const tabs = [
     { id: 'all', label: state.language === 'en' ? 'All' : 'সব' },
-    { id: 'applied', label: state.language === 'en' ? 'Applied' : 'আবেদনকৃত' },
-    { id: 'exam_date', label: state.language === 'en' ? 'Exam Date' : 'পরীক্ষার তারিখ' },
-    { id: 'result', label: state.language === 'en' ? 'Result' : 'ফলাফল' }
+    { id: 'applied', label: state.language === 'en' ? 'Applied' : 'আবেদনকৃত' }
   ];
 
   // Load jobs from AdminContext
