@@ -204,8 +204,15 @@ export default function Home() {
 
         {/* Questions & Answers Categories */}
         <div className="mb-lg">
-          <div className="section-header">
-            <h3 className="section-title">{isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}</h3>
+          <div className="section-header" style={{
+            background: 'var(--white)',
+            padding: '10px 14px',
+            borderRadius: '12px',
+            border: '1px solid rgba(37, 99, 235, 0.08)',
+            marginBottom: '14px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+          }}>
+            <h3 className="section-title" style={{ margin: 0 }}>{isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}</h3>
             <Link to="/questions-hub" className="section-link">
               <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
               <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
@@ -220,6 +227,12 @@ export default function Home() {
               <div
                 key={cat.id}
                 className="category-grid-item"
+                style={{
+                  border: '1px solid rgba(37, 99, 235, 0.12)',
+                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                  background: 'var(--white)',
+                  borderRadius: '16px'
+                }}
                 onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
               >
                 <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -230,6 +243,12 @@ export default function Home() {
             ))}
             <div
               className="category-grid-item"
+              style={{
+                border: '1px solid rgba(37, 99, 235, 0.12)',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                background: 'var(--white)',
+                borderRadius: '16px'
+              }}
               onClick={() => navigate('/questions-hub')}
             >
               <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
@@ -242,8 +261,15 @@ export default function Home() {
 
         {/* Dynamic Feed Segment */}
         <div>
-          <div className="section-header">
-            <h3 className="section-title">{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
+          <div className="section-header" style={{
+            background: 'var(--white)',
+            padding: '10px 14px',
+            borderRadius: '12px',
+            border: '1px solid rgba(37, 99, 235, 0.08)',
+            marginBottom: '14px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+          }}>
+            <h3 className="section-title" style={{ margin: 0 }}>{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
             <Link to="/all-circulars" className="section-link">
               <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
               <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
