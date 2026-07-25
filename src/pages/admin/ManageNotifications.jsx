@@ -2,60 +2,13 @@ import React, { useState, useMemo } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 
 export default function ManageNotifications() {
-  const { notifications: ctxNotifications } = useAdminContext() || {};
-
-  // Mock initial data if context doesn't provide it
-  const initialNotifications = ctxNotifications || [
-    {
-      id: 'notif-1',
-      title: 'New Job Alert',
-      organization: 'Bangladesh Bank',
-      message: 'Officer (General) position open for applications.',
-      time: '2 hours ago',
-      isRead: false,
-      type: 'new_job',
-      jobId: 'job-11'
-    },
-    {
-      id: 'notif-2',
-      title: 'Deadline Approaching',
-      organization: 'Sonali Bank',
-      message: 'Last day to apply for Senior Officer.',
-      time: '1 day ago',
-      isRead: true,
-      type: 'deadline',
-      jobId: 'job-12'
-    }
-  ];
-
-  const initialItems = [
-    {
-      id: 'item-1',
-      examName: 'Officer (IT) MCQ Exam',
-      organization: 'Bangladesh Bank',
-      type: 'admit_card',
-      status: 'Published',
-      date: '2023-11-15',
-      downloadLink: '#'
-    },
-    {
-      id: 'item-2',
-      examName: 'Senior Officer Written Result',
-      organization: 'Agrani Bank',
-      type: 'result',
-      status: 'Published',
-      date: '2023-11-10',
-      downloadLink: '#'
-    }
-  ];
+  const { state, dispatch } = useAdminContext();
+  const notifications = state.notifications || [];
+  const items = state.admits || [];
 
   const [activeTab, setActiveTab] = useState('notifications');
-  const [notifications, setNotifications] = useState(initialNotifications);
-  const [items, setItems] = useState(initialItems);
-
   const [searchNotif, setSearchNotif] = useState('');
   const [searchItem, setSearchItem] = useState('');
-
   const [toast, setToast] = useState(null);
 
   // Modals state
@@ -82,9 +35,9 @@ export default function ManageNotifications() {
 
   const filteredNotifications = useMemo(() => {
     return notifications.filter(n =>
-      n.title.toLowerCase().includes(searchNotif.toLowerCase()) ||
-      n.organization.toLowerCase().includes(searchNotif.toLowerCase()) ||
-      n.message.toLowerCase().includes(searchNotif.toLowerCase())
+      (n.title || '').toLowerCase().includes(searchNotif.toLowerCase()) ||
+      (n.organization || '').toLowerCase().includes(searchNotif.toLowerCase()) ||
+      (n.message || '').toLowerCase().includes(searchNotif.toLowerCase())
     );
   }, [notifications, searchNotif]);
 
@@ -102,18 +55,18 @@ export default function ManageNotifications() {
   const handleSaveNotif = (e) => {
     e.preventDefault();
     if (editingNotifId) {
-      setNotifications(prev => prev.map(n => n.id === editingNotifId ? { ...n, ...notifFormData } : n));
+      dispatch({ type: 'UPDATE_NOTIFICATION', payload: { ...notifFormData, id: editingNotifId } });
       showToast('Notification updated successfully');
     } else {
-      const newNotif = { ...notifFormData, id: `notif-${Date.now()}`, isRead: false };
-      setNotifications(prev => [newNotif, ...prev]);
+      const newNotif = { ...notifFormData, id: `notif-${Date.now()}`, isRead: false, createdAt: new Date().toISOString() };
+      dispatch({ type: 'ADD_NOTIFICATION', payload: newNotif });
       showToast('Notification added successfully');
     }
     setIsNotifModalOpen(false);
   };
 
   const handleDeleteNotif = () => {
-    setNotifications(prev => prev.filter(n => n.id !== deleteNotifId));
+    dispatch({ type: 'DELETE_NOTIFICATION', payload: deleteNotifId });
     setDeleteNotifId(null);
     showToast('Notification deleted successfully');
   };
@@ -132,8 +85,8 @@ export default function ManageNotifications() {
 
   const filteredItems = useMemo(() => {
     return items.filter(i =>
-      i.examName.toLowerCase().includes(searchItem.toLowerCase()) ||
-      i.organization.toLowerCase().includes(searchItem.toLowerCase())
+      (i.examName || '').toLowerCase().includes(searchItem.toLowerCase()) ||
+      (i.organization || '').toLowerCase().includes(searchItem.toLowerCase())
     );
   }, [items, searchItem]);
 
@@ -151,18 +104,18 @@ export default function ManageNotifications() {
   const handleSaveItem = (e) => {
     e.preventDefault();
     if (editingItemId) {
-      setItems(prev => prev.map(i => i.id === editingItemId ? { ...i, ...itemFormData } : i));
+      dispatch({ type: 'UPDATE_ADMIT', payload: { ...itemFormData, id: editingItemId } });
       showToast('Item updated successfully');
     } else {
-      const newItem = { ...itemFormData, id: `item-${Date.now()}` };
-      setItems(prev => [newItem, ...prev]);
+      const newItem = { ...itemFormData, id: `admit-${Date.now()}`, createdAt: new Date().toISOString() };
+      dispatch({ type: 'ADD_ADMIT', payload: newItem });
       showToast('Item added successfully');
     }
     setIsItemModalOpen(false);
   };
 
   const handleDeleteItem = () => {
-    setItems(prev => prev.filter(i => i.id !== deleteItemId));
+    dispatch({ type: 'DELETE_ADMIT', payload: deleteItemId });
     setDeleteItemId(null);
     showToast('Item deleted successfully');
   };
@@ -307,7 +260,7 @@ export default function ManageNotifications() {
               <tbody>
                 {filteredNotifications.map((notif) => {
                   const badge = getNotifBadgeColor(notif.type);
-                  const truncatedMsg = notif.message.length > 50 ? notif.message.substring(0, 50) + '...' : notif.message;
+                  const truncatedMsg = (notif.message || '').length > 50 ? notif.message.substring(0, 50) + '...' : notif.message;
                   return (
                     <tr key={notif.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>{notif.title}</td>
@@ -319,10 +272,10 @@ export default function ManageNotifications() {
                           padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '600',
                           textTransform: 'capitalize'
                         }}>
-                          {notif.type.replace('_', ' ')}
+                          {(notif.type || '').replace('_', ' ')}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.time}</td>
+                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.time || 'N/A'}</td>
                       <td style={{ padding: '12px 16px' }}>
                         <div style={{ display: 'flex', gap: '8px' }}>
                           <button onClick={() => handleOpenNotifModal(notif)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
@@ -410,7 +363,7 @@ export default function ManageNotifications() {
                           padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '600',
                           textTransform: 'capitalize'
                         }}>
-                          {item.type.replace('_', ' ')}
+                          {(item.type || '').replace('_', ' ')}
                         </span>
                       </td>
                       <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{item.status}</td>
