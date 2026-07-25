@@ -4,11 +4,8 @@ import { useAdminContext } from '../../context/AdminContext';
 export default function ManageNotifications() {
   const { state, dispatch } = useAdminContext();
   const notifications = state.notifications || [];
-  const items = state.admits || [];
 
-  const [activeTab, setActiveTab] = useState('notifications');
   const [searchNotif, setSearchNotif] = useState('');
-  const [searchItem, setSearchItem] = useState('');
   const [toast, setToast] = useState(null);
 
   // Modals state
@@ -18,13 +15,6 @@ export default function ManageNotifications() {
   });
   const [editingNotifId, setEditingNotifId] = useState(null);
   const [deleteNotifId, setDeleteNotifId] = useState(null);
-
-  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
-  const [itemFormData, setItemFormData] = useState({
-    examName: '', organization: '', type: 'admit_card', status: '', date: '', downloadLink: ''
-  });
-  const [editingItemId, setEditingItemId] = useState(null);
-  const [deleteItemId, setDeleteItemId] = useState(null);
 
   const showToast = (message) => {
     setToast(message);
@@ -81,53 +71,6 @@ export default function ManageNotifications() {
     }
   };
 
-  // ---------------- Items Logic ----------------
-
-  const filteredItems = useMemo(() => {
-    return items.filter(i =>
-      (i.examName || '').toLowerCase().includes(searchItem.toLowerCase()) ||
-      (i.organization || '').toLowerCase().includes(searchItem.toLowerCase())
-    );
-  }, [items, searchItem]);
-
-  const handleOpenItemModal = (item = null) => {
-    if (item) {
-      setItemFormData(item);
-      setEditingItemId(item.id);
-    } else {
-      setItemFormData({ examName: '', organization: '', type: 'admit_card', status: '', date: '', downloadLink: '' });
-      setEditingItemId(null);
-    }
-    setIsItemModalOpen(true);
-  };
-
-  const handleSaveItem = (e) => {
-    e.preventDefault();
-    if (editingItemId) {
-      dispatch({ type: 'UPDATE_ADMIT', payload: { ...itemFormData, id: editingItemId } });
-      showToast('Item updated successfully');
-    } else {
-      const newItem = { ...itemFormData, id: `admit-${Date.now()}`, createdAt: new Date().toISOString() };
-      dispatch({ type: 'ADD_ADMIT', payload: newItem });
-      showToast('Item added successfully');
-    }
-    setIsItemModalOpen(false);
-  };
-
-  const handleDeleteItem = () => {
-    dispatch({ type: 'DELETE_ADMIT', payload: deleteItemId });
-    setDeleteItemId(null);
-    showToast('Item deleted successfully');
-  };
-
-  const getItemBadgeColor = (type) => {
-    switch (type) {
-      case 'admit_card': return { bg: '#D1FAE5', text: '#047857' };
-      case 'result': return { bg: '#F3E8FF', text: '#7E22CE' };
-      default: return { bg: '#F3F4F6', text: '#374151' };
-    }
-  };
-
   // ---------------- Icons ----------------
   const SearchIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -170,227 +113,98 @@ export default function ManageNotifications() {
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
       <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: '#1e293b' }}>
-        Manage Notifications & Updates
+        Manage Notifications
       </h1>
 
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
-        <button
-          onClick={() => setActiveTab('notifications')}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '500',
-            backgroundColor: activeTab === 'notifications' ? '#1a56db' : '#f1f5f9',
-            color: activeTab === 'notifications' ? 'white' : '#64748b',
-            transition: 'all 0.2s'
-          }}
-        >
-          Notifications
-        </button>
-        <button
-          onClick={() => setActiveTab('admit_results')}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '6px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '500',
-            backgroundColor: activeTab === 'admit_results' ? '#1a56db' : '#f1f5f9',
-            color: activeTab === 'admit_results' ? 'white' : '#64748b',
-            transition: 'all 0.2s'
-          }}
-        >
-          Admit Card & Results
-        </button>
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', flex: '1', minWidth: '250px', maxWidth: '400px' }}>
+            <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex' }}>
+              <SearchIcon />
+            </div>
+            <input
+              type="text"
+              placeholder="Search notifications..."
+              value={searchNotif}
+              onChange={(e) => setSearchNotif(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px 12px 10px 40px',
+                borderRadius: '8px',
+                border: '1px solid #e2e8f0',
+                outline: 'none',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                color: '#1e293b',
+                backgroundColor: '#ffffff'
+              }}
+            />
+          </div>
+          <button
+            onClick={() => handleOpenNotifModal()}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '8px',
+              padding: '10px 16px', backgroundColor: '#10B981', color: 'white',
+              border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '500'
+            }}
+          >
+            <PlusIcon /> Add Notification
+          </button>
+        </div>
+
+        <div style={{ overflowX: 'auto', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Title</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Organization</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Message</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Type</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Time</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredNotifications.map((notif) => {
+                const badge = getNotifBadgeColor(notif.type);
+                const truncatedMsg = (notif.message || '').length > 50 ? notif.message.substring(0, 50) + '...' : notif.message;
+                return (
+                  <tr key={notif.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                    <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>{notif.title}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.organization}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }} title={notif.message}>{truncatedMsg}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{
+                        backgroundColor: badge.bg, color: badge.text,
+                        padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '600',
+                        textTransform: 'capitalize'
+                      }}>
+                        {(notif.type || '').replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.time || 'N/A'}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button onClick={() => handleOpenNotifModal(notif)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
+                          <EditIcon />
+                        </button>
+                        <button onClick={() => setDeleteNotifId(notif.id)} style={{ padding: '6px', backgroundColor: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Delete">
+                          <TrashIcon />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+              {filteredNotifications.length === 0 && (
+                <tr>
+                  <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>No notifications found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      {/* Tab Content: Notifications */}
-      {activeTab === 'notifications' && (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: '1', minWidth: '250px', maxWidth: '400px' }}>
-              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex' }}>
-                <SearchIcon />
-              </div>
-              <input
-                type="text"
-                placeholder="Search notifications..."
-                value={searchNotif}
-                onChange={(e) => setSearchNotif(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px 10px 40px',
-                  borderRadius: '8px',
-                  border: '1px solid #e2e8f0',
-                  outline: 'none',
-                  fontSize: '14px',
-                  boxSizing: 'border-box',
-                  color: '#1e293b',
-                  backgroundColor: '#ffffff'
-                }}
-              />
-            </div>
-            <button
-              onClick={() => handleOpenNotifModal()}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                padding: '10px 16px', backgroundColor: '#10B981', color: 'white',
-                border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '500'
-              }}
-            >
-              <PlusIcon /> Add Notification
-            </button>
-          </div>
-
-          <div style={{ overflowX: 'auto', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Title</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Organization</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Message</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Type</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Time</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredNotifications.map((notif) => {
-                  const badge = getNotifBadgeColor(notif.type);
-                  const truncatedMsg = (notif.message || '').length > 50 ? notif.message.substring(0, 50) + '...' : notif.message;
-                  return (
-                    <tr key={notif.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                      <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>{notif.title}</td>
-                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.organization}</td>
-                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }} title={notif.message}>{truncatedMsg}</td>
-                      <td style={{ padding: '12px 16px' }}>
-                        <span style={{
-                          backgroundColor: badge.bg, color: badge.text,
-                          padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '600',
-                          textTransform: 'capitalize'
-                        }}>
-                          {(notif.type || '').replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.time || 'N/A'}</td>
-                      <td style={{ padding: '12px 16px' }}>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button onClick={() => handleOpenNotifModal(notif)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
-                            <EditIcon />
-                          </button>
-                          <button onClick={() => setDeleteNotifId(notif.id)} style={{ padding: '6px', backgroundColor: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Delete">
-                            <TrashIcon />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-                {filteredNotifications.length === 0 && (
-                  <tr>
-                    <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>No notifications found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
-      {/* Tab Content: Admit Card & Results */}
-      {activeTab === 'admit_results' && (
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: '1', minWidth: '250px', maxWidth: '400px' }}>
-              <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex' }}>
-                <SearchIcon />
-              </div>
-              <input
-                type="text"
-                placeholder="Search exams or organizations..."
-                value={searchItem}
-                onChange={(e) => setSearchItem(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '10px 12px 10px 40px',
-                  borderRadius: '8px',
-                  border: '1px solid #e2e8f0',
-                  outline: 'none',
-                  fontSize: '14px',
-                  boxSizing: 'border-box',
-                  color: '#1e293b',
-                  backgroundColor: '#ffffff'
-                }}
-              />
-            </div>
-            <button
-              onClick={() => handleOpenItemModal()}
-              style={{
-                display: 'flex', alignItems: 'center', gap: '8px',
-                padding: '10px 16px', backgroundColor: '#10B981', color: 'white',
-                border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '500'
-              }}
-            >
-              <PlusIcon /> Add Item
-            </button>
-          </div>
-
-          <div style={{ overflowX: 'auto', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Exam Name</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Organization</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Type</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Status</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Date</th>
-                  <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredItems.map((item) => {
-                  const badge = getItemBadgeColor(item.type);
-                  return (
-                    <tr key={item.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                      <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>{item.examName}</td>
-                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{item.organization}</td>
-                      <td style={{ padding: '12px 16px' }}>
-                        <span style={{
-                          backgroundColor: badge.bg, color: badge.text,
-                          padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '600',
-                          textTransform: 'capitalize'
-                        }}>
-                          {(item.type || '').replace('_', ' ')}
-                        </span>
-                      </td>
-                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{item.status}</td>
-                      <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{item.date}</td>
-                      <td style={{ padding: '12px 16px' }}>
-                        <div style={{ display: 'flex', gap: '8px' }}>
-                          <button onClick={() => handleOpenItemModal(item)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
-                            <EditIcon />
-                          </button>
-                          <button onClick={() => setDeleteItemId(item.id)} style={{ padding: '6px', backgroundColor: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Delete">
-                            <TrashIcon />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                })}
-                {filteredItems.length === 0 && (
-                  <tr>
-                    <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>No items found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
 
       {/* Modal: Notification */}
       {isNotifModalOpen && (
@@ -441,55 +255,6 @@ export default function ManageNotifications() {
         </div>
       )}
 
-      {/* Modal: Admit/Result Item */}
-      {isItemModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#1e293b' }}>{editingItemId ? 'Edit Item' : 'Add Item'}</h2>
-              <button onClick={() => setIsItemModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><XIcon /></button>
-            </div>
-            <form onSubmit={handleSaveItem} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Exam Name</label>
-                <input required type="text" value={itemFormData.examName} onChange={e => setItemFormData({...itemFormData, examName: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Organization</label>
-                <input required type="text" value={itemFormData.organization} onChange={e => setItemFormData({...itemFormData, organization: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
-              </div>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Type</label>
-                  <select value={itemFormData.type} onChange={e => setItemFormData({...itemFormData, type: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }}>
-                    <option value="admit_card">Admit Card</option>
-                    <option value="result">Result</option>
-                  </select>
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Status</label>
-                  <input required type="text" value={itemFormData.status} onChange={e => setItemFormData({...itemFormData, status: e.target.value})} placeholder="e.g. Published" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Date</label>
-                  <input required type="text" value={itemFormData.date} onChange={e => setItemFormData({...itemFormData, date: e.target.value})} placeholder="YYYY-MM-DD" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Download Link</label>
-                  <input type="text" value={itemFormData.downloadLink} onChange={e => setItemFormData({...itemFormData, downloadLink: e.target.value})} placeholder="https://..." style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
-                </div>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
-                <button type="button" onClick={() => setIsItemModalOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#1a56db', color: 'white', cursor: 'pointer', fontWeight: '500' }}>{editingItemId ? 'Save Changes' : 'Add Item'}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Delete Confirmation Modal: Notification */}
       {deleteNotifId && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}>
@@ -502,23 +267,6 @@ export default function ManageNotifications() {
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
               <button onClick={() => setDeleteNotifId(null)} style={{ padding: '10px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
               <button onClick={handleDeleteNotif} style={{ padding: '10px 20px', borderRadius: '6px', border: 'none', backgroundColor: '#DC2626', color: 'white', cursor: 'pointer', fontWeight: '500' }}>Delete</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal: Item */}
-      {deleteItemId && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-            <div style={{ margin: '0 auto 16px', width: '48px', height: '48px', backgroundColor: '#FEE2E2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626' }}>
-              <TrashIcon />
-            </div>
-            <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>Delete Item?</h3>
-            <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '14px' }}>Are you sure you want to delete this admit card / result? This action cannot be undone.</p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button onClick={() => setDeleteItemId(null)} style={{ padding: '10px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
-              <button onClick={handleDeleteItem} style={{ padding: '10px 20px', borderRadius: '6px', border: 'none', backgroundColor: '#DC2626', color: 'white', cursor: 'pointer', fontWeight: '500' }}>Delete</button>
             </div>
           </div>
         </div>
