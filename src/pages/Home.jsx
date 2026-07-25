@@ -273,7 +273,13 @@ export default function Home() {
                     key={item.id} 
                     className="job-card animate-fade-in" 
                     onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)}
-                    style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
+                    style={{
+                      cursor: 'pointer',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(16, 185, 129, 0.12)',
+                      boxShadow: '0 4px 18px rgba(16, 185, 129, 0.04)'
+                    }}
                   >
                     {/* Professional Accent Border */}
                     <div style={{
@@ -364,7 +370,13 @@ export default function Home() {
                   key={item.id} 
                   className="job-card animate-fade-in" 
                   onClick={() => navigate(`/result-details/${item.originalId || item.id}`)}
-                  style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
+                  style={{
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: '1px solid rgba(124, 58, 237, 0.12)',
+                    boxShadow: '0 4px 18px rgba(124, 58, 237, 0.04)'
+                  }}
                 >
                   {/* Professional Accent Border */}
                   <div style={{

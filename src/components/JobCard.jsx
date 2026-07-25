@@ -123,7 +123,16 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
   };
 
   return (
-    <div className="job-card" onClick={() => navigate(`/job/${job.id}`)} style={{ position: 'relative', overflow: 'hidden' }}>
+    <div
+      className="job-card"
+      onClick={() => navigate(`/job/${job.id}`)}
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        border: '1px solid rgba(37, 99, 235, 0.12)',
+        boxShadow: '0 4px 18px rgba(37, 99, 235, 0.04)'
+      }}
+    >
       {/* Professional Accent Border */}
       <div style={{
         position: 'absolute',
