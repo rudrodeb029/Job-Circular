@@ -72,10 +72,12 @@ export default function Home() {
   const combinedFeedItems = useMemo(() => {
     if (localJobs.length === 0) return [];
 
-    const jobItems = localJobs.map(job => ({
-      ...job,
-      feedType: 'job'
-    }));
+    const jobItems = localJobs
+      .filter(job => !job.showInExamDate && !job.showInResult) // Hide base job if it's an update
+      .map(job => ({
+        ...job,
+        feedType: 'job'
+      }));
 
     // Special Filter: Also include Exam Date and Result markers as separate items in feed
     const examMarkerItems = localJobs.filter(j => j.showInExamDate).map(j => ({
