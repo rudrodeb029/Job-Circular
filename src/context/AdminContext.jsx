@@ -92,8 +92,8 @@ const adminReducer = (state, action) => {
   const sortByCreatedAt = (a, b) => {
     const tsA = getItemTimestamp(a);
     const tsB = getItemTimestamp(b);
-    if (tsA !== tsB) return tsA - tsB; // Oldest first (FIFO)
-    return String(a.id || '').localeCompare(String(b.id || ''));
+    if (tsA !== tsB) return tsB - tsA; // Newest first (LIFO)
+    return String(b.id || '').localeCompare(String(a.id || ''));
   };
 
   switch (action.type) {
@@ -160,7 +160,9 @@ const adminReducer = (state, action) => {
     case 'UPDATE_ADMIT':
       newState = {
         ...state,
-        admits: state.admits.map(a => (a.id === action.payload.id ? { ...a, ...action.payload } : a))
+        admits: state.admits.some(a => a.id === action.payload.id)
+          ? state.admits.map(a => (a.id === action.payload.id ? { ...a, ...action.payload } : a))
+          : [action.payload, ...state.admits]
       };
       break;
     case 'DELETE_ADMIT':

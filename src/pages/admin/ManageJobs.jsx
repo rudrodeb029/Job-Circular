@@ -240,6 +240,52 @@ export default function ManageJobs() {
         `${jobData.organization}-এ "${jobData.title}" পদের বিজ্ঞপ্তিটি বিস্তারিত দেখুন।`
       );
     }
+
+    // --- AUTO SYNC TO ADMITS COLLECTION ---
+    if (formData.showInExamDate && finalExamDate) {
+      const admitId = `admit-${targetId}`;
+      const admitData = {
+        id: admitId,
+        jobId: targetId,
+        examName: `${formData.title} পরীক্ষা`,
+        examNameEn: `${formData.titleEn || formData.title} Exam`,
+        organization: formData.organization,
+        organizationEn: formData.organizationEn || formData.organization,
+        type: 'admit_card',
+        status: 'পরীক্ষার তারিখ প্রকাশিত',
+        statusEn: 'Exam Date Published',
+        date: finalExamDate,
+        dateEn: formData.examDateEn || finalExamDate,
+        downloadLink: formData.applyLink || '#',
+        createdAt: jobData.createdAt
+      };
+      dispatch({ type: 'UPDATE_ADMIT', payload: admitData });
+    } else {
+      dispatch({ type: 'DELETE_ADMIT', payload: `admit-${targetId}` });
+    }
+
+    if (formData.showInResult && finalExamResult) {
+      const resultId = `result-${targetId}`;
+      const resultData = {
+        id: resultId,
+        jobId: targetId,
+        examName: `${formData.title} পরীক্ষার ফলাফল`,
+        examNameEn: `${formData.titleEn || formData.title} Exam Result`,
+        organization: formData.organization,
+        organizationEn: formData.organizationEn || formData.organization,
+        type: 'result',
+        status: 'ফলাফল প্রকাশিত',
+        statusEn: 'Result Published',
+        date: jobData.postedAt || new Date().toISOString().split('T')[0],
+        dateEn: jobData.postedAt || 'Recently',
+        downloadLink: finalExamResult,
+        createdAt: jobData.createdAt
+      };
+      dispatch({ type: 'UPDATE_ADMIT', payload: resultData });
+    } else {
+       dispatch({ type: 'DELETE_ADMIT', payload: `result-${targetId}` });
+    }
+
     window.dispatchEvent(new Event('jobs_updated'));
     handleCloseModal();
   };
