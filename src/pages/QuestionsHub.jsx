@@ -187,7 +187,7 @@ export default function QuestionsHub() {
 
   // Filtered Live Exams Data based on liveTab selector
   const filteredLiveExams = useMemo(() => {
-    return liveExams.filter(exam => {
+    const list = liveExams.filter(exam => {
       const status = getExamStatus(exam);
       if (liveTab === 'live') {
         return status.type === 'live' || status.type === 'upcoming';
@@ -195,6 +195,8 @@ export default function QuestionsHub() {
         return status.type === 'ended' || status.type === 'submitted';
       }
     });
+    // Sort LIFO
+    return [...list].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   }, [liveExams, liveTab, now]);
 
   // Filtered Question Papers Data
@@ -210,7 +212,8 @@ export default function QuestionsHub() {
         (p.titleEn || '').toLowerCase().includes(q)
       );
     }
-    return list;
+    // Sort LIFO
+    return [...list].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   }, [activeCategory, searchQuery, papers]);
 
   return (

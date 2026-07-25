@@ -197,7 +197,9 @@ export default function ManageJobs() {
       examResult: finalExamResult,
       requirements: reqArray,
       images: imgArray,
-      postedAt: editingJob 
+      createdAt: editingJob ? (editingJob.createdAt || new Date().toISOString()) : new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      postedAt: editingJob
         ? editingJob.postedAt 
         : (formData.linkedCircularId 
             ? (jobs.find(j => j.id === formData.linkedCircularId)?.postedAt || new Date().toISOString().split('T')[0]) 

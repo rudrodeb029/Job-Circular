@@ -128,7 +128,9 @@ export default function ManageLiveExams() {
       startTime: new Date(startTime).toISOString(),
       duration: parseInt(duration, 10),
       subjectTopics,
-      questions
+      questions,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     const updatedList = [newExam, ...exams];

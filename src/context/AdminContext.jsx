@@ -14,7 +14,15 @@ import {
 
 const AdminContext = createContext();
 
-// Map jobs to ensure they have status/timestamps
+// Map items to ensure they have timestamps
+const mapWithTimestamps = (items) => {
+  return items.map(item => ({
+    ...item,
+    createdAt: item.createdAt || new Date().toISOString(),
+    updatedAt: item.updatedAt || new Date().toISOString()
+  }));
+};
+
 const mapJobs = (jobs) => {
   return jobs.map(job => ({
     ...job,
@@ -47,19 +55,21 @@ const initialState = {
 
 const adminReducer = (state, action) => {
   let newState;
+  const sortByCreatedAt = (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+
   switch (action.type) {
     // ─── Firestore sync actions (bulk replace from snapshot) ────
     case 'SET_JOBS':
-      newState = { ...state, jobs: action.payload };
+      newState = { ...state, jobs: [...action.payload].sort(sortByCreatedAt) };
       break;
     case 'SET_NOTIFICATIONS':
-      newState = { ...state, notifications: action.payload };
+      newState = { ...state, notifications: [...action.payload].sort(sortByCreatedAt) };
       break;
     case 'SET_ADMITS':
-      newState = { ...state, admits: action.payload };
+      newState = { ...state, admits: [...action.payload].sort(sortByCreatedAt) };
       break;
     case 'SET_ACTIVITIES':
-      newState = { ...state, activities: action.payload };
+      newState = { ...state, activities: [...action.payload].sort(sortByCreatedAt) };
       break;
     case 'SET_FIRESTORE_READY':
       return { ...state, firestoreReady: true };
@@ -210,7 +220,7 @@ export const AdminProvider = ({ children }) => {
         const admitsData = await getCollection(COLLECTIONS.ADMITS);
         if (admitsData.length === 0) {
           console.log('Seeding initial admits data to Firestore...');
-          for (const admit of initialAdmits) {
+          for (const admit of mapWithTimestamps(initialAdmits)) {
             const { id, ...data } = admit;
             await setDocument(COLLECTIONS.ADMITS, id, data);
           }
@@ -219,7 +229,7 @@ export const AdminProvider = ({ children }) => {
         const questionsList = await getCollection(COLLECTIONS.QUESTIONS);
         if (questionsList.length === 0) {
           console.log('Seeding initial questions data to Firestore...');
-          for (const paper of questionsData) {
+          for (const paper of mapWithTimestamps(questionsData)) {
             const { id, ...data } = paper;
             await setDocument(COLLECTIONS.QUESTIONS, id, data);
           }
@@ -228,7 +238,7 @@ export const AdminProvider = ({ children }) => {
         const examsList = await getCollection(COLLECTIONS.LIVE_EXAMS);
         if (examsList.length === 0) {
           console.log('Seeding initial live exams data to Firestore...');
-          for (const exam of defaultLiveExams) {
+          for (const exam of mapWithTimestamps(defaultLiveExams)) {
             const { id, ...data } = exam;
             await setDocument(COLLECTIONS.LIVE_EXAMS, id, data);
           }
@@ -254,7 +264,7 @@ export const AdminProvider = ({ children }) => {
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (data) => {
             if (data.length > 0) {
-              dispatch({ type: 'SET_NOTIFICATIONS', payload: data });
+              dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(data) });
             }
           })
         );
@@ -263,7 +273,7 @@ export const AdminProvider = ({ children }) => {
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => {
             if (data.length > 0) {
-              dispatch({ type: 'SET_ADMITS', payload: data });
+              dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(data) });
             }
           })
         );
@@ -272,7 +282,7 @@ export const AdminProvider = ({ children }) => {
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (data) => {
             if (data.length > 0) {
-              dispatch({ type: 'SET_ACTIVITIES', payload: data });
+              dispatch({ type: 'SET_ACTIVITIES', payload: mapWithTimestamps(data) });
             }
           })
         );

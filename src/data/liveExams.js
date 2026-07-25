@@ -189,8 +189,9 @@ let cachedLiveExams = (() => {
 try {
   onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => {
     if (data && data.length > 0) {
-      cachedLiveExams = data;
-      localStorage.setItem('admin_live_exams', JSON.stringify(data));
+      // Sort LIFO (newest first)
+      cachedLiveExams = [...data].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      localStorage.setItem('admin_live_exams', JSON.stringify(cachedLiveExams));
     }
   });
 } catch (err) {

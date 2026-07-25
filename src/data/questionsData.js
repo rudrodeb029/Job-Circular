@@ -235,8 +235,10 @@ let cachedQuestionsData = (() => {
 try {
   onCollectionSnapshot(COLLECTIONS.QUESTIONS, (data) => {
     if (data && data.length > 0) {
-      cachedQuestionsData = data;
-      localStorage.setItem('questions_data', JSON.stringify(data));
+      // Sort LIFO (newest first)
+      cachedQuestionsData = [...data].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      localStorage.setItem('questions_data', JSON.stringify(cachedQuestionsData));
+      window.dispatchEvent(new CustomEvent('questions_updated'));
     }
   });
 } catch (err) {

@@ -186,7 +186,9 @@ export default function ManageQuestions() {
       totalQuestions: String(questions.length),
       timeLimit,
       timeLimitEn,
-      questions
+      questions,
+      createdAt: currentPaper ? (currentPaper.createdAt || new Date().toISOString()) : new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
 
     let updatedPapers;
