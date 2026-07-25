@@ -261,6 +261,15 @@ export default function Profile() {
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 
+            {/* MCQ Exam & Question Bank */}
+            <div className="menu-item" onClick={() => navigate('/questions-hub')} style={{ borderBottom: '1px solid var(--border-light)' }}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white' }}>
+                <FileText size={15} />
+              </div>
+              <span className="menu-item-label">{isEn ? 'MCQ Exam & Question Bank' : 'MCQ Exam ও প্রশ্নব্যাংক'}</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
+            </div>
+
             {/* Admit Card & Result */}
             <div className="menu-item" onClick={() => navigate('/admit-card')}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', color: 'white' }}>
