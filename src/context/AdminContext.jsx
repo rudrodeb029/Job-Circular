@@ -55,7 +55,24 @@ const initialState = {
 
 const adminReducer = (state, action) => {
   let newState;
-  const sortByCreatedAt = (a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+  const getItemTimestamp = (item) => {
+    if (item.createdAt) {
+      const ms = new Date(item.createdAt).getTime();
+      if (!isNaN(ms)) return ms;
+    }
+    if (item.id) {
+      const matches = String(item.id).match(/\d{10,13}/);
+      if (matches) return parseInt(matches[0], 10);
+    }
+    return 0;
+  };
+
+  const sortByCreatedAt = (a, b) => {
+    const tsA = getItemTimestamp(a);
+    const tsB = getItemTimestamp(b);
+    if (tsB !== tsA) return tsB - tsA;
+    return String(b.id || '').localeCompare(String(a.id || ''));
+  };
 
   switch (action.type) {
     // ─── Firestore sync actions (bulk replace from snapshot) ────

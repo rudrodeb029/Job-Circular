@@ -195,8 +195,26 @@ export default function QuestionsHub() {
         return status.type === 'ended' || status.type === 'submitted';
       }
     });
+
+    const getItemTimestamp = (item) => {
+      if (item.createdAt) {
+        const ms = new Date(item.createdAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      if (item.id) {
+        const matches = String(item.id).match(/\d{10,13}/);
+        if (matches) return parseInt(matches[0], 10);
+      }
+      return 0;
+    };
+
     // Sort LIFO
-    return [...list].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    return [...list].sort((a, b) => {
+      const tsA = getItemTimestamp(a);
+      const tsB = getItemTimestamp(b);
+      if (tsB !== tsA) return tsB - tsA;
+      return String(b.id || '').localeCompare(String(a.id || ''));
+    });
   }, [liveExams, liveTab, now]);
 
   // Filtered Question Papers Data
@@ -212,8 +230,26 @@ export default function QuestionsHub() {
         (p.titleEn || '').toLowerCase().includes(q)
       );
     }
+
+    const getItemTimestamp = (item) => {
+      if (item.createdAt) {
+        const ms = new Date(item.createdAt).getTime();
+        if (!isNaN(ms)) return ms;
+      }
+      if (item.id) {
+        const matches = String(item.id).match(/\d{10,13}/);
+        if (matches) return parseInt(matches[0], 10);
+      }
+      return 0;
+    };
+
     // Sort LIFO
-    return [...list].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    return [...list].sort((a, b) => {
+      const tsA = getItemTimestamp(a);
+      const tsB = getItemTimestamp(b);
+      if (tsB !== tsA) return tsB - tsA;
+      return String(b.id || '').localeCompare(String(a.id || ''));
+    });
   }, [activeCategory, searchQuery, papers]);
 
   return (

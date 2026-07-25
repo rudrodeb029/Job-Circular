@@ -130,10 +130,10 @@ export default function AllCirculars() {
         if (!isNaN(ms)) return ms;
       }
       if (item.id) {
-        const matches = item.id.match(/\d{10,13}/);
+        const matches = String(item.id).match(/\d{10,13}/);
         if (matches) return parseInt(matches[0], 10);
       }
-      if (item.postedAt) {
+      if (item.postedAt && item.postedAt.includes('-')) {
         const ms = new Date(item.postedAt).getTime();
         if (!isNaN(ms)) return ms;
       }
@@ -141,7 +141,12 @@ export default function AllCirculars() {
     };
 
     return [...jobItems, ...examJobs, ...resultJobs, ...notifExamItems, ...notifResultItems]
-      .sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+      .sort((a, b) => {
+        const tsA = getItemTimestamp(a);
+        const tsB = getItemTimestamp(b);
+        if (tsB !== tsA) return tsB - tsA;
+        return String(b.id || '').localeCompare(String(a.id || ''));
+      });
   }, [adminState.jobs]);
 
   // Filter jobs based on search query
