@@ -247,6 +247,13 @@ export const AdminProvider = ({ children }) => {
 
     const seedInitialData = async () => {
       try {
+        // Check if seeding has already been done once to prevent resurrection of deleted items
+        const config = await getDocument('system', 'seeding_status');
+        if (config && config.is_seeded) {
+          console.log('Seeding already done previously, skipping.');
+          return;
+        }
+
         const jobsData = await getCollection(COLLECTIONS.JOBS);
         if (jobsData.length === 0) {
           console.log('Seeding initial jobs data to Firestore...');
@@ -282,32 +289,31 @@ export const AdminProvider = ({ children }) => {
             await setDocument(COLLECTIONS.LIVE_EXAMS, id, data);
           }
         }
+
+        // Mark as seeded
+        await setDocument('system', 'seeding_status', { is_seeded: true });
       } catch (err) {
         console.error('Auto-seeding error:', err);
       }
     };
 
     const setupListeners = () => {
-      // Don't call seedInitialData() here to avoid race conditions
+      seedInitialData();
       try {
         // Jobs collection
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.JOBS, (data) => {
-            if (data.length > 0) {
-              const mapped = mapJobs(data);
-              dispatch({ type: 'SET_JOBS', payload: mapped });
+            const mapped = mapJobs(data);
+            dispatch({ type: 'SET_JOBS', payload: mapped });
 
-              // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
-              const needsFix = data.some(j => !j.createdAt);
-              if (needsFix) {
-                console.log('Auto-repairing missing job timestamps in Firestore...');
-                mapped.forEach(j => {
-                  const { id, ...payload } = j;
-                  setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
-                });
-              }
-            } else {
-               seedInitialData();
+            // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
+            const needsFix = data.some(j => !j.createdAt);
+            if (data.length > 0 && needsFix) {
+              console.log('Auto-repairing missing job timestamps in Firestore...');
+              mapped.forEach(j => {
+                const { id, ...payload } = j;
+                setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
+              });
             }
           })
         );
