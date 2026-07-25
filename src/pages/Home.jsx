@@ -205,12 +205,12 @@ export default function Home() {
         {/* Questions & Answers Categories */}
         <div className="mb-lg">
           <div className="section-header" style={{
-            background: 'var(--white)',
-            padding: '10px 14px',
-            borderRadius: '12px',
-            border: '1px solid rgba(37, 99, 235, 0.08)',
+            background: 'transparent',
+            padding: '10px 0',
+            borderRadius: '0',
+            border: 'none',
             marginBottom: '14px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+            boxShadow: 'none'
           }}>
             <h3 className="section-title" style={{ margin: 0 }}>{isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}</h3>
             <Link to="/questions-hub" className="section-link">
@@ -262,12 +262,12 @@ export default function Home() {
         {/* Dynamic Feed Segment */}
         <div>
           <div className="section-header" style={{
-            background: 'var(--white)',
-            padding: '10px 14px',
-            borderRadius: '12px',
-            border: '1px solid rgba(37, 99, 235, 0.08)',
+            background: 'transparent',
+            padding: '10px 0',
+            borderRadius: '0',
+            border: 'none',
             marginBottom: '14px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+            boxShadow: 'none'
           }}>
             <h3 className="section-title" style={{ margin: 0 }}>{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
             <Link to="/all-circulars" className="section-link">
