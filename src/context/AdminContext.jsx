@@ -246,55 +246,9 @@ export const AdminProvider = ({ children }) => {
     const unsubscribers = [];
 
     const seedInitialData = async () => {
-      try {
-        // Check if seeding has already been done once to prevent resurrection of deleted items
-        const config = await getDocument('system', 'seeding_status');
-        if (config && config.is_seeded) {
-          console.log('Seeding already done previously, skipping.');
-          return;
-        }
-
-        const jobsData = await getCollection(COLLECTIONS.JOBS);
-        if (jobsData.length === 0) {
-          console.log('Seeding initial jobs data to Firestore...');
-          for (const job of mapJobs(initialJobs)) {
-            const { id, ...data } = job;
-            await setDocument(COLLECTIONS.JOBS, id, data);
-          }
-        }
-
-        const admitsData = await getCollection(COLLECTIONS.ADMITS);
-        if (admitsData.length === 0) {
-          console.log('Seeding initial admits data to Firestore...');
-          for (const admit of mapWithTimestamps(initialAdmits)) {
-            const { id, ...data } = admit;
-            await setDocument(COLLECTIONS.ADMITS, id, data);
-          }
-        }
-
-        const questionsList = await getCollection(COLLECTIONS.QUESTIONS);
-        if (questionsList.length === 0) {
-          console.log('Seeding initial questions data to Firestore...');
-          for (const paper of mapWithTimestamps(questionsData)) {
-            const { id, ...data } = paper;
-            await setDocument(COLLECTIONS.QUESTIONS, id, data);
-          }
-        }
-
-        const examsList = await getCollection(COLLECTIONS.LIVE_EXAMS);
-        if (examsList.length === 0) {
-          console.log('Seeding initial live exams data to Firestore...');
-          for (const exam of mapWithTimestamps(defaultLiveExams)) {
-            const { id, ...data } = exam;
-            await setDocument(COLLECTIONS.LIVE_EXAMS, id, data);
-          }
-        }
-
-        // Mark as seeded
-        await setDocument('system', 'seeding_status', { is_seeded: true });
-      } catch (err) {
-        console.error('Auto-seeding error:', err);
-      }
+      // Auto-seeding is now permanently disabled to keep the database clear
+      console.log('Database seeding disabled by request.');
+      return;
     };
 
     const setupListeners = () => {
