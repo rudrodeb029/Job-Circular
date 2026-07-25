@@ -16,20 +16,42 @@ const AdminContext = createContext();
 
 // Map items to ensure they have timestamps
 const mapWithTimestamps = (items) => {
-  return items.map(item => ({
-    ...item,
-    createdAt: item.createdAt || new Date().toISOString(),
-    updatedAt: item.updatedAt || new Date().toISOString()
-  }));
+  return items.map(item => {
+    let stableDate = item.createdAt;
+    if (!stableDate) {
+      const matches = String(item.id).match(/\d{10,13}/);
+      if (matches) {
+        stableDate = new Date(parseInt(matches[0], 10)).toISOString();
+      } else {
+        stableDate = '2024-05-20T10:00:00.000Z'; // Stable old date
+      }
+    }
+    return {
+      ...item,
+      createdAt: stableDate,
+      updatedAt: item.updatedAt || stableDate
+    };
+  });
 };
 
 const mapJobs = (jobs) => {
-  return jobs.map(job => ({
-    ...job,
-    status: job.status || 'active',
-    createdAt: job.createdAt || new Date().toISOString(),
-    updatedAt: job.updatedAt || new Date().toISOString()
-  }));
+  return jobs.map(job => {
+    let stableDate = job.createdAt;
+    if (!stableDate) {
+      const matches = String(job.id).match(/\d{10,13}/);
+      if (matches) {
+        stableDate = new Date(parseInt(matches[0], 10)).toISOString();
+      } else {
+        stableDate = '2024-05-20T10:00:00.000Z'; // Stable old date
+      }
+    }
+    return {
+      ...job,
+      status: job.status || 'active',
+      createdAt: stableDate,
+      updatedAt: job.updatedAt || stableDate
+    };
+  });
 };
 
 // Fallback: load from localStorage if Firestore unavailable
@@ -272,9 +294,19 @@ export const AdminProvider = ({ children }) => {
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.JOBS, (data) => {
             if (data.length > 0) {
-              dispatch({ type: 'SET_JOBS', payload: mapJobs(data) });
+              const mapped = mapJobs(data);
+              dispatch({ type: 'SET_JOBS', payload: mapped });
+
+              // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
+              const needsFix = data.some(j => !j.createdAt);
+              if (needsFix) {
+                console.log('Auto-repairing missing job timestamps in Firestore...');
+                mapped.forEach(j => {
+                  const { id, ...payload } = j;
+                  setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
+                });
+              }
             } else {
-               // Only seed if Firestore is truly empty
                seedInitialData();
             }
           })
