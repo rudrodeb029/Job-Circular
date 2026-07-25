@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
+import defaultNoticeImg from '../assets/job_circular_notice.png';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
@@ -70,7 +71,7 @@ export default function JobDetails() {
   }
 
   if (circularImages.length === 0) {
-    circularImages = [job.circularImage || './job_circular_notice.png'];
+    circularImages = [job.circularImage || defaultNoticeImg];
   }
 
   const isSaved = state.savedJobs.includes(job.id);
