@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bookmark, BookmarkCheck, Calendar, Clock } from './Icons';
 import { useAppContext } from '../context/AppContext';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const categoryStyles = {
   gov: {
@@ -183,7 +184,9 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
             <span>Deadline: {job.deadline}</span>
             <span style={{ opacity: 0.4, margin: '0 1px' }}>•</span>
             <Clock size={9} style={{ color: '#475569' }} /> 
-            <span style={{ color: '#475569', fontWeight: 500 }}>{job.postedDate || '১৫ মি. আগে'}</span>
+            <span style={{ color: '#475569', fontWeight: 500 }}>
+              {formatTimeAgo(job.createdAt, isEn)}
+            </span>
           </span>
         </div>
       </div>

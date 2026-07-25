@@ -8,6 +8,7 @@ import { admitCardsAndResults } from '../data/notifications';
 import JobCard from '../components/JobCard';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -256,7 +257,7 @@ export default function AllCirculars() {
                           <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
                         </span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                          • 🕒 {isEn ? (item.postedDateEn || item.postedDate || item.examDateEn || item.examDate || '1 day ago') : (item.postedDate || item.examDate || '১ দিন আগে')}
+                          • 🕒 {formatTimeAgo(item.createdAt, isEn)}
                         </span>
                       </div>
                     </div>
@@ -335,7 +336,7 @@ export default function AllCirculars() {
                         🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
                       </span>
                       <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                        • 🕒 {isEn ? (item.postedDateEn || item.postedDate || item.examDateEn || item.examDate || '1 day ago') : (item.postedDate || item.examDate || '১ দিন আগে')}
+                        • 🕒 {formatTimeAgo(item.createdAt, isEn)}
                       </span>
                     </div>
                   </div>
