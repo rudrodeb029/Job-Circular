@@ -66,7 +66,22 @@ export default function AdmitCardResult() {
       return 0;
     };
 
-    return [...localAdmits].sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+    const unique = [];
+    const seen = new Set();
+
+    // Sort first so newest unique items are kept
+    const sorted = [...localAdmits].sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+
+    for (const item of sorted) {
+      // Create a key based on job ID and type (admit_card or result)
+      const key = `${item.jobId}_${item.type}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(item);
+      }
+    }
+
+    return unique;
   }, [adminState.admits]);
 
   const searchedItems = useMemo(() => {
