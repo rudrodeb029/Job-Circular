@@ -229,6 +229,10 @@ export default function ResultDetails() {
               src={circularImages[activeImageIndex]}
               alt="Result Sheet Preview"
               onClick={() => setShowFullImage(!showFullImage)}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = defaultNoticeImg;
+              }}
               style={{
                 width: '100%',
                 maxHeight: showFullImage ? 'none' : '380px',

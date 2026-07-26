@@ -241,6 +241,10 @@ export default function JobDetails() {
               src={circularImages[activeImageIndex]}
               alt={`Circular Notice Page ${activeImageIndex + 1}`}
               onClick={() => setShowFullImage(!showFullImage)}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = defaultNoticeImg;
+              }}
               style={{
                 width: '100%',
                 maxHeight: showFullImage ? 'none' : '380px',
