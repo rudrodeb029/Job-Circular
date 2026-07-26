@@ -190,13 +190,46 @@ const adminReducer = (state, action) => {
 
   // ─── Persist to Firestore (async, fire-and-forget) ──────────
   try {
-    if (['ADD_JOB', 'UPDATE_JOB', 'TOGGLE_JOB_STATUS'].includes(action.type)) {
+    case 'ADD_JOB':
+    case 'UPDATE_JOB':
+    case 'TOGGLE_JOB_STATUS':
       const job = newState.jobs.find(j => j.id === action.payload?.id || j.id === action.payload);
       if (job) {
         const { id, ...data } = job;
         setDocument(COLLECTIONS.JOBS, id, data).catch(console.error);
+
+        // TRIGGER BROADCAST NOTIFICATION on New Job or Significant Update
+        if (action.type === 'ADD_JOB' || (action.type === 'UPDATE_JOB' && (job.showInExamDate || job.showInResult))) {
+           const notifId = `broadcast_${Date.now()}`;
+           let type = 'new_job';
+           let msg = `${job.organization} has published a new circular: ${job.title}`;
+           let msgBn = `${job.organization}-এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
+
+           if (job.showInResult) {
+             type = 'result';
+             msg = `Result published for ${job.title} at ${job.organization}`;
+             msgBn = `${job.organization}-এ "${job.title}" পদের ফলাফল প্রকাশিত হয়েছে।`;
+           } else if (job.showInExamDate) {
+             type = 'admit_card';
+             msg = `Exam date announced for ${job.title} at ${job.organization}`;
+             msgBn = `${job.organization}-এ "${job.title}" পদের পরীক্ষার তারিখ ঘোষণা করা হয়েছে।`;
+           }
+
+           const notifPayload = {
+             id: notifId,
+             jobId: job.id,
+             type: type,
+             title: job.organization,
+             organization: job.organization,
+             message: msgBn,
+             messageEn: msg,
+             isRead: false,
+             createdAt: new Date().toISOString()
+           };
+           setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifPayload).catch(console.error);
+        }
       }
-    } else if (action.type === 'DELETE_JOB') {
+      break;
       deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
     } else if (['ADD_NOTIFICATION', 'UPDATE_NOTIFICATION'].includes(action.type)) {
       const notif = newState.notifications.find(n => n.id === action.payload?.id);
@@ -260,50 +293,23 @@ export const AdminProvider = ({ children }) => {
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.JOBS, (data) => {
             const mapped = mapJobs(data);
-
-            // AUTO-NOTIFICATION LOGIC:
-            // Detect new jobs and create notifications automatically
-            if (state.firestoreReady && mapped.length > state.jobs.length) {
-              const newJobs = mapped.filter(mj => !state.jobs.some(sj => sj.id === mj.id));
-              newJobs.forEach(nj => {
-                const notifId = `notif_auto_${nj.id}`;
-                let type = 'new_job';
-                let msg = `${nj.organization} has published a new circular: ${nj.title}`;
-                let msgBn = `${nj.organization}-এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${nj.title}`;
-
-                if (nj.showInResult) {
-                  type = 'result';
-                  msg = `Result published for ${nj.title} at ${nj.organization}`;
-                  msgBn = `${nj.organization}-এ "${nj.title}" পদের ফলাফল প্রকাশিত হয়েছে।`;
-                } else if (nj.showInExamDate) {
-                  type = 'admit_card';
-                  msg = `Exam date announced for ${nj.title} at ${nj.organization}`;
-                  msgBn = `${nj.organization}-এ "${nj.title}" পদের পরীক্ষার তারিখ ঘোষণা করা হয়েছে।`;
-                }
-
-                const notifPayload = {
-                  id: notifId,
-                  jobId: nj.id,
-                  type: type,
-                  title: nj.organization,
-                  organization: nj.organization,
-                  message: msgBn,
-                  messageEn: msg,
-                  isRead: false,
-                  createdAt: new Date().toISOString()
-                };
-
-                // Add to Firestore notifications
-                const { id, ...data } = notifPayload;
-                setDocument(COLLECTIONS.NOTIFICATIONS, id, data).catch(console.error);
-              });
-            }
-
             dispatch({ type: 'SET_JOBS', payload: mapped });
 
             if (data.length === 0) {
               localStorage.removeItem('admin_jobs');
             } else {
+              // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
+              const needsFix = data.some(j => !j.createdAt);
+              if (needsFix) {
+                console.log('Auto-repairing missing job timestamps in Firestore...');
+                mapped.forEach(j => {
+                  const { id, ...payload } = j;
+                  setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
+                });
+              }
+            }
+          })
+        );
               // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
               const needsFix = data.some(j => !j.createdAt);
               if (needsFix) {
