@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
+import { formatTimeAgo } from '../../utils/timeUtils';
 
 export default function ManageNotifications() {
   const { state, dispatch } = useAdminContext();
   const notifications = state.notifications || [];
+  const isEn = true; // Use English for Admin Panel labels by default
 
   const [searchNotif, setSearchNotif] = useState('');
   const [toast, setToast] = useState(null);
@@ -182,7 +184,9 @@ export default function ManageNotifications() {
                         {(notif.type || '').replace('_', ' ')}
                       </span>
                     </td>
-                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.time || 'N/A'}</td>
+                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>
+                      {notif.createdAt ? formatTimeAgo(notif.createdAt, true) : (notif.time || 'N/A')}
+                    </td>
                     <td style={{ padding: '12px 16px' }}>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button onClick={() => handleOpenNotifModal(notif)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
