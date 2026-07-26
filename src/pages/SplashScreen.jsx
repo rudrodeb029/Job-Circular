@@ -30,21 +30,18 @@ export default function SplashScreen() {
         <div style={{
           width: '120px',
           height: '120px',
-          borderRadius: '24px',
           overflow: 'hidden',
-          boxShadow: '0 15px 35px rgba(26, 86, 219, 0.25)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          background: 'white'
+          justifyContent: 'center'
         }}>
           <img
-            src="/app-logo-v2.png"
+            src="/app-logo.png"
             alt="Job Circular BD"
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover'
+              objectFit: 'contain'
             }}
           />
         </div>
