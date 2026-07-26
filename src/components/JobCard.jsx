@@ -186,23 +186,58 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
         </p>
         
         {/* Ultra-compact single-line metadata badge */}
-        <div style={{ marginTop: '3px', overflow: 'hidden' }}>
-          <span style={{
-            fontSize: '8.5px',
-            color: 'var(--primary)',
-            background: 'var(--primary-lightest)',
-            padding: '1.5px 5px',
-            borderRadius: '4px',
-            fontWeight: 600,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '3px',
-            whiteSpace: 'nowrap',
-            maxWidth: '100%'
-          }}>
-            <Calendar size={9} /> 
-            <span>Deadline: {job.deadline}</span>
-            <span style={{ opacity: 0.4, margin: '0 1px' }}>•</span>
+        <div style={{ marginTop: '3px', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          {job.showInResult ? (
+            <span style={{
+              fontSize: '8.5px',
+              color: '#7e22ce',
+              background: '#f3e8ff',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '3px',
+              whiteSpace: 'nowrap'
+            }}>
+              🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
+            </span>
+          ) : job.showInExamDate ? (
+            <span style={{
+              fontSize: '8.5px',
+              color: '#059669',
+              background: '#d1fae5',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '3px',
+              whiteSpace: 'nowrap'
+            }}>
+              <Calendar size={10} />
+              <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
+            </span>
+          ) : (
+            <span style={{
+              fontSize: '8.5px',
+              color: 'var(--primary)',
+              background: 'var(--primary-lightest)',
+              padding: '1.5px 5px',
+              borderRadius: '4px',
+              fontWeight: 600,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '3px',
+              whiteSpace: 'nowrap'
+            }}>
+              <Calendar size={9} />
+              <span>Deadline: {job.deadline}</span>
+            </span>
+          )}
+
+          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+            <span style={{ opacity: 0.4 }}>•</span>
             <Clock size={9} style={{ color: '#475569' }} /> 
             <span style={{ color: '#475569', fontWeight: 500 }}>
               {formatTimeAgo(job.createdAt, isEn)}
