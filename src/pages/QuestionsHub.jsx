@@ -98,18 +98,31 @@ export default function QuestionsHub() {
         
         {/* SECTION 1: Live MCQ Exam Quick Link */}
         <div style={{ marginBottom: '24px' }}>
-          <div className="section-header" style={{ marginBottom: '14px' }}>
-            <h3 className="section-title" style={{
-              color: 'var(--text-secondary)',
-              background: 'rgba(26, 86, 219, 0.04)',
-              borderLeft: '4px solid var(--primary)',
-              padding: '6px 14px',
-              borderRadius: '8px',
-              fontWeight: 800,
-              fontSize: '13.5px'
+          <div className="section-header" style={{ marginBottom: '16px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'transparent',
+              padding: '6px 0 6px 14px',
+              position: 'relative',
+              overflow: 'hidden',
+              border: 'none'
             }}>
-              <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
-            </h3>
+              {/* Left Accent Bar */}
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: '0',
+                bottom: 0,
+                width: '4.5px',
+                background: 'var(--primary)',
+                borderRadius: '0(4px 4px 0'
+              }}></div>
+
+              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                {isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}
+              </h3>
+            </div>
             <button
               onClick={() => navigate('/live-exams-list')}
               style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary)', background: 'transparent', border: 'none', cursor: 'pointer' }}
@@ -148,12 +161,11 @@ export default function QuestionsHub() {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              background: 'rgba(26, 86, 219, 0.04)',
-              padding: '6px 14px 6px 10px',
-              borderRadius: '10px',
+              background: 'transparent',
+              padding: '6px 0 6px 14px',
               position: 'relative',
               overflow: 'hidden',
-              border: '1px solid rgba(26, 86, 219, 0.08)'
+              border: 'none'
             }}>
               {/* Left Accent Bar */}
               <div style={{
@@ -166,17 +178,7 @@ export default function QuestionsHub() {
                 borderRadius: '0 4px 4px 0'
               }}></div>
 
-              {/* Blue Dot */}
-              <div style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: 'var(--primary)',
-                marginRight: '8px',
-                marginLeft: '4px'
-              }}></div>
-
-              <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
                 {isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}
               </h3>
             </div>
