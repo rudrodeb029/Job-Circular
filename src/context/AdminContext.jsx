@@ -293,7 +293,20 @@ export const AdminProvider = ({ children }) => {
           onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => {
             const mapped = mapWithTimestamps(data);
             dispatch({ type: 'SET_ADMITS', payload: mapped });
-            if (data.length === 0) localStorage.removeItem('admin_admits');
+
+            if (data.length === 0) {
+              localStorage.removeItem('admin_admits');
+            } else {
+              // AUTO-REPAIR: If any admit in Firestore is missing createdAt, fix it
+              const needsFix = data.some(a => !a.createdAt);
+              if (needsFix) {
+                console.log('Auto-repairing missing admit timestamps in Firestore...');
+                mapped.forEach(a => {
+                  const { id, ...payload } = a;
+                  setDocument(COLLECTIONS.ADMITS, id, payload).catch(console.error);
+                });
+              }
+            }
           })
         );
 
