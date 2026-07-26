@@ -2,11 +2,14 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Home, LayoutGrid, Bookmark, Bell, User } from './Icons';
 import { useAppContext } from '../context/AppContext';
-import { notifications } from '../data/notifications';
+import { useAdminContext } from '../context/AdminContext';
 
 const BottomNav = () => {
   const { state } = useAppContext();
-  const unreadCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
+  const { state: adminState } = useAdminContext();
+
+  const notificationsList = adminState.notifications || [];
+  const unreadCount = notificationsList.filter(n => !state.readNotifications.includes(n.id)).length;
 
   return (
     <nav className="bottom-nav">

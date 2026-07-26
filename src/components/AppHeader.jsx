@@ -2,17 +2,19 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight } from './Icons';
 import { useAppContext } from '../context/AppContext';
-import { notifications } from '../data/notifications';
+import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsData } from '../data/questionsData';
 
 export default function AppHeader() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+  const { state: adminState } = useAdminContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [questionsMenuOpen, setQuestionsMenuOpen] = useState(true); // Default open for better discoverability
   const [expandedCategory, setExpandedCategory] = useState(null);
 
-  const unreadCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
+  const notificationsList = adminState.notifications || [];
+  const unreadCount = notificationsList.filter(n => !state.readNotifications.includes(n.id)).length;
 
   return (
     <>
