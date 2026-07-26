@@ -326,7 +326,8 @@ export const AdminProvider = ({ children }) => {
         // Notifications collection
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (data) => {
-            dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(data) });
+            const mapped = mapWithTimestamps(data);
+            dispatch({ type: 'SET_NOTIFICATIONS', payload: mapped });
             if (data.length === 0) localStorage.removeItem('admin_notifications');
           })
         );
