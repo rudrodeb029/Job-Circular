@@ -79,25 +79,6 @@ export default function Home() {
         feedType: 'job'
       }));
 
-    // Special Filter: Also include Exam Date and Result markers as separate items in feed
-    const examMarkerItems = localJobs.filter(j => j.showInExamDate).map(j => ({
-      ...j,
-      id: `home-exam-${j.id}`,
-      feedType: 'exam_date',
-      postTitle: j.title,
-      postTitleEn: j.titleEn,
-      examDate: j.examDate || j.deadline,
-      examDateEn: j.examDateEn || j.deadline
-    }));
-
-    const resultMarkerItems = localJobs.filter(j => j.showInResult).map(j => ({
-      ...j,
-      id: `home-result-${j.id}`,
-      feedType: 'result',
-      postTitle: j.title,
-      postTitleEn: j.titleEn
-    }));
-
     // Notifications admit card items from database
     const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
       ...item,
@@ -135,7 +116,7 @@ export default function Home() {
       return 0;
     };
 
-    const rawFeed = [...jobItems, ...examMarkerItems, ...resultMarkerItems, ...notifExamItems, ...notifResultItems];
+    const rawFeed = [...jobItems, ...notifExamItems, ...notifResultItems];
 
     // DEDUPLICATION: Use a Map to keep only one item per original circular
     const deduplicatedMap = new Map();
@@ -157,7 +138,7 @@ export default function Home() {
         if (tsA !== tsB) return tsB - tsA; // LIFO (Newest first)
         return String(b.id || '').localeCompare(String(a.id || ''));
       });
-  }, [localJobs]);
+  }, [localJobs, localAdmits]);
 
   // Paginated feed items
   const paginatedFeed = useMemo(() => {
