@@ -28,3 +28,17 @@ dist-ssr
 # Firebase
 .firebase/
 
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/capacitor-cordova-android-plugins/
+android/app/src/main/assets/public/
+
+# Capacitor
+/www/
+/node_modules/
+/ios/App/App/public
+/ios/App/Pods
+/android/app/src/main/assets/public
