@@ -135,7 +135,22 @@ export default function Home() {
       return 0;
     };
 
-    return [...jobItems, ...examMarkerItems, ...resultMarkerItems, ...notifExamItems, ...notifResultItems]
+    const rawFeed = [...jobItems, ...examMarkerItems, ...resultMarkerItems, ...notifExamItems, ...notifResultItems];
+
+    // DEDUPLICATION: Use a Map to keep only one item per original circular
+    const deduplicatedMap = new Map();
+
+    rawFeed.forEach(item => {
+      const baseId = item.originalId || item.id;
+      const existing = deduplicatedMap.get(baseId);
+
+      // If we have an 'exam_date' or 'result' type, it should override a standard 'job' type
+      if (!existing || (item.feedType === 'exam_date' || item.feedType === 'result')) {
+        deduplicatedMap.set(baseId, item);
+      }
+    });
+
+    return Array.from(deduplicatedMap.values())
       .sort((a, b) => {
         const tsA = getItemTimestamp(a);
         const tsB = getItemTimestamp(b);
