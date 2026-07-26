@@ -12,7 +12,7 @@ export default function Notifications() {
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
 
-  const notificationsList = useMemo(() => getNotifications(), [adminState.jobs]);
+  const notificationsList = adminState.notifications || [];
 
   const handleMarkAllRead = () => {
     const allIds = notificationsList.map(n => n.id);
