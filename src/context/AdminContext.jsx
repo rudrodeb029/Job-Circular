@@ -260,6 +260,45 @@ export const AdminProvider = ({ children }) => {
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.JOBS, (data) => {
             const mapped = mapJobs(data);
+
+            // AUTO-NOTIFICATION LOGIC:
+            // Detect new jobs and create notifications automatically
+            if (state.firestoreReady && mapped.length > state.jobs.length) {
+              const newJobs = mapped.filter(mj => !state.jobs.some(sj => sj.id === mj.id));
+              newJobs.forEach(nj => {
+                const notifId = `notif_auto_${nj.id}`;
+                let type = 'new_job';
+                let msg = `${nj.organization} has published a new circular: ${nj.title}`;
+                let msgBn = `${nj.organization}-এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${nj.title}`;
+
+                if (nj.showInResult) {
+                  type = 'result';
+                  msg = `Result published for ${nj.title} at ${nj.organization}`;
+                  msgBn = `${nj.organization}-এ "${nj.title}" পদের ফলাফল প্রকাশিত হয়েছে।`;
+                } else if (nj.showInExamDate) {
+                  type = 'admit_card';
+                  msg = `Exam date announced for ${nj.title} at ${nj.organization}`;
+                  msgBn = `${nj.organization}-এ "${nj.title}" পদের পরীক্ষার তারিখ ঘোষণা করা হয়েছে।`;
+                }
+
+                const notifPayload = {
+                  id: notifId,
+                  jobId: nj.id,
+                  type: type,
+                  title: nj.organization,
+                  organization: nj.organization,
+                  message: msgBn,
+                  messageEn: msg,
+                  isRead: false,
+                  createdAt: new Date().toISOString()
+                };
+
+                // Add to Firestore notifications
+                const { id, ...data } = notifPayload;
+                setDocument(COLLECTIONS.NOTIFICATIONS, id, data).catch(console.error);
+              });
+            }
+
             dispatch({ type: 'SET_JOBS', payload: mapped });
 
             if (data.length === 0) {
