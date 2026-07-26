@@ -10,7 +10,7 @@ import { useAdminContext } from '../context/AdminContext';
 export default function Categories() {
   const navigate = useNavigate();
   const { state } = useAppContext();
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, loading: adminLoading } = useAdminContext();
   const isEn = state.language === 'en';
 
   const jobs = adminState.jobs || [];
@@ -25,6 +25,17 @@ export default function Categories() {
       };
     });
   }, [jobs]);
+
+  if (adminLoading) {
+    return (
+      <div className="page">
+        <div className="page-header">
+           <h1 style={{ fontSize: '16px' }}>{isEn ? 'Loading...' : 'লোড হচ্ছে...'}</h1>
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
 
   return (
     <div className="page">
