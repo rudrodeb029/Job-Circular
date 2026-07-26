@@ -225,21 +225,11 @@ export default function Home() {
               <div style={{
                 position: 'absolute',
                 left: 0,
-                top: '20%',
-                bottom: '20%',
-                width: '4px',
+                top: '0',
+                bottom: 0,
+                width: '4.5px',
                 background: 'var(--primary)',
                 borderRadius: '0 4px 4px 0'
-              }}></div>
-
-              {/* Blue Dot */}
-              <div style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: 'var(--primary)',
-                marginRight: '8px',
-                marginLeft: '4px'
               }}></div>
 
               <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
@@ -316,21 +306,11 @@ export default function Home() {
               <div style={{
                 position: 'absolute',
                 left: 0,
-                top: '20%',
-                bottom: '20%',
-                width: '4px',
+                top: '0',
+                bottom: 0,
+                width: '4.5px',
                 background: 'var(--primary)',
                 borderRadius: '0 4px 4px 0'
-              }}></div>
-
-              {/* Blue Dot */}
-              <div style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: 'var(--primary)',
-                marginRight: '8px',
-                marginLeft: '4px'
               }}></div>
 
               <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
