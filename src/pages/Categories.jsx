@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, LayoutGrid } from '../components/Icons';
 import CategoryCard from '../components/CategoryCard';
