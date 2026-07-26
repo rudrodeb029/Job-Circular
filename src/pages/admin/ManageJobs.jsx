@@ -184,7 +184,6 @@ export default function ManageJobs() {
       : [];
       
     const finalExamDate = formData.showInExamDate ? formData.examDate : '';
-    const finalExamResult = formData.showInResult ? formData.examResult : '';
 
     const targetId = editingJob 
       ? editingJob.id 
@@ -194,16 +193,14 @@ export default function ManageJobs() {
       ...formData,
       id: targetId,
       examDate: finalExamDate,
-      examResult: finalExamResult,
+      examResult: imgArray.length > 0 ? imgArray[0] : '', // Consolidate: use first file as result link
       requirements: reqArray,
       images: imgArray,
       createdAt: editingJob ? (editingJob.createdAt || new Date().toISOString()) : new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       postedAt: editingJob
         ? editingJob.postedAt 
-        : (formData.linkedCircularId 
-            ? (jobs.find(j => j.id === formData.linkedCircularId)?.postedAt || new Date().toISOString().split('T')[0]) 
-            : new Date().toISOString().split('T')[0])
+        : (jobs.find(j => j.id === formData.linkedCircularId)?.postedAt || new Date().toISOString().split('T')[0])
     };
 
     if (editingJob || formData.linkedCircularId) {
@@ -251,6 +248,7 @@ export default function ManageJobs() {
         examNameEn: `${formData.titleEn || formData.title} Exam`,
         organization: formData.organization,
         organizationEn: formData.organizationEn || formData.organization,
+        category: formData.categoryId, // Ensure it shows in category filters
         type: 'admit_card',
         status: 'পরীক্ষার তারিখ প্রকাশিত',
         statusEn: 'Exam Date Published',
@@ -264,7 +262,7 @@ export default function ManageJobs() {
       dispatch({ type: 'DELETE_ADMIT', payload: `admit-${targetId}` });
     }
 
-    if (formData.showInResult && finalExamResult) {
+    if (formData.showInResult) {
       const resultId = `result-${targetId}`;
       const resultData = {
         id: resultId,
@@ -273,12 +271,13 @@ export default function ManageJobs() {
         examNameEn: `${formData.titleEn || formData.title} Exam Result`,
         organization: formData.organization,
         organizationEn: formData.organizationEn || formData.organization,
+        category: formData.categoryId, // Ensure it shows in category filters
         type: 'result',
         status: 'ফলাফল প্রকাশিত',
         statusEn: 'Result Published',
         date: jobData.postedAt || new Date().toISOString().split('T')[0],
         dateEn: jobData.postedAt || 'Recently',
-        downloadLink: finalExamResult,
+        downloadLink: jobData.applyLink || '#',
         createdAt: jobData.createdAt
       };
       dispatch({ type: 'UPDATE_ADMIT', payload: resultData });
