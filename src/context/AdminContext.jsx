@@ -192,7 +192,7 @@ const adminReducer = (state, action) => {
   // ─── Persist to Firestore (async, fire-and-forget) ──────────
   try {
     if (['ADD_JOB', 'UPDATE_JOB', 'TOGGLE_JOB_STATUS'].includes(action.type)) {
-      const job = newState.jobs.find(j => j.id === action.payload?.id || j.id === action.payload);
+      const job = newState.jobs.find(j => j.id === (action.payload?.id || action.payload));
       if (job) {
         const { id, ...data } = job;
         setDocument(COLLECTIONS.JOBS, id, data).catch(console.error);
@@ -322,7 +322,8 @@ export const AdminProvider = ({ children }) => {
         // Admits collection
         unsubscribers.push(
           onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => {
-            dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(data) });
+            const mapped = mapWithTimestamps(data);
+            dispatch({ type: 'SET_ADMITS', payload: mapped });
             if (data.length === 0) localStorage.removeItem('admin_admits');
           })
         );
