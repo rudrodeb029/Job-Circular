@@ -73,11 +73,13 @@ export default function AdmitCardResult() {
     const sorted = [...localAdmits].sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
 
     for (const item of sorted) {
-      // Create a key based on job ID and type (admit_card or result)
-      const key = `${item.jobId}_${item.type}`;
+      // Robust key based on job ID (fallback to document ID) and type
+      const baseId = item.jobId || String(item.id).replace('admit-', '').replace('result-', '').replace('dynamic-exam-', '').replace('dynamic-result-', '');
+      const key = `${baseId}_${item.type}`;
+
       if (!seen.has(key)) {
         seen.add(key);
-        unique.push(item);
+        unique.push({ ...item, jobId: baseId }); // Ensure jobId is present
       }
     }
 
@@ -302,7 +304,7 @@ export default function AdmitCardResult() {
                         🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
                       </span>
                       <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                        • 🕒 {isEn ? (item.dateEn || '1 day ago') : (item.date || '১ দিন আগে')}
+                        • 🕒 {formatTimeAgo(item.createdAt, isEn)}
                       </span>
                     </div>
                   </div>

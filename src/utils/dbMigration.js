@@ -27,6 +27,20 @@ export const runDatabaseMigration = async () => {
       let updatedCount = 0;
 
       for (const doc of documents) {
+        // Fix jobId and type for admits collection
+        if (collectionName === COLLECTIONS.ADMITS) {
+           const updatePayload = {};
+           if (!doc.jobId) {
+             updatePayload.jobId = String(doc.id).replace('admit-', '').replace('result-', '').replace('dynamic-exam-', '').replace('dynamic-result-', '');
+           }
+           if (!doc.type) {
+             updatePayload.type = String(doc.id).startsWith('result-') ? 'result' : 'admit_card';
+           }
+           if (Object.keys(updatePayload).length > 0) {
+             await updateDocument(COLLECTIONS.ADMITS, doc.id, updatePayload);
+           }
+        }
+
         // If createdAt is missing, try to infer it from ID or use a reasonable default
         if (!doc.createdAt) {
           let inferredDate = new Date().toISOString();
