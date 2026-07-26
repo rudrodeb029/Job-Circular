@@ -101,7 +101,7 @@ export default function Home() {
     // Notifications admit card items from database
     const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
       ...item,
-      originalId: String(item.id).replace('admit-', 'job-'),
+      originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examDate: item.date,
@@ -114,7 +114,7 @@ export default function Home() {
     // Notifications result items from database
     const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
       ...item,
-      originalId: String(item.id).replace('result-', 'job-'),
+      originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,
