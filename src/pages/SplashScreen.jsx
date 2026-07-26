@@ -23,7 +23,7 @@ export default function SplashScreen() {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      background: 'var(--bg)',
+      background: '#FFFFFF',
       position: 'relative'
     }}>
       <div className="animate-scale-in" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
