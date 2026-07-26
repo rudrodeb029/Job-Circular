@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from './Icons';
 import { useAppContext } from '../context/AppContext';
 
 const toBengaliNumber = (num) => {
