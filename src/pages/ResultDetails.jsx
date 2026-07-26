@@ -58,6 +58,18 @@ export default function ResultDetails() {
   const localJobs = adminState.jobs;
   const job = localJobs.find(j => j.id === id);
 
+  // Auto-mark notifications as read when viewing details
+  React.useEffect(() => {
+    if (job) {
+      const relatedNotifs = (adminState.notifications || []).filter(n => n.jobId === job.id);
+      relatedNotifs.forEach(n => {
+        if (!state.readNotifications.includes(n.id)) {
+          dispatch({ type: 'MARK_NOTIFICATION_READ', payload: n.id });
+        }
+      });
+    }
+  }, [job, adminState.notifications, state.readNotifications, dispatch]);
+
   if (!job) return <NotFoundPage />;
 
   let circularImages = [];
