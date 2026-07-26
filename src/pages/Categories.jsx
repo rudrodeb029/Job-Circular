@@ -5,11 +5,26 @@ import CategoryCard from '../components/CategoryCard';
 import BottomNav from '../components/BottomNav';
 import { categories } from '../data/categories';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 
 export default function Categories() {
   const navigate = useNavigate();
   const { state } = useAppContext();
+  const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
+
+  const jobs = adminState.jobs || [];
+
+  const categoriesWithCounts = useMemo(() => {
+    return categories.map(cat => {
+      // Check both categoryId and category field for robustness
+      const count = jobs.filter(j => j.categoryId === cat.id || j.category === cat.id).length;
+      return {
+        ...cat,
+        jobCount: count
+      };
+    });
+  }, [jobs]);
 
   return (
     <div className="page">
@@ -25,7 +40,7 @@ export default function Categories() {
 
       <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
         <div>
-          {categories.map((cat, index) => (
+          {categoriesWithCounts.map((cat, index) => (
             <div
               key={cat.id}
               className="animate-slide-up"

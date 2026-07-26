@@ -1,6 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight } from './Icons';
+import { useAppContext } from '../context/AppContext';
+
+const toBengaliNumber = (num) => {
+  const engNum = String(num);
+  const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+  return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
 
 const categoryGradientMap = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.3)', badgeBg: '#eff6ff', badgeColor: '#1d4ed8' },
@@ -18,7 +24,13 @@ const categoryGradientMap = {
 
 export default function CategoryCard({ category }) {
   const navigate = useNavigate();
+  const { state } = useAppContext();
+  const isEn = state.language === 'en';
   const theme = categoryGradientMap[category.id] || categoryGradientMap.gov;
+
+  const displayCount = isEn
+    ? `${category.jobCount} circulars`
+    : `${toBengaliNumber(category.jobCount)}টি সার্কুলার`;
 
   return (
     <div
@@ -75,7 +87,7 @@ export default function CategoryCard({ category }) {
           padding: '2px 8px',
           borderRadius: '12px'
         }}>
-          {category.jobCount} circulars
+          {displayCount}
         </span>
       </div>
 
