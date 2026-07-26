@@ -9,6 +9,7 @@ import {
   setDocument,
   deleteDocument,
   onCollectionSnapshot,
+  getDocument,
   COLLECTIONS
 } from '../services/firestoreService';
 
@@ -190,9 +191,7 @@ const adminReducer = (state, action) => {
 
   // ─── Persist to Firestore (async, fire-and-forget) ──────────
   try {
-    case 'ADD_JOB':
-    case 'UPDATE_JOB':
-    case 'TOGGLE_JOB_STATUS':
+    if (['ADD_JOB', 'UPDATE_JOB', 'TOGGLE_JOB_STATUS'].includes(action.type)) {
       const job = newState.jobs.find(j => j.id === action.payload?.id || j.id === action.payload);
       if (job) {
         const { id, ...data } = job;
@@ -229,7 +228,7 @@ const adminReducer = (state, action) => {
            setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifPayload).catch(console.error);
         }
       }
-      break;
+    } else if (action.type === 'DELETE_JOB') {
       deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
     } else if (['ADD_NOTIFICATION', 'UPDATE_NOTIFICATION'].includes(action.type)) {
       const notif = newState.notifications.find(n => n.id === action.payload?.id);
@@ -298,18 +297,6 @@ export const AdminProvider = ({ children }) => {
             if (data.length === 0) {
               localStorage.removeItem('admin_jobs');
             } else {
-              // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
-              const needsFix = data.some(j => !j.createdAt);
-              if (needsFix) {
-                console.log('Auto-repairing missing job timestamps in Firestore...');
-                mapped.forEach(j => {
-                  const { id, ...payload } = j;
-                  setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
-                });
-              }
-            }
-          })
-        );
               // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
               const needsFix = data.some(j => !j.createdAt);
               if (needsFix) {
