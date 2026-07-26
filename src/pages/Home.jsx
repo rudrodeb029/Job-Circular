@@ -214,12 +214,12 @@ export default function Home() {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              background: 'rgba(26, 86, 219, 0.04)',
-              padding: '6px 14px 6px 10px',
-              borderRadius: '10px',
+              background: 'transparent',
+              padding: '6px 0 6px 14px',
+              borderRadius: '0',
               position: 'relative',
               overflow: 'hidden',
-              border: '1px solid rgba(26, 86, 219, 0.08)'
+              border: 'none'
             }}>
               {/* Left Accent Bar */}
               <div style={{
@@ -232,7 +232,7 @@ export default function Home() {
                 borderRadius: '0 4px 4px 0'
               }}></div>
 
-              <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
                 {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
               </h3>
             </div>
@@ -295,12 +295,12 @@ export default function Home() {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              background: 'rgba(26, 86, 219, 0.04)',
-              padding: '6px 14px 6px 10px',
-              borderRadius: '10px',
+              background: 'transparent',
+              padding: '6px 0 6px 14px',
+              borderRadius: '0',
               position: 'relative',
               overflow: 'hidden',
-              border: '1px solid rgba(26, 86, 219, 0.08)'
+              border: 'none'
             }}>
               {/* Left Accent Bar */}
               <div style={{
@@ -313,7 +313,7 @@ export default function Home() {
                 borderRadius: '0 4px 4px 0'
               }}></div>
 
-              <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
                 {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
               </h3>
             </div>
