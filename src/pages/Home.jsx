@@ -215,23 +215,11 @@ export default function Home() {
               display: 'flex',
               alignItems: 'center',
               background: 'transparent',
-              padding: '6px 0 6px 14px',
-              borderRadius: '0',
+              padding: '6px 0',
               position: 'relative',
               overflow: 'hidden',
               border: 'none'
             }}>
-              {/* Left Accent Bar */}
-              <div style={{
-                position: 'absolute',
-                left: 0,
-                top: '0',
-                bottom: 0,
-                width: '4.5px',
-                background: 'var(--primary)',
-                borderRadius: '0 4px 4px 0'
-              }}></div>
-
               <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
                 {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
               </h3>
@@ -296,23 +284,11 @@ export default function Home() {
               display: 'flex',
               alignItems: 'center',
               background: 'transparent',
-              padding: '6px 0 6px 14px',
-              borderRadius: '0',
+              padding: '6px 0',
               position: 'relative',
               overflow: 'hidden',
               border: 'none'
             }}>
-              {/* Left Accent Bar */}
-              <div style={{
-                position: 'absolute',
-                left: 0,
-                top: '0',
-                bottom: 0,
-                width: '4.5px',
-                background: 'var(--primary)',
-                borderRadius: '0 4px 4px 0'
-              }}></div>
-
               <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
                 {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
               </h3>
