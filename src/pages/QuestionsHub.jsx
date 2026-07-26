@@ -145,17 +145,41 @@ export default function QuestionsHub() {
         {/* SECTION 2: Q&A Categories */}
         <div style={{ marginBottom: '24px' }}>
           <div className="section-header" style={{ marginBottom: '14px' }}>
-            <h3 className="section-title" style={{
-              color: 'var(--text-secondary)',
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
               background: 'rgba(26, 86, 219, 0.04)',
-              borderLeft: '4px solid var(--primary)',
-              padding: '6px 14px',
-              borderRadius: '8px',
-              fontWeight: 800,
-              fontSize: '13.5px'
+              padding: '6px 14px 6px 10px',
+              borderRadius: '10px',
+              position: 'relative',
+              overflow: 'hidden',
+              border: '1px solid rgba(26, 86, 219, 0.08)'
             }}>
-              <span>{isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}</span>
-            </h3>
+              {/* Left Accent Bar */}
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: '20%',
+                bottom: '20%',
+                width: '4px',
+                background: 'var(--primary)',
+                borderRadius: '0 4px 4px 0'
+              }}></div>
+
+              {/* Blue Dot */}
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: 'var(--primary)',
+                marginRight: '8px',
+                marginLeft: '4px'
+              }}></div>
+
+              <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                {isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}
+              </h3>
+            </div>
           </div>
 
           <div className="category-grid">

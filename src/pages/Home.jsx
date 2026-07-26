@@ -207,12 +207,46 @@ export default function Home() {
           <div className="section-header" style={{
             background: 'transparent',
             padding: '10px 0',
-            borderRadius: '0',
-            border: 'none',
             marginBottom: '14px',
+            border: 'none',
             boxShadow: 'none'
           }}>
-            <h3 className="section-title" style={{ margin: 0 }}>{isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}</h3>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'rgba(26, 86, 219, 0.04)',
+              padding: '6px 14px 6px 10px',
+              borderRadius: '10px',
+              position: 'relative',
+              overflow: 'hidden',
+              border: '1px solid rgba(26, 86, 219, 0.08)'
+            }}>
+              {/* Left Accent Bar */}
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: '20%',
+                bottom: '20%',
+                width: '4px',
+                background: 'var(--primary)',
+                borderRadius: '0 4px 4px 0'
+              }}></div>
+
+              {/* Blue Dot */}
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: 'var(--primary)',
+                marginRight: '8px',
+                marginLeft: '4px'
+              }}></div>
+
+              <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
+              </h3>
+            </div>
+
             <Link to="/questions-hub" className="section-link">
               <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
               <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
@@ -264,12 +298,46 @@ export default function Home() {
           <div className="section-header" style={{
             background: 'transparent',
             padding: '10px 0',
-            borderRadius: '0',
-            border: 'none',
             marginBottom: '14px',
+            border: 'none',
             boxShadow: 'none'
           }}>
-            <h3 className="section-title" style={{ margin: 0 }}>{isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}</h3>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'rgba(26, 86, 219, 0.04)',
+              padding: '6px 14px 6px 10px',
+              borderRadius: '10px',
+              position: 'relative',
+              overflow: 'hidden',
+              border: '1px solid rgba(26, 86, 219, 0.08)'
+            }}>
+              {/* Left Accent Bar */}
+              <div style={{
+                position: 'absolute',
+                left: 0,
+                top: '20%',
+                bottom: '20%',
+                width: '4px',
+                background: 'var(--primary)',
+                borderRadius: '0 4px 4px 0'
+              }}></div>
+
+              {/* Blue Dot */}
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: 'var(--primary)',
+                marginRight: '8px',
+                marginLeft: '4px'
+              }}></div>
+
+              <h3 className="section-title" style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
+              </h3>
+            </div>
+
             <Link to="/all-circulars" className="section-link">
               <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
               <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
