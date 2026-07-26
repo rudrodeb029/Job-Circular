@@ -122,10 +122,11 @@ export default function Home() {
     const deduplicatedMap = new Map();
 
     rawFeed.forEach(item => {
-      const baseId = item.originalId || item.id;
+      // Robust base ID: use jobId if available, otherwise originalId, otherwise the document id
+      const baseId = String(item.jobId || item.originalId || item.id);
       const existing = deduplicatedMap.get(baseId);
 
-      // If we have an 'exam_date' or 'result' type, it should override a standard 'job' type
+      // Prioritization: Exam Date or Result update cards should replace generic job cards
       if (!existing || (item.feedType === 'exam_date' || item.feedType === 'result')) {
         deduplicatedMap.set(baseId, item);
       }

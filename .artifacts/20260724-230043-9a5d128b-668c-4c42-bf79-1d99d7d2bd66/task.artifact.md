@@ -14,3 +14,6 @@
 - [x] Apply professional card border styling and global category highlights
 - [x] Fix GitHub Actions build and authentication errors
 - [x] Reinforce LIFO sorting on Homepage
+- [x] Implement automatic smart notifications for new content
+- [x] Connect user notification badge to live database state
+- [x] Implement smart notification auto-read when viewing post details
