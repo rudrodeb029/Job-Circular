@@ -196,6 +196,37 @@ const adminReducer = (state, action) => {
       if (job) {
         const { id, ...data } = job;
         setDocument(COLLECTIONS.JOBS, id, data).catch(console.error);
+
+        // TRIGGER BROADCAST NOTIFICATION on New Job or Significant Update
+        if (action.type === 'ADD_JOB' || (action.type === 'UPDATE_JOB' && (job.showInExamDate || job.showInResult))) {
+           const notifId = `broadcast_${Date.now()}`;
+           let type = 'new_job';
+           let msg = `${job.organization} has published a new circular: ${job.title}`;
+           let msgBn = `${job.organization}-এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
+
+           if (job.showInResult) {
+             type = 'result';
+             msg = `Result published for ${job.title} at ${job.organization}`;
+             msgBn = `${job.organization}-এ "${job.title}" পদের ফলাফল প্রকাশিত হয়েছে।`;
+           } else if (job.showInExamDate) {
+             type = 'admit_card';
+             msg = `Exam date announced for ${job.title} at ${job.organization}`;
+             msgBn = `${job.organization}-এ "${job.title}" পদের পরীক্ষার তারিখ ঘোষণা করা হয়েছে।`;
+           }
+
+           const notifPayload = {
+             id: notifId,
+             jobId: job.id,
+             type: type,
+             title: job.organization,
+             organization: job.organization,
+             message: msgBn,
+             messageEn: msg,
+             isRead: false,
+             createdAt: new Date().toISOString()
+           };
+           setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifPayload).catch(console.error);
+        }
       }
     } else if (action.type === 'DELETE_JOB') {
       deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
@@ -293,20 +324,7 @@ export const AdminProvider = ({ children }) => {
           onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => {
             const mapped = mapWithTimestamps(data);
             dispatch({ type: 'SET_ADMITS', payload: mapped });
-
-            if (data.length === 0) {
-              localStorage.removeItem('admin_admits');
-            } else {
-              // AUTO-REPAIR: If any admit in Firestore is missing createdAt, fix it
-              const needsFix = data.some(a => !a.createdAt);
-              if (needsFix) {
-                console.log('Auto-repairing missing admit timestamps in Firestore...');
-                mapped.forEach(a => {
-                  const { id, ...payload } = a;
-                  setDocument(COLLECTIONS.ADMITS, id, payload).catch(console.error);
-                });
-              }
-            }
+            if (data.length === 0) localStorage.removeItem('admin_admits');
           })
         );
 
