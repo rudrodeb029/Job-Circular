@@ -179,7 +179,7 @@ export default function Home() {
         </div>
 
         {/* Stats Card */}
-        <div className="stats-card mb-lg">
+        <div className="stats-card mb-md">
           <div className="stats-card-row">
             <div>
               <p className="stats-label">{isEn ? 'Total Active Circulars' : 'মোট সক্রিয় সার্কুলার'}</p>
@@ -203,11 +203,11 @@ export default function Home() {
 
 
         {/* Questions & Answers Categories */}
-        <div className="mb-lg">
+        <div className="mb-md">
           <div className="section-header" style={{
             background: 'transparent',
-            padding: '10px 0',
-            marginBottom: '14px',
+            padding: '5px 0',
+            marginBottom: '10px',
             border: 'none',
             boxShadow: 'none'
           }}>
@@ -275,8 +275,8 @@ export default function Home() {
         <div>
           <div className="section-header" style={{
             background: 'transparent',
-            padding: '10px 0',
-            marginBottom: '14px',
+            padding: '5px 0',
+            marginBottom: '10px',
             border: 'none',
             boxShadow: 'none'
           }}>
