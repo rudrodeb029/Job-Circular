@@ -165,9 +165,9 @@ export default function Home() {
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
         </div>
 
-        {/* RE-DESIGNED HERO STATS CARD - MATCHING IMAGE WITH REDUCED HEIGHT */}
+        {/* RE-DESIGNED HERO STATS CARD - MATCHING IMAGE WITH REDUCED HEIGHT & PIXEL-PERFECT ILLUSTRATION */}
         <div style={{
-          background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
           borderRadius: '20px',
           padding: '16px 20px',
           position: 'relative',
@@ -216,7 +216,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Corrected Illustration Placement */}
+          {/* New Custom 3D Illustration - Professional Replacement for hero.png */}
           <div style={{
             position: 'absolute',
             right: '-4px',
@@ -228,16 +228,30 @@ export default function Home() {
             alignItems: 'flex-end',
             justifyContent: 'flex-end'
           }}>
-            <img
-              src={heroImg}
-              alt="Hero"
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.15))'
-              }}
-            />
+            <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.2))' }}>
+              {/* Resume Paper */}
+              <rect x="100" y="30" width="70" height="90" rx="6" fill="#ffffff" opacity="0.95" transform="rotate(5 135 75)" />
+              <circle cx="120" cy="55" r="10" fill="#3b82f6" opacity="0.3" transform="rotate(5 135 75)" />
+              <rect x="135" y="50" width="25" height="4" rx="2" fill="#e2e8f0" transform="rotate(5 135 75)" />
+              <rect x="135" y="60" width="25" height="4" rx="2" fill="#e2e8f0" transform="rotate(5 135 75)" />
+
+              {/* Briefcase Body */}
+              <rect x="50" y="70" width="100" height="75" rx="14" fill="#7c3aed" />
+              <rect x="50" y="70" width="100" height="25" rx="14" fill="#6d28d9" opacity="0.3" />
+              <rect x="80" y="60" width="40" height="20" rx="6" fill="none" stroke="#6d28d9" strokeWidth="8" />
+              <rect x="95" y="95" width="10" height="8" rx="2" fill="#ffffff" opacity="0.4" />
+
+              {/* Magnifying Glass */}
+              <g transform="translate(140, 140) rotate(-10)">
+                <line x1="0" y1="0" x2="35" y2="35" stroke="#334155" strokeWidth="10" strokeLinecap="round" />
+                <circle cx="0" cy="0" r="24" fill="#3b82f6" opacity="0.7" stroke="#ffffff" strokeWidth="4" />
+                <circle cx="-6" cy="-6" r="10" fill="#ffffff" opacity="0.25" />
+              </g>
+
+              {/* Green Leaves Accent */}
+              <path d="M165 100 Q180 80 185 110 Q195 120 175 130 Z" fill="#22c55e" opacity="0.9" />
+              <path d="M175 120 Q195 110 190 140 Q200 150 180 160 Z" fill="#16a34a" opacity="0.9" />
+            </svg>
           </div>
         </div>
 
