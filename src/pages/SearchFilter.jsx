@@ -17,7 +17,7 @@ export default function SearchFilter() {
   const initialCategory = searchParams.get('category') || '';
 
   const [query, setQuery] = useState('');
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState(initialCategory || 'all');
 
   const typeTabs = useMemo(() => {
     const isEn = state.language === 'en';
@@ -72,11 +72,13 @@ export default function SearchFilter() {
         if (!titleMatch && !orgMatch) return false;
       }
 
-      // Category filter from URL
-      if (filters.category && job.category !== filters.category) return false;
+      // Category filter from URL & Tabs
+      const jobCategory = job.categoryId || job.category;
+
+      if (filters.category && jobCategory !== filters.category) return false;
 
       // Type tabs filter
-      if (activeTab !== 'all' && job.category !== activeTab) return false;
+      if (activeTab !== 'all' && jobCategory !== activeTab) return false;
 
       // Filter panel options
       if (filters.location && job.location !== filters.location) return false;
