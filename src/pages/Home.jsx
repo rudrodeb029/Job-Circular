@@ -179,18 +179,18 @@ export default function Home() {
           alignItems: 'center'
         }}>
           <div style={{ position: 'relative', zIndex: 2, maxWidth: '65%' }}>
-            <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '11.5px', fontWeight: 600, marginBottom: '4px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '10.5px', fontWeight: 600, marginBottom: '4px', letterSpacing: '0.2px' }}>
               {getGreeting(isEn)}, {userName} 👋
             </p>
-            <h2 style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900, marginBottom: '0px', lineHeight: 1 }}>
+            <h2 style={{ color: '#ffffff', fontSize: '28px', fontWeight: 800, marginBottom: '0px', lineHeight: 1 }}>
               {isEn
                 ? `${combinedFeedItems.length}+`
                 : `${toBengaliNumber(combinedFeedItems.length)}+`}
             </h2>
-            <p style={{ color: '#ffffff', fontSize: '14.5px', fontWeight: 800, marginBottom: '4px', letterSpacing: '-0.2px' }}>
+            <p style={{ color: '#ffffff', fontSize: '13px', fontWeight: 700, marginBottom: '2px', letterSpacing: '-0.1px' }}>
               {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '11px', marginBottom: '14px', fontWeight: 500 }}>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '10px', marginBottom: '16px', fontWeight: 500, letterSpacing: '0.1px' }}>
               {isEn ? 'Find your dream job today!' : 'আজই আপনার পছন্দের চাকরিটি খুঁজুন!'}
             </p>
 
@@ -198,10 +198,10 @@ export default function Home() {
               onClick={() => navigate('/all-circulars')}
               style={{
                 background: '#ffffff',
-                color: '#1a56db',
-                padding: '8px 16px',
-                borderRadius: '10px',
-                fontSize: '12px',
+                color: '#1e40af',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '11.5px',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
