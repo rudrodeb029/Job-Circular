@@ -10,10 +10,28 @@ const FCM_LEGACY_SERVER_KEY = 'AAAAz8W-I_g:APA91bFv7yZ8_u9-j9_9_9_9_9_9_9_9_9_9_
 export const initializePushNotifications = async () => {
   if (Capacitor.getPlatform() === 'web') return;
 
-  // 1. Add listeners FIRST before registering
+  // 1. Create Notification Channel (Required for Android 8+)
+  try {
+    await PushNotifications.createChannel({
+      id: 'default_channel_id',
+      name: 'Default',
+      description: 'General Notifications',
+      importance: 5,
+      visibility: 1,
+      sound: 'default'
+    });
+    console.log('Notification channel created');
+  } catch (err) {
+    console.error('Channel creation failed:', err);
+  }
+
+  // 2. Add listeners FIRST before registering
   PushNotifications.addListener('registration', async (token) => {
     console.log('Push registration success, token: ' + token.value);
     localStorage.setItem('fcm_token', token.value);
+
+    // DEBUG ALERT
+    alert('FCM Registered Successfully!');
 
     try {
       // Always subscribe to topic on registration
@@ -26,6 +44,7 @@ export const initializePushNotifications = async () => {
 
   PushNotifications.addListener('registrationError', (error) => {
     console.error('Push registration error:', error);
+    alert('Push Registration Error: ' + JSON.stringify(error));
   });
 
   PushNotifications.addListener('pushNotificationReceived', (notification) => {
@@ -40,7 +59,7 @@ export const initializePushNotifications = async () => {
     }
   });
 
-  // 2. Request permissions and register
+  // 3. Request permissions and register
   let permStatus = await PushNotifications.checkPermissions();
   if (permStatus.receive !== 'granted') {
     permStatus = await PushNotifications.requestPermissions();
@@ -49,8 +68,7 @@ export const initializePushNotifications = async () => {
   if (permStatus.receive === 'granted') {
     await PushNotifications.register();
 
-    // 3. Fallback: If already registered, manually subscribe to topic
-    // This helps if the 'registration' event doesn't fire (common on some devices/restarts)
+    // 4. Fallback: If already registered, manually subscribe to topic
     const existingToken = localStorage.getItem('fcm_token');
     if (existingToken) {
       try {
@@ -60,6 +78,8 @@ export const initializePushNotifications = async () => {
         console.warn('Refresh topic failed:', err);
       }
     }
+  } else {
+    alert('Notification permission denied by user.');
   }
 };
 
@@ -72,7 +92,7 @@ export const sendPushToAll = async (title, body, data = {}) => {
 
   const serverKey = localStorage.getItem('fcm_server_key') || FCM_LEGACY_SERVER_KEY;
 
-  if (serverKey && serverKey.startsWith('AAAA')) {
+  if (serverKey && (serverKey.startsWith('AAAA') || serverKey.startsWith('AIza'))) {
     try {
       const response = await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
@@ -87,7 +107,7 @@ export const sendPushToAll = async (title, body, data = {}) => {
             body: body,
             sound: 'default',
             icon: 'ic_launcher',
-            click_action: 'FCM_PLUGIN_ACTIVITY' // Added to notification block
+            click_action: 'FCM_PLUGIN_ACTIVITY'
           },
           data: {
             ...data,
@@ -105,7 +125,7 @@ export const sendPushToAll = async (title, body, data = {}) => {
       throw error;
     }
   } else {
-    console.warn('FCM Server Key not configured or invalid. Using Cloud Functions fallback if available.');
+    console.warn('FCM Server Key not configured correctly in Admin panel.');
   }
 };
 

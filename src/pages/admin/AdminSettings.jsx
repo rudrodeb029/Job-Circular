@@ -22,8 +22,8 @@ const AdminSettings = () => {
 
   const handleSaveFcmKey = (e) => {
     e.preventDefault();
-    if (fcmServerKey && !fcmServerKey.startsWith('AAAA')) {
-      alert('Invalid Key Format! FCM Legacy Server Key usually starts with "AAAA..."');
+    if (fcmServerKey && !fcmServerKey.startsWith('AAAA') && !fcmServerKey.startsWith('AIza')) {
+      alert('Invalid Key Format! FCM Keys usually start with "AAAA..." or "AIza..."');
       return;
     }
     localStorage.setItem('fcm_server_key', fcmServerKey);
