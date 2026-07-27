@@ -165,32 +165,32 @@ export default function Home() {
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
         </div>
 
-        {/* RE-DESIGNED HERO STATS CARD - PIXEL PERFECT 3D ILLUSTRATION & GRADIENTS */}
+        {/* COMPACT HERO STATS CARD - REDUCED HEIGHT & TEXT SIZE */}
         <div style={{
           background: 'linear-gradient(135deg, #3b82f6 0%, #1a56db 100%)',
           borderRadius: '24px',
-          padding: '24px',
+          padding: '18px 24px',
           position: 'relative',
-          marginBottom: '28px',
+          marginBottom: '24px',
           overflow: 'hidden',
-          boxShadow: '0 15px 35px rgba(26, 86, 219, 0.25)',
-          minHeight: '165px',
+          boxShadow: '0 12px 30px rgba(26, 86, 219, 0.2)',
+          minHeight: '145px',
           display: 'flex',
           alignItems: 'center'
         }}>
           <div style={{ position: 'relative', zIndex: 2, maxWidth: '65%' }}>
-            <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '11.5px', fontWeight: 600, marginBottom: '4px' }}>
               {getGreeting(isEn)}, {userName} 👋
             </p>
-            <h2 style={{ color: '#ffffff', fontSize: '38px', fontWeight: 900, marginBottom: '2px', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+            <h2 style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900, marginBottom: '0px', lineHeight: 1 }}>
               {isEn
                 ? `${combinedFeedItems.length}+`
                 : `${toBengaliNumber(combinedFeedItems.length)}+`}
             </h2>
-            <p style={{ color: '#ffffff', fontSize: '17px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.3px' }}>
+            <p style={{ color: '#ffffff', fontSize: '14.5px', fontWeight: 800, marginBottom: '4px', letterSpacing: '-0.2px' }}>
               {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', marginBottom: '20px', fontWeight: 500 }}>
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '11px', marginBottom: '14px', fontWeight: 500 }}>
               {isEn ? 'Find your dream job today!' : 'আজই আপনার পছন্দের চাকরিটি খুঁজুন!'}
             </p>
 
@@ -199,31 +199,30 @@ export default function Home() {
               style={{
                 background: '#ffffff',
                 color: '#1a56db',
-                padding: '10px 22px',
-                borderRadius: '12px',
-                fontSize: '14px',
+                padding: '8px 16px',
+                borderRadius: '10px',
+                fontSize: '12px',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
+                gap: '6px',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
                 border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.2s'
+                cursor: 'pointer'
               }}
             >
               {isEn ? 'View All Jobs' : 'সবগুলো দেখুন'}
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
           </div>
 
-          {/* HIGH-FIDELITY 3D ILLUSTRATION */}
+          {/* COMPACT 3D ILLUSTRATION */}
           <div style={{
             position: 'absolute',
             right: '-10px',
-            bottom: '10px',
-            width: '170px',
-            height: '170px',
+            bottom: '0px',
+            width: '145px',
+            height: '145px',
             zIndex: 1,
             display: 'flex',
             alignItems: 'flex-end',
