@@ -12,7 +12,6 @@ import { HomeSkeleton } from '../components/SkeletonLoader';
 import { categories } from '../data/categories';
 import Disclaimer from '../components/Disclaimer';
 import { formatTimeAgo } from '../utils/timeUtils';
-import heroImg from '../assets/hero.png';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
