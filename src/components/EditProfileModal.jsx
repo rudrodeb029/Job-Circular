@@ -70,7 +70,8 @@ function FormSelect({ label, icon, value, onChange, children }) {
           display: 'flex',
           alignItems: 'center',
           pointerEvents: 'none',
-          transition: 'color 0.2s'
+          transition: 'color 0.2s',
+          zIndex: 2
         }}>
           {icon}
         </div>
@@ -84,22 +85,37 @@ function FormSelect({ label, icon, value, onChange, children }) {
             padding: '12px 34px 12px 40px',
             fontSize: '13px',
             fontWeight: 600,
-            background: isFocused ? 'var(--white)' : '#f8fafc',
+            background: isFocused ? 'var(--white)' : '#ffffff',
             border: isFocused ? '1.5px solid var(--primary)' : '1.5px solid #e2e8f0',
             borderRadius: '12px',
             color: 'var(--text-secondary)',
-            boxShadow: isFocused ? '0 0 0 4px rgba(26, 86, 219, 0.08)' : 'none',
-            transition: 'all 0.2s',
+            boxShadow: isFocused ? '0 8px 20px rgba(26, 86, 219, 0.08)' : '0 2px 8px rgba(0,0,0,0.02)',
+            transition: 'all 0.25s ease',
             outline: 'none',
             appearance: 'none',
-            backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
-            backgroundRepeat: 'no-repeat',
-            backgroundPosition: 'right 14px center',
-            backgroundSize: '14px'
+            cursor: 'pointer',
+            position: 'relative',
+            zIndex: 1
           }}
         >
           {children}
         </select>
+        {/* Custom Arrow for Professional Look */}
+        <div style={{
+          position: 'absolute',
+          right: '14px',
+          color: isFocused ? 'var(--primary)' : '#94a3b8',
+          pointerEvents: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          transition: 'all 0.2s ease',
+          transform: isFocused ? 'rotate(180deg)' : 'none',
+          zIndex: 2
+        }}>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
       </div>
     </div>
   );
