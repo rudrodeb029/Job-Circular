@@ -4,64 +4,6 @@ import { Bookmark, BookmarkCheck, Calendar, Clock } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { formatTimeAgo } from '../utils/timeUtils';
 
-const categoryStyles = {
-  gov: {
-    bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
-    shadow: 'rgba(29, 78, 216, 0.3)',
-    defaultIcon: '🏛️'
-  },
-  bank: {
-    bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-    shadow: 'rgba(5, 150, 105, 0.3)',
-    defaultIcon: '🏦'
-  },
-  ngo: {
-    bg: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)',
-    shadow: 'rgba(234, 88, 12, 0.3)',
-    defaultIcon: '🤝'
-  },
-  private: {
-    bg: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)',
-    shadow: 'rgba(124, 58, 237, 0.3)',
-    defaultIcon: '🏢'
-  },
-  teaching: {
-    bg: 'linear-gradient(135deg, #db2777 0%, #ec4899 100%)',
-    shadow: 'rgba(219, 39, 119, 0.3)',
-    defaultIcon: '📚'
-  },
-  defense: {
-    bg: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)',
-    shadow: 'rgba(220, 38, 38, 0.3)',
-    defaultIcon: '🛡️'
-  },
-  healthcare: {
-    bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
-    shadow: 'rgba(13, 148, 136, 0.3)',
-    defaultIcon: '🏥'
-  },
-  health: {
-    bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)',
-    shadow: 'rgba(13, 148, 136, 0.3)',
-    defaultIcon: '🏥'
-  },
-  it: {
-    bg: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',
-    shadow: 'rgba(79, 70, 229, 0.3)',
-    defaultIcon: '💻'
-  },
-  engineering: {
-    bg: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)',
-    shadow: 'rgba(217, 119, 6, 0.3)',
-    defaultIcon: '⚙️'
-  },
-  parttime: {
-    bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)',
-    shadow: 'rgba(2, 132, 199, 0.3)',
-    defaultIcon: '⏰'
-  }
-};
-
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
   'সোনালী ব্যাংক লিমিটেড': '🏦',
@@ -86,12 +28,9 @@ const orgIconsMap = {
   'আকিক গ্রুপ': '🏭',
   'ওয়াটারএইড বাংলাদেশ': '💧',
   'টেন মিনিট স্কুল': '✍️',
-  'প্রাণ-আরএফএল গ্রুপ': '📦',
-  'পপুলার ডায়াগনস্টিক সেন্টার': '🔬',
-  'বেক্সিমকো ফার্মা': '💊',
-  'ফাইবার অ্যাট হোম': '🌐',
-  'দুর্নীতি দমন কমিশন (দুদক)': '⚖️',
-  'স্বপ্ন সুপার শপ': '🛒'
+  'প্রাথমিক শিক্ষা অধিদপ্তর': '🏫',
+  'ইসলামী ব্যাংক বাংলাদেশ': '🕌',
+  'প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়': '🏫'
 };
 
 const toBengaliNumber = (num) => {
@@ -101,21 +40,20 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-export default function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = false }) {
+export default function JobCard({ job, showBookmark = true }) {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
 
   const isSaved = state.savedJobs.includes(job.id);
-  const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
-  const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
-
   const isEn = state.language === 'en';
+
+  const displayIcon = job.icon || orgIconsMap[job.organization] || '🏛️';
   const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
   const titleName = isEn ? (job.titleEn || job.title) : job.title;
   
   const descriptionSentence = isEn
-    ? `Recruitment notice published for the post of ${titleName}${job.vacancy ? ` (${job.vacancy} vacancies)` : ''}. Apply today!`
-    : `${titleName} পদে ${job.vacancy ? `${toBengaliNumber(job.vacancy)} জনের ` : ''}নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে। আজই আবেদন করুন।`;
+    ? `${titleName} at ${orgName}. Apply now!`
+    : `${orgName}-এ "${titleName}" পদে নিয়োগ বিজ্ঞপ্তি।`;
 
   const handleBookmark = (e) => {
     e.stopPropagation();
@@ -127,154 +65,62 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
       className="job-card"
       onClick={() => navigate(`/job/${job.id}`)}
       style={{
-        position: 'relative',
-        overflow: 'hidden',
-        border: '1px solid rgba(37, 99, 235, 0.12)',
-        boxShadow: '0 4px 18px rgba(37, 99, 235, 0.04)'
+        padding: '16px',
+        background: '#ffffff',
+        borderRadius: '18px',
+        border: '1px solid #f1f5f9',
+        display: 'flex',
+        gap: '12px',
+        alignItems: 'center',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.02)'
       }}
     >
-      {/* Professional Accent Border */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        bottom: 0,
-        width: '4px',
-        background: 'linear-gradient(to bottom, var(--primary), #60a5fa)',
-        borderRadius: '4px 0 0 4px'
-      }}></div>
+        width: '44px', height: '44px', borderRadius: '12px',
+        background: '#f8faff', display: 'flex', alignItems: 'center',
+        justifyContent: 'center', fontSize: '20px', flexShrink: 0
+      }}>
+        {displayIcon}
+      </div>
 
-      {/* Modern Glossy 3D Gradient Icon Tile */}
-      {showIcon && (
-        <div
-          className="job-card-icon"
-          style={{
-            background: styleConfig.bg,
-            color: 'white',
-            fontSize: '15px',
-            boxShadow: `0 4px 12px ${styleConfig.shadow}`,
-            borderRadius: '8px',
-            width: '32px',
-            height: '32px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0
-          }}
-        >
-          {displayIcon}
-        </div>
-      )}
-
-      <div className="job-card-content">
-        <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
-          <span>{orgName}</span>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ fontSize: '14.5px', fontWeight: 700, color: '#1e293b', marginBottom: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {orgName}
         </h4>
-        <p className="job-card-org" style={{
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'normal',
-          lineHeight: '1.4',
-          marginBottom: '4px',
-          fontWeight: 400
-        }}>
+        <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500, marginBottom: '6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {descriptionSentence}
         </p>
         
-        {/* Ultra-compact single-line metadata badge */}
-        <div style={{ marginTop: '3px', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          {job.showInResult ? (
-            <span style={{
-              fontSize: '8.5px',
-              color: '#7e22ce',
-              background: '#f3e8ff',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '3px',
-              whiteSpace: 'nowrap'
-            }}>
-              🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
-            </span>
-          ) : job.showInExamDate ? (
-            <span style={{
-              fontSize: '8.5px',
-              color: '#059669',
-              background: '#d1fae5',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '3px',
-              whiteSpace: 'nowrap'
-            }}>
-              <Calendar size={10} />
-              <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
-            </span>
-          ) : (
-            <span style={{
-              fontSize: '8.5px',
-              color: 'var(--primary)',
-              background: 'var(--primary-lightest)',
-              padding: '1.5px 5px',
-              borderRadius: '4px',
-              fontWeight: 600,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '3px',
-              whiteSpace: 'nowrap'
-            }}>
-              <Calendar size={9} />
-              <span>Deadline: {job.deadline}</span>
-            </span>
-          )}
-
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-            <span style={{ opacity: 0.4 }}>•</span>
-            <Clock size={9} style={{ color: '#475569' }} /> 
-            <span style={{ color: '#475569', fontWeight: 500 }}>
-              {formatTimeAgo(job.createdAt, isEn)}
-            </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span style={{ fontSize: '9px', color: '#1a56db', background: '#eff6ff', padding: '2px 8px', borderRadius: '4px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Calendar size={10} />
+            {job.deadline}
+          </span>
+          <span style={{ fontSize: '10.5px', color: '#94a3b8', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <Clock size={10} />
+            {formatTimeAgo(job.createdAt, isEn)}
           </span>
         </div>
       </div>
 
       {showBookmark && (
-        isAppliedView ? (
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              background: '#d1fae5',
-              color: '#059669',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              boxShadow: '0 2px 6px rgba(16, 185, 129, 0.15)',
-              marginRight: '6px'
-            }}
-            title="Applied"
-          >
-            <span style={{ fontSize: '15px', fontWeight: 800 }}>✓</span>
-          </div>
-        ) : (
-          <button
-            className={`job-card-bookmark ${isSaved ? 'saved' : ''}`}
-            onClick={handleBookmark}
-            aria-label="Bookmark job"
-          >
-            {isSaved ? <BookmarkCheck size={20} /> : <Bookmark size={20} />}
-          </button>
-        )
+        <button
+          onClick={handleBookmark}
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            background: isSaved ? '#eff6ff' : '#f8faff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: isSaved ? '#1a56db' : '#94a3b8',
+            flexShrink: 0,
+            transition: '0.2s'
+          }}
+        >
+          {isSaved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+        </button>
       )}
     </div>
   );
