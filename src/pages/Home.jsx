@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Search, Download, FileText, Filter, ChevronRight } from '../components/Icons';
+import { Bell, Search, LayoutGrid, Download, FileText, Calendar } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import JobCard from '../components/JobCard';
+import SearchBar from '../components/SearchBar';
+import TabBar from '../components/TabBar';
 import { HomeSkeleton } from '../components/SkeletonLoader';
+import { categories } from '../data/categories';
 import Disclaimer from '../components/Disclaimer';
 import { formatTimeAgo } from '../utils/timeUtils';
-import heroImg from '../assets/hero.png';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -47,13 +49,6 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-const getGreeting = (isEn) => {
-  const hour = new Date().getHours();
-  if (hour < 12) return isEn ? 'Good Morning' : 'শুভ সকাল';
-  if (hour < 17) return isEn ? 'Good Afternoon' : 'শুভ দুপুর';
-  return isEn ? 'Good Evening' : 'শুভ সন্ধ্যা';
-};
-
 export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
@@ -66,19 +61,25 @@ export default function Home() {
   const postsPerPage = 20;
 
   useEffect(() => {
+    // Wait for AdminContext to finish its initial Firestore sync
     if (!adminLoading) {
       const timer = setTimeout(() => setLoading(false), 300);
       return () => clearTimeout(timer);
     }
   }, [adminLoading]);
 
+  // Merge circulars data based on feed types
   const combinedFeedItems = useMemo(() => {
     if (localJobs.length === 0) return [];
 
     const jobItems = localJobs
-      .filter(job => !job.showInExamDate && !job.showInResult)
-      .map(job => ({ ...job, feedType: 'job' }));
+      .filter(job => !job.showInExamDate && !job.showInResult) // Hide base job if it's an update
+      .map(job => ({
+        ...job,
+        feedType: 'job'
+      }));
 
+    // Notifications admit card items from database
     const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
       ...item,
       originalId: item.jobId,
@@ -86,39 +87,61 @@ export default function Home() {
       postTitleEn: item.examNameEn,
       examDate: item.date,
       examDateEn: item.dateEn,
+      postedDate: item.date || '১ দিন আগে',
+      postedDateEn: item.dateEn || item.date || '1 day ago',
       feedType: 'exam_date'
     }));
 
+    // Notifications result items from database
     const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
       ...item,
       originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,
+      postedDate: item.date || '১ দিন আগে',
+      postedDateEn: item.dateEn || item.date || '1 day ago',
       feedType: 'result'
     }));
 
     const getItemTimestamp = (item) => {
       if (item.createdAt) {
         const ms = new Date(item.createdAt).getTime();
-        return isNaN(ms) ? 0 : ms;
+        if (!isNaN(ms)) return ms;
+      }
+      if (item.id) {
+        const matches = String(item.id).match(/\d{10,13}/);
+        if (matches) return parseInt(matches[0], 10);
       }
       return 0;
     };
 
+    const rawFeed = [...jobItems, ...notifExamItems, ...notifResultItems];
+
+    // DEDUPLICATION: Use a Map to keep only one item per original circular
     const deduplicatedMap = new Map();
-    [...jobItems, ...notifExamItems, ...notifResultItems].forEach(item => {
+
+    rawFeed.forEach(item => {
+      // Robust base ID: use jobId if available, otherwise originalId, otherwise the document id
       const baseId = String(item.jobId || item.originalId || item.id);
       const existing = deduplicatedMap.get(baseId);
+
+      // Prioritization: Exam Date or Result update cards should replace generic job cards
       if (!existing || (item.feedType === 'exam_date' || item.feedType === 'result')) {
         deduplicatedMap.set(baseId, item);
       }
     });
 
     return Array.from(deduplicatedMap.values())
-      .sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
+      .sort((a, b) => {
+        const tsA = getItemTimestamp(a);
+        const tsB = getItemTimestamp(b);
+        if (tsA !== tsB) return tsB - tsA; // LIFO (Newest first)
+        return String(b.id || '').localeCompare(String(a.id || ''));
+      });
   }, [localJobs, localAdmits]);
 
+  // Paginated feed items
   const paginatedFeed = useMemo(() => {
     const indexOfLastPost = currentPage * postsPerPage;
     const indexOfFirstPost = indexOfLastPost - postsPerPage;
@@ -126,6 +149,7 @@ export default function Home() {
   }, [combinedFeedItems, currentPage]);
 
   const totalPages = Math.ceil(combinedFeedItems.length / postsPerPage);
+  const displayCategories = categories.slice(0, 3);
 
   if (loading) {
     return (
@@ -136,160 +160,147 @@ export default function Home() {
     );
   }
 
-  const userName = state.user.name || (isEn ? 'Suvro' : 'সুভ্র');
-
   return (
-    <div className="page" style={{ backgroundColor: '#f8faff' }}>
-      <div className="page-content" style={{ padding: '0 16px 20px 16px' }}>
+    <div className="page">
+      <div className="page-content">
+        {/* Top App Header */}
         <AppHeader />
 
-        {/* Search Bar - Clean & Sharp */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-          <div
-            onClick={() => navigate('/search')}
-            style={{
-              flex: 1,
-              height: '50px',
-              background: '#ffffff',
-              borderRadius: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '0 16px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-              cursor: 'pointer',
-              border: '1px solid #f1f5f9'
-            }}
-          >
-            <Search size={18} color="#94a3b8" />
-            <span style={{ marginLeft: '12px', color: '#94a3b8', fontSize: '13.5px', fontWeight: 500 }}>
-              {isEn ? 'Search jobs by title, company...' : 'টাইটেল বা কোম্পানি দিয়ে খুঁজুন...'}
-            </span>
-          </div>
-          <button
-            onClick={() => navigate('/search')}
-            style={{
-              width: '50px',
-              height: '50px',
-              background: '#ffffff',
-              borderRadius: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
-              border: '1px solid #f1f5f9'
-            }}
-          >
-            <Filter size={20} color="#1a56db" />
-          </button>
+        {/* Advanced Modern Search Bar */}
+        <div className="mb-lg" onClick={() => navigate('/search')} style={{ cursor: 'pointer' }}>
+          <SearchBar
+            value=""
+            onChange={() => {}}
+            placeholder="Search jobs..."
+          />
         </div>
 
-        {/* Hero Card - Reduced Height & Refined Styling */}
-        <div style={{
-          background: 'linear-gradient(135deg, #3b82f6 0%, #1a56db 100%)',
-          borderRadius: '24px',
-          padding: '20px 22px',
-          position: 'relative',
-          marginBottom: '24px',
-          overflow: 'hidden',
-          boxShadow: '0 10px 25px rgba(29, 78, 216, 0.2)',
-          minHeight: '160px'
-        }}>
-          <div style={{ position: 'relative', zIndex: 2, maxWidth: '65%' }}>
-            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', fontWeight: 500, marginBottom: '4px' }}>
-              {getGreeting(isEn)}, {userName} 👋
-            </p>
-            <h2 style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900, marginBottom: '2px' }}>
-              {isEn ? `${combinedFeedItems.length}+` : `${toBengaliNumber(combinedFeedItems.length)}+`}
-            </h2>
-            <p style={{ color: '#ffffff', fontSize: '15px', fontWeight: 700, marginBottom: '6px' }}>
-              {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
-            </p>
-            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', marginBottom: '16px', fontWeight: 500 }}>
-              {isEn ? 'Find your dream job today!' : 'আজই আপনার পছন্দের চাকরিটি খুঁজুন!'}
-            </p>
-
-            <button
-              onClick={() => navigate('/all-circulars')}
-              style={{
-                background: '#ffffff',
-                color: '#1a56db',
-                padding: '8px 16px',
-                borderRadius: '10px',
-                fontSize: '13px',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                border: 'none'
-              }}
-            >
-              {isEn ? 'View All Jobs' : 'সবগুলো দেখুন'}
-              <ChevronRight size={14} />
-            </button>
+        {/* Stats Card */}
+        <div className="stats-card mb-md">
+          <div className="stats-card-row">
+            <div>
+              <p className="stats-label">{isEn ? 'Total Active Circulars' : 'মোট সক্রিয় সার্কুলার'}</p>
+              <p className="stats-number">
+                {isEn 
+                  ? `${combinedFeedItems.length.toLocaleString()}+` 
+                  : `${toBengaliNumber(combinedFeedItems.length.toLocaleString())}+`}
+              </p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <span className="stats-badge">{isEn ? 'This Week' : 'এই সপ্তাহে'}</span>
+              <p style={{ fontSize: '15px', fontWeight: 800, marginTop: '4px' }}>
+                {isEn 
+                  ? `+${localJobs.length.toLocaleString()}` 
+                  : `+${toBengaliNumber(localJobs.length.toLocaleString())}`}
+              </p>
+            </div>
           </div>
+        </div>
 
-          <div style={{
-            position: 'absolute',
-            right: '-10px',
-            bottom: '0px',
-            width: '140px',
-            height: '140px',
-            zIndex: 1
+
+
+        {/* Questions & Answers Categories */}
+        <div className="mb-md">
+          <div className="section-header" style={{
+            background: 'transparent',
+            padding: '5px 0',
+            marginBottom: '10px',
+            border: 'none',
+            boxShadow: 'none'
           }}>
-            <img src={heroImg} alt="Hero" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </div>
-        </div>
-
-        {/* Quick Access Section - Restored Style */}
-        <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#6366f1' }}></div>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#1e293b' }}>
-                {isEn ? 'Quick Access' : 'কুইক অ্যাক্সেস'}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'transparent',
+              padding: '6px 0',
+              position: 'relative',
+              overflow: 'hidden',
+              border: 'none'
+            }}>
+              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
               </h3>
             </div>
-            <Link to="/categories" style={{ fontSize: '13px', fontWeight: 700, color: '#1a56db', display: 'flex', alignItems: 'center', gap: '2px', textDecoration: 'none' }}>
-              {isEn ? 'See All' : 'সব দেখুন'}
-              <ChevronRight size={14} />
+
+            <Link to="/questions-hub" className="section-link">
+              <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
+              <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
             </Link>
           </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px' }}>
+          <div className="category-grid">
             {[
-              { id: 'gov', name: 'Govt', nameBn: 'সরকারি', icon: '🎓', color: '#4f46e5' },
-              { id: 'bank', name: 'Bank', nameBn: 'ব্যাংক', icon: '🏛️', color: '#10b981' },
-              { id: 'ngo', name: 'NGO', nameBn: 'এনজিও', icon: '💼', color: '#f59e0b' },
-              { id: 'it', name: 'IT', nameBn: 'আইটি', icon: '💻', color: '#8b5cf6' },
-              { id: 'others', name: 'Others', nameBn: 'অন্যান্য', icon: '🍱', color: '#06b6d4' }
+              { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
+              { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
+              { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' }
             ].map(cat => (
-              <div key={cat.id} onClick={() => navigate(`/categories?id=${cat.id}`)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                <div style={{ width: '100%', aspectRatio: '1/1', background: '#ffffff', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 10px rgba(0,0,0,0.03)', border: '1px solid #f1f5f9' }}>
-                  <div style={{ width: '34px', height: '34px', borderRadius: '10px', background: cat.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', fontSize: '18px' }}>
-                    {cat.icon}
-                  </div>
+              <div
+                key={cat.id}
+                className="category-grid-item"
+                style={{
+                  border: '1px solid rgba(37, 99, 235, 0.12)',
+                  boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                  background: 'var(--white)',
+                  borderRadius: '16px'
+                }}
+                onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
+              >
+                <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {cat.icon}
                 </div>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b' }}>{isEn ? cat.name : cat.nameBn}</span>
+                <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
               </div>
             ))}
+            <div
+              className="category-grid-item"
+              style={{
+                border: '1px solid rgba(37, 99, 235, 0.12)',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                background: 'var(--white)',
+                borderRadius: '16px'
+              }}
+              onClick={() => navigate('/questions-hub')}
+            >
+              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}>
+                <LayoutGrid size={22} />
+              </div>
+              <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
+            </div>
           </div>
         </div>
 
-        {/* Feed Section - Restored Titles */}
+        {/* Dynamic Feed Segment */}
         <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#1a56db' }}></div>
-              <h3 style={{ fontSize: '17px', fontWeight: 800, color: '#1e293b' }}>
-                {isEn ? 'Latest Circulars' : 'সাম্প্রতিক বিজ্ঞপ্তি'}
+          <div className="section-header" style={{
+            background: 'transparent',
+            padding: '5px 0',
+            marginBottom: '10px',
+            border: 'none',
+            boxShadow: 'none'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              background: 'transparent',
+              padding: '6px 0',
+              position: 'relative',
+              overflow: 'hidden',
+              border: 'none'
+            }}>
+              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
               </h3>
             </div>
-            <Link to="/all-circulars" style={{ fontSize: '13px', fontWeight: 700, color: '#1a56db', textDecoration: 'none' }}>
-              {isEn ? 'See All' : 'সব দেখুন'}
+
+            <Link to="/all-circulars" className="section-link">
+              <span>{isEn ? 'See All' : 'সব দেখুন'}</span>
+              <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
             </Link>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+
+
+          {/* Paginated Combined Circulars List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {paginatedFeed.map(item => {
               if (item.feedType === 'job') {
                 return <JobCard key={item.id} job={item} />;
@@ -299,80 +310,270 @@ export default function Home() {
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
               const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
 
-              const isExam = item.feedType === 'exam_date';
-              const accentColor = isExam ? '#10b981' : '#7c3aed';
-              const bgColor = isExam ? '#f0fdf4' : '#f5f3ff';
+              if (item.feedType === 'exam_date') {
+                const descriptionSentence = isEn
+                  ? `Exam date published for the post of ${postTitle}.`
+                  : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
 
-              return (
-                <div
-                  key={item.id}
-                  className="job-card"
-                  onClick={() => navigate(isExam ? `/exam-details/${item.originalId || item.id}` : `/result-details/${item.originalId || item.id}`)}
-                  style={{
-                    cursor: 'pointer',
-                    background: '#ffffff',
-                    borderRadius: '18px',
-                    padding: '14px',
-                    border: '1px solid #f1f5f9',
-                    display: 'flex',
-                    gap: '12px',
-                    alignItems: 'center'
-                  }}
-                >
-                  <div style={{
-                    width: '44px', height: '44px', borderRadius: '12px',
-                    background: bgColor, display: 'flex', alignItems: 'center',
-                    justifyContent: 'center', fontSize: '20px'
-                  }}>
-                    {displayIcon}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>{orgName}</h4>
-                    <p style={{ fontSize: '12.5px', color: '#64748b', fontWeight: 500 }}>
-                      {isEn ? `${isExam ? 'Exam date' : 'Result'} published for ${postTitle}` : `${postTitle} পদের ${isExam ? 'পরীক্ষার তারিখ' : 'ফলাফল'} প্রকাশিত`}
-                    </p>
-                    <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '9px', color: accentColor, background: bgColor, padding: '2px 8px', borderRadius: '4px', fontWeight: 700, border: `1px solid ${accentColor}20` }}>
-                        {isExam ? (isEn ? 'EXAM DATE' : 'পরীক্ষার তারিখ') : (isEn ? 'RESULT' : 'ফলাফল')}
-                      </span>
-                      <span style={{ fontSize: '10.5px', color: '#94a3b8' }}>• {formatTimeAgo(item.createdAt, isEn)}</span>
+                return (
+                  <div 
+                    key={item.id} 
+                    className="job-card animate-fade-in" 
+                    onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)}
+                    style={{
+                      cursor: 'pointer',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      border: '1px solid rgba(16, 185, 129, 0.12)',
+                      boxShadow: '0 4px 18px rgba(16, 185, 129, 0.04)'
+                    }}
+                  >
+                    {/* Professional Accent Border */}
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      bottom: 0,
+                      width: '4px',
+                      background: 'linear-gradient(to bottom, #10b981, #34d399)',
+                      borderRadius: '4px 0 0 4px'
+                    }}></div>
+
+                    <div className="job-card-content">
+                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                        <span>{orgName}</span>
+                      </h4>
+                      <p className="job-card-org" style={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'normal',
+                        lineHeight: '1.4',
+                        marginBottom: '4px',
+                        fontWeight: 400
+                      }}>
+                        {descriptionSentence}
+                      </p>
+                      <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
+                        <span style={{
+                          fontSize: '8.5px',
+                          color: '#059669',
+                          background: '#d1fae5',
+                          padding: '2px 6px',
+                          borderRadius: '4px',
+                          fontWeight: 600,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '3px',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          <Calendar size={10} />
+                          <span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span>
+                        </span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                          • 🕒 {formatTimeAgo(item.createdAt, isEn)}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/exam-details/${item.originalId || item.id}`);
+                        }}
+                        title="View Exam Details"
+                        style={{ 
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '28px',
+                          height: '28px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                          color: '#ffffff',
+                          boxShadow: '0 4px 12px rgba(16, 185, 129, 0.25)',
+                          transition: 'all 0.2s ease',
+                          cursor: 'pointer',
+                          flexShrink: 0
+                        }}
+                      >
+                        <Download size={14} color="#ffffff" />
+                      </div>
                     </div>
                   </div>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f8faff', display: 'flex', alignItems: 'center', justifyContent: 'center', color: accentColor }}>
-                    {isExam ? <Download size={16} /> : <FileText size={16} />}
+                );
+              }
+
+              // feedType === 'result'
+              const descriptionSentence = isEn
+                ? `Written/Viva exam result published for the post of ${postTitle}. View result now!`
+                : `${postTitle} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
+
+              return (
+                <div 
+                  key={item.id} 
+                  className="job-card animate-fade-in" 
+                  onClick={() => navigate(`/result-details/${item.originalId || item.id}`)}
+                  style={{
+                    cursor: 'pointer',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    border: '1px solid rgba(124, 58, 237, 0.12)',
+                    boxShadow: '0 4px 18px rgba(124, 58, 237, 0.04)'
+                  }}
+                >
+                  {/* Professional Accent Border */}
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    width: '4px',
+                    background: 'linear-gradient(to bottom, #7c3aed, #a78bfa)',
+                    borderRadius: '4px 0 0 4px'
+                  }}></div>
+
+                  <div className="job-card-content">
+                    <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                      <span>{orgName}</span>
+                    </h4>
+                    <p className="job-card-org" style={{
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'normal',
+                      lineHeight: '1.4',
+                      marginBottom: '4px',
+                      fontWeight: 400
+                    }}>
+                      {descriptionSentence}
+                    </p>
+                    <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
+                      <span style={{
+                        fontSize: '8.5px',
+                        color: '#7e22ce',
+                        background: '#f3e8ff',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontWeight: 600,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span>
+                      </span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        • 🕒 {formatTimeAgo(item.createdAt, isEn)}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0 }}>
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/result-details/${item.originalId || item.id}`);
+                      }}
+                      title="View Result Details"
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+                        color: '#ffffff',
+                        boxShadow: '0 4px 12px rgba(124, 58, 237, 0.25)',
+                        transition: 'all 0.2s ease',
+                        cursor: 'pointer',
+                        flexShrink: 0
+                      }}
+                    >
+                      <FileText size={14} color="#ffffff" />
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Compact Pagination */}
+          {/* Previous & Next Pagination Buttons Container */}
           {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px' }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginTop: '24px',
+              marginBottom: '10px',
+              padding: '12px 0',
+              borderTop: '1px solid var(--border-light)'
+            }}>
               <button
                 disabled={currentPage === 1}
-                onClick={() => { setCurrentPage(prev => prev - 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#ffffff', color: '#1a56db', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f1f5f9', opacity: currentPage === 1 ? 0.5 : 1 }}
+                onClick={() => {
+                  setCurrentPage(prev => Math.max(prev - 1, 1));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: currentPage === 1 ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                  color: currentPage === 1 ? '#94a3b8' : '#ffffff',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  boxShadow: currentPage === 1 ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
               >
-                ◀
+                ◀ {isEn ? 'Previous' : 'পূর্ববর্তী'}
               </button>
-              <div style={{ height: '36px', padding: '0 12px', borderRadius: '10px', background: '#ffffff', color: '#1e293b', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f1f5f9', fontSize: '12px' }}>
-                {isEn ? `Page ${currentPage} / ${totalPages}` : `পৃষ্ঠা ${toBengaliNumber(currentPage)} / ${toBengaliNumber(totalPages)}`}
-              </div>
+
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                {isEn 
+                  ? `Page ${currentPage} of ${totalPages}` 
+                  : `পৃষ্ঠা ${toBengaliNumber(currentPage)} / ${toBengaliNumber(totalPages)}`}
+              </span>
+
               <button
                 disabled={currentPage === totalPages}
-                onClick={() => { setCurrentPage(prev => prev + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#ffffff', color: '#1a56db', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #f1f5f9', opacity: currentPage === totalPages ? 0.5 : 1 }}
+                onClick={() => {
+                  setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: currentPage === totalPages ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                  color: currentPage === totalPages ? '#94a3b8' : '#ffffff',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                  boxShadow: currentPage === totalPages ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
               >
-                ▶
+                {isEn ? 'Next' : 'পরবর্তী'} ▶
               </button>
             </div>
           )}
         </div>
-
-        <div style={{ marginTop: '24px' }}>
-          <Disclaimer />
-        </div>
+        <Disclaimer />
       </div>
       <BottomNav />
     </div>
