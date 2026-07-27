@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import { App as CapacitorApp } from '@capacitor/app'
 import { useAppContext } from './context/AppContext'
 import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
@@ -43,7 +44,8 @@ import AdminSettings from './pages/admin/AdminSettings'
 function App() {
   const { state } = useAppContext()
   const location = useLocation()
-  
+  const navigate = useNavigate()
+
   const [updateInfo, setUpdateInfo] = useState(null)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
 
@@ -51,11 +53,26 @@ function App() {
   const isAdminRoute = location.pathname.startsWith('/admin')
 
   useEffect(() => {
-    // Initialize Push Notifications for non-admin users
+    // 1. Initialize Push Notifications for non-admin users
     if (!isAdminRoute) {
       initializePushNotifications();
     }
-  }, [isAdminRoute]);
+
+    // 2. Handle Android Hardware Back Button
+    const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (location.pathname === '/home' || location.pathname === '/' || location.pathname === '/onboarding') {
+        // Exit app if on root pages
+        CapacitorApp.exitApp();
+      } else {
+        // Otherwise, navigate back in history
+        navigate(-1);
+      }
+    });
+
+    return () => {
+      backButtonListener.remove();
+    };
+  }, [isAdminRoute, location.pathname, navigate]);
 
   useEffect(() => {
     const checkVersion = async () => {
