@@ -51,9 +51,10 @@ const toBengaliNumber = (num) => {
 
 const getGreeting = (isEn) => {
   const hour = new Date().getHours();
-  if (hour < 12) return isEn ? 'Good Morning' : 'শুভ সকাল';
-  if (hour < 17) return isEn ? 'Good Afternoon' : 'শুভ দুপুর';
-  return isEn ? 'Good Evening' : 'শুভ সন্ধ্যা';
+  if (hour >= 5 && hour < 12) return isEn ? 'Good Morning' : 'শুভ সকাল';
+  if (hour >= 12 && hour < 17) return isEn ? 'Good Afternoon' : 'শুভ দুপুর';
+  if (hour >= 17 && hour < 21) return isEn ? 'Good Evening' : 'শুভ সন্ধ্যা';
+  return isEn ? 'Good Night' : 'শুভ রাত্রি';
 };
 
 export default function Home() {
@@ -178,18 +179,18 @@ export default function Home() {
           alignItems: 'center'
         }}>
           <div style={{ position: 'relative', zIndex: 2, maxWidth: '65%' }}>
-            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '10.5px', fontWeight: 600, marginBottom: '4px', letterSpacing: '0.2px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '10px', fontWeight: 600, marginBottom: '6px', letterSpacing: '0.3px' }}>
               {getGreeting(isEn)}, {userName} 👋
             </p>
-            <h2 style={{ color: '#ffffff', fontSize: '28px', fontWeight: 800, marginBottom: '0px', lineHeight: 1 }}>
+            <h2 style={{ color: '#ffffff', fontSize: '26px', fontWeight: 800, marginBottom: '0px', lineHeight: 1 }}>
               {isEn
                 ? `${combinedFeedItems.length}+`
                 : `${toBengaliNumber(combinedFeedItems.length)}+`}
             </h2>
-            <p style={{ color: '#ffffff', fontSize: '13px', fontWeight: 700, marginBottom: '2px', letterSpacing: '-0.1px' }}>
+            <p style={{ color: '#ffffff', fontSize: '13.5px', fontWeight: 700, marginBottom: '4px', letterSpacing: '-0.1px' }}>
               {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '10px', marginBottom: '16px', fontWeight: 500, letterSpacing: '0.1px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '9.5px', marginBottom: '14px', fontWeight: 500, letterSpacing: '0.1px' }}>
               {isEn ? 'Find your dream job today!' : 'আজই আপনার পছন্দের চাকরিটি খুঁজুন!'}
             </p>
 
@@ -198,20 +199,20 @@ export default function Home() {
               style={{
                 background: '#ffffff',
                 color: '#1e40af',
-                padding: '7px 14px',
+                padding: '6px 14px',
                 borderRadius: '8px',
-                fontSize: '11.5px',
+                fontSize: '11px',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+                gap: '4px',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.06)',
                 border: 'none',
                 cursor: 'pointer'
               }}
             >
               {isEn ? 'View All Jobs' : 'সবগুলো দেখুন'}
-              <ChevronRight size={14} />
+              <ChevronRight size={12} />
             </button>
           </div>
 
