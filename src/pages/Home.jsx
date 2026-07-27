@@ -216,13 +216,13 @@ export default function Home() {
             </button>
           </div>
 
-          {/* COMPACT 3D ILLUSTRATION */}
+          {/* COMPACT 3D ILLUSTRATION - RE-POSITIONED LEFT & FIXED MAGNIFIER */}
           <div style={{
             position: 'absolute',
-            right: '-10px',
-            bottom: '0px',
-            width: '145px',
-            height: '145px',
+            right: '20px',
+            bottom: '10px',
+            width: '160px',
+            height: '150px',
             zIndex: 1,
             display: 'flex',
             alignItems: 'flex-end',
@@ -249,7 +249,7 @@ export default function Home() {
               </defs>
 
               {/* Background Resume Paper (Layer 1) */}
-              <g transform="translate(130, 40) rotate(8)" filter="url(#shadow3d)">
+              <g transform="translate(110, 40) rotate(8)" filter="url(#shadow3d)">
                 <rect x="0" y="0" width="85" height="110" rx="8" fill="url(#resumeGrad)" />
                 <circle cx="22" cy="25" r="12" fill="#e2e8f0" />
                 <rect x="40" y="20" width="30" height="4" rx="2" fill="#e2e8f0" />
@@ -261,7 +261,7 @@ export default function Home() {
               </g>
 
               {/* Briefcase (Layer 2) */}
-              <g transform="translate(65, 85)" filter="url(#shadow3d)">
+              <g transform="translate(50, 85)" filter="url(#shadow3d)">
                 {/* Handle */}
                 <path d="M35 -12 Q55 -25 75 -12" fill="none" stroke="#6d28d9" strokeWidth="9" strokeLinecap="round" />
                 {/* Main Body */}
@@ -272,20 +272,20 @@ export default function Home() {
                 <rect x="52.5" y="32" width="10" height="10" rx="3" fill="#ffffff" opacity="0.3" />
               </g>
 
-              {/* Magnifying Glass (Layer 3) */}
-              <g transform="translate(160, 160) rotate(-15)" filter="url(#shadow3d)">
-                {/* Handle */}
-                <rect x="35" y="0" width="45" height="12" rx="6" fill="#475569" />
+              {/* Magnifying Glass (Layer 3) - FIXED HANDLE POSITION */}
+              <g transform="translate(125, 160) rotate(-25)" filter="url(#shadow3d)">
+                {/* Handle - Now positioned to stay within view */}
+                <rect x="25" y="-5" width="40" height="12" rx="6" fill="#475569" />
                 {/* Frame */}
                 <circle cx="0" cy="0" r="28" fill="none" stroke="#cbd5e1" strokeWidth="6" />
                 {/* Lens */}
                 <circle cx="0" cy="0" r="25" fill="url(#glassGrad)" />
                 {/* Reflection */}
-                <path d="M-12 -12 Q-15 -15 -8 -15" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+                <path d="M-10 -10 Q-15 -15 -8 -15" fill="none" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" opacity="0.5" />
               </g>
 
               {/* Green Leaves (Layer 4) */}
-              <g transform="translate(195, 125) rotate(20)" opacity="0.9">
+              <g transform="translate(185, 125) rotate(20)" opacity="0.9">
                 <path d="M0 0 Q15 -25 35 0 Q15 25 0 0" fill="#22c55e" />
                 <path d="M0 15 Q15 -10 35 15 Q15 40 0 15" fill="#16a34a" transform="translate(5, 20) rotate(-15)" />
                 <path d="M0 -15 Q15 -40 35 -15 Q15 10 0 -15" fill="#10b981" transform="translate(-10, -10) rotate(10)" />
