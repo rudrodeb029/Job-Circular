@@ -13,10 +13,17 @@ const AdminSettings = () => {
   const [autoPublish, setAutoPublish] = useState(true);
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [showExpired, setShowExpired] = useState(false);
+  const [fcmServerKey, setFcmServerKey] = useState(localStorage.getItem('fcm_server_key') || '');
 
   const handleUpdateProfile = (e) => {
     e.preventDefault();
     setIsEditingProfile(false);
+  };
+
+  const handleSaveFcmKey = (e) => {
+    e.preventDefault();
+    localStorage.setItem('fcm_server_key', fcmServerKey);
+    alert('FCM Server Key saved successfully!');
   };
 
   const handleExportData = () => {
@@ -115,6 +122,25 @@ const AdminSettings = () => {
             <div style={{ width: 24, height: 24, borderRadius: '50%', background: '#ffffff', position: 'absolute', top: 2, left: showExpired ? 26 : 2, transition: 'left 0.3s', boxShadow: '0 1px 2px rgba(0,0,0,0.2)' }} />
           </div>
         </div>
+      </div>
+
+      <div className="admin-chart-card" style={{ background: '#ffffff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ color: '#1e293b' }}>Push Notification (FCM)</h3>
+        <p style={{ color: '#64748b', fontSize: '0.875rem', marginBottom: 15 }}>
+          Enter your Firebase Legacy Server Key to enable notifications even when the app is closed.
+        </p>
+        <form onSubmit={handleSaveFcmKey} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <input
+            type="password"
+            placeholder="FCM Legacy Server Key (AAAA...)"
+            value={fcmServerKey}
+            onChange={(e) => setFcmServerKey(e.target.value)}
+            style={{ width: '100%', padding: '10px', border: '1px solid #e2e8f0', borderRadius: 6, background: '#f8fafc', color: '#1e293b' }}
+          />
+          <button type="submit" style={{ alignSelf: 'flex-start', padding: '8px 20px', background: '#1a56db', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: '500' }}>
+            Save FCM Key
+          </button>
+        </form>
       </div>
 
       <div className="admin-chart-card" style={{ background: '#ffffff', padding: 20, borderRadius: 8, marginBottom: 20, boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>

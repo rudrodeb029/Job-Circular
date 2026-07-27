@@ -3,6 +3,7 @@ import { Routes, Route, useLocation } from 'react-router-dom'
 import { useAppContext } from './context/AppContext'
 import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
+import { initializePushNotifications } from './utils/notifications'
 
 const CURRENT_VERSION = "1.0.0";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
@@ -48,6 +49,13 @@ function App() {
 
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
+
+  useEffect(() => {
+    // Initialize Push Notifications for non-admin users
+    if (!isAdminRoute) {
+      initializePushNotifications();
+    }
+  }, [isAdminRoute]);
 
   useEffect(() => {
     const checkVersion = async () => {

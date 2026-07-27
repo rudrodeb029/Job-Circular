@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "67566831458",
+    "firebase_url": "https://job-circular-75dbb-default-rtdb.firebaseio.com",
+    "project_id": "job-circular-75dbb",
+    "storage_bucket": "job-circular-75dbb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67566831458:android:c7378853de23db5bb10e3b",
+        "android_client_info": {
+          "package_name": "com.jobcircular.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLmoEX3swczLz4ZNOs4C1slyXs5U-ZbgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,7 @@ import { notifications as initialNotifications, admitCardsAndResults as initialA
 import { categories } from '../data/categories';
 import { defaultLiveExams } from '../data/liveExams';
 import { questionsData } from '../data/questionsData';
+import { triggerLocalNotification, sendPushToAll } from '../utils/notifications';
 import {
   getCollection,
   setDocument,
@@ -226,6 +227,15 @@ const adminReducer = (state, action) => {
              createdAt: new Date().toISOString()
            };
            setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifPayload).catch(console.error);
+
+           // TRIGGER GLOBAL PUSH NOTIFICATION (FCM)
+           sendPushToAll(job.organization, msgBn, {
+             jobId: job.id,
+             type: type
+           }).catch(err => console.error('Global push failed:', err));
+
+           // Also trigger a professional local notification for the admin as feedback
+           triggerLocalNotification(job.organization, msgBn);
         }
       }
     } else if (action.type === 'DELETE_JOB') {
