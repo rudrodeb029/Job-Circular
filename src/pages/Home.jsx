@@ -165,33 +165,32 @@ export default function Home() {
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
         </div>
 
-        {/* RE-DESIGNED HERO STATS CARD - MATCHING IMAGE */}
+        {/* RE-DESIGNED HERO STATS CARD - MATCHING IMAGE WITH REDUCED HEIGHT */}
         <div style={{
           background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-          borderRadius: '24px',
-          padding: '24px',
+          borderRadius: '20px',
+          padding: '16px 20px',
           position: 'relative',
-          marginBottom: '24px',
+          marginBottom: '20px',
           overflow: 'hidden',
-          boxShadow: '0 12px 24px rgba(26, 86, 219, 0.2)',
-          minHeight: '180px',
+          boxShadow: '0 8px 24px rgba(26, 86, 219, 0.15)',
+          minHeight: '140px',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center'
+          alignItems: 'center'
         }}>
-          <div style={{ position: 'relative', zIndex: 2, maxWidth: '60%' }}>
-            <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', fontWeight: 500, marginBottom: '8px' }}>
+          <div style={{ position: 'relative', zIndex: 2, maxWidth: '65%' }}>
+            <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>
               {getGreeting(isEn)}, {userName} 👋
             </p>
-            <h2 style={{ color: '#ffffff', fontSize: '36px', fontWeight: 800, marginBottom: '2px', lineHeight: 1.1 }}>
+            <h2 style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900, marginBottom: '0px', lineHeight: 1 }}>
               {isEn
                 ? `${combinedFeedItems.length}+`
                 : `${toBengaliNumber(combinedFeedItems.length)}+`}
             </h2>
-            <p style={{ color: '#ffffff', fontSize: '16px', fontWeight: 700, marginBottom: '4px' }}>
+            <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: 700, marginBottom: '2px' }}>
               {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', marginBottom: '20px', fontWeight: 400 }}>
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '11px', marginBottom: '14px', fontWeight: 400 }}>
               {isEn ? 'Find your dream job today!' : 'আজই আপনার পছন্দের চাকরিটি খুঁজুন!'}
             </p>
 
@@ -200,35 +199,44 @@ export default function Home() {
               style={{
                 background: '#ffffff',
                 color: '#1e40af',
-                padding: '10px 18px',
-                borderRadius: '12px',
-                fontSize: '13px',
+                padding: '8px 14px',
+                borderRadius: '10px',
+                fontSize: '12px',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                gap: '6px',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
                 border: 'none',
                 cursor: 'pointer'
               }}
             >
               {isEn ? 'View All Jobs' : 'সবগুলো দেখুন'}
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
           </div>
 
+          {/* Corrected Illustration Placement */}
           <div style={{
             position: 'absolute',
-            right: '-10px',
+            right: '-4px',
             bottom: '0px',
-            width: '160px',
-            height: '160px',
-            zIndex: 1
+            width: '135px',
+            height: '135px',
+            zIndex: 1,
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'flex-end'
           }}>
             <img
               src={heroImg}
               alt="Hero"
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.15))'
+              }}
             />
           </div>
         </div>
