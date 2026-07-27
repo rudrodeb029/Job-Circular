@@ -283,13 +283,6 @@ export default function Home() {
                 {/* Reflection */}
                 <path d="M-10 -10 Q-15 -15 -8 -15" fill="none" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" opacity="0.5" />
               </g>
-
-              {/* Green Leaves (Layer 4) */}
-              <g transform="translate(185, 125) rotate(20)" opacity="0.9">
-                <path d="M0 0 Q15 -25 35 0 Q15 25 0 0" fill="#22c55e" />
-                <path d="M0 15 Q15 -10 35 15 Q15 40 0 15" fill="#16a34a" transform="translate(5, 20) rotate(-15)" />
-                <path d="M0 -15 Q15 -40 35 -15 Q15 10 0 -15" fill="#10b981" transform="translate(-10, -10) rotate(10)" />
-              </g>
             </svg>
           </div>
 
