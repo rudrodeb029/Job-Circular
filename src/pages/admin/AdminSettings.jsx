@@ -22,8 +22,28 @@ const AdminSettings = () => {
 
   const handleSaveFcmKey = (e) => {
     e.preventDefault();
+    if (fcmServerKey && !fcmServerKey.startsWith('AAAA')) {
+      alert('Invalid Key Format! FCM Legacy Server Key usually starts with "AAAA..."');
+      return;
+    }
     localStorage.setItem('fcm_server_key', fcmServerKey);
     alert('FCM Server Key saved successfully!');
+  };
+
+  const handleTestNotification = async () => {
+    if (!fcmServerKey) {
+      alert('Please save an FCM Server Key first!');
+      return;
+    }
+
+    try {
+      const { sendPushToAll } = await import('../../utils/notifications');
+      await sendPushToAll('Test Notification 🔔', 'If you see this, your FCM setup is working correctly!', { type: 'test' });
+      alert('Test notification sent to all users (topic: all)!');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to send test notification: ' + err.message);
+    }
   };
 
   const handleExportData = () => {
@@ -137,9 +157,19 @@ const AdminSettings = () => {
             onChange={(e) => setFcmServerKey(e.target.value)}
             style={{ width: '100%', padding: '10px', border: '1px solid #e2e8f0', borderRadius: 6, background: '#f8fafc', color: '#1e293b' }}
           />
-          <button type="submit" style={{ alignSelf: 'flex-start', padding: '8px 20px', background: '#1a56db', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: '500' }}>
-            Save FCM Key
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button type="submit" style={{ padding: '8px 20px', background: '#1a56db', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: '500' }}>
+              Save FCM Key
+            </button>
+            <button
+              type="button"
+              onClick={handleTestNotification}
+              style={{ padding: '8px 20px', background: '#10b981', color: 'white', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '5px' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              Send Test Push
+            </button>
+          </div>
         </form>
       </div>
 

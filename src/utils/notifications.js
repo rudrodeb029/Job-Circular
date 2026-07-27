@@ -10,20 +10,13 @@ const FCM_LEGACY_SERVER_KEY = 'AAAAz8W-I_g:APA91bFv7yZ8_u9-j9_9_9_9_9_9_9_9_9_9_
 export const initializePushNotifications = async () => {
   if (Capacitor.getPlatform() === 'web') return;
 
-  let permStatus = await PushNotifications.checkPermissions();
-  if (permStatus.receive !== 'granted') {
-    permStatus = await PushNotifications.requestPermissions();
-  }
-
-  if (permStatus.receive === 'granted') {
-    await PushNotifications.register();
-  }
-
+  // 1. Add listeners FIRST before registering
   PushNotifications.addListener('registration', async (token) => {
     console.log('Push registration success, token: ' + token.value);
     localStorage.setItem('fcm_token', token.value);
 
     try {
+      // Always subscribe to topic on registration
       await FCM.subscribeTo({ topic: 'all' });
       console.log('Subscribed to "all" topic');
     } catch (err) {
@@ -31,9 +24,43 @@ export const initializePushNotifications = async () => {
     }
   });
 
+  PushNotifications.addListener('registrationError', (error) => {
+    console.error('Push registration error:', error);
+  });
+
   PushNotifications.addListener('pushNotificationReceived', (notification) => {
+    console.log('Push received in foreground:', notification);
     triggerLocalNotification(notification.title, notification.body);
   });
+
+  PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+    console.log('Push action performed:', action);
+    if (action.notification.data.jobId) {
+      window.location.href = `/job/${action.notification.data.jobId}`;
+    }
+  });
+
+  // 2. Request permissions and register
+  let permStatus = await PushNotifications.checkPermissions();
+  if (permStatus.receive !== 'granted') {
+    permStatus = await PushNotifications.requestPermissions();
+  }
+
+  if (permStatus.receive === 'granted') {
+    await PushNotifications.register();
+
+    // 3. Fallback: If already registered, manually subscribe to topic
+    // This helps if the 'registration' event doesn't fire (common on some devices/restarts)
+    const existingToken = localStorage.getItem('fcm_token');
+    if (existingToken) {
+      try {
+        await FCM.subscribeTo({ topic: 'all' });
+        console.log('Topic subscription refreshed (fallback)');
+      } catch (err) {
+        console.warn('Refresh topic failed:', err);
+      }
+    }
+  }
 };
 
 /**
@@ -43,11 +70,9 @@ export const initializePushNotifications = async () => {
 export const sendPushToAll = async (title, body, data = {}) => {
   console.log('Attempting to send push to all users:', { title, body });
 
-  // Use a hardcoded key or better, one stored in Firestore to avoid rebuilding APK if key changes
-  // For now, we use a placeholder. User must update this in Firebase Console.
   const serverKey = localStorage.getItem('fcm_server_key') || FCM_LEGACY_SERVER_KEY;
 
-  if (serverKey.startsWith('AAAA')) {
+  if (serverKey && serverKey.startsWith('AAAA')) {
     try {
       const response = await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
@@ -61,7 +86,8 @@ export const sendPushToAll = async (title, body, data = {}) => {
             title: title,
             body: body,
             sound: 'default',
-            icon: 'ic_launcher'
+            icon: 'ic_launcher',
+            click_action: 'FCM_PLUGIN_ACTIVITY' // Added to notification block
           },
           data: {
             ...data,
@@ -79,7 +105,7 @@ export const sendPushToAll = async (title, body, data = {}) => {
       throw error;
     }
   } else {
-    console.warn('FCM Server Key not configured correctly in Admin panel.');
+    console.warn('FCM Server Key not configured or invalid. Using Cloud Functions fallback if available.');
   }
 };
 

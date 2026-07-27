@@ -15,14 +15,21 @@ exports.sendPushOnNewNotification = functions.firestore
             notification: {
                 title: data.title || "New Job Circular!",
                 body: data.message || "Check out the latest job update.",
-                icon: "ic_launcher",
-                clickAction: "FCM_PLUGIN_ACTIVITY", // Needed for Capacitor
+            },
+            android: {
+                notification: {
+                    icon: "ic_launcher",
+                    color: "#1a56db",
+                    sound: "default",
+                    clickAction: "FCM_PLUGIN_ACTIVITY",
+                }
             },
             data: {
                 jobId: data.jobId || "",
-                type: data.type || "new_job"
+                type: data.type || "new_job",
+                click_action: "FCM_PLUGIN_ACTIVITY"
             },
-            topic: "all" // Matches the subscription in notifications.js
+            topic: "all"
         };
 
         try {
