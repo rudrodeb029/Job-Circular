@@ -216,10 +216,10 @@ export default function Home() {
             </button>
           </div>
 
-          {/* COMPACT 3D ILLUSTRATION - RE-POSITIONED LEFT & FIXED MAGNIFIER */}
+          {/* COMPACT 3D ILLUSTRATION - RE-POSITIONED RIGHT & FIXED MAGNIFIER HANDLE */}
           <div style={{
             position: 'absolute',
-            right: '20px',
+            right: '0px',
             bottom: '10px',
             width: '160px',
             height: '150px',
@@ -272,10 +272,10 @@ export default function Home() {
                 <rect x="52.5" y="32" width="10" height="10" rx="3" fill="#ffffff" opacity="0.3" />
               </g>
 
-              {/* Magnifying Glass (Layer 3) - FIXED HANDLE POSITION */}
-              <g transform="translate(125, 160) rotate(-25)" filter="url(#shadow3d)">
-                {/* Handle - Now positioned to stay within view */}
-                <rect x="25" y="-5" width="40" height="12" rx="6" fill="#475569" />
+              {/* Magnifying Glass (Layer 3) - FIXED HANDLE POSITION AND ANGLE */}
+              <g transform="translate(145, 155) rotate(-15)" filter="url(#shadow3d)">
+                {/* Handle - Now correctly positioned pointing down-right */}
+                <rect x="25" y="-6" width="45" height="12" rx="6" fill="#475569" />
                 {/* Frame */}
                 <circle cx="0" cy="0" r="28" fill="none" stroke="#cbd5e1" strokeWidth="6" />
                 {/* Lens */}
