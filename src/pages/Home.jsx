@@ -165,32 +165,32 @@ export default function Home() {
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
         </div>
 
-        {/* RE-DESIGNED HERO STATS CARD - MATCHING IMAGE WITH REDUCED HEIGHT & PIXEL-PERFECT ILLUSTRATION */}
+        {/* RE-DESIGNED HERO STATS CARD - PIXEL PERFECT 3D ILLUSTRATION & GRADIENTS */}
         <div style={{
-          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-          borderRadius: '20px',
-          padding: '16px 20px',
+          background: 'linear-gradient(135deg, #3b82f6 0%, #1a56db 100%)',
+          borderRadius: '24px',
+          padding: '24px',
           position: 'relative',
-          marginBottom: '20px',
+          marginBottom: '28px',
           overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(26, 86, 219, 0.15)',
-          minHeight: '140px',
+          boxShadow: '0 15px 35px rgba(26, 86, 219, 0.25)',
+          minHeight: '165px',
           display: 'flex',
           alignItems: 'center'
         }}>
           <div style={{ position: 'relative', zIndex: 2, maxWidth: '65%' }}>
-            <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '11px', fontWeight: 500, marginBottom: '6px' }}>
+            <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '13px', fontWeight: 600, marginBottom: '6px' }}>
               {getGreeting(isEn)}, {userName} 👋
             </p>
-            <h2 style={{ color: '#ffffff', fontSize: '32px', fontWeight: 900, marginBottom: '0px', lineHeight: 1 }}>
+            <h2 style={{ color: '#ffffff', fontSize: '38px', fontWeight: 900, marginBottom: '2px', lineHeight: 1, textShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
               {isEn
                 ? `${combinedFeedItems.length}+`
                 : `${toBengaliNumber(combinedFeedItems.length)}+`}
             </h2>
-            <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: 700, marginBottom: '2px' }}>
+            <p style={{ color: '#ffffff', fontSize: '17px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.3px' }}>
               {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
             </p>
-            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '11px', marginBottom: '14px', fontWeight: 400 }}>
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', marginBottom: '20px', fontWeight: 500 }}>
               {isEn ? 'Find your dream job today!' : 'আজই আপনার পছন্দের চাকরিটি খুঁজুন!'}
             </p>
 
@@ -198,61 +198,113 @@ export default function Home() {
               onClick={() => navigate('/all-circulars')}
               style={{
                 background: '#ffffff',
-                color: '#1e40af',
-                padding: '8px 14px',
-                borderRadius: '10px',
-                fontSize: '12px',
+                color: '#1a56db',
+                padding: '10px 22px',
+                borderRadius: '12px',
+                fontSize: '14px',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+                gap: '8px',
+                boxShadow: '0 6px 16px rgba(0,0,0,0.1)',
                 border: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'all 0.2s'
               }}
             >
               {isEn ? 'View All Jobs' : 'সবগুলো দেখুন'}
-              <ChevronRight size={14} />
+              <ChevronRight size={16} />
             </button>
           </div>
 
-          {/* New Custom 3D Illustration - Professional Replacement for hero.png */}
+          {/* HIGH-FIDELITY 3D ILLUSTRATION */}
           <div style={{
             position: 'absolute',
-            right: '-4px',
-            bottom: '0px',
-            width: '135px',
-            height: '135px',
+            right: '-10px',
+            bottom: '10px',
+            width: '170px',
+            height: '170px',
             zIndex: 1,
             display: 'flex',
             alignItems: 'flex-end',
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
+            pointerEvents: 'none'
           }}>
-            <svg viewBox="0 0 200 200" style={{ width: '100%', height: '100%', filter: 'drop-shadow(0 10px 15px rgba(0,0,0,0.2))' }}>
-              {/* Resume Paper */}
-              <rect x="100" y="30" width="70" height="90" rx="6" fill="#ffffff" opacity="0.95" transform="rotate(5 135 75)" />
-              <circle cx="120" cy="55" r="10" fill="#3b82f6" opacity="0.3" transform="rotate(5 135 75)" />
-              <rect x="135" y="50" width="25" height="4" rx="2" fill="#e2e8f0" transform="rotate(5 135 75)" />
-              <rect x="135" y="60" width="25" height="4" rx="2" fill="#e2e8f0" transform="rotate(5 135 75)" />
+            <svg viewBox="0 0 240 240" style={{ width: '100%', height: '100%' }}>
+              <defs>
+                <linearGradient id="briefcaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#a78bfa" />
+                  <stop offset="100%" stopColor="#7c3aed" />
+                </linearGradient>
+                <linearGradient id="resumeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#ffffff" />
+                  <stop offset="100%" stopColor="#f8fafc" />
+                </linearGradient>
+                <filter id="shadow3d" x="-20%" y="-20%" width="150%" height="150%">
+                  <feDropShadow dx="2" dy="5" stdDeviation="5" shadowOpacity="0.2" />
+                </filter>
+                <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.4" />
+                </linearGradient>
+              </defs>
 
-              {/* Briefcase Body */}
-              <rect x="50" y="70" width="100" height="75" rx="14" fill="#7c3aed" />
-              <rect x="50" y="70" width="100" height="25" rx="14" fill="#6d28d9" opacity="0.3" />
-              <rect x="80" y="60" width="40" height="20" rx="6" fill="none" stroke="#6d28d9" strokeWidth="8" />
-              <rect x="95" y="95" width="10" height="8" rx="2" fill="#ffffff" opacity="0.4" />
-
-              {/* Magnifying Glass */}
-              <g transform="translate(140, 140) rotate(-10)">
-                <line x1="0" y1="0" x2="35" y2="35" stroke="#334155" strokeWidth="10" strokeLinecap="round" />
-                <circle cx="0" cy="0" r="24" fill="#3b82f6" opacity="0.7" stroke="#ffffff" strokeWidth="4" />
-                <circle cx="-6" cy="-6" r="10" fill="#ffffff" opacity="0.25" />
+              {/* Background Resume Paper (Layer 1) */}
+              <g transform="translate(130, 40) rotate(8)" filter="url(#shadow3d)">
+                <rect x="0" y="0" width="85" height="110" rx="8" fill="url(#resumeGrad)" />
+                <circle cx="22" cy="25" r="12" fill="#e2e8f0" />
+                <rect x="40" y="20" width="30" height="4" rx="2" fill="#e2e8f0" />
+                <rect x="40" y="30" width="20" height="4" rx="2" fill="#e2e8f0" />
+                <rect x="15" y="55" width="55" height="3" rx="1.5" fill="#f1f5f9" />
+                <rect x="15" y="65" width="55" height="3" rx="1.5" fill="#f1f5f9" />
+                <rect x="15" y="75" width="40" height="3" rx="1.5" fill="#f1f5f9" />
+                <rect x="15" y="85" width="55" height="3" rx="1.5" fill="#f1f5f9" />
               </g>
 
-              {/* Green Leaves Accent */}
-              <path d="M165 100 Q180 80 185 110 Q195 120 175 130 Z" fill="#22c55e" opacity="0.9" />
-              <path d="M175 120 Q195 110 190 140 Q200 150 180 160 Z" fill="#16a34a" opacity="0.9" />
+              {/* Briefcase (Layer 2) */}
+              <g transform="translate(65, 85)" filter="url(#shadow3d)">
+                {/* Handle */}
+                <path d="M35 -12 Q55 -25 75 -12" fill="none" stroke="#6d28d9" strokeWidth="9" strokeLinecap="round" />
+                {/* Main Body */}
+                <rect x="0" y="0" width="115" height="85" rx="18" fill="url(#briefcaseGrad)" />
+                {/* Lid Detail */}
+                <path d="M0 35 Q57.5 45 115 35" fill="none" stroke="#6d28d9" strokeWidth="2" opacity="0.4" />
+                {/* Lock Detail */}
+                <rect x="52.5" y="32" width="10" height="10" rx="3" fill="#ffffff" opacity="0.3" />
+              </g>
+
+              {/* Magnifying Glass (Layer 3) */}
+              <g transform="translate(160, 160) rotate(-15)" filter="url(#shadow3d)">
+                {/* Handle */}
+                <rect x="35" y="0" width="45" height="12" rx="6" fill="#475569" />
+                {/* Frame */}
+                <circle cx="0" cy="0" r="28" fill="none" stroke="#cbd5e1" strokeWidth="6" />
+                {/* Lens */}
+                <circle cx="0" cy="0" r="25" fill="url(#glassGrad)" />
+                {/* Reflection */}
+                <path d="M-12 -12 Q-15 -15 -8 -15" fill="none" stroke="#ffffff" strokeWidth="3" strokeLinecap="round" opacity="0.4" />
+              </g>
+
+              {/* Green Leaves (Layer 4) */}
+              <g transform="translate(195, 125) rotate(20)" opacity="0.9">
+                <path d="M0 0 Q15 -25 35 0 Q15 25 0 0" fill="#22c55e" />
+                <path d="M0 15 Q15 -10 35 15 Q15 40 0 15" fill="#16a34a" transform="translate(5, 20) rotate(-15)" />
+                <path d="M0 -15 Q15 -40 35 -15 Q15 10 0 -15" fill="#10b981" transform="translate(-10, -10) rotate(10)" />
+              </g>
             </svg>
           </div>
+
+          {/* Background Decorative Blob */}
+          <div style={{
+            position: 'absolute',
+            top: '-50px',
+            right: '15%',
+            width: '140px',
+            height: '140px',
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.08)',
+            zIndex: 0
+          }}></div>
         </div>
 
         <div className="mb-md">
