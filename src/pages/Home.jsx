@@ -88,13 +88,22 @@ export default function Home() {
   const combinedFeedItems = useMemo(() => {
     if (localJobs.length === 0) return [];
 
+    // Create a set of unexpired job IDs for quick lookup
+    const activeJobIds = new Set(
+      localJobs
+        .filter(job => !isExpired(job.deadline))
+        .map(job => String(job.id))
+    );
+
     const jobItems = localJobs
-      .filter(job => !job.showInExamDate && !job.showInResult && !isExpired(job.deadline))
+      .filter(job => !job.showInExamDate && !job.showInResult && activeJobIds.has(String(job.id)))
       .map(job => ({ ...job, feedType: 'job' }));
 
-    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
-      ...item,
-      originalId: item.jobId,
+    const notifExamItems = localAdmits
+      .filter(item => item.type === 'admit_card' && activeJobIds.has(String(item.jobId)))
+      .map(item => ({
+        ...item,
+        originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examDate: item.date,
@@ -104,9 +113,11 @@ export default function Home() {
       feedType: 'exam_date'
     }));
 
-    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
-      ...item,
-      originalId: item.jobId,
+    const notifResultItems = localAdmits
+      .filter(item => item.type === 'result' && activeJobIds.has(String(item.jobId)))
+      .map(item => ({
+        ...item,
+        originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,
