@@ -468,13 +468,21 @@ export default function ManageJobs() {
             </div>
 
             <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-              <div style={{ gridColumn: 'span 2' }}>
+              <div>
                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Title (Bengali)</label>
                  <input name="title" value={formData.title} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
               </div>
               <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Organization</label>
+                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Title (English)</label>
+                 <input name="titleEn" value={formData.titleEn} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
+              </div>
+              <div>
+                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Organization (Bengali)</label>
                  <input name="organization" value={formData.organization} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
+              </div>
+              <div>
+                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Organization (English)</label>
+                 <input name="organizationEn" value={formData.organizationEn} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
               </div>
               <div>
                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Category</label>
@@ -484,17 +492,85 @@ export default function ManageJobs() {
                  </select>
               </div>
               <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Deadline</label>
-                 <input type="date" name="deadline" value={formData.deadline} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
-              </div>
-              <div>
                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Job Type</label>
-                 <input name="jobType" value={formData.jobType} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. Full-time" />
+                 <input name="jobType" value={formData.jobType} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. সরকারি, ব্যাংক" />
               </div>
+              <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+                <div>
+                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Location</label>
+                   <input name="location" value={formData.location} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
+                </div>
+                <div>
+                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Vacancy</label>
+                   <input type="number" name="vacancy" value={formData.vacancy} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
+                </div>
+                <div>
+                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Deadline</label>
+                   <input type="date" name="deadline" value={formData.deadline} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
+                </div>
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Description</label>
+                 <textarea name="description" rows="4" value={formData.description} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none', resize: 'vertical' }}></textarea>
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Requirements (One per line)</label>
+                 <textarea name="requirements" rows="4" value={formData.requirements} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none', resize: 'vertical' }}></textarea>
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Apply Link</label>
+                 <input type="url" name="applyLink" value={formData.applyLink} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
+              </div>
+
+              <div style={{ gridColumn: 'span 2' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Circular Images / PDF (URLs)</label>
+                <input name="images" value={formData.images} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none', marginBottom: '12px' }} placeholder="Comma-separated image/PDF URLs or upload below" />
+
+                <div style={{ background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <input type="file" multiple accept="image/*,application/pdf" onChange={handleCloudinaryUpload} disabled={!!uploadProgress} style={{ fontSize: '13px' }} />
+                  {uploadProgress && <span style={{ fontSize: '13px', color: '#1a56db', fontWeight: 'bold' }}>{uploadProgress}</span>}
+                </div>
+
+                {formData.images && (
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+                    {formData.images.split(',').map(i => i.trim()).filter(i => i).map((fileUrl, index) => (
+                      <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
+                        <img src={fileUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button type="button" onClick={() => {
+                          const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
+                          current.splice(index, 1);
+                          setFormData(prev => ({ ...prev, images: current.join(', ') }));
+                        }} style={{ position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px' }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '24px', padding: '16px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+                   <input type="checkbox" checked={!!formData.showInExamDate} onChange={e => setFormData(prev => ({ ...prev, showInExamDate: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
+                   Exam Date
+                 </label>
+                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+                   <input type="checkbox" checked={!!formData.showInResult} onChange={e => setFormData(prev => ({ ...prev, showInResult: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
+                   Result
+                 </label>
+              </div>
+
+              {formData.showInExamDate && (
+                <div style={{ gridColumn: 'span 2' }}>
+                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Exam Date Information</label>
+                   <input name="examDate" value={formData.examDate} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. 15 June 2024" />
+                </div>
+              )}
 
               <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
                 <button type="button" onClick={handleCloseModal} style={{ padding: '14px 32px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>Save Changes</button>
+                <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>Save Circular</button>
               </div>
             </form>
           </div>
