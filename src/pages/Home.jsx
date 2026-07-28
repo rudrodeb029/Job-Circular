@@ -92,7 +92,7 @@ export default function Home() {
       .filter(job => !job.showInExamDate && !job.showInResult)
       .map(job => ({ ...job, feedType: 'job' }));
 
-    const notifExamItems = localAdmits.map(item => ({
+    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
       ...item,
       originalId: item.jobId,
       postTitle: item.examName,
@@ -104,7 +104,7 @@ export default function Home() {
       feedType: 'exam_date'
     }));
 
-    const notifResultItems = localAdmits.map(item => ({
+    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
       ...item,
       originalId: item.jobId,
       postTitle: item.examName,
