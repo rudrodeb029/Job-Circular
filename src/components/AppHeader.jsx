@@ -33,7 +33,7 @@ export default function AppHeader() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 14px',
-        margin: '-12px -14px 14px -14px'
+        margin: '0 -14px 14px -14px'
       }}>
         {/* Left: Hamburger Menu Icon Button */}
         <button
