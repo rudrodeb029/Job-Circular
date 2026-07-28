@@ -62,8 +62,21 @@ export default function SearchFilter() {
   const { state: adminState } = useAdminContext();
   const localJobs = adminState.jobs;
 
+  const isExpired = (deadline) => {
+    if (!deadline) return false;
+    const deadlineDate = new Date(deadline);
+    if (isNaN(deadlineDate.getTime())) return false;
+    // Set time to end of day for deadline
+    const endOfDay = new Date(deadlineDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    return endOfDay < new Date();
+  };
+
   const filteredJobs = useMemo(() => {
     return localJobs.filter(job => {
+      // Expiration filter
+      if (isExpired(job.deadline)) return false;
+
       // Query filter
       if (query) {
         const q = query.toLowerCase();

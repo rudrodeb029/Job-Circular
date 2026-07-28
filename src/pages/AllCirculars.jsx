@@ -46,6 +46,16 @@ export default function AllCirculars() {
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 20;
 
+  const isExpired = (deadline) => {
+    if (!deadline) return false;
+    const deadlineDate = new Date(deadline);
+    if (isNaN(deadlineDate.getTime())) return false;
+    // Set time to end of day for deadline
+    const endOfDay = new Date(deadlineDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    return endOfDay < new Date();
+  };
+
   const toBengaliNumber = (num) => {
     const englishToBengali = {
       '0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪',
@@ -60,10 +70,12 @@ export default function AllCirculars() {
     const localJobs = adminState.jobs;
     const localAdmits = adminState.admits || [];
 
-    const jobItems = localJobs.map(job => ({
-      ...job,
-      feedType: 'job'
-    }));
+    const jobItems = localJobs
+      .filter(job => !isExpired(job.deadline))
+      .map(job => ({
+        ...job,
+        feedType: 'job'
+      }));
 
     // Exam Date jobs from localJobs
     const examJobs = localJobs.filter(job => job.examDate).map(job => ({

@@ -15,10 +15,22 @@ export default function Categories() {
 
   const jobs = adminState.jobs || [];
 
+  const isExpired = (deadline) => {
+    if (!deadline) return false;
+    const deadlineDate = new Date(deadline);
+    if (isNaN(deadlineDate.getTime())) return false;
+    // Set time to end of day for deadline
+    const endOfDay = new Date(deadlineDate);
+    endOfDay.setHours(23, 59, 59, 999);
+    return endOfDay < new Date();
+  };
+
   const categoriesWithCounts = useMemo(() => {
     return categories.map(cat => {
       // Check both categoryId and category field for robustness
-      const count = jobs.filter(j => j.categoryId === cat.id || j.category === cat.id).length;
+      const count = jobs.filter(j =>
+        (j.categoryId === cat.id || j.category === cat.id) && !isExpired(j.deadline)
+      ).length;
       return {
         ...cat,
         jobCount: count

@@ -49,6 +49,16 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
+const isExpired = (deadline) => {
+  if (!deadline) return false;
+  const deadlineDate = new Date(deadline);
+  if (isNaN(deadlineDate.getTime())) return false;
+  // Set time to end of day for deadline
+  const endOfDay = new Date(deadlineDate);
+  endOfDay.setHours(23, 59, 59, 999);
+  return endOfDay < new Date();
+};
+
 const getGreeting = (isEn) => {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) return isEn ? 'Good Morning' : 'শুভ সকাল';
@@ -79,7 +89,7 @@ export default function Home() {
     if (localJobs.length === 0) return [];
 
     const jobItems = localJobs
-      .filter(job => !job.showInExamDate && !job.showInResult)
+      .filter(job => !job.showInExamDate && !job.showInResult && !isExpired(job.deadline))
       .map(job => ({ ...job, feedType: 'job' }));
 
     const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
