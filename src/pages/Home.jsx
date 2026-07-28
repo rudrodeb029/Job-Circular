@@ -248,7 +248,7 @@ export default function Home() {
             </button>
           </div>
 
-          {/* COMPACT 3D ILLUSTRATION - ENHANCED WITH CONTINUOUS ANIMATIONS */}
+          {/* COMPACT 3D ILLUSTRATION - RE-POSITIONED RIGHT & FIXED MAGNIFIER HANDLE */}
           <div style={{
             position: 'absolute',
             right: '0px',
@@ -261,33 +261,6 @@ export default function Home() {
             justifyContent: 'flex-end',
             pointerEvents: 'none'
           }}>
-            <style>{`
-              @keyframes floatBriefcase {
-                0%, 100% { transform: translateY(0px) rotate(0deg); }
-                50% { transform: translateY(-6px) rotate(1deg); }
-              }
-              @keyframes scanGlass {
-                0%, 100% { transform: translate(145px, 155px) rotate(-15deg); }
-                50% { transform: translate(138px, 148px) rotate(-8deg); }
-              }
-              @keyframes driftResume {
-                0%, 100% { transform: translate(110px, 40px) rotate(8deg); }
-                50% { transform: translate(113px, 37px) rotate(11deg); }
-              }
-              @keyframes pulseBlob {
-                0%, 100% { transform: scale(1); opacity: 0.08; }
-                50% { transform: scale(1.15); opacity: 0.12; }
-              }
-              @keyframes pulseGlow {
-                0%, 100% { opacity: 0.2; transform: scale(1); }
-                50% { opacity: 0.4; transform: scale(1.1); }
-              }
-              @keyframes sparkle {
-                0%, 100% { transform: scale(0); opacity: 0; }
-                50% { transform: scale(1); opacity: 0.8; }
-              }
-            `}</style>
-
             <svg viewBox="0 0 240 240" style={{ width: '100%', height: '100%' }}>
               <defs>
                 <linearGradient id="briefcaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -296,7 +269,7 @@ export default function Home() {
                 </linearGradient>
                 <linearGradient id="resumeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                   <stop offset="0%" stopColor="#ffffff" />
-                  <stop offset="100%" stopColor="#f1f5f9" />
+                  <stop offset="100%" stopColor="#f8fafc" />
                 </linearGradient>
                 <filter id="shadow3d" x="-20%" y="-20%" width="150%" height="150%">
                   <feDropShadow dx="2" dy="5" stdDeviation="5" shadowOpacity="0.2" />
@@ -307,13 +280,8 @@ export default function Home() {
                 </linearGradient>
               </defs>
 
-              {/* Decorative Sparkles */}
-              <circle cx="200" cy="50" r="2" fill="white" style={{ animation: 'sparkle 3s infinite ease-in-out', animationDelay: '0s' }} />
-              <circle cx="170" cy="80" r="1.5" fill="white" style={{ animation: 'sparkle 4s infinite ease-in-out', animationDelay: '1s' }} />
-              <circle cx="220" cy="120" r="1.2" fill="white" style={{ animation: 'sparkle 3.5s infinite ease-in-out', animationDelay: '0.5s' }} />
-
               {/* Background Resume Paper (Layer 1) */}
-              <g style={{ animation: 'driftResume 5s infinite ease-in-out' }} filter="url(#shadow3d)">
+              <g transform="translate(110, 40) rotate(8)" filter="url(#shadow3d)">
                 <rect x="0" y="0" width="85" height="110" rx="8" fill="url(#resumeGrad)" />
                 <circle cx="22" cy="25" r="12" fill="#e2e8f0" />
                 <rect x="40" y="20" width="30" height="4" rx="2" fill="#e2e8f0" />
@@ -325,7 +293,7 @@ export default function Home() {
               </g>
 
               {/* Briefcase (Layer 2) */}
-              <g transform="translate(50, 85)" style={{ animation: 'floatBriefcase 4s infinite ease-in-out' }} filter="url(#shadow3d)">
+              <g transform="translate(50, 85)" filter="url(#shadow3d)">
                 {/* Handle */}
                 <path d="M35 -12 Q55 -25 75 -12" fill="none" stroke="#6d28d9" strokeWidth="9" strokeLinecap="round" />
                 {/* Main Body */}
@@ -336,9 +304,9 @@ export default function Home() {
                 <rect x="52.5" y="32" width="10" height="10" rx="3" fill="#ffffff" opacity="0.3" />
               </g>
 
-              {/* Magnifying Glass (Layer 3) */}
-              <g style={{ animation: 'scanGlass 4.5s infinite ease-in-out' }} filter="url(#shadow3d)">
-                {/* Handle */}
+              {/* Magnifying Glass (Layer 3) - FIXED HANDLE POSITION AND ANGLE */}
+              <g transform="translate(145, 155) rotate(-15)" filter="url(#shadow3d)">
+                {/* Handle - Now correctly positioned pointing down-right */}
                 <rect x="25" y="-6" width="45" height="12" rx="6" fill="#475569" />
                 {/* Frame */}
                 <circle cx="0" cy="0" r="28" fill="none" stroke="#cbd5e1" strokeWidth="6" />
