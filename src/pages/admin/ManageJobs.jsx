@@ -145,8 +145,8 @@ export default function ManageJobs() {
       setEditingJob(job);
       setFormData({
         ...job,
-        showInExamDate: !!job.examDate,
-        showInResult: !!job.examResult,
+        showInExamDate: job.showInExamDate ?? !!job.examDate,
+        showInResult: job.showInResult ?? !!job.examResult,
         linkedCircularId: job.linkedCircularId || '',
         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : (job.requirements || ''),
         images: Array.isArray(job.images) ? job.images.join(', ') : (job.images || '')
@@ -180,6 +180,7 @@ export default function ManageJobs() {
       : [];
       
     const finalExamDate = formData.showInExamDate ? formData.examDate : '';
+    const finalExamResult = formData.showInResult ? (formData.examResult || (imgArray.length > 0 ? imgArray[0] : '')) : '';
 
     const targetId = editingJob 
       ? editingJob.id 
@@ -189,7 +190,7 @@ export default function ManageJobs() {
       ...formData,
       id: targetId,
       examDate: finalExamDate,
-      examResult: imgArray.length > 0 ? imgArray[0] : '',
+      examResult: finalExamResult,
       requirements: reqArray,
       images: imgArray,
       createdAt: editingJob ? (editingJob.createdAt || new Date().toISOString()) : new Date().toISOString(),
@@ -216,7 +217,7 @@ export default function ManageJobs() {
     }
 
     // --- AUTO SYNC TO ADMITS COLLECTION ---
-    if (formData.showInExamDate && finalExamDate) {
+    if (formData.showInExamDate) {
       const admitId = `admit-${targetId}`;
       const admitData = {
         id: admitId,
@@ -229,8 +230,8 @@ export default function ManageJobs() {
         type: 'admit_card',
         status: 'পরীক্ষার তারিখ প্রকাশিত',
         statusEn: 'Exam Date Published',
-        date: finalExamDate,
-        dateEn: formData.examDateEn || finalExamDate,
+        date: finalExamDate || 'শীঘ্রই আসছে',
+        dateEn: formData.examDateEn || finalExamDate || 'Coming Soon',
         downloadLink: formData.applyLink || '#',
         createdAt: jobData.createdAt
       };
@@ -254,7 +255,7 @@ export default function ManageJobs() {
         statusEn: 'Result Published',
         date: jobData.postedAt || new Date().toISOString().split('T')[0],
         dateEn: jobData.postedAt || 'Recently',
-        downloadLink: jobData.applyLink || '#',
+        downloadLink: finalExamResult || formData.applyLink || '#',
         createdAt: jobData.createdAt
       };
       dispatch({ type: 'UPDATE_ADMIT', payload: resultData });

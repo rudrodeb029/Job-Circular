@@ -167,9 +167,20 @@ export default function JobDetails() {
 
           {/* Chips Row: Job Type + Deadline Badge */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600, fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>
-              <Calendar size={11} /> Deadline: {job.deadline}
-            </span>
+            {job.showInResult ? (
+              <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px', background: '#f3e8ff', color: '#7e22ce', border: '1px solid #e9d5ff' }}>
+                🏆 {state.language === 'en' ? 'Result Published' : 'ফলাফল প্রকাশিত'}
+              </span>
+            ) : job.showInExamDate ? (
+              <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px', background: '#d1fae5', color: '#059669', border: '1px solid #a7f3d0' }}>
+                <Calendar size={12} /> {state.language === 'en' ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}
+              </span>
+            ) : (
+              <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600, fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>
+                <Calendar size={11} /> Deadline: {job.deadline}
+              </span>
+            )}
+            <span className="chip" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>{job.type}</span>
             {isApplied && <span className="chip chip-success" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>✓ Applied</span>}
           </div>
         </div>
