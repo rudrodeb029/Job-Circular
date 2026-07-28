@@ -167,7 +167,6 @@ export default function JobDetails() {
 
           {/* Chips Row: Job Type + Deadline Badge */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            <span className="chip" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>{job.type}</span>
             <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600, fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>
               <Calendar size={11} /> Deadline: {job.deadline}
             </span>
