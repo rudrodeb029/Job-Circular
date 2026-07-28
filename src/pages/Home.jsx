@@ -383,6 +383,8 @@ export default function Home() {
               const displayIcon = item.icon || orgIconsMap[item.organization] || '🏛️';
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
               const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
+              const catData = categories.find(c => c.id === (item.category || item.categoryId));
+              const catName = isEn ? (catData?.nameEn || catData?.name) : catData?.name;
 
               if (item.feedType === 'exam_date') {
                 const descriptionSentence = isEn ? `Exam date published for the post of ${postTitle}.` : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
@@ -393,6 +395,11 @@ export default function Home() {
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
                       <p className="job-card-org" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', lineHeight: '1.4', marginBottom: '4px', fontWeight: 400 }}>{descriptionSentence}</p>
                       <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
+                        {catName && (
+                          <span style={{ fontSize: '8.5px', color: '#64748b', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>
+                             {catName}
+                          </span>
+                        )}
                         <span style={{ fontSize: '8.5px', color: '#059669', background: '#d1fae5', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}><Calendar size={10} /><span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span></span>
                         <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>• 🕒 {formatTimeAgo(item.createdAt, isEn)}</span>
                       </div>
@@ -412,6 +419,11 @@ export default function Home() {
                     <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
                     <p className="job-card-org" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', lineHeight: '1.4', marginBottom: '4px', fontWeight: 400 }}>{descriptionSentence}</p>
                     <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
+                      {catName && (
+                        <span style={{ fontSize: '8.5px', color: '#64748b', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>
+                           {catName}
+                        </span>
+                      )}
                       <span style={{ fontSize: '8.5px', color: '#7e22ce', background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span></span>
                       <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>• 🕒 {formatTimeAgo(item.createdAt, isEn)}</span>
                     </div>

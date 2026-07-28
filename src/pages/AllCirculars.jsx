@@ -233,6 +233,8 @@ export default function AllCirculars() {
               const displayIcon = item.icon || orgIconsMap[item.organization] || '🏛️';
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
               const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
+              const catData = categories.find(c => c.id === (item.category || item.categoryId));
+              const catName = isEn ? (catData?.nameEn || catData?.name) : catData?.name;
 
               if (item.feedType === 'exam_date') {
                 const descriptionSentence = isEn
@@ -265,6 +267,11 @@ export default function AllCirculars() {
                         {descriptionSentence}
                       </p>
                       <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
+                        {catName && (
+                          <span style={{ fontSize: '8.5px', color: '#64748b', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>
+                             {catName}
+                          </span>
+                        )}
                         <span style={{
                           fontSize: '8.5px',
                           color: '#059669',
@@ -345,6 +352,11 @@ export default function AllCirculars() {
                       {descriptionSentence}
                     </p>
                     <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
+                      {catName && (
+                        <span style={{ fontSize: '8.5px', color: '#64748b', background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>
+                           {catName}
+                        </span>
+                      )}
                       <span style={{
                         fontSize: '8.5px',
                         color: '#7e22ce',
