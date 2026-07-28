@@ -5,7 +5,6 @@ import { formatTimeAgo } from '../../utils/timeUtils';
 export default function ManageNotifications() {
   const { state, dispatch } = useAdminContext();
   const notifications = state.notifications || [];
-  const isEn = true; // Use English for Admin Panel labels by default
 
   const [searchNotif, setSearchNotif] = useState('');
   const [toast, setToast] = useState(null);
@@ -22,8 +21,6 @@ export default function ManageNotifications() {
     setToast(message);
     setTimeout(() => setToast(null), 3000);
   };
-
-  // ---------------- Notifications Logic ----------------
 
   const filteredNotifications = useMemo(() => {
     return notifications.filter(n =>
@@ -65,235 +62,191 @@ export default function ManageNotifications() {
 
   const getNotifBadgeColor = (type) => {
     switch (type) {
-      case 'new_job': return { bg: '#DBEAFE', text: '#1D4ED8' };
-      case 'deadline': return { bg: '#FFEDD5', text: '#C2410C' };
-      case 'admit_card': return { bg: '#D1FAE5', text: '#047857' };
-      case 'result': return { bg: '#F3E8FF', text: '#7E22CE' };
-      default: return { bg: '#F3F4F6', text: '#374151' };
+      case 'new_job': return { bg: '#eff6ff', text: '#1e40af', icon: '✨' };
+      case 'deadline': return { bg: '#fff7ed', text: '#9a3412', icon: '⏰' };
+      case 'admit_card': return { bg: '#ecfdf5', text: '#065f46', icon: '🎫' };
+      case 'result': return { bg: '#f5f3ff', text: '#5b21b6', icon: '🏆' };
+      default: return { bg: '#f8fafc', text: '#475569', icon: '🔔' };
     }
   };
 
-  // ---------------- Icons ----------------
-  const SearchIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-    </svg>
-  );
-  
-  const PlusIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-  );
-
-  const EditIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-    </svg>
-  );
-
-  const TrashIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="3 6 5 6 21 6"></polyline>
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-    </svg>
-  );
-
-  const CheckIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12"></polyline>
-    </svg>
-  );
-
-  const XIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-  );
-
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: '#1e293b' }}>
-        Manage Notifications
-      </h1>
+    <div className="manage-notifications-page animate-fade-in">
+      <style>{`
+        .admin-card {
+          background: #ffffff;
+          border-radius: 20px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .notif-table th {
+          background: #f8fafc;
+          color: #64748b;
+          font-weight: 700;
+          text-transform: uppercase;
+          font-size: 11px;
+          letter-spacing: 0.05em;
+          padding: 16px;
+        }
+        .notif-table td {
+          padding: 16px;
+          border-bottom: 1px solid #f1f5f9;
+          font-size: 14px;
+        }
+        .action-btn {
+          width: 36px; height: 36px; border-radius: 10px;
+          display: flex; alignItems: center; justifyContent: center;
+          transition: all 0.2s; border: none; cursor: pointer;
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+        .modal-overlay { background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(8px); position: fixed; inset: 0; z-index: 2000; display: flex; alignItems: center; justifyContent: center; }
+      `}</style>
 
-      <div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flex: '1', minWidth: '250px', maxWidth: '400px' }}>
-            <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', display: 'flex' }}>
-              <SearchIcon />
-            </div>
-            <input
-              type="text"
-              placeholder="Search notifications..."
-              value={searchNotif}
-              onChange={(e) => setSearchNotif(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 12px 10px 40px',
-                borderRadius: '8px',
-                border: '1px solid #e2e8f0',
-                outline: 'none',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                color: '#1e293b',
-                backgroundColor: '#ffffff'
-              }}
-            />
-          </div>
-          <button
-            onClick={() => handleOpenNotifModal()}
-            style={{
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: '10px 16px', backgroundColor: '#10B981', color: 'white',
-              border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: '500'
-            }}
-          >
-            <PlusIcon /> Add Notification
-          </button>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
+        <div>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Notifications</h1>
+          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Broadcast updates to all app users</p>
         </div>
+        <button
+          onClick={() => handleOpenNotifModal()}
+          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          New Notification
+        </button>
+      </div>
 
-        <div style={{ overflowX: 'auto', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Title</th>
-                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Organization</th>
-                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Message</th>
-                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Type</th>
-                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Time</th>
-                <th style={{ padding: '12px 16px', fontWeight: '600', color: '#334155', fontSize: '14px' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredNotifications.map((notif) => {
-                const badge = getNotifBadgeColor(notif.type);
-                const truncatedMsg = (notif.message || '').length > 50 ? notif.message.substring(0, 50) + '...' : notif.message;
-                return (
-                  <tr key={notif.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                    <td style={{ padding: '12px 16px', color: '#1e293b', fontSize: '14px', fontWeight: '500' }}>{notif.title}</td>
-                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>{notif.organization}</td>
-                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }} title={notif.message}>{truncatedMsg}</td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <span style={{
-                        backgroundColor: badge.bg, color: badge.text,
-                        padding: '4px 8px', borderRadius: '9999px', fontSize: '12px', fontWeight: '600',
-                        textTransform: 'capitalize'
-                      }}>
-                        {(notif.type || '').replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px 16px', color: '#64748b', fontSize: '14px' }}>
-                      {notif.createdAt ? formatTimeAgo(notif.createdAt, true) : (notif.time || 'N/A')}
-                    </td>
-                    <td style={{ padding: '12px 16px' }}>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button onClick={() => handleOpenNotifModal(notif)} style={{ padding: '6px', backgroundColor: '#DBEAFE', color: '#1D4ED8', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Edit">
-                          <EditIcon />
-                        </button>
-                        <button onClick={() => setDeleteNotifId(notif.id)} style={{ padding: '6px', backgroundColor: '#FEE2E2', color: '#DC2626', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex' }} title="Delete">
-                          <TrashIcon />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-              {filteredNotifications.length === 0 && (
-                <tr>
-                  <td colSpan="6" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>No notifications found.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <div className="admin-card" style={{ padding: '24px', marginBottom: '2rem' }}>
+        <div style={{ position: 'relative', maxWidth: '400px' }}>
+          <svg style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input
+            type="text"
+            placeholder="Search broadcast history..."
+            style={{ width: '100%', padding: '14px 14px 14px 48px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', outline: 'none' }}
+            value={searchNotif}
+            onChange={(e) => setSearchNotif(e.target.value)}
+          />
         </div>
       </div>
 
-      {/* Modal: Notification */}
+      <div className="admin-card" style={{ overflow: 'hidden' }}>
+        <table className="notif-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+          <thead>
+            <tr>
+              <th>Event Info</th>
+              <th>Message Content</th>
+              <th>Type</th>
+              <th>Posted Time</th>
+              <th style={{ textAlign: 'center' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredNotifications.map((notif) => {
+              const badge = getNotifBadgeColor(notif.type);
+              return (
+                <tr key={notif.id}>
+                  <td>
+                    <div style={{ fontWeight: 700, color: '#1e293b' }}>{notif.title}</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>{notif.organization}</div>
+                  </td>
+                  <td style={{ color: '#475569', maxWidth: '300px' }}>
+                    <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{notif.message}</div>
+                  </td>
+                  <td>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', width: 'fit-content', padding: '4px 12px', borderRadius: '8px', fontSize: '11px', fontWeight: 700, background: badge.bg, color: badge.text }}>
+                      <span>{badge.icon}</span>
+                      <span style={{ textTransform: 'uppercase' }}>{(notif.type || '').replace('_', ' ')}</span>
+                    </span>
+                  </td>
+                  <td style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+                    {notif.createdAt ? formatTimeAgo(notif.createdAt, true) : 'Recently'}
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                      <button className="action-btn" style={{ background: '#eff6ff', color: '#1a56db' }} onClick={() => handleOpenNotifModal(notif)} title="Edit">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                      </button>
+                      <button className="action-btn" style={{ background: '#fef2f2', color: '#ef4444' }} onClick={() => setDeleteNotifId(notif.id)} title="Delete">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+            {filteredNotifications.length === 0 && (
+              <tr><td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>No broadcast records found.</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
       {isNotifModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2 style={{ margin: 0, fontSize: '20px', fontWeight: '600', color: '#1e293b' }}>{editingNotifId ? 'Edit Notification' : 'Add Notification'}</h2>
-              <button onClick={() => setIsNotifModalOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}><XIcon /></button>
+        <div className="modal-overlay">
+          <div className="admin-card animate-fade-in" style={{ width: '100%', maxWidth: '500px', padding: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', margin: 0 }}>{editingNotifId ? 'Edit Notification' : 'Broadcast Message'}</h2>
+              <button onClick={() => setIsNotifModalOpen(false)} style={{ background: '#f1f5f9', border: 'none', padding: '8px', borderRadius: '10px', cursor: 'pointer' }}>
+                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
             </div>
-            <form onSubmit={handleSaveNotif} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleSaveNotif} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Title</label>
-                <input required type="text" value={notifFormData.title} onChange={e => setNotifFormData({...notifFormData, title: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Alert Title</label>
+                <input required value={notifFormData.title} onChange={e => setNotifFormData({...notifFormData, title: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. New Circular Published" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Organization</label>
-                <input required type="text" value={notifFormData.organization} onChange={e => setNotifFormData({...notifFormData, organization: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Organization</label>
+                <input required value={notifFormData.organization} onChange={e => setNotifFormData({...notifFormData, organization: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. Bangladesh Bank" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Message</label>
-                <textarea required rows="3" value={notifFormData.message} onChange={e => setNotifFormData({...notifFormData, message: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', resize: 'vertical', backgroundColor: '#ffffff', color: '#1e293b' }} />
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Message Body</label>
+                <textarea required rows="3" value={notifFormData.message} onChange={e => setNotifFormData({...notifFormData, message: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none', resize: 'none' }} placeholder="Enter the content of your notification..." />
               </div>
-              <div style={{ display: 'flex', gap: '16px' }}>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Type</label>
-                  <select value={notifFormData.type} onChange={e => setNotifFormData({...notifFormData, type: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Category Type</label>
+                  <select value={notifFormData.type} onChange={e => setNotifFormData({...notifFormData, type: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }}>
                     <option value="new_job">New Job</option>
                     <option value="deadline">Deadline</option>
                     <option value="admit_card">Admit Card</option>
                     <option value="result">Result</option>
                   </select>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Time</label>
-                  <input required type="text" value={notifFormData.time} onChange={e => setNotifFormData({...notifFormData, time: e.target.value})} placeholder="e.g. 2 hours ago" style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Job Reference ID</label>
+                  <input value={notifFormData.jobId} onChange={e => setNotifFormData({...notifFormData, jobId: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. job_123" />
                 </div>
               </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '6px', fontSize: '14px', fontWeight: '500', color: '#334155' }}>Job ID (optional)</label>
-                <input type="text" value={notifFormData.jobId} onChange={e => setNotifFormData({...notifFormData, jobId: e.target.value})} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box', backgroundColor: '#ffffff', color: '#1e293b' }} />
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '8px' }}>
-                <button type="button" onClick={() => setIsNotifModalOpen(false)} style={{ padding: '10px 16px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
-                <button type="submit" style={{ padding: '10px 16px', borderRadius: '6px', border: 'none', backgroundColor: '#1a56db', color: 'white', cursor: 'pointer', fontWeight: '500' }}>{editingNotifId ? 'Save Changes' : 'Add Notification'}</button>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '12px' }}>
+                <button type="button" onClick={() => setIsNotifModalOpen(false)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Cancel</button>
+                <button type="submit" style={{ flex: 1, padding: '14px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700, cursor: 'pointer' }}>Send Broadcast</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation Modal: Notification */}
       {deleteNotifId && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60 }}>
-          <div style={{ backgroundColor: '#ffffff', borderRadius: '12px', padding: '24px', width: '100%', maxWidth: '400px', textAlign: 'center' }}>
-            <div style={{ margin: '0 auto 16px', width: '48px', height: '48px', backgroundColor: '#FEE2E2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#DC2626' }}>
-              <TrashIcon />
-            </div>
-            <h3 style={{ margin: '0 0 8px', fontSize: '18px', fontWeight: '600', color: '#1e293b' }}>Delete Notification?</h3>
-            <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '14px' }}>Are you sure you want to delete this notification? This action cannot be undone.</p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button onClick={() => setDeleteNotifId(null)} style={{ padding: '10px 20px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', color: '#1e293b', cursor: 'pointer', fontWeight: '500' }}>Cancel</button>
-              <button onClick={handleDeleteNotif} style={{ padding: '10px 20px', borderRadius: '6px', border: 'none', backgroundColor: '#DC2626', color: 'white', cursor: 'pointer', fontWeight: '500' }}>Delete</button>
+        <div className="modal-overlay">
+          <div className="admin-card animate-fade-in" style={{ padding: '32px', maxWidth: '400px', textAlign: 'center' }}>
+            <div style={{ width: '60px', height: '60px', background: '#fee2e2', color: '#ef4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: '24px' }}>🗑️</div>
+            <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>Delete Broadcast?</h3>
+            <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '32px' }}>This notification will be removed from all user feeds. Continue?</p>
+            <div style={{ display: 'flex', gap: '12px' }}>
+               <button onClick={() => setDeleteNotifId(null)} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Keep it</button>
+               <button onClick={handleDeleteNotif} style={{ flex: 1, padding: '12px', borderRadius: '10px', border: 'none', background: '#ef4444', color: 'white', fontWeight: 700, cursor: 'pointer' }}>Confirm Delete</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Toast */}
       {toast && (
-        <div style={{
-          position: 'fixed', bottom: '24px', right: '24px', backgroundColor: '#10B981', color: 'white',
-          padding: '12px 20px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '8px',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', zIndex: 100, animation: 'fadeIn 0.3s'
-        }}>
-          <CheckIcon />
-          <span style={{ fontWeight: '500', fontSize: '14px' }}>{toast}</span>
+        <div style={{ position: 'fixed', bottom: '32px', right: '32px', background: '#10b981', color: 'white', padding: '14px 28px', borderRadius: '16px', fontWeight: 700, boxShadow: '0 10px 25px rgba(16, 185, 129, 0.2)', zIndex: 100, display: 'flex', alignItems: 'center', gap: '10px', animation: 'slideInRight 0.3s' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          {toast}
         </div>
       )}
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

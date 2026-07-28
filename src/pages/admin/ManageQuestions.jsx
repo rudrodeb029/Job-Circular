@@ -6,31 +6,16 @@ export default function ManageQuestions() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [currentPaper, setCurrentPaper] = useState(null); // null means adding a new paper
+  const [currentPaper, setCurrentPaper] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
-  // Fields for adding/editing paper
+  // Fields
   const [title, setTitle] = useState('');
   const [titleEn, setTitleEn] = useState('');
   const [category, setCategory] = useState('bcs');
-  const [customCategory, setCustomCategory] = useState('');
-  const [customCategoryEn, setCustomCategoryEn] = useState('');
-  const [date, setDate] = useState('');
   const [dateEn, setDateEn] = useState('');
-  const [timeLimit, setTimeLimit] = useState('১০ মিনিট');
   const [timeLimitEn, setTimeLimitEn] = useState('10 Mins');
-  const [questions, setQuestions] = useState([
-    {
-      id: 'q-1',
-      question: '',
-      questionEn: '',
-      options: ['', '', '', ''],
-      optionsEn: ['', '', '', ''],
-      correctIndex: 0,
-      explanation: '',
-      explanationEn: ''
-    }
-  ]);
+  const [questions, setQuestions] = useState([]);
 
   useEffect(() => {
     setPapers(getQuestionsData());
@@ -38,665 +23,110 @@ export default function ManageQuestions() {
 
   const triggerToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
-    setTimeout(() => {
-      setToast({ show: false, message: '', type: 'success' });
-    }, 3000);
+    setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
   };
 
   const handleOpenAdd = () => {
     setCurrentPaper(null);
-    setTitle('');
-    setTitleEn('');
-    setCategory('bcs');
-    setCustomCategory('');
-    setCustomCategoryEn('');
-    setDate('');
-    setDateEn('');
-    setTimeLimit('১০ মিনিট');
-    setTimeLimitEn('10 Mins');
-    setQuestions([
-      {
-        id: `q-${Date.now()}-1`,
-        question: '',
-        questionEn: '',
-        options: ['', '', '', ''],
-        optionsEn: ['', '', '', ''],
-        correctIndex: 0,
-        explanation: '',
-        explanationEn: ''
-      }
-    ]);
+    setTitle(''); setTitleEn(''); setCategory('bcs'); setDateEn(''); setTimeLimitEn('10 Mins');
+    setQuestions([{ id: 'q1', question: '', questionEn: '', options: ['','','',''], optionsEn: ['','','',''], correctIndex: 0 }]);
     setShowModal(true);
-  };
-
-  const handleOpenEdit = (paper) => {
-    setCurrentPaper(paper);
-    setTitle(paper.title || '');
-    setTitleEn(paper.titleEn || '');
-    const isExisting = ['bcs', 'bank', 'ntrca', 'primary', 'ministry'].includes(paper.category);
-    setCategory(isExisting ? paper.category : 'new_category');
-    setCustomCategory(isExisting ? '' : (paper.categoryName || ''));
-    setCustomCategoryEn(isExisting ? '' : (paper.categoryNameEn || ''));
-    setDate(paper.date || '');
-    setDateEn(paper.dateEn || '');
-    setTimeLimit(paper.timeLimit || '১০ মিনিট');
-    setTimeLimitEn(paper.timeLimitEn || '10 Mins');
-    setQuestions(paper.questions && paper.questions.length > 0 ? paper.questions : [
-      {
-        id: `q-${Date.now()}-1`,
-        question: '',
-        questionEn: '',
-        options: ['', '', '', ''],
-        optionsEn: ['', '', '', ''],
-        correctIndex: 0,
-        explanation: '',
-        explanationEn: ''
-      }
-    ]);
-    setShowModal(true);
-  };
-
-  const handleAddQuestionRow = () => {
-    setQuestions(prev => [
-      ...prev,
-      {
-        id: `q-${Date.now()}-${prev.length + 1}`,
-        question: '',
-        questionEn: '',
-        options: ['', '', '', ''],
-        optionsEn: ['', '', '', ''],
-        correctIndex: 0,
-        explanation: '',
-        explanationEn: ''
-      }
-    ]);
-  };
-
-  const handleRemoveQuestionRow = (index) => {
-    if (questions.length <= 1) {
-      triggerToast('At least one question is required.', 'error');
-      return;
-    }
-    setQuestions(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleQuestionFieldChange = (index, field, value) => {
-    setQuestions(prev => prev.map((q, i) => {
-      if (i === index) {
-        return { ...q, [field]: value };
-      }
-      return q;
-    }));
-  };
-
-  const handleOptionChange = (qIndex, oIndex, isEn, value) => {
-    setQuestions(prev => prev.map((q, i) => {
-      if (i === qIndex) {
-        const key = isEn ? 'optionsEn' : 'options';
-        const newOpts = [...q[key]];
-        newOpts[oIndex] = value;
-        return { ...q, [key]: newOpts };
-      }
-      return q;
-    }));
-  };
-
-  const getCategoryLabelEn = (cat) => {
-    const labels = {
-      bcs: 'BCS',
-      bank: 'Bank',
-      ntrca: 'NTRCA',
-      primary: 'Primary',
-      ministry: 'Ministries'
-    };
-    return labels[cat] || cat;
   };
 
   const handleSave = (e) => {
     e.preventDefault();
-
-    if (!title.trim() || !titleEn.trim()) {
-      triggerToast('Title in both languages is required.', 'error');
-      return;
-    }
-
-    let finalCategory = category;
-    let finalCategoryName = getCategoryLabel(category);
-    let finalCategoryNameEn = getCategoryLabelEn(category);
-
-    if (category === 'new_category') {
-      if (!customCategory.trim() || !customCategoryEn.trim()) {
-        triggerToast('Custom category name in both languages is required.', 'error');
-        return;
-      }
-      finalCategory = customCategoryEn.toLowerCase().replace(/[^a-z0-9]/g, '');
-      finalCategoryName = customCategory;
-      finalCategoryNameEn = customCategoryEn;
-    }
-
     const newPaper = {
       id: currentPaper ? currentPaper.id : `paper-${Date.now()}`,
-      category: finalCategory,
-      categoryName: finalCategoryName,
-      categoryNameEn: finalCategoryNameEn,
-      title,
-      titleEn,
-      date,
-      dateEn,
-      totalQuestions: String(questions.length),
-      timeLimit,
-      timeLimitEn,
-      questions,
-      createdAt: currentPaper ? (currentPaper.createdAt || new Date().toISOString()) : new Date().toISOString(),
+      category, title, titleEn, dateEn, timeLimitEn, questions,
+      createdAt: currentPaper?.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-
-    let updatedPapers;
-    if (currentPaper) {
-      updatedPapers = papers.map(p => p.id === currentPaper.id ? newPaper : p);
-      triggerToast('Question paper updated successfully!');
-    } else {
-      updatedPapers = [newPaper, ...papers];
-      triggerToast('New question paper created successfully!');
-    }
-
-    setPapers(updatedPapers);
-    saveQuestionsData(updatedPapers);
-    window.dispatchEvent(new Event('questions_updated'));
+    const updated = currentPaper ? papers.map(p => p.id === currentPaper.id ? newPaper : p) : [newPaper, ...papers];
+    setPapers(updated);
+    saveQuestionsData(updated);
+    triggerToast(currentPaper ? 'Paper updated!' : 'Paper created!');
     setShowModal(false);
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this question paper?')) {
-      const updated = papers.filter(p => p.id !== id);
-      setPapers(updated);
-      saveQuestionsData(updated);
-      triggerToast('Question paper deleted.');
-    }
-  };
-
-  const filteredPapers = papers.filter(p => {
-    const matchesCategory = categoryFilter === 'all' || p.category === categoryFilter;
-    const matchesSearch = searchQuery.trim() === '' || 
-      (p.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (p.titleEn || '').toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
-  const getCategoryLabel = (cat) => {
-    const labels = {
-      bcs: 'বিসিএস (BCS)',
-      bank: 'ব্যাংক (Bank)',
-      ntrca: 'NTRCA',
-      primary: 'প্রাইমারি (Primary)',
-      ministry: 'বিভিন্ন মন্ত্রনালয় (Ministries)'
-    };
-    return labels[cat] || cat;
-  };
-
   return (
-    <div className="admin-content">
-      {/* Toast Notification */}
+    <div className="manage-questions-page animate-fade-in">
+      <style>{`
+        .admin-card { background: #ffffff; border-radius: 20px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .q-table th { background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 11px; padding: 16px; }
+        .q-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .cat-pill { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; background: #eff6ff; color: #1a56db; }
+      `}</style>
+
       {toast.show && (
-        <div className={`admin-toast ${toast.type === 'error' ? 'error' : ''}`}>
-          <span>{toast.message}</span>
+        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 3000, background: '#10b981', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'slideInRight 0.3s' }}>
+          {toast.message}
         </div>
       )}
 
-      {/* Top Header Actions */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
-          <h2 style={{ fontSize: '20px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>Questions Bank Management</h2>
-          <p style={{ fontSize: '13px', color: '#64748b', margin: 0 }}>Add, edit, or delete question papers and their nested MCQs by category</p>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Questions Bank</h1>
+          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Manage academic and competitive question papers</p>
         </div>
-        <button className="admin-btn admin-btn-primary" onClick={handleOpenAdd}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          <span>Create Question Paper</span>
+        <button onClick={handleOpenAdd} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Create Paper
         </button>
       </div>
 
-      {/* Filters Toolbar */}
-      <div style={{
-        background: '#ffffff',
-        border: '1px solid #e2e8f0',
-        borderRadius: '12px',
-        padding: '16px',
-        marginBottom: '20px',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '16px',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748b' }}>Filter Category:</span>
-          {['all', 'bcs', 'bank', 'ntrca', 'primary', 'ministry'].map(cat => (
-            <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
-              className="admin-btn"
-              style={{
-                padding: '6px 12px',
-                fontSize: '12.5px',
-                borderRadius: '8px',
-                fontWeight: 600,
-                background: categoryFilter === cat ? '#eff6ff' : 'transparent',
-                color: categoryFilter === cat ? '#1a56db' : '#64748b',
-                border: categoryFilter === cat ? '1px solid #dbeafe' : '1px solid transparent'
-              }}
-            >
-              {cat === 'all' ? 'All' : getCategoryLabel(cat)}
-            </button>
-          ))}
+      <div className="admin-card" style={{ padding: '24px', marginBottom: '2rem', display: 'flex', gap: '20px', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+           <svg style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+           <input placeholder="Search questions..." style={{ width: '100%', padding: '14px 48px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', outline: 'none' }} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
         </div>
-
-        <div className="admin-search">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input
-            type="text"
-            placeholder="Search papers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+        <select style={{ padding: '14px 24px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', outline: 'none', fontWeight: 600 }} value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+           <option value="all">All Categories</option>
+           {['bcs', 'bank', 'ntrca', 'primary', 'ministry'].map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+        </select>
       </div>
 
-      {/* Table list of Question Papers */}
-      <div className="admin-table-wrapper">
-        <div className="admin-table-header">
-          <h3 className="admin-table-title">Question Papers List ({filteredPapers.length})</h3>
-        </div>
-        <table className="admin-table">
+      <div className="admin-card" style={{ overflow: 'hidden' }}>
+        <table className="q-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
           <thead>
             <tr>
               <th>Paper Title</th>
               <th>Category</th>
-              <th>Questions</th>
-              <th>Time Limit</th>
               <th>Date</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
+              <th>Time Limit</th>
+              <th style={{ textAlign: 'center' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredPapers.map(paper => (
+            {papers.filter(p => categoryFilter === 'all' || p.category === categoryFilter).map(paper => (
               <tr key={paper.id}>
                 <td>
-                  <div style={{ fontWeight: 600, color: '#1e293b', fontSize: '13.5px' }}>{paper.title}</div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>{paper.titleEn}</div>
+                  <div style={{ fontWeight: 700, color: '#1e293b' }}>{paper.titleEn}</div>
+                  <div style={{ fontSize: '12px', color: '#64748b' }}>{paper.title}</div>
                 </td>
-                <td>
-                  <span className="status-badge status-pending" style={{ textTransform: 'capitalize' }}>
-                    {paper.category}
-                  </span>
-                </td>
-                <td style={{ fontWeight: 600, color: '#334155' }}>
-                  {paper.questions?.length || paper.totalQuestions || 0} MCQs
-                </td>
-                <td style={{ fontSize: '13px', color: '#64748b' }}>
-                  {paper.timeLimitEn}
-                </td>
-                <td style={{ fontSize: '13px', color: '#64748b' }}>
-                  {paper.dateEn}
-                </td>
-                <td style={{ textAlign: 'right' }}>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                    <button
-                      onClick={() => handleOpenEdit(paper)}
-                      className="admin-btn admin-btn-secondary admin-btn-sm"
-                      style={{ padding: '6px 10px', fontSize: '12px' }}
-                    >
-                      Edit Questions & Info
-                    </button>
-                    <button
-                      onClick={() => handleDelete(paper.id)}
-                      className="admin-btn admin-btn-danger admin-btn-sm"
-                      style={{ padding: '6px 10px', fontSize: '12px' }}
-                    >
-                      Delete
-                    </button>
-                  </div>
+                <td><span className="cat-pill">{paper.category}</span></td>
+                <td style={{ color: '#475569', fontWeight: 600 }}>{paper.dateEn || 'N/A'}</td>
+                <td style={{ color: '#475569', fontWeight: 600 }}>{paper.timeLimitEn}</td>
+                <td style={{ textAlign: 'center' }}>
+                   <button onClick={() => { if(window.confirm('Delete paper?')) { setPapers(papers.filter(p => p.id !== paper.id)); triggerToast('Deleted!'); } }} style={{ padding: '8px 16px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '8px', fontWeight: 700, cursor: 'pointer' }}>Delete</button>
                 </td>
               </tr>
             ))}
-            {filteredPapers.length === 0 && (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '40px 20px', color: '#94a3b8' }}>
-                  No question papers found matching filters.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
 
-      {/* Add / Edit Modal */}
       {showModal && (
-        <div className="admin-modal-overlay">
-          <div className="admin-modal" style={{ maxWidth: '800px', width: '90%' }}>
-            <div className="admin-modal-header">
-              <h3>{currentPaper ? 'Edit Question Paper' : 'Create Question Paper'}</h3>
-              <button
-                className="admin-btn admin-btn-ghost admin-btn-icon"
-                onClick={() => setShowModal(false)}
-                style={{ fontSize: '20px', cursor: 'pointer' }}
-              >
-                ✕
-              </button>
-            </div>
-            <form onSubmit={handleSave}>
-              <div className="admin-modal-body" style={{ maxHeight: '65vh', overflowY: 'auto' }}>
-                <h4 style={{ fontSize: '13.5px', fontWeight: 700, color: '#1e293b', marginBottom: '14px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>Paper Configurations</h4>
-                
-                <div className="admin-form-row">
-                  <div className="admin-form-group">
-                    <label className="admin-form-label">Title (Bengali)</label>
-                    <input
-                      type="text"
-                      className="admin-form-input"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      placeholder="যেমন: ৪৫তম বিসিএস প্রিলিমিনারি প্রশ্ন"
-                      required
-                    />
-                  </div>
-                  <div className="admin-form-group">
-                    <label className="admin-form-label">Title (English)</label>
-                    <input
-                      type="text"
-                      className="admin-form-input"
-                      value={titleEn}
-                      onChange={(e) => setTitleEn(e.target.value)}
-                      placeholder="e.g. 45th BCS Preliminary Question"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="admin-form-row">
-                  <div className="admin-form-group">
-                    <label className="admin-form-label">Category</label>
-                    <select
-                      className="admin-form-input admin-form-select"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                    >
-                      <option value="bcs">বিসিএস (BCS)</option>
-                      <option value="bank">ব্যাংক (Bank)</option>
-                      <option value="ntrca">NTRCA</option>
-                      <option value="primary">প্রাইমারি (Primary)</option>
-                      <option value="ministry">বিভিন্ন মন্ত্রনালয় (Ministries)</option>
-                      <option value="new_category">-- Add New Category --</option>
-                    </select>
-                  </div>
-                  <div className="admin-form-group">
-                    <label className="admin-form-label">Time Limit (English)</label>
-                    <input
-                      type="text"
-                      className="admin-form-input"
-                      value={timeLimitEn}
-                      onChange={(e) => setTimeLimitEn(e.target.value)}
-                      placeholder="e.g. 10 Mins"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {category === 'new_category' && (
-                  <div className="admin-form-row animate-fade-in" style={{ border: '1.5px dashed var(--primary)', borderRadius: '8px', padding: '12px', marginBottom: '16px', backgroundColor: 'rgba(26, 86, 219, 0.02)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                    <div className="admin-form-group">
-                      <label className="admin-form-label" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>New Category Name (Bengali)</label>
-                      <input
-                        type="text"
-                        className="admin-form-input"
-                        value={customCategory}
-                        onChange={(e) => setCustomCategory(e.target.value)}
-                        placeholder="যেমন: রেলওয়ে"
-                        required
-                      />
-                    </div>
-                    <div className="admin-form-group">
-                      <label className="admin-form-label" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>New Category Name (English)</label>
-                      <input
-                        type="text"
-                        className="admin-form-input"
-                        value={customCategoryEn}
-                        onChange={(e) => setCustomCategoryEn(e.target.value)}
-                        placeholder="e.g. Railway"
-                        required
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="admin-form-row">
-                  <div className="admin-form-group">
-                    <label className="admin-form-label">Exam Date (Bengali)</label>
-                    <input
-                      type="text"
-                      className="admin-form-input"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      placeholder="যেমন: ১৯ মে ২০২৩"
-                    />
-                  </div>
-                  <div className="admin-form-group">
-                    <label className="admin-form-label">Exam Date (English)</label>
-                    <input
-                      type="text"
-                      className="admin-form-input"
-                      value={dateEn}
-                      onChange={(e) => setDateEn(e.target.value)}
-                      placeholder="e.g. 19 May 2023"
-                    />
-                  </div>
-                </div>
-
-                <h4 style={{ fontSize: '13.5px', fontWeight: 700, color: '#1e293b', marginTop: '24px', marginBottom: '14px', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>Questions Sheet List ({questions.length})</span>
-                  <button
-                    type="button"
-                    className="admin-btn admin-btn-secondary admin-btn-sm"
-                    onClick={handleAddQuestionRow}
-                    style={{ padding: '4px 10px', fontSize: '11px' }}
-                  >
-                    + Add MCQ Row
-                  </button>
-                </h4>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  {questions.map((q, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        background: '#f8fafc',
-                        border: '1px solid #e2e8f0',
-                        borderRadius: '12px',
-                        padding: '16px',
-                        position: 'relative'
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveQuestionRow(idx)}
-                        style={{
-                          position: 'absolute',
-                          top: '12px',
-                          right: '12px',
-                          background: 'none',
-                          border: 'none',
-                          color: '#ef4444',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                          fontSize: '13px'
-                        }}
-                      >
-                        Remove MCQ
-                      </button>
-
-                      <div style={{ fontWeight: 700, fontSize: '13px', color: '#64748b', marginBottom: '12px' }}>
-                        MCQ Question #{idx + 1}
-                      </div>
-
-                      <div className="admin-form-row">
-                        <div className="admin-form-group">
-                          <label className="admin-form-label">Question Text (Bengali)</label>
-                          <input
-                            type="text"
-                            className="admin-form-input"
-                            value={q.question}
-                            onChange={(e) => handleQuestionFieldChange(idx, 'question', e.target.value)}
-                            placeholder="যেমন: বাংলা সাহিত্যের প্রাচীনতম নিদর্শন কোনটি?"
-                            required
-                          />
-                        </div>
-                        <div className="admin-form-group">
-                          <label className="admin-form-label">Question Text (English)</label>
-                          <input
-                            type="text"
-                            className="admin-form-input"
-                            value={q.questionEn}
-                            onChange={(e) => handleQuestionFieldChange(idx, 'questionEn', e.target.value)}
-                            placeholder="e.g. Which is the oldest literary work in Bengali literature?"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      {/* Options Bengali */}
-                      <div className="admin-form-label" style={{ marginTop: '8px', marginBottom: '8px' }}>MCQ Options (Bengali)</div>
-                      <div className="admin-form-row" style={{ marginBottom: '8px' }}>
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.options[0]}
-                          onChange={(e) => handleOptionChange(idx, 0, false, e.target.value)}
-                          placeholder="Option A (ক)"
-                          required
-                        />
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.options[1]}
-                          onChange={(e) => handleOptionChange(idx, 1, false, e.target.value)}
-                          placeholder="Option B (খ)"
-                          required
-                        />
-                      </div>
-                      <div className="admin-form-row">
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.options[2]}
-                          onChange={(e) => handleOptionChange(idx, 2, false, e.target.value)}
-                          placeholder="Option C (গ)"
-                          required
-                        />
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.options[3]}
-                          onChange={(e) => handleOptionChange(idx, 3, false, e.target.value)}
-                          placeholder="Option D (ঘ)"
-                          required
-                        />
-                      </div>
-
-                      {/* Options English */}
-                      <div className="admin-form-label" style={{ marginTop: '12px', marginBottom: '8px' }}>MCQ Options (English)</div>
-                      <div className="admin-form-row" style={{ marginBottom: '8px' }}>
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.optionsEn[0]}
-                          onChange={(e) => handleOptionChange(idx, 0, true, e.target.value)}
-                          placeholder="Option A (English)"
-                          required
-                        />
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.optionsEn[1]}
-                          onChange={(e) => handleOptionChange(idx, 1, true, e.target.value)}
-                          placeholder="Option B (English)"
-                          required
-                        />
-                      </div>
-                      <div className="admin-form-row">
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.optionsEn[2]}
-                          onChange={(e) => handleOptionChange(idx, 2, true, e.target.value)}
-                          placeholder="Option C (English)"
-                          required
-                        />
-                        <input
-                          type="text"
-                          className="admin-form-input"
-                          value={q.optionsEn[3]}
-                          onChange={(e) => handleOptionChange(idx, 3, true, e.target.value)}
-                          placeholder="Option D (English)"
-                          required
-                        />
-                      </div>
-
-                      <div className="admin-form-row" style={{ marginTop: '12px' }}>
-                        <div className="admin-form-group">
-                          <label className="admin-form-label">Correct Option Index (0-3)</label>
-                          <select
-                            className="admin-form-input admin-form-select"
-                            value={q.correctIndex}
-                            onChange={(e) => handleQuestionFieldChange(idx, 'correctIndex', Number(e.target.value))}
-                          >
-                            <option value={0}>Option A (ক)</option>
-                            <option value={1}>Option B (খ)</option>
-                            <option value={2}>Option C (গ)</option>
-                            <option value={3}>Option D (ঘ)</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <div className="admin-form-row">
-                        <div className="admin-form-group">
-                          <label className="admin-form-label">Explanation (Bengali)</label>
-                          <textarea
-                            className="admin-form-input admin-form-textarea"
-                            value={q.explanation}
-                            onChange={(e) => handleQuestionFieldChange(idx, 'explanation', e.target.value)}
-                            placeholder="সঠিক উত্তরের ব্যাখ্যা..."
-                          />
-                        </div>
-                        <div className="admin-form-group">
-                          <label className="admin-form-label">Explanation (English)</label>
-                          <textarea
-                            className="admin-form-input admin-form-textarea"
-                            value={q.explanationEn}
-                            onChange={(e) => handleQuestionFieldChange(idx, 'explanationEn', e.target.value)}
-                            placeholder="Explanation of correct answer..."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="admin-modal-footer">
-                <button
-                  type="button"
-                  className="admin-btn admin-btn-secondary"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="admin-btn admin-btn-primary">
-                  Save Changes
-                </button>
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(15,23,42,0.4)', backdropFilter: 'blur(8px)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="admin-card animate-fade-in" style={{ width: '90%', maxWidth: '600px', padding: '32px' }}>
+            <h2 style={{ margin: '0 0 24px 0', fontSize: '22px', fontWeight: 800 }}>New Question Paper</h2>
+            <form onSubmit={handleSave} style={{ display: 'grid', gap: '20px' }}>
+              <input placeholder="Title (English)" style={{ padding: '14px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }} value={titleEn} onChange={e => setTitleEn(e.target.value)} required />
+              <select style={{ padding: '14px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }} value={category} onChange={e => setCategory(e.target.value)}>
+                 {['bcs', 'bank', 'ntrca', 'primary', 'ministry'].map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+              </select>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700 }}>Cancel</button>
+                <button type="submit" style={{ flex: 1, padding: '14px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700 }}>Create</button>
               </div>
             </form>
           </div>

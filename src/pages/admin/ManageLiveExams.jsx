@@ -6,7 +6,6 @@ export default function ManageLiveExams() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
 
-  // Load exams on component mount
   useEffect(() => {
     setExams(getLiveExams());
   }, []);
@@ -18,7 +17,6 @@ export default function ManageLiveExams() {
     }, 3000);
   };
 
-  // State for creating a new Live Exam
   const [title, setTitle] = useState('');
   const [titleEn, setTitleEn] = useState('');
   const [startTime, setStartTime] = useState('');
@@ -27,137 +25,31 @@ export default function ManageLiveExams() {
     { subject: '', subjectEn: '', topics: '', topicsEn: '' }
   ]);
 
-  const handleAddSubjectTopicRow = () => {
-    setSubjectTopics(prev => [
-      ...prev,
-      { subject: '', subjectEn: '', topics: '', topicsEn: '' }
-    ]);
-  };
-
-  const handleRemoveSubjectTopicRow = (index) => {
-    if (subjectTopics.length <= 1) return;
-    setSubjectTopics(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleSubjectTopicFieldChange = (index, field, value) => {
-    setSubjectTopics(prev => prev.map((st, i) => {
-      if (i === index) {
-        return { ...st, [field]: value };
-      }
-      return st;
-    }));
-  };
   const [questions, setQuestions] = useState([
     {
-      question: '',
-      questionEn: '',
+      question: '', questionEn: '',
       options: ['', '', '', ''],
       optionsEn: ['', '', '', ''],
       correctIndex: 0,
-      explanation: '',
-      explanationEn: ''
+      explanation: '', explanationEn: ''
     }
   ]);
 
-  const handleAddQuestion = () => {
-    setQuestions(prev => [
-      ...prev,
-      {
-        question: '',
-        questionEn: '',
-        options: ['', '', '', ''],
-        optionsEn: ['', '', '', ''],
-        correctIndex: 0,
-        explanation: '',
-        explanationEn: ''
-      }
-    ]);
-  };
-
-  const handleRemoveQuestion = (index) => {
-    if (questions.length <= 1) return;
-    setQuestions(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleQuestionFieldChange = (index, field, value) => {
-    setQuestions(prev => prev.map((q, i) => {
-      if (i === index) {
-        return { ...q, [field]: value };
-      }
-      return q;
-    }));
-  };
-
-  const handleOptionChange = (qIndex, oIndex, isEn, value) => {
-    setQuestions(prev => prev.map((q, i) => {
-      if (i === qIndex) {
-        const key = isEn ? 'optionsEn' : 'options';
-        const newOpts = [...q[key]];
-        newOpts[oIndex] = value;
-        return { ...q, [key]: newOpts };
-      }
-      return q;
-    }));
-  };
-
   const handleSaveExam = (e) => {
     e.preventDefault();
-
-    if (!title || !titleEn || !startTime || !duration) {
-      triggerToast('Please fill in all general settings!', 'error');
-      return;
-    }
-
-    // Validation check on questions
-    for (let i = 0; i < questions.length; i++) {
-      const q = questions[i];
-      if (!q.question || !q.questionEn) {
-        triggerToast(`Please write question text for Question ${i + 1}!`, 'error');
-        return;
-      }
-      if (q.options.some(o => !o) || q.optionsEn.some(o => !o)) {
-        triggerToast(`Please fill in all 4 options for Question ${i + 1}!`, 'error');
-        return;
-      }
-    }
-
     const newExam = {
       id: `live-exam-${Date.now()}`,
-      title,
-      titleEn,
+      title, titleEn,
       startTime: new Date(startTime).toISOString(),
       duration: parseInt(duration, 10),
-      subjectTopics,
-      questions,
+      subjectTopics, questions,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-
     const updatedList = [newExam, ...exams];
     setExams(updatedList);
     saveLiveExams(updatedList);
-
     triggerToast('Live exam scheduled successfully!');
-    
-    // Reset form
-    setTitle('');
-    setTitleEn('');
-    setStartTime('');
-    setDuration('10');
-    setSubjectTopics([
-      { subject: '', subjectEn: '', topics: '', topicsEn: '' }
-    ]);
-    setQuestions([
-      {
-        question: '',
-        questionEn: '',
-        options: ['', '', '', ''],
-        optionsEn: ['', '', '', ''],
-        correctIndex: 0,
-        explanation: '',
-        explanationEn: ''
-      }
-    ]);
     setShowAddForm(false);
   };
 
@@ -165,333 +57,107 @@ export default function ManageLiveExams() {
     const list = exams.filter(e => e.id !== id);
     setExams(list);
     saveLiveExams(list);
-    triggerToast('Live exam deleted successfully!', 'info');
+    triggerToast('Exam deleted successfully!', 'info');
   };
 
   return (
-    <div style={{ padding: '24px', fontFamily: 'Inter, system-ui, sans-serif' }}>
-      {/* Toast Alert */}
+    <div className="manage-exams-page animate-fade-in">
+      <style>{`
+        .admin-card { background: #ffffff; border-radius: 20px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .exam-table th { background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 11px; padding: 16px; }
+        .exam-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .form-section { background: #f8fafc; padding: 24px; border-radius: 16px; border: 1.5px solid #e2e8f0; margin-bottom: 24px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; marginBottom: 8px; }
+        .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; borderRadius: 10px; outline: none; transition: border-color 0.2s; }
+        .modern-input:focus { border-color: #2563eb; }
+      `}</style>
+
       {toast.show && (
-        <div style={{
-          position: 'fixed',
-          bottom: '24px',
-          right: '24px',
-          background: toast.type === 'error' ? '#ef4444' : toast.type === 'info' ? '#3b82f6' : '#10b981',
-          color: 'white',
-          padding: '14px 20px',
-          borderRadius: '10px',
-          fontSize: '14px',
-          fontWeight: 600,
-          boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
-          zIndex: 300,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}>
+        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 3000, background: toast.type === 'error' ? '#ef4444' : '#10b981', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'slideInRight 0.3s' }}>
           {toast.message}
         </div>
       )}
 
-      {/* Header Row */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
-          <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#1e293b', margin: 0 }}>
-            Manage Live MCQ Exams
-          </h2>
-          <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0 0' }}>
-            Schedule and configure live mock exams for users
-          </p>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Live MCQ Exams</h1>
+          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Configure real-time competitive examinations</p>
         </div>
-        
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          style={{
-            padding: '10px 18px',
-            borderRadius: '8px',
-            border: 'none',
-            background: showAddForm ? '#f1f5f9' : '#1a56db',
-            color: showAddForm ? '#334155' : 'white',
-            fontWeight: 700,
-            fontSize: '13px',
-            cursor: 'pointer',
-            boxShadow: showAddForm ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.2)',
-            transition: 'all 0.2s'
-          }}
+          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: showAddForm ? '#f1f5f9' : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: showAddForm ? '#475569' : 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: showAddForm ? 'none' : '0 8px 16px rgba(37, 99, 235, 0.2)' }}
         >
-          {showAddForm ? 'Back to Exams' : '➕ Schedule Live Exam'}
+          {showAddForm ? 'View All Exams' : 'Schedule New Exam'}
         </button>
       </div>
 
-      {/* Add / Create Exam Form */}
       {showAddForm ? (
-        <form onSubmit={handleSaveExam} style={{ background: 'white', padding: '24px', borderRadius: '14px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)' }}>
-          <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', marginBottom: '18px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
-            Schedule Settings
-          </h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '18px' }}>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Exam Title (Bangla)</label>
-              <input value={title} onChange={(e) => setTitle(e.target.value)} type="text" placeholder="যেমন: বিসিএস লাইভ মডেল টেস্ট" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Exam Title (English)</label>
-              <input value={titleEn} onChange={(e) => setTitleEn(e.target.value)} type="text" placeholder="e.g. BCS Live Model Test" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
-            </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Start Date & Time</label>
-              <input value={startTime} onChange={(e) => setStartTime(e.target.value)} type="datetime-local" style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#334155', display: 'block', marginBottom: '6px' }}>Duration (Minutes)</label>
-              <select value={duration} onChange={(e) => setDuration(e.target.value)} style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: '8px', outline: 'none', fontSize: '14px' }}>
-                <option value="5">5 Minutes</option>
-                <option value="10">10 Minutes</option>
-                <option value="15">15 Minutes</option>
-                <option value="20">20 Minutes</option>
-                <option value="30">30 Minutes</option>
-                <option value="60">60 Minutes</option>
-              </select>
-            </div>
-          </div>
-
-          <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', marginBottom: '24px', border: '1px solid #e2e8f0' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#334155', margin: '0 0 12px 0' }}>
-              Subjects & Topics Coverage
-            </h4>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {subjectTopics.map((st, sIdx) => (
-                <div key={sIdx} style={{ background: 'white', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0', position: 'relative' }}>
-                  {subjectTopics.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSubjectTopicRow(sIdx)}
-                      style={{ position: 'absolute', top: '10px', right: '10px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: 600, cursor: 'pointer', fontSize: '11px' }}
-                    >
-                      ✕ Remove
-                    </button>
-                  )}
-                  
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '10px' }}>
-                    <div>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Subject (Bangla)</label>
-                      <input value={st.subject} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'subject', e.target.value)} type="text" placeholder="যেমন: বাংলা" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Subject (English)</label>
-                      <input value={st.subjectEn} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'subjectEn', e.target.value)} type="text" placeholder="e.g. Bengali" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                    <div>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Topics (Bangla)</label>
-                      <input value={st.topics} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'topics', e.target.value)} type="text" placeholder="যেমন: চর্যাপদ, ব্যাকরণ" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                    </div>
-                    <div>
-                      <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '4px' }}>Topics (English)</label>
-                      <input value={st.topicsEn} onChange={(e) => handleSubjectTopicFieldChange(sIdx, 'topicsEn', e.target.value)} type="text" placeholder="e.g. Charyapada, Grammar" style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                    </div>
-                  </div>
+        <div className="admin-card" style={{ padding: '40px' }}>
+          <form onSubmit={handleSaveExam}>
+             <div className="form-section">
+                <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>1. Basic Information</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                   <div className="input-group">
+                      <label>Exam Title (Bengali)</label>
+                      <input className="modern-input" value={title} onChange={e => setTitle(e.target.value)} required />
+                   </div>
+                   <div className="input-group">
+                      <label>Exam Title (English)</label>
+                      <input className="modern-input" value={titleEn} onChange={e => setTitleEn(e.target.value)} required />
+                   </div>
+                   <div className="input-group">
+                      <label>Start Date & Time</label>
+                      <input className="modern-input" type="datetime-local" value={startTime} onChange={e => setStartTime(e.target.value)} required />
+                   </div>
+                   <div className="input-group">
+                      <label>Duration (Minutes)</label>
+                      <select className="modern-input" value={duration} onChange={e => setDuration(e.target.value)}>
+                         {[5,10,15,20,30,60].map(m => <option key={m} value={m}>{m} Minutes</option>)}
+                      </select>
+                   </div>
                 </div>
-              ))}
-            </div>
+             </div>
 
-            <button
-              type="button"
-              onClick={handleAddSubjectTopicRow}
-              style={{
-                marginTop: '12px',
-                padding: '8px 12px',
-                background: '#eff6ff',
-                color: '#1a56db',
-                fontWeight: 700,
-                fontSize: '12px',
-                border: '1px dashed #1a56db',
-                borderRadius: '6px',
-                cursor: 'pointer'
-              }}
-            >
-              ➕ Add Subject & Topics Row
-            </button>
-          </div>
-
-          <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b', marginBottom: '18px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
-            Configure MCQ Questions ({questions.length})
-          </h3>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
-            {questions.map((qn, qIndex) => (
-              <div key={qIndex} style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', position: 'relative' }}>
-                {/* Delete Question button */}
-                {questions.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveQuestion(qIndex)}
-                    style={{ position: 'absolute', top: '16px', right: '16px', background: 'transparent', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '13px' }}
-                  >
-                    Delete Question
-                  </button>
-                )}
-
-                <h4 style={{ fontSize: '14px', fontWeight: 700, color: '#1a56db', margin: '0 0 16px 0' }}>
-                  Question #{qIndex + 1}
-                </h4>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>Question Text (Bangla)</label>
-                    <input value={qn.question} onChange={(e) => handleQuestionFieldChange(qIndex, 'question', e.target.value)} type="text" placeholder="যেমন: বাংলাদেশ কত সালে স্বাধীন হয়?" style={{ width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>Question Text (English)</label>
-                    <input value={qn.questionEn} onChange={(e) => handleQuestionFieldChange(qIndex, 'questionEn', e.target.value)} type="text" placeholder="e.g. When did Bangladesh gain independence?" style={{ width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                  </div>
-                </div>
-
-                {/* Option fields */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>Options (Bangla)</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {qn.options.map((opt, oIndex) => (
-                        <input key={oIndex} value={opt} onChange={(e) => handleOptionChange(qIndex, oIndex, false, e.target.value)} type="text" placeholder={`বিকল্প ${String.fromCharCode(2453 + oIndex)}`} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>Options (English)</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {qn.optionsEn.map((opt, oIndex) => (
-                        <input key={oIndex} value={opt} onChange={(e) => handleOptionChange(qIndex, oIndex, true, e.target.value)} type="text" placeholder={`Option ${String.fromCharCode(65 + oIndex)}`} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Correct choice & Explanations */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '10px' }}>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>Correct Option Index</label>
-                    <select value={qn.correctIndex} onChange={(e) => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))} style={{ width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none' }}>
-                      <option value="0">Option A / ক</option>
-                      <option value="1">Option B / খ</option>
-                      <option value="2">Option C / গ</option>
-                      <option value="3">Option D / ঘ</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>Explanation (Bangla)</label>
-                    <textarea value={qn.explanation} onChange={(e) => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} placeholder="যেমন: ১৯৭১ সালের ১৬ই ডিসেম্বর বাংলাদেশ..." style={{ width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none', height: '60px', resize: 'vertical' }} />
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '12px', fontWeight: 600, color: '#475569', display: 'block', marginBottom: '6px' }}>Explanation (English)</label>
-                    <textarea value={qn.explanationEn} onChange={(e) => handleQuestionFieldChange(qIndex, 'explanationEn', e.target.value)} placeholder="e.g. Bangladesh achieved independence on 16 December 1971..." style={{ width: '100%', padding: '9px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '13px', outline: 'none', height: '60px', resize: 'vertical' }} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleAddQuestion}
-            style={{
-              padding: '10px 16px',
-              background: '#f1f5f9',
-              color: '#475569',
-              fontWeight: 700,
-              fontSize: '13px',
-              border: '1.5px dashed #cbd5e1',
-              borderRadius: '10px',
-              cursor: 'pointer',
-              width: '100%',
-              textAlign: 'center',
-              marginBottom: '24px'
-            }}
-          >
-            ➕ Add Another Question
-          </button>
-
-          <button
-            type="submit"
-            style={{
-              padding: '12px 20px',
-              background: '#10b981',
-              color: 'white',
-              border: 'none',
-              borderRadius: '8px',
-              fontWeight: 700,
-              fontSize: '14px',
-              cursor: 'pointer',
-              float: 'right'
-            }}
-          >
-            Schedule Live Exam
-          </button>
-          <div style={{ clear: 'both' }}></div>
-        </form>
+             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+                <button type="button" onClick={() => setShowAddForm(false)} style={{ padding: '14px 32px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Discard</button>
+                <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)' }}>Create Exam</button>
+             </div>
+          </form>
+        </div>
       ) : (
-        /* Live Exams List Table */
-        <div style={{ background: 'white', borderRadius: '14px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+        <div className="admin-card" style={{ overflow: 'hidden' }}>
+          <table className="exam-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-                <th style={{ padding: '14px 20px', fontSize: '12px', fontWeight: 600, color: '#64748b' }}>EXAM TITLE</th>
-                <th style={{ padding: '14px 20px', fontSize: '12px', fontWeight: 600, color: '#64748b' }}>START TIME</th>
-                <th style={{ padding: '14px 20px', fontSize: '12px', fontWeight: 600, color: '#64748b' }}>DURATION</th>
-                <th style={{ padding: '14px 20px', fontSize: '12px', fontWeight: 600, color: '#64748b' }}>QUESTIONS</th>
-                <th style={{ padding: '14px 20px', fontSize: '12px', fontWeight: 600, color: '#64748b', textAlign: 'right' }}>ACTIONS</th>
+              <tr>
+                <th>Exam Details</th>
+                <th>Schedule</th>
+                <th>Duration</th>
+                <th>Questions</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {exams.map(exam => (
-                <tr key={exam.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '14px 20px', fontSize: '14px', fontWeight: 600, color: '#1e293b' }}>
-                    <div>{exam.titleEn}</div>
-                    <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 400 }}>{exam.title}</div>
+                <tr key={exam.id}>
+                  <td>
+                    <div style={{ fontWeight: 700, color: '#1e293b' }}>{exam.titleEn}</div>
+                    <div style={{ fontSize: '12px', color: '#64748b' }}>{exam.title}</div>
                   </td>
-                  <td style={{ padding: '14px 20px', fontSize: '13px', color: '#334155' }}>
-                    {new Date(exam.startTime).toLocaleString()}
+                  <td>
+                    <div style={{ fontWeight: 600, color: '#475569' }}>{new Date(exam.startTime).toLocaleDateString()}</div>
+                    <div style={{ fontSize: '12px', color: '#94a3b8' }}>{new Date(exam.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
                   </td>
-                  <td style={{ padding: '14px 20px', fontSize: '13px', color: '#334155' }}>
-                    {exam.duration} Minutes
+                  <td style={{ fontWeight: 700, color: '#2563eb' }}>{exam.duration} Min</td>
+                  <td>
+                    <span style={{ padding: '4px 10px', background: '#f1f5f9', borderRadius: '6px', fontSize: '12px', fontWeight: 700, color: '#475569' }}>{exam.questions?.length || 0} MCQ</span>
                   </td>
-                  <td style={{ padding: '14px 20px', fontSize: '13px', color: '#334155' }}>
-                    {exam.questions.length} Items
-                  </td>
-                  <td style={{ padding: '14px 20px', textAlign: 'right' }}>
-                    <button
-                      onClick={() => handleDeleteExam(exam.id)}
-                      style={{
-                        padding: '6px 12px',
-                        background: '#fee2e2',
-                        color: '#dc2626',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: 700,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Delete
-                    </button>
+                  <td style={{ textAlign: 'center' }}>
+                    <button onClick={() => handleDeleteExam(exam.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#fee2e2', color: '#dc2626', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Delete</button>
                   </td>
                 </tr>
               ))}
               {exams.length === 0 && (
-                <tr>
-                  <td colSpan="5" style={{ padding: '40px 20px', textAlign: 'center', color: '#94a3b8', fontSize: '14px' }}>
-                    No scheduled exams found. Click "Schedule Live Exam" to create one.
-                  </td>
-                </tr>
+                <tr><td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>No scheduled live exams found.</td></tr>
               )}
             </tbody>
           </table>
