@@ -133,8 +133,17 @@ export default function Home() {
     rawFeed.forEach(item => {
       const baseId = String(item.jobId || item.originalId || item.id);
       const existing = deduplicatedMap.get(baseId);
-      if (!existing || (item.feedType === 'exam_date' || item.feedType === 'result')) {
+
+      if (!existing) {
         deduplicatedMap.set(baseId, item);
+      } else {
+        // If multiple updates exist, prefer the one with the latest timestamp
+        const currentTS = getItemTimestamp(item);
+        const existingTS = getItemTimestamp(existing);
+
+        if (currentTS >= existingTS) {
+          deduplicatedMap.set(baseId, item);
+        }
       }
     });
 

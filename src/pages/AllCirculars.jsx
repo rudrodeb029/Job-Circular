@@ -159,9 +159,16 @@ export default function AllCirculars() {
       const baseId = item.originalId || item.id;
       const existing = deduplicatedMap.get(baseId);
 
-      // If we have an 'exam_date' or 'result' type, it should override a standard 'job' type
-      if (!existing || (item.feedType === 'exam_date' || item.feedType === 'result')) {
+      if (!existing) {
         deduplicatedMap.set(baseId, item);
+      } else {
+        // Prefer the most recent update based on timestamp
+        const currentTS = getItemTimestamp(item);
+        const existingTS = getItemTimestamp(existing);
+
+        if (currentTS >= existingTS) {
+          deduplicatedMap.set(baseId, item);
+        }
       }
     });
 
