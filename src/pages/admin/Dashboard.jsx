@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
@@ -325,10 +325,6 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
-};
-
     </div>
   );
 };
