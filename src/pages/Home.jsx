@@ -88,22 +88,13 @@ export default function Home() {
   const combinedFeedItems = useMemo(() => {
     if (localJobs.length === 0) return [];
 
-    // Create a set of unexpired job IDs for quick lookup
-    const activeJobIds = new Set(
-      localJobs
-        .filter(job => !isExpired(job.deadline))
-        .map(job => String(job.id))
-    );
-
     const jobItems = localJobs
-      .filter(job => !job.showInExamDate && !job.showInResult && activeJobIds.has(String(job.id)))
+      .filter(job => !job.showInExamDate && !job.showInResult)
       .map(job => ({ ...job, feedType: 'job' }));
 
-    const notifExamItems = localAdmits
-      .filter(item => item.type === 'admit_card' && activeJobIds.has(String(item.jobId)))
-      .map(item => ({
-        ...item,
-        originalId: item.jobId,
+    const notifExamItems = localAdmits.map(item => ({
+      ...item,
+      originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examDate: item.date,
@@ -113,11 +104,9 @@ export default function Home() {
       feedType: 'exam_date'
     }));
 
-    const notifResultItems = localAdmits
-      .filter(item => item.type === 'result' && activeJobIds.has(String(item.jobId)))
-      .map(item => ({
-        ...item,
-        originalId: item.jobId,
+    const notifResultItems = localAdmits.map(item => ({
+      ...item,
+      originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,
@@ -157,6 +146,14 @@ export default function Home() {
         return String(b.id || '').localeCompare(String(a.id || ''));
       });
   }, [localJobs, localAdmits]);
+
+  const unexpiredFeedCount = useMemo(() => {
+    return combinedFeedItems.filter(item => {
+      const jobId = item.jobId || item.originalId || item.id;
+      const job = localJobs.find(j => String(j.id) === String(jobId));
+      return job ? !isExpired(job.deadline) : true;
+    }).length;
+  }, [combinedFeedItems, localJobs]);
 
   const paginatedFeed = useMemo(() => {
     const indexOfLastPost = currentPage * postsPerPage;
@@ -205,8 +202,8 @@ export default function Home() {
             </p>
             <h2 style={{ color: '#ffffff', fontSize: '26px', fontWeight: 800, marginBottom: '0px', lineHeight: 1 }}>
               {isEn
-                ? `${combinedFeedItems.length}+`
-                : `${toBengaliNumber(combinedFeedItems.length)}+`}
+                ? `${unexpiredFeedCount}+`
+                : `${toBengaliNumber(unexpiredFeedCount)}+`}
             </h2>
             <p style={{ color: '#ffffff', fontSize: '13.5px', fontWeight: 700, marginBottom: '4px', letterSpacing: '-0.1px' }}>
               {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}

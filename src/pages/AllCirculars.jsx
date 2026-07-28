@@ -70,26 +70,15 @@ export default function AllCirculars() {
     const localJobs = adminState.jobs;
     const localAdmits = adminState.admits || [];
 
-    // Create a set of unexpired job IDs for quick lookup
-    const activeJobIds = new Set(
-      localJobs
-        .filter(job => !isExpired(job.deadline))
-        .map(job => String(job.id))
-    );
-
-    const jobItems = localJobs
-      .filter(job => activeJobIds.has(String(job.id)))
-      .map(job => ({
-        ...job,
-        feedType: 'job'
-      }));
+    const jobItems = localJobs.map(job => ({
+      ...job,
+      feedType: 'job'
+    }));
 
     // Exam Date jobs from localJobs
-    const examJobs = localJobs
-      .filter(job => job.examDate && activeJobIds.has(String(job.id)))
-      .map(job => ({
-        ...job,
-        id: `exam_${job.id}`,
+    const examJobs = localJobs.filter(job => job.examDate).map(job => ({
+      ...job,
+      id: `exam_${job.id}`,
       originalId: job.id,
       organization: job.organization,
       organizationEn: job.organizationEn,
@@ -105,11 +94,9 @@ export default function AllCirculars() {
     }));
 
     // Result jobs from localJobs
-    const resultJobs = localJobs
-      .filter(job => job.examResult && activeJobIds.has(String(job.id)))
-      .map(job => ({
-        ...job,
-        id: `result_${job.id}`,
+    const resultJobs = localJobs.filter(job => job.examResult).map(job => ({
+      ...job,
+      id: `result_${job.id}`,
       originalId: job.id,
       organization: job.organization,
       organizationEn: job.organizationEn,
@@ -123,11 +110,9 @@ export default function AllCirculars() {
     }));
 
     // Notifications admit card items from database
-    const notifExamItems = localAdmits
-      .filter(item => item.type === 'admit_card' && activeJobIds.has(String(item.jobId)))
-      .map(item => ({
-        ...item,
-        originalId: item.jobId,
+    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
+      ...item,
+      originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examDate: item.date,
@@ -138,11 +123,9 @@ export default function AllCirculars() {
     }));
 
     // Notifications result items from database
-    const notifResultItems = localAdmits
-      .filter(item => item.type === 'result' && activeJobIds.has(String(item.jobId)))
-      .map(item => ({
-        ...item,
-        originalId: item.jobId,
+    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
+      ...item,
+      originalId: item.jobId,
       postTitle: item.examName,
       postTitleEn: item.examNameEn,
       examResult: item.downloadLink,
