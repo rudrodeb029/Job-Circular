@@ -5,7 +5,9 @@ import { categories } from '../../data/categories';
 import { runDatabaseMigration } from '../../utils/dbMigration';
 
 const Dashboard = () => {
-  const { jobs = [], activities = [] } = useAdminContext();
+  const { state: adminState } = useAdminContext();
+  const jobs = adminState.jobs || [];
+  const activities = adminState.activities || [];
   const navigate = useNavigate();
   const [migrating, setMigrating] = useState(false);
 
