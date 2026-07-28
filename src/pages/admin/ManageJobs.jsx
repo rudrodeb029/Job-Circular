@@ -345,7 +345,6 @@ export default function ManageJobs() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Manage Circulars</h1>
-          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Overview of all published job advertisements</p>
         </div>
         <button
           onClick={() => handleOpenModal()}

@@ -108,7 +108,6 @@ const AdminSettings = () => {
 
       <div style={{ marginBottom: '2.5rem' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Admin Settings</h1>
-        <p style={{ color: '#64748b', fontSize: '16px', marginTop: '6px' }}>Configure your profile and application preferences</p>
       </div>
 
       <div className="settings-grid">

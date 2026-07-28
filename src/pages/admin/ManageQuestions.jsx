@@ -66,7 +66,6 @@ export default function ManageQuestions() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
         <div>
           <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Questions Bank</h1>
-          <p style={{ color: '#64748b', fontSize: '14px', marginTop: '4px' }}>Manage academic and competitive question papers</p>
         </div>
         <button onClick={handleOpenAdd} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>

@@ -91,7 +91,6 @@ const Dashboard = () => {
       <div className="admin-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
         <div>
           <h1 className="admin-page-title" style={{ color: '#0f172a', fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.025em', margin: 0 }}>Dashboard</h1>
-          <p className="admin-page-subtitle" style={{ color: '#64748b', fontSize: '1.1rem', fontWeight: 500, marginTop: '4px' }}>Welcome back, Admin 👋</p>
         </div>
         <button
           onClick={handleMigration}
