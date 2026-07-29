@@ -143,14 +143,10 @@ export default function ManageLiveExams() {
           <form onSubmit={handleSaveExam}>
              <div className="form-section">
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>1. Basic Information</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
                    <div className="input-group">
                       <label>Exam Title (Bengali)</label>
                       <input className="modern-input" value={title} onChange={e => setTitle(e.target.value)} required />
-                   </div>
-                   <div className="input-group">
-                      <label>Exam Title (English)</label>
-                      <input className="modern-input" value={titleEn} onChange={e => setTitleEn(e.target.value)} required />
                    </div>
                    <div className="input-group">
                       <label>Start Date & Time</label>
@@ -173,24 +169,14 @@ export default function ManageLiveExams() {
                          {subjectTopics.length > 1 && (
                             <button type="button" onClick={() => handleRemoveSubjectTopicRow(sIdx)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}>✕ Remove</button>
                          )}
-                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '10px' }}>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div className="input-group">
                                <label>Subject (Bengali)</label>
                                <input className="modern-input" value={st.subject} onChange={e => handleSubjectTopicFieldChange(sIdx, 'subject', e.target.value)} />
                             </div>
                             <div className="input-group">
-                               <label>Subject (English)</label>
-                               <input className="modern-input" value={st.subjectEn} onChange={e => handleSubjectTopicFieldChange(sIdx, 'subjectEn', e.target.value)} />
-                            </div>
-                         </div>
-                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                            <div className="input-group">
                                <label>Topics (Bengali)</label>
                                <input className="modern-input" value={st.topics} onChange={e => handleSubjectTopicFieldChange(sIdx, 'topics', e.target.value)} />
-                            </div>
-                            <div className="input-group">
-                               <label>Topics (English)</label>
-                               <input className="modern-input" value={st.topicsEn} onChange={e => handleSubjectTopicFieldChange(sIdx, 'topicsEn', e.target.value)} />
                             </div>
                          </div>
                       </div>
@@ -208,47 +194,35 @@ export default function ManageLiveExams() {
                             <button type="button" onClick={() => handleRemoveQuestion(qIndex)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}>Delete Question</button>
                          )}
                          <h4 style={{ margin: '0 0 16px 0', color: '#1a56db', fontSize: '14px', fontWeight: 800 }}>Question #{qIndex + 1}</h4>
-                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
                             <div className="input-group">
                                <label>Question (Bengali)</label>
                                <input className="modern-input" value={qn.question} onChange={e => handleQuestionFieldChange(qIndex, 'question', e.target.value)} />
                             </div>
-                            <div className="input-group">
-                               <label>Question (English)</label>
-                               <input className="modern-input" value={qn.questionEn} onChange={e => handleQuestionFieldChange(qIndex, 'questionEn', e.target.value)} />
-                            </div>
                          </div>
-                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '16px' }}>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px', marginBottom: '16px' }}>
                             <div>
                                <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (Bengali)</label>
-                               {qn.options.map((opt, oIdx) => (
-                                  <input key={oIdx} className="modern-input" style={{ marginBottom: '8px' }} value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} placeholder={`বিকল্প ${oIdx + 1}`} />
-                               ))}
+                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                 {qn.options.map((opt, oIdx) => (
+                                    <input key={oIdx} className="modern-input" value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} placeholder={`বিকল্প ${oIdx + 1}`} />
+                                 ))}
+                               </div>
                             </div>
+                         </div>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
                             <div>
-                               <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (English)</label>
-                               {qn.optionsEn.map((opt, oIdx) => (
-                                  <input key={oIdx} className="modern-input" style={{ marginBottom: '8px' }} value={opt} onChange={e => handleOptionChange(qIndex, oIdx, true, e.target.value)} placeholder={`Option ${oIdx + 1}`} />
-                               ))}
+                               <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Option Index (0-3)</label>
+                               <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
+                                  <option value="0">Option 1 / ক</option>
+                                  <option value="1">Option 2 / খ</option>
+                                  <option value="2">Option 3 / গ</option>
+                                  <option value="3">Option 4 / ঘ</option>
+                               </select>
                             </div>
-                         </div>
-                         <div style={{ marginBottom: '16px' }}>
-                            <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Option Index (0-3)</label>
-                            <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
-                               <option value="0">Option 1 / ক</option>
-                               <option value="1">Option 2 / খ</option>
-                               <option value="2">Option 3 / গ</option>
-                               <option value="3">Option 4 / ঘ</option>
-                            </select>
-                         </div>
-                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div className="input-group">
                                <label>Explanation (Bengali)</label>
-                               <textarea className="modern-input" style={{ height: '80px', resize: 'none' }} value={qn.explanation} onChange={e => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} />
-                            </div>
-                            <div className="input-group">
-                               <label>Explanation (English)</label>
-                               <textarea className="modern-input" style={{ height: '80px', resize: 'none' }} value={qn.explanationEn} onChange={e => handleQuestionFieldChange(qIndex, 'explanationEn', e.target.value)} />
+                               <textarea className="modern-input" style={{ height: '50px', resize: 'none' }} value={qn.explanation} onChange={e => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} />
                             </div>
                          </div>
                       </div>

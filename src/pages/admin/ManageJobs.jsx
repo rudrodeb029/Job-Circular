@@ -374,35 +374,29 @@ export default function ManageJobs() {
             <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0 }}>{editingJob ? 'Edit Circular' : 'New Circular'}</h2>
           </div>
 
-          <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
             <div className="input-group">
                <label>Title (Bengali)</label>
                <input name="title" className="modern-input" value={formData.title} onChange={handleInputChange} required />
             </div>
             <div className="input-group">
-               <label>Title (English)</label>
-               <input name="titleEn" className="modern-input" value={formData.titleEn} onChange={handleInputChange} required />
-            </div>
-            <div className="input-group">
                <label>Organization (Bengali)</label>
                <input name="organization" className="modern-input" value={formData.organization} onChange={handleInputChange} required />
             </div>
-            <div className="input-group">
-               <label>Organization (English)</label>
-               <input name="organizationEn" className="modern-input" value={formData.organizationEn} onChange={handleInputChange} />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div className="input-group">
+                 <label>Category</label>
+                 <select name="categoryId" className="modern-input" value={formData.categoryId} onChange={handleInputChange} required>
+                    <option value="">Select Category</option>
+                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                 </select>
+              </div>
+              <div className="input-group">
+                 <label>Job Type</label>
+                 <input name="jobType" className="modern-input" value={formData.jobType} onChange={handleInputChange} placeholder="e.g. সরকারি, ব্যাংক" />
+              </div>
             </div>
-            <div className="input-group">
-               <label>Category</label>
-               <select name="categoryId" className="modern-input" value={formData.categoryId} onChange={handleInputChange} required>
-                  <option value="">Select Category</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-               </select>
-            </div>
-            <div className="input-group">
-               <label>Job Type</label>
-               <input name="jobType" className="modern-input" value={formData.jobType} onChange={handleInputChange} placeholder="e.g. সরকারি, ব্যাংক" />
-            </div>
-            <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
               <div className="input-group">
                  <label>Location</label>
                  <input name="location" className="modern-input" value={formData.location} onChange={handleInputChange} />

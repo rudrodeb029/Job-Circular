@@ -226,10 +226,6 @@ export default function ManageQuestions() {
                 <input className="modern-input" value={title} onChange={e => setTitle(e.target.value)} required />
               </div>
               <div className="input-group">
-                <label>Title (English)</label>
-                <input className="modern-input" value={titleEn} onChange={e => setTitleEn(e.target.value)} required />
-              </div>
-              <div className="input-group">
                 <label>Category</label>
                 <select className="modern-input" value={category} onChange={e => setCategory(e.target.value)}>
                   {['bcs', 'bank', 'ntrca', 'primary', 'ministry'].map(c => <option key={c} value={c}>{getCategoryLabel(c)}</option>)}
@@ -243,10 +239,6 @@ export default function ManageQuestions() {
                 <label>Exam Date (Bengali)</label>
                 <input className="modern-input" value={date} onChange={e => setDate(e.target.value)} />
               </div>
-              <div className="input-group">
-                <label>Exam Date (English)</label>
-                <input className="modern-input" value={dateEn} onChange={e => setDateEn(e.target.value)} />
-              </div>
             </div>
 
             <div style={{ borderTop: '2px solid #f1f5f9', paddingTop: '32px' }}>
@@ -257,50 +249,38 @@ export default function ManageQuestions() {
                        <button type="button" onClick={() => handleRemoveQuestionRow(qIndex)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}>Remove MCQ</button>
                        <h4 style={{ margin: '0 0 16px 0', color: '#1a56db', fontSize: '14px', fontWeight: 800 }}>MCQ Question #{qIndex + 1}</h4>
 
-                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', marginBottom: '20px' }}>
                           <div className="input-group">
                              <label>Question Text (Bengali)</label>
                              <input className="modern-input" value={qn.question} onChange={e => handleQuestionFieldChange(qIndex, 'question', e.target.value)} required />
                           </div>
-                          <div className="input-group">
-                             <label>Question Text (English)</label>
-                             <input className="modern-input" value={qn.questionEn} onChange={e => handleQuestionFieldChange(qIndex, 'questionEn', e.target.value)} required />
-                          </div>
                        </div>
 
-                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '20px' }}>
+                       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px', marginBottom: '20px' }}>
                           <div>
                              <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (Bengali)</label>
-                             {qn.options.map((opt, oIdx) => (
-                                <input key={oIdx} className="modern-input" style={{ marginBottom: '8px' }} value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} placeholder={`বিকল্প ${oIdx + 1}`} required />
-                             ))}
-                          </div>
-                          <div>
-                             <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (English)</label>
-                             {qn.optionsEn.map((opt, oIdx) => (
-                                <input key={oIdx} className="modern-input" style={{ marginBottom: '8px' }} value={opt} onChange={e => handleOptionChange(qIndex, oIdx, true, e.target.value)} placeholder={`Option ${oIdx + 1}`} required />
-                             ))}
+                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                                {qn.options.map((opt, oIdx) => (
+                                   <input key={oIdx} className="modern-input" value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} placeholder={`বিকল্প ${oIdx + 1}`} required />
+                                ))}
+                             </div>
                           </div>
                        </div>
 
-                       <div style={{ marginBottom: '20px' }}>
-                          <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Choice (0-3)</label>
-                          <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
-                             <option value="0">Option 1 / ক</option>
-                             <option value="1">Option 2 / খ</option>
-                             <option value="2">Option 3 / গ</option>
-                             <option value="3">Option 4 / ঘ</option>
-                          </select>
-                       </div>
+                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'flex-end' }}>
+                          <div style={{ marginBottom: '20px' }}>
+                             <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Choice (0-3)</label>
+                             <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
+                                <option value="0">Option 1 / ক</option>
+                                <option value="1">Option 2 / খ</option>
+                                <option value="2">Option 3 / গ</option>
+                                <option value="3">Option 4 / ঘ</option>
+                             </select>
+                          </div>
 
-                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-                          <div className="input-group">
+                          <div className="input-group" style={{ marginBottom: '20px' }}>
                              <label>Answer Explanation (Bengali)</label>
-                             <textarea className="modern-input" style={{ height: '80px', resize: 'none' }} value={qn.explanation} onChange={e => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} />
-                          </div>
-                          <div className="input-group">
-                             <label>Answer Explanation (English)</label>
-                             <textarea className="modern-input" style={{ height: '80px', resize: 'none' }} value={qn.explanationEn} onChange={e => handleQuestionFieldChange(qIndex, 'explanationEn', e.target.value)} />
+                             <textarea className="modern-input" style={{ height: '50px', resize: 'none' }} value={qn.explanation} onChange={e => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} />
                           </div>
                        </div>
                     </div>
