@@ -52,6 +52,7 @@ export default function ResultDetails() {
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   // Load jobs from AdminContext
   const { state: adminState } = useAdminContext();
@@ -177,27 +178,33 @@ export default function ResultDetails() {
           </h3>
           <p className="text-secondary" style={{
             fontSize: '13px',
-            lineHeight: 1.6
+            lineHeight: 1.6,
+            display: '-webkit-box',
+            WebkitLineClamp: showFullDescription ? 'unset' : 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
           }}>
             {job.description}
           </p>
-        </div>
-
-        {/* Results Info Panel */}
-        <div className="card" style={{ marginBottom: 'var(--space-lg)', borderLeft: '4px solid #c084fc', background: '#faf5ff' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#6b21a8' }}>
-            🏆 {isEn ? 'Result Announcement' : 'পরীক্ষার ফলাফল ঘোষণা'}
-          </h3>
-          <div style={{ fontSize: '12px', color: '#581c87', lineHeight: 1.6, marginTop: '10px' }}>
-            <p style={{ margin: '0 0 6px 0' }}>
-              <strong>{isEn ? 'Status' : 'অবস্থা'}:</strong> <span style={{ color: '#7e22ce', fontWeight: 700 }}>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত হয়েছে'}</span>
-            </p>
-            <p style={{ margin: 0 }}>
-              {isEn 
-                ? 'The official recruitment written/viva exam result for this post has been published. Selected candidates can check their details in the attached sheet.' 
-                : 'উক্ত পদের নিয়োগ পরীক্ষার (লিখিত/ব্যবহারিক/মৌখিক) ফলাফল প্রকাশ করা হয়েছে। উত্তীর্ণ প্রার্থীদের রোল নম্বর ও পরবর্তী নির্দেশনাবলী নিচে সংযুক্ত ফাইলটিতে পাওয়া যাবে।'}
-            </p>
-          </div>
+          <button
+            onClick={() => setShowFullDescription(!showFullDescription)}
+            style={{
+              color: 'var(--primary)',
+              fontWeight: 700,
+              fontSize: '12px',
+              marginTop: '8px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: 0
+            }}
+          >
+            {showFullDescription ? (isEn ? 'View Less' : 'কম দেখুন') : (isEn ? 'View More' : 'আরও দেখুন')}
+            <span style={{ transform: showFullDescription ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease', display: 'inline-block' }}>▼</span>
+          </button>
         </div>
 
         {/* Result PDF Attachment Section */}

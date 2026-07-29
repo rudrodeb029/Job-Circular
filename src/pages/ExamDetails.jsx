@@ -50,6 +50,7 @@ export default function ExamDetails() {
   const { state, dispatch } = useAppContext();
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
   // Load jobs from AdminContext
   const { state: adminState } = useAdminContext();
@@ -171,10 +172,33 @@ export default function ExamDetails() {
           </h3>
           <p className="text-secondary" style={{
             fontSize: '13px',
-            lineHeight: 1.6
+            lineHeight: 1.6,
+            display: '-webkit-box',
+            WebkitLineClamp: showFullDescription ? 'unset' : 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
           }}>
             {job.description}
           </p>
+          <button
+            onClick={() => setShowFullDescription(!showFullDescription)}
+            style={{
+              color: 'var(--primary)',
+              fontWeight: 700,
+              fontSize: '12px',
+              marginTop: '8px',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              padding: 0
+            }}
+          >
+            {showFullDescription ? (state.language === 'en' ? 'View Less' : 'কম দেখুন') : (state.language === 'en' ? 'View More' : 'আরও দেখুন')}
+            <span style={{ transform: showFullDescription ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease', display: 'inline-block' }}>▼</span>
+          </button>
         </div>
 
         {/* Instructions */}
