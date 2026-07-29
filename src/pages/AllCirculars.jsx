@@ -187,11 +187,10 @@ export default function AllCirculars() {
         if (tsA !== tsB) return tsB - tsA; // LIFO (Newest first)
         return String(b.id || '').localeCompare(String(a.id || ''));
       });
-  }, [adminState.jobs]);
+  }, [adminState.jobs, adminState.admits]);
 
   // Filter jobs based on search query
   const filteredJobs = useMemo(() => {
-    setCurrentPage(1); // Reset page to 1 when search query changes
     if (!searchQuery.trim()) return allFeedItems;
     
     return allFeedItems.filter(item => {
@@ -213,6 +212,10 @@ export default function AllCirculars() {
   }, [filteredJobs, currentPage]);
 
   const totalPages = Math.ceil(filteredJobs.length / postsPerPage);
+
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   return (
     <div className="page" style={{ paddingBottom: '100px' }}>
