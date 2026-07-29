@@ -118,7 +118,7 @@ export default function ResultDetails() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1 style={{ flex: 1 }}>{isEn ? 'Result Details' : 'ফলাফলের বিবরণ'}</h1>
+        <h1 style={{ flex: 1 }}>Result Details</h1>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <button
@@ -174,7 +174,7 @@ export default function ResultDetails() {
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           <h3 className="font-bold mb-xs" style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
-            {isEn ? 'Job Description' : 'চাকরির বিবরণ'}
+            Job Description
           </h3>
           <p className="text-secondary" style={{
             fontSize: '13px',
@@ -212,7 +212,7 @@ export default function ResultDetails() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
               <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
-                {isEn ? 'Official Result Sheet' : 'অফিসিয়াল ফলাফল শিট'}
+                Official Result Sheet
               </h3>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
                 {isEn 
