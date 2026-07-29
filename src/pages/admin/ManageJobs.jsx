@@ -12,7 +12,7 @@ export default function ManageJobs() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   
-  const [showModal, setShowModal] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
   
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -140,7 +140,7 @@ export default function ManageJobs() {
     setCurrentPage(1);
   }, [searchQuery, statusFilter, categoryFilter]);
 
-  const handleOpenModal = (job = null) => {
+  const handleOpenForm = (job = null) => {
     if (job) {
       setEditingJob(job);
       setFormData({
@@ -155,11 +155,11 @@ export default function ManageJobs() {
       setEditingJob(null);
       setFormData(initialFormState);
     }
-    setShowModal(true);
+    setShowForm(true);
   };
 
-  const handleCloseModal = () => {
-    setShowModal(false);
+  const handleCloseForm = () => {
+    setShowForm(false);
     setEditingJob(null);
     setFormData(initialFormState);
   };
@@ -232,6 +232,7 @@ export default function ManageJobs() {
         statusEn: 'Exam Date Published',
         date: finalExamDate || 'শীঘ্রই আসছে',
         dateEn: formData.examDateEn || finalExamDate || 'Coming Soon',
+        jobType: formData.jobType,
         downloadLink: formData.applyLink || '#',
         createdAt: jobData.createdAt
       };
@@ -255,6 +256,7 @@ export default function ManageJobs() {
         statusEn: 'Result Published',
         date: jobData.postedAt || new Date().toISOString().split('T')[0],
         dateEn: jobData.postedAt || 'Recently',
+        jobType: formData.jobType,
         downloadLink: finalExamResult || formData.applyLink || '#',
         createdAt: jobData.createdAt
       };
@@ -263,7 +265,7 @@ export default function ManageJobs() {
        dispatch({ type: 'DELETE_ADMIT', payload: `result-${targetId}` });
     }
 
-    handleCloseModal();
+    handleCloseForm();
   };
 
   const executeDelete = () => {
@@ -334,11 +336,20 @@ export default function ManageJobs() {
         .modal-overlay {
           background: rgba(15, 23, 42, 0.4);
           backdrop-filter: blur(8px);
+          position: fixed;
+          inset: 0;
+          z-index: 3000;
+          display: flex;
+          alignItems: center;
+          justifyContent: center;
         }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; marginBottom: 8px; }
+        .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; borderRadius: 10px; outline: none; transition: border-color 0.2s; }
+        .modern-input:focus { border-color: #2563eb; }
       `}</style>
 
       {toast.show && (
-        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 1000, background: toast.type === 'success' ? '#10b981' : '#ef4444', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'slideInRight 0.3s ease' }}>
+        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 4000, background: toast.type === 'success' ? '#10b981' : '#ef4444', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'slideInRight 0.3s ease' }}>
           {toast.message}
         </div>
       )}
@@ -348,239 +359,238 @@ export default function ManageJobs() {
           <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Manage Circulars</h1>
         </div>
         <button
-          onClick={() => handleOpenModal()}
-          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}
+          onClick={() => showForm ? handleCloseForm() : handleOpenForm()}
+          style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: showForm ? '#f1f5f9' : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: showForm ? '#475569' : 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: showForm ? 'none' : '0 8px 16px rgba(37, 99, 235, 0.2)', transition: 'all 0.2s ease' }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Add Circular
+          {showForm ? 'View All Circulars' : (
+            <>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add Circular
+            </>
+          )}
         </button>
       </div>
 
-      <div className="admin-card" style={{ padding: '24px', marginBottom: '2rem', display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', flex: 1, minWidth: '300px' }}>
-          <svg style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <input 
-            type="text" 
-            placeholder="Search by title or organization..."
-            style={{ width: '100%', padding: '14px 14px 14px 48px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', outline: 'none', transition: 'border-color 0.2s' }}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        
-        <div style={{ display: 'flex', background: '#f8fafc', padding: '6px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
-          {['all', 'active', 'expired'].map(s => (
-            <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              style={{ padding: '8px 20px', border: 'none', borderRadius: '10px', fontSize: '12px', fontWeight: 700, textTransform: 'capitalize', cursor: 'pointer', background: statusFilter === s ? '#ffffff' : 'transparent', color: statusFilter === s ? '#1a56db' : '#64748b', boxShadow: statusFilter === s ? '0 2px 4px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
-            >
-              {s}
-            </button>
-          ))}
-        </div>
+      {showForm ? (
+        <div className="admin-card animate-fade-in" style={{ padding: '40px' }}>
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0 }}>{editingJob ? 'Edit Circular' : 'New Circular'}</h2>
+          </div>
 
-        <select 
-          style={{ padding: '14px 20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#1e293b', outline: 'none' }}
-          value={categoryFilter}
-          onChange={(e) => setCategoryFilter(e.target.value)}
-        >
-          <option value="all">All Categories</option>
-          {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
-        </select>
-      </div>
-
-      <div className="admin-card" style={{ overflow: 'hidden' }}>
-        <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Job Information</th>
-              <th>Category</th>
-              <th>Vacancy</th>
-              <th>Deadline</th>
-              <th>Status</th>
-              <th style={{ textAlign: 'center' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedJobs.map((job, idx) => {
-              const cat = categories.find(c => c.id === job.categoryId);
-              return (
-                <tr key={job.id}>
-                  <td style={{ color: '#94a3b8', fontWeight: 600 }}>{(currentPage-1)*itemsPerPage + idx + 1}</td>
-                  <td>
-                    <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>{job.title}</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>{job.organization}</div>
-                  </td>
-                  <td>
-                    <span style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: `${cat?.textColor}15`, color: cat?.textColor }}>
-                      {cat?.name || 'Unknown'}
-                    </span>
-                  </td>
-                  <td style={{ fontWeight: 600, color: '#475569' }}>{job.vacancy || 'N/A'}</td>
-                  <td style={{ fontWeight: 600, color: '#475569' }}>{job.deadline}</td>
-                  <td>
-                    <span className="status-pill" style={{
-                      background: job.status === 'Active' ? '#d1fae5' : '#fee2e2',
-                      color: job.status === 'Active' ? '#065f46' : '#991b1b'
-                    }}>
-                      {job.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                      <button className="action-btn" style={{ background: '#eff6ff', color: '#1a56db' }} onClick={() => handleOpenModal(job)} title="Edit">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                      </button>
-                      <button className="action-btn" style={{ background: '#fef2f2', color: '#ef4444' }} onClick={() => { setDeletingJobId(job.id); setShowDeleteConfirm(true); }} title="Delete">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-            {paginatedJobs.length === 0 && (
-              <tr><td colSpan="7" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: '15px' }}>No circulars found matching your criteria.</td></tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Pagination & Modals (Simplified for brevity but maintaining design) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px' }}>
-         <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>Showing {paginatedJobs.length} of {filteredJobs.length} circulars</p>
-         <div style={{ display: 'flex', gap: '10px' }}>
-            <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p-1)} style={{ padding: '10px 20px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}>Previous</button>
-            <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p+1)} style={{ padding: '10px 20px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', opacity: currentPage === totalPages ? 0.5 : 1 }}>Next</button>
-         </div>
-      </div>
-
-      {/* Simplified Modal Structure with Modern Styling */}
-      {showModal && (
-        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-          <div className="admin-card animate-fade-in" style={{ width: '100%', maxWidth: '900px', maxHeight: '90vh', overflowY: 'auto', padding: '40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0 }}>{editingJob ? 'Edit Circular' : 'New Circular'}</h2>
-              <button onClick={handleCloseModal} style={{ background: '#f1f5f9', border: 'none', padding: '10px', borderRadius: '12px', cursor: 'pointer', color: '#64748b' }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </button>
+          <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+            <div className="input-group">
+               <label>Title (Bengali)</label>
+               <input name="title" className="modern-input" value={formData.title} onChange={handleInputChange} required />
+            </div>
+            <div className="input-group">
+               <label>Title (English)</label>
+               <input name="titleEn" className="modern-input" value={formData.titleEn} onChange={handleInputChange} required />
+            </div>
+            <div className="input-group">
+               <label>Organization (Bengali)</label>
+               <input name="organization" className="modern-input" value={formData.organization} onChange={handleInputChange} required />
+            </div>
+            <div className="input-group">
+               <label>Organization (English)</label>
+               <input name="organizationEn" className="modern-input" value={formData.organizationEn} onChange={handleInputChange} />
+            </div>
+            <div className="input-group">
+               <label>Category</label>
+               <select name="categoryId" className="modern-input" value={formData.categoryId} onChange={handleInputChange} required>
+                  <option value="">Select Category</option>
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+               </select>
+            </div>
+            <div className="input-group">
+               <label>Job Type</label>
+               <input name="jobType" className="modern-input" value={formData.jobType} onChange={handleInputChange} placeholder="e.g. সরকারি, ব্যাংক" />
+            </div>
+            <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+              <div className="input-group">
+                 <label>Location</label>
+                 <input name="location" className="modern-input" value={formData.location} onChange={handleInputChange} />
+              </div>
+              <div className="input-group">
+                 <label>Vacancy</label>
+                 <input type="number" name="vacancy" className="modern-input" value={formData.vacancy} onChange={handleInputChange} />
+              </div>
+              <div className="input-group">
+                 <label>Deadline</label>
+                 <input type="date" name="deadline" className="modern-input" value={formData.deadline} onChange={handleInputChange} required />
+              </div>
             </div>
 
-            <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-              <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Title (Bengali)</label>
-                 <input name="title" value={formData.title} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
-              </div>
-              <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Title (English)</label>
-                 <input name="titleEn" value={formData.titleEn} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
-              </div>
-              <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Organization (Bengali)</label>
-                 <input name="organization" value={formData.organization} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
-              </div>
-              <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Organization (English)</label>
-                 <input name="organizationEn" value={formData.organizationEn} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
-              </div>
-              <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Category</label>
-                 <select name="categoryId" value={formData.categoryId} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required>
-                    <option value="">Select Category</option>
-                    {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                 </select>
-              </div>
-              <div>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Job Type</label>
-                 <input name="jobType" value={formData.jobType} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. সরকারি, ব্যাংক" />
-              </div>
-              <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
-                <div>
-                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Location</label>
-                   <input name="location" value={formData.location} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
-                </div>
-                <div>
-                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Vacancy</label>
-                   <input type="number" name="vacancy" value={formData.vacancy} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
-                </div>
-                <div>
-                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Deadline</label>
-                   <input type="date" name="deadline" value={formData.deadline} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} required />
-                </div>
+            <div style={{ gridColumn: 'span 2' }} className="input-group">
+               <label>Description</label>
+               <textarea name="description" rows="4" className="modern-input" value={formData.description} onChange={handleInputChange} style={{ resize: 'vertical' }}></textarea>
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }} className="input-group">
+               <label>Requirements (One per line)</label>
+               <textarea name="requirements" rows="4" className="modern-input" value={formData.requirements} onChange={handleInputChange} style={{ resize: 'vertical' }}></textarea>
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }} className="input-group">
+               <label>Apply Link</label>
+               <input type="url" name="applyLink" className="modern-input" value={formData.applyLink} onChange={handleInputChange} />
+            </div>
+
+            <div style={{ gridColumn: 'span 2' }} className="input-group">
+              <label>Circular Images / PDF (URLs)</label>
+              <input name="images" className="modern-input" value={formData.images} onChange={handleInputChange} style={{ marginBottom: '12px' }} placeholder="Comma-separated image/PDF URLs or upload below" />
+
+              <div style={{ background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <input type="file" multiple accept="image/*,application/pdf" onChange={handleCloudinaryUpload} disabled={!!uploadProgress} style={{ fontSize: '13px' }} />
+                {uploadProgress && <span style={{ fontSize: '13px', color: '#1a56db', fontWeight: 'bold' }}>{uploadProgress}</span>}
               </div>
 
-              <div style={{ gridColumn: 'span 2' }}>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Description</label>
-                 <textarea name="description" rows="4" value={formData.description} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none', resize: 'vertical' }}></textarea>
-              </div>
-
-              <div style={{ gridColumn: 'span 2' }}>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Requirements (One per line)</label>
-                 <textarea name="requirements" rows="4" value={formData.requirements} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none', resize: 'vertical' }}></textarea>
-              </div>
-
-              <div style={{ gridColumn: 'span 2' }}>
-                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Apply Link</label>
-                 <input type="url" name="applyLink" value={formData.applyLink} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} />
-              </div>
-
-              <div style={{ gridColumn: 'span 2' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Circular Images / PDF (URLs)</label>
-                <input name="images" value={formData.images} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none', marginBottom: '12px' }} placeholder="Comma-separated image/PDF URLs or upload below" />
-
-                <div style={{ background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <input type="file" multiple accept="image/*,application/pdf" onChange={handleCloudinaryUpload} disabled={!!uploadProgress} style={{ fontSize: '13px' }} />
-                  {uploadProgress && <span style={{ fontSize: '13px', color: '#1a56db', fontWeight: 'bold' }}>{uploadProgress}</span>}
-                </div>
-
-                {formData.images && (
-                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
-                    {formData.images.split(',').map(i => i.trim()).filter(i => i).map((fileUrl, index) => (
-                      <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
-                        <img src={fileUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        <button type="button" onClick={() => {
-                          const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
-                          current.splice(index, 1);
-                          setFormData(prev => ({ ...prev, images: current.join(', ') }));
-                        }} style={{ position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px' }}>✕</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div style={{ gridColumn: 'span 2', display: 'flex', gap: '24px', padding: '16px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
-                   <input type="checkbox" checked={!!formData.showInExamDate} onChange={e => setFormData(prev => ({ ...prev, showInExamDate: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
-                   Exam Date
-                 </label>
-                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
-                   <input type="checkbox" checked={!!formData.showInResult} onChange={e => setFormData(prev => ({ ...prev, showInResult: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
-                   Result
-                 </label>
-              </div>
-
-              {formData.showInExamDate && (
-                <div style={{ gridColumn: 'span 2' }}>
-                   <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Exam Date Information</label>
-                   <input name="examDate" value={formData.examDate} onChange={handleInputChange} style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. 15 June 2024" />
+              {formData.images && (
+                <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+                  {formData.images.split(',').map(i => i.trim()).filter(i => i).map((fileUrl, index) => (
+                    <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
+                      <img src={fileUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <button type="button" onClick={() => {
+                        const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
+                        current.splice(index, 1);
+                        setFormData(prev => ({ ...prev, images: current.join(', ') }));
+                      }} style={{ position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px' }}>✕</button>
+                    </div>
+                  ))}
                 </div>
               )}
+            </div>
 
-              <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
-                <button type="button" onClick={handleCloseModal} style={{ padding: '14px 32px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Cancel</button>
-                <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>Save Circular</button>
+            <div style={{ gridColumn: 'span 2', display: 'flex', gap: '24px', padding: '16px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+                 <input type="checkbox" checked={!!formData.showInExamDate} onChange={e => setFormData(prev => ({ ...prev, showInExamDate: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
+                 Exam Date
+               </label>
+               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
+                 <input type="checkbox" checked={!!formData.showInResult} onChange={e => setFormData(prev => ({ ...prev, showInResult: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
+                 Result
+               </label>
+            </div>
+
+            {formData.showInExamDate && (
+              <div style={{ gridColumn: 'span 2' }} className="input-group">
+                 <label>Exam Date Information</label>
+                 <input name="examDate" className="modern-input" value={formData.examDate} onChange={handleInputChange} placeholder="e.g. 15 June 2024" />
               </div>
-            </form>
-          </div>
+            )}
+
+            <div style={{ gridColumn: 'span 2', marginTop: '20px', display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
+              <button type="button" onClick={handleCloseForm} style={{ padding: '14px 32px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Cancel</button>
+              <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>Save Circular</button>
+            </div>
+          </form>
         </div>
+      ) : (
+        <>
+          <div className="admin-card" style={{ padding: '24px', marginBottom: '2rem', display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '300px' }}>
+              <svg style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input
+                type="text"
+                placeholder="Search by title or organization..."
+                style={{ width: '100%', padding: '14px 14px 14px 48px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', outline: 'none', transition: 'border-color 0.2s' }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div style={{ display: 'flex', background: '#f8fafc', padding: '6px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
+              {['all', 'active', 'expired'].map(s => (
+                <button
+                  key={s}
+                  onClick={() => setStatusFilter(s)}
+                  style={{ padding: '8px 20px', border: 'none', borderRadius: '10px', fontSize: '12px', fontWeight: 700, textTransform: 'capitalize', cursor: 'pointer', background: statusFilter === s ? '#ffffff' : 'transparent', color: statusFilter === s ? '#1a56db' : '#64748b', boxShadow: statusFilter === s ? '0 2px 4px rgba(0,0,0,0.05)' : 'none', transition: 'all 0.2s' }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <select
+              style={{ padding: '14px 20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', fontWeight: 600, color: '#1e293b', outline: 'none' }}
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="all">All Categories</option>
+              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+            </select>
+          </div>
+
+          <div className="admin-card" style={{ overflow: 'hidden' }}>
+            <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Job Information</th>
+                  <th>Category</th>
+                  <th>Vacancy</th>
+                  <th>Deadline</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'center' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedJobs.map((job, idx) => {
+                  const cat = categories.find(c => c.id === job.categoryId);
+                  return (
+                    <tr key={job.id}>
+                      <td style={{ color: '#94a3b8', fontWeight: 600 }}>{(currentPage-1)*itemsPerPage + idx + 1}</td>
+                      <td>
+                        <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>{job.title}</div>
+                        <div style={{ fontSize: '12px', color: '#64748b' }}>{job.organization}</div>
+                      </td>
+                      <td>
+                        <span style={{ padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, background: `${cat?.textColor}15`, color: cat?.textColor }}>
+                          {cat?.name || 'Unknown'}
+                        </span>
+                      </td>
+                      <td style={{ fontWeight: 600, color: '#475569' }}>{job.vacancy || 'N/A'}</td>
+                      <td style={{ fontWeight: 600, color: '#475569' }}>{job.deadline}</td>
+                      <td>
+                        <span className="status-pill" style={{
+                          background: job.status === 'Active' ? '#d1fae5' : '#fee2e2',
+                          color: job.status === 'Active' ? '#065f46' : '#991b1b'
+                        }}>
+                          {job.status}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                          <button className="action-btn" style={{ background: '#eff6ff', color: '#1a56db' }} onClick={() => handleOpenForm(job)} title="Edit">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                          </button>
+                          <button className="action-btn" style={{ background: '#fef2f2', color: '#ef4444' }} onClick={() => { setDeletingJobId(job.id); setShowDeleteConfirm(true); }} title="Delete">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {paginatedJobs.length === 0 && (
+                  <tr><td colSpan="7" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: '15px' }}>No circulars found matching your criteria.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px', padding: '0 24px 24px' }}>
+             <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>Showing {paginatedJobs.length} of {filteredJobs.length} circulars</p>
+             <div style={{ display: 'flex', gap: '10px' }}>
+                <button disabled={currentPage === 1} onClick={() => setCurrentPage(p => p-1)} style={{ padding: '10px 20px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', opacity: currentPage === 1 ? 0.5 : 1 }}>Previous</button>
+                <button disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p+1)} style={{ padding: '10px 20px', background: 'white', border: '1px solid #e2e8f0', borderRadius: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', opacity: currentPage === totalPages ? 0.5 : 1 }}>Next</button>
+             </div>
+          </div>
+        </>
       )}
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal (Keep as Modal as it's a small confirmation) */}
       {showDeleteConfirm && (
-        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, zIndex: 3000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="modal-overlay">
           <div className="admin-card animate-fade-in" style={{ padding: '32px', maxWidth: '400px', textAlign: 'center' }}>
             <div style={{ width: '60px', height: '60px', background: '#fee2e2', color: '#ef4444', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: '24px' }}>🗑️</div>
             <h3 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', marginBottom: '12px' }}>Confirm Delete</h3>
