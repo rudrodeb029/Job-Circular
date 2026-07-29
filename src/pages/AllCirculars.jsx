@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Briefcase, Calendar, Download, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
@@ -7,6 +7,7 @@ import JobCard from '../components/JobCard';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import { formatTimeAgo } from '../utils/timeUtils';
+import { categories } from '../data/categories';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -211,9 +212,9 @@ export default function AllCirculars() {
     return filteredJobs.slice(indexOfFirstPost, indexOfLastPost);
   }, [filteredJobs, currentPage]);
 
-  const totalPages = Math.ceil(filteredJobs.length / postsPerPage);
+  const totalPages = Math.ceil(filteredJobs.length / postsPerPage) || 1;
 
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
