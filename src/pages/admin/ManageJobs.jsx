@@ -354,10 +354,7 @@ export default function ManageJobs() {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
-        <div>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Manage Circulars</h1>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '2.5rem' }}>
         <button
           onClick={() => showForm ? handleCloseForm() : handleOpenForm()}
           style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: showForm ? '#f1f5f9' : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: showForm ? '#475569' : 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: showForm ? 'none' : '0 8px 16px rgba(37, 99, 235, 0.2)', transition: 'all 0.2s ease' }}
