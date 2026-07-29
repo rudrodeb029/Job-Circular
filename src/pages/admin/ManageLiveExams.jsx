@@ -35,6 +35,53 @@ export default function ManageLiveExams() {
     }
   ]);
 
+  const handleAddSubjectTopicRow = () => {
+    setSubjectTopics(prev => [...prev, { subject: '', subjectEn: '', topics: '', topicsEn: '' }]);
+  };
+
+  const handleRemoveSubjectTopicRow = (index) => {
+    if (subjectTopics.length <= 1) return;
+    setSubjectTopics(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubjectTopicFieldChange = (index, field, value) => {
+    setSubjectTopics(prev => prev.map((st, i) => i === index ? { ...st, [field]: value } : st));
+  };
+
+  const handleAddQuestion = () => {
+    setQuestions(prev => [
+      ...prev,
+      {
+        question: '', questionEn: '',
+        options: ['', '', '', ''],
+        optionsEn: ['', '', '', ''],
+        correctIndex: 0,
+        explanation: '', explanationEn: ''
+      }
+    ]);
+  };
+
+  const handleRemoveQuestion = (index) => {
+    if (questions.length <= 1) return;
+    setQuestions(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleQuestionFieldChange = (index, field, value) => {
+    setQuestions(prev => prev.map((q, i) => i === index ? { ...q, [field]: value } : q));
+  };
+
+  const handleOptionChange = (qIndex, oIndex, isEn, value) => {
+    setQuestions(prev => prev.map((q, i) => {
+      if (i === qIndex) {
+        const key = isEn ? 'optionsEn' : 'options';
+        const newOpts = [...q[key]];
+        newOpts[oIndex] = value;
+        return { ...q, [key]: newOpts };
+      }
+      return q;
+    }));
+  };
+
   const handleSaveExam = (e) => {
     e.preventDefault();
     const newExam = {
@@ -70,6 +117,7 @@ export default function ManageLiveExams() {
         .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; marginBottom: 8px; }
         .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; borderRadius: 10px; outline: none; transition: border-color 0.2s; }
         .modern-input:focus { border-color: #2563eb; }
+        .q-card { background: white; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 16px; position: relative; }
       `}</style>
 
       {toast.show && (
@@ -117,9 +165,101 @@ export default function ManageLiveExams() {
                 </div>
              </div>
 
+             <div className="form-section">
+                <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>2. Subjects & Topics</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                   {subjectTopics.map((st, sIdx) => (
+                      <div key={sIdx} style={{ background: 'white', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', position: 'relative' }}>
+                         {subjectTopics.length > 1 && (
+                            <button type="button" onClick={() => handleRemoveSubjectTopicRow(sIdx)} style={{ position: 'absolute', top: '10px', right: '10px', background: 'none', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}>✕ Remove</button>
+                         )}
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '10px' }}>
+                            <div className="input-group">
+                               <label>Subject (Bengali)</label>
+                               <input className="modern-input" value={st.subject} onChange={e => handleSubjectTopicFieldChange(sIdx, 'subject', e.target.value)} />
+                            </div>
+                            <div className="input-group">
+                               <label>Subject (English)</label>
+                               <input className="modern-input" value={st.subjectEn} onChange={e => handleSubjectTopicFieldChange(sIdx, 'subjectEn', e.target.value)} />
+                            </div>
+                         </div>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="input-group">
+                               <label>Topics (Bengali)</label>
+                               <input className="modern-input" value={st.topics} onChange={e => handleSubjectTopicFieldChange(sIdx, 'topics', e.target.value)} />
+                            </div>
+                            <div className="input-group">
+                               <label>Topics (English)</label>
+                               <input className="modern-input" value={st.topicsEn} onChange={e => handleSubjectTopicFieldChange(sIdx, 'topicsEn', e.target.value)} />
+                            </div>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+                <button type="button" onClick={handleAddSubjectTopicRow} style={{ marginTop: '16px', padding: '10px 16px', background: '#eff6ff', color: '#1a56db', border: '1.5px dashed #1a56db', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}>+ Add More Subjects</button>
+             </div>
+
+             <div className="form-section">
+                <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>3. Configure MCQ Questions ({questions.length})</h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                   {questions.map((qn, qIndex) => (
+                      <div key={qIndex} className="q-card">
+                         {questions.length > 1 && (
+                            <button type="button" onClick={() => handleRemoveQuestion(qIndex)} style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', color: '#ef4444', fontWeight: 700, cursor: 'pointer', fontSize: '12px' }}>Delete Question</button>
+                         )}
+                         <h4 style={{ margin: '0 0 16px 0', color: '#1a56db', fontSize: '14px', fontWeight: 800 }}>Question #{qIndex + 1}</h4>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                            <div className="input-group">
+                               <label>Question (Bengali)</label>
+                               <input className="modern-input" value={qn.question} onChange={e => handleQuestionFieldChange(qIndex, 'question', e.target.value)} />
+                            </div>
+                            <div className="input-group">
+                               <label>Question (English)</label>
+                               <input className="modern-input" value={qn.questionEn} onChange={e => handleQuestionFieldChange(qIndex, 'questionEn', e.target.value)} />
+                            </div>
+                         </div>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '16px' }}>
+                            <div>
+                               <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (Bengali)</label>
+                               {qn.options.map((opt, oIdx) => (
+                                  <input key={oIdx} className="modern-input" style={{ marginBottom: '8px' }} value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} placeholder={`বিকল্প ${oIdx + 1}`} />
+                               ))}
+                            </div>
+                            <div>
+                               <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (English)</label>
+                               {qn.optionsEn.map((opt, oIdx) => (
+                                  <input key={oIdx} className="modern-input" style={{ marginBottom: '8px' }} value={opt} onChange={e => handleOptionChange(qIndex, oIdx, true, e.target.value)} placeholder={`Option ${oIdx + 1}`} />
+                               ))}
+                            </div>
+                         </div>
+                         <div style={{ marginBottom: '16px' }}>
+                            <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Option Index (0-3)</label>
+                            <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
+                               <option value="0">Option 1 / ক</option>
+                               <option value="1">Option 2 / খ</option>
+                               <option value="2">Option 3 / গ</option>
+                               <option value="3">Option 4 / ঘ</option>
+                            </select>
+                         </div>
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="input-group">
+                               <label>Explanation (Bengali)</label>
+                               <textarea className="modern-input" style={{ height: '80px', resize: 'none' }} value={qn.explanation} onChange={e => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} />
+                            </div>
+                            <div className="input-group">
+                               <label>Explanation (English)</label>
+                               <textarea className="modern-input" style={{ height: '80px', resize: 'none' }} value={qn.explanationEn} onChange={e => handleQuestionFieldChange(qIndex, 'explanationEn', e.target.value)} />
+                            </div>
+                         </div>
+                      </div>
+                   ))}
+                </div>
+                <button type="button" onClick={handleAddQuestion} style={{ marginTop: '16px', width: '100%', padding: '14px', background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>+ Add Another Question</button>
+             </div>
+
              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
                 <button type="button" onClick={() => setShowAddForm(false)} style={{ padding: '14px 32px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Discard</button>
-                <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)' }}>Create Exam</button>
+                <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(16, 185, 129, 0.2)' }}>Schedule Exam</button>
              </div>
           </form>
         </div>
