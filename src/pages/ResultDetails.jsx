@@ -170,6 +170,19 @@ export default function ResultDetails() {
           </h2>
         </div>
 
+        {/* Job Description Section */}
+        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+            {isEn ? 'Job Description' : 'চাকরির বিবরণ'}
+          </h3>
+          <p className="text-secondary" style={{
+            fontSize: '13px',
+            lineHeight: 1.6
+          }}>
+            {job.description}
+          </p>
+        </div>
+
         {/* Results Info Panel */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)', borderLeft: '4px solid #c084fc', background: '#faf5ff' }}>
           <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: '#6b21a8' }}>

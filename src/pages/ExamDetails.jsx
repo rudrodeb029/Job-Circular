@@ -159,11 +159,22 @@ export default function ExamDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#334155', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#334155', marginBottom: '0' }}>
             {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
           </h2>
+        </div>
 
-
+        {/* Job Description Section */}
+        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+            {state.language === 'en' ? 'Job Description' : 'চাকরির বিবরণ'}
+          </h3>
+          <p className="text-secondary" style={{
+            fontSize: '13px',
+            lineHeight: 1.6
+          }}>
+            {job.description}
+          </p>
         </div>
 
         {/* Instructions */}
