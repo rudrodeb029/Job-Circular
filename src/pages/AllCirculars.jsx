@@ -110,29 +110,37 @@ export default function AllCirculars() {
     }));
 
     // Notifications admit card items from database
-    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => ({
-      ...item,
-      originalId: item.jobId,
-      postTitle: item.examName,
-      postTitleEn: item.examNameEn,
-      examDate: item.date,
-      examDateEn: item.dateEn,
-      postedDate: item.date || '১ দিন আগে',
-      postedDateEn: item.dateEn || item.date || '1 day ago',
-      feedType: 'exam_date'
-    }));
+    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => {
+      const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
+      return {
+        ...item,
+        description: parentJob?.description || '',
+        originalId: item.jobId,
+        postTitle: item.examName,
+        postTitleEn: item.examNameEn,
+        examDate: item.date,
+        examDateEn: item.dateEn,
+        postedDate: item.date || '১ দিন আগে',
+        postedDateEn: item.dateEn || item.date || '1 day ago',
+        feedType: 'exam_date'
+      };
+    });
 
     // Notifications result items from database
-    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => ({
-      ...item,
-      originalId: item.jobId,
-      postTitle: item.examName,
-      postTitleEn: item.examNameEn,
-      examResult: item.downloadLink,
-      postedDate: item.date || '১ দিন আগে',
-      postedDateEn: item.dateEn || item.date || '1 day ago',
-      feedType: 'result'
-    }));
+    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => {
+      const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
+      return {
+        ...item,
+        description: parentJob?.description || '',
+        originalId: item.jobId,
+        postTitle: item.examName,
+        postTitleEn: item.examNameEn,
+        examResult: item.downloadLink,
+        postedDate: item.date || '১ দিন আগে',
+        postedDateEn: item.dateEn || item.date || '1 day ago',
+        feedType: 'result'
+      };
+    });
 
     const getItemTimestamp = (item) => {
       if (item.createdAt) {
@@ -248,6 +256,8 @@ export default function AllCirculars() {
                   ? `Exam date published for the post of ${postTitle}.`
                   : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
 
+                const displayDesc = item.description || descriptionSentence;
+
                 return (
                   <div 
                     key={item.id} 
@@ -271,7 +281,7 @@ export default function AllCirculars() {
                         marginBottom: '4px',
                         fontWeight: 400
                       }}>
-                        {descriptionSentence}
+                        {displayDesc}
                       </p>
                       <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                         <span style={{
@@ -328,6 +338,8 @@ export default function AllCirculars() {
                 ? `Written/Viva exam result published for the post of ${postTitle}. View result now!`
                 : `${postTitle} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
 
+              const displayDesc = item.description || descriptionSentence;
+
               return (
                 <div 
                   key={item.id} 
@@ -351,7 +363,7 @@ export default function AllCirculars() {
                       marginBottom: '4px',
                       fontWeight: 400
                     }}>
-                      {descriptionSentence}
+                      {displayDesc}
                     </p>
                     <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                       <span style={{

@@ -117,6 +117,8 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
     ? `Recruitment notice published for the post of ${titleName}${job.vacancy ? ` (${job.vacancy} vacancies)` : ''}. Apply today!`
     : `${titleName} পদে ${job.vacancy ? `${toBengaliNumber(job.vacancy)} জনের ` : ''}নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে। আজই আবেদন করুন।`;
 
+  const displayDesc = job.description || descriptionSentence;
+
   const handleBookmark = (e) => {
     e.stopPropagation();
     dispatch({ type: 'TOGGLE_SAVE_JOB', payload: job.id });
@@ -182,7 +184,7 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
           marginBottom: '4px',
           fontWeight: 400
         }}>
-          {descriptionSentence}
+          {displayDesc}
         </p>
         
         {/* Ultra-compact single-line metadata badge */}
