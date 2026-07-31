@@ -164,7 +164,7 @@ export default function Home() {
       });
   }, [localJobs, localAdmits]);
 
-  const unexpiredFeedCount = useMemo(() => {
+  const activeJobCount = useMemo(() => {
     return localJobs.filter(job => !isExpired(job.deadline)).length;
   }, [localJobs]);
 
@@ -229,8 +229,8 @@ export default function Home() {
             </p>
             <h2 style={{ color: '#ffffff', fontSize: '26px', fontWeight: 800, marginBottom: '0px', lineHeight: 1 }}>
               {isEn
-                ? `${unexpiredFeedCount}+`
-                : `${toBengaliNumber(unexpiredFeedCount)}+`}
+                ? `${activeJobCount}+`
+                : `${toBengaliNumber(activeJobCount)}+`}
             </h2>
             <p style={{ color: '#ffffff', fontSize: '13.5px', fontWeight: 700, marginBottom: '4px', letterSpacing: '-0.1px' }}>
               {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
