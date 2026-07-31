@@ -12,7 +12,15 @@ export default function Notifications() {
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
 
-  const notificationsList = adminState.notifications || [];
+  const notificationsList = useMemo(() => {
+    const raw = adminState.notifications || [];
+    // Only show notifications created after the user installed the app
+    return raw.filter(n => {
+      const created = n.createdAt ? new Date(n.createdAt).getTime() : 0;
+      const installed = state.installTime ? new Date(state.installTime).getTime() : 0;
+      return created >= installed;
+    });
+  }, [adminState.notifications, state.installTime]);
 
   const handleMarkAllRead = () => {
     const allIds = notificationsList.map(n => n.id);

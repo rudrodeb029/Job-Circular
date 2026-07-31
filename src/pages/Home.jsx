@@ -165,12 +165,8 @@ export default function Home() {
   }, [localJobs, localAdmits]);
 
   const unexpiredFeedCount = useMemo(() => {
-    return combinedFeedItems.filter(item => {
-      const jobId = item.jobId || item.originalId || item.id;
-      const job = localJobs.find(j => String(j.id) === String(jobId));
-      return job ? !isExpired(job.deadline) : true;
-    }).length;
-  }, [combinedFeedItems, localJobs]);
+    return localJobs.filter(job => !isExpired(job.deadline)).length;
+  }, [localJobs]);
 
   const paginatedFeed = useMemo(() => {
     const indexOfLastPost = currentPage * postsPerPage;

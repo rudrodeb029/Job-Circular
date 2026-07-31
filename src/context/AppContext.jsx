@@ -18,6 +18,7 @@ const initialState = {
   readNotifications: JSON.parse(localStorage.getItem('readNotifications')) || [],
   theme: localStorage.getItem('theme_v2') || 'light',
   language: localStorage.getItem('language') || 'bn', // Default app language is Bengali (bn)
+  installTime: localStorage.getItem('installTime') || new Date().toISOString(),
   hasSeenOnboarding: JSON.parse(localStorage.getItem('hasSeenOnboarding')) || false,
   searchQuery: '',
   activeFilters: {
@@ -118,8 +119,12 @@ export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   useEffect(() => {
+    // Persistent Install Time for Notification Filtering
+    if (!localStorage.getItem('installTime')) {
+      localStorage.setItem('installTime', state.installTime);
+    }
     document.documentElement.setAttribute('data-theme', state.theme);
-  }, [state.theme]);
+  }, [state.theme, state.installTime]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
