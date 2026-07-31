@@ -643,6 +643,31 @@
   border: 1px solid rgba(255,255,255,0.25);
 }
 
+/* Continuous Scrolling Animation */
+@keyframes scrollLeft {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.scrolling-container {
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.scrolling-content {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  animation: scrollLeft 25s linear infinite;
+}
+
+.scrolling-content:hover {
+  animation-play-state: paused;
+}
+
 /* Category Grid (Home) - Card Facelift */
 .category-grid {
   display: grid;

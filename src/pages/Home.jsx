@@ -345,7 +345,7 @@ export default function Home() {
         </div>
 
         <div className="mb-md">
-          <div className="section-header" style={{ background: 'transparent', padding: '5px 0', marginBottom: '10px', border: 'none', boxShadow: 'none' }}>
+          <div className="section-header" style={{ background: 'transparent', padding: '5px 0', marginBottom: '4px', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '6px 0', position: 'relative', overflow: 'hidden', border: 'none' }}>
               <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
                 {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
@@ -356,20 +356,39 @@ export default function Home() {
               <span style={{ fontSize: '11px', display: 'inline-flex', alignItems: 'center' }}>➔</span>
             </Link>
           </div>
-          <div className="category-grid">
-            {[
-              { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
-              { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
-              { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' }
-            ].map(cat => (
-              <div key={cat.id} className="category-grid-item" style={{ border: '1px solid rgba(37, 99, 235, 0.12)', boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)', background: 'var(--white)', borderRadius: '16px' }} onClick={() => navigate(`/questions-hub?category=${cat.id}`)}>
-                <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
-                <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
-              </div>
-            ))}
-            <div className="category-grid-item" style={{ border: '1px solid rgba(37, 99, 235, 0.12)', boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)', background: 'var(--white)', borderRadius: '16px' }} onClick={() => navigate('/questions-hub')}>
-              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}><LayoutGrid size={22} /></div>
-              <span className="category-grid-label">{isEn ? 'More' : 'আরও'}</span>
+
+          <div className="scrolling-container">
+            <div className="scrolling-content">
+              {[
+                { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
+                { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
+                { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
+                { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
+                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+              ].concat([
+                { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
+                { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
+                { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
+                { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
+                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+              ]).map((cat, idx) => (
+                <div
+                  key={`${cat.id}-${idx}`}
+                  className="category-grid-item"
+                  style={{
+                    border: '1px solid rgba(37, 99, 235, 0.12)',
+                    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                    background: 'var(--white)',
+                    borderRadius: '16px',
+                    minWidth: '90px',
+                    marginRight: '0px'
+                  }}
+                  onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
+                >
+                  <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
+                  <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
