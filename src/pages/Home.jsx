@@ -364,13 +364,15 @@ export default function Home() {
                 { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
                 { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
                 { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
-                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' },
+                { id: 'more', name: 'আরও', nameEn: 'More', icon: <LayoutGrid size={20} />, color: 'var(--bg-secondary)', isAction: true }
               ].concat([
                 { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
                 { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
                 { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
                 { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
-                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' },
+                { id: 'more', name: 'আরও', nameEn: 'More', icon: <LayoutGrid size={20} />, color: 'var(--bg-secondary)', isAction: true }
               ]).map((cat, idx) => (
                 <div
                   key={`${cat.id}-${idx}`}
@@ -383,9 +385,18 @@ export default function Home() {
                     minWidth: '90px',
                     marginRight: '0px'
                   }}
-                  onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
+                  onClick={() => cat.isAction ? navigate('/questions-hub') : navigate(`/questions-hub?category=${cat.id}`)}
                 >
-                  <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
+                  <div className="category-grid-icon" style={{
+                    background: cat.color,
+                    fontSize: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: cat.isAction ? 'var(--text-secondary)' : 'inherit'
+                  }}>
+                    {cat.icon}
+                  </div>
                   <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
                 </div>
               ))}
