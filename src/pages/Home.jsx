@@ -357,49 +357,61 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="scrolling-container">
-            <div className="scrolling-content">
-              {[
-                { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
-                { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
-                { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
-                { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
-                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' },
-                { id: 'more', name: 'আরও', nameEn: 'More', icon: <LayoutGrid size={20} />, color: 'var(--bg-secondary)', isAction: true }
-              ].concat([
-                { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
-                { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
-                { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
-                { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
-                { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' },
-                { id: 'more', name: 'আরও', nameEn: 'More', icon: <LayoutGrid size={20} />, color: 'var(--bg-secondary)', isAction: true }
-              ]).map((cat, idx) => (
-                <div
-                  key={`${cat.id}-${idx}`}
-                  className="category-grid-item"
-                  style={{
-                    border: '1px solid rgba(37, 99, 235, 0.12)',
-                    boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
-                    background: 'var(--white)',
-                    borderRadius: '16px',
-                    minWidth: '90px',
-                    marginRight: '0px'
-                  }}
-                  onClick={() => cat.isAction ? navigate('/questions-hub') : navigate(`/questions-hub?category=${cat.id}`)}
-                >
-                  <div className="category-grid-icon" style={{
-                    background: cat.color,
-                    fontSize: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: cat.isAction ? 'var(--text-secondary)' : 'inherit'
-                  }}>
-                    {cat.icon}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {/* Scrolling part - 5 Categories only */}
+            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '10px 0' }}>
+              <div className="scrolling-content" style={{ gap: '12px' }}>
+                {[
+                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
+                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
+                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
+                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
+                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+                ].concat([
+                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
+                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
+                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
+                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
+                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+                ]).map((cat, idx) => (
+                  <div
+                    key={`${cat.id}-${idx}`}
+                    className="category-grid-item"
+                    style={{
+                      border: '1px solid rgba(37, 99, 235, 0.12)',
+                      boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                      background: 'var(--white)',
+                      borderRadius: '16px',
+                      minWidth: '85px',
+                      flexShrink: 0
+                    }}
+                    onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
+                  >
+                    <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
+                    <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
                   </div>
-                  <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* FIXED MORE CARD - STATIONARY ON THE RIGHT */}
+            <div
+              className="category-grid-item animate-scale-in"
+              style={{
+                border: '1.5px solid rgba(37, 99, 235, 0.15)',
+                boxShadow: '0 6px 20px rgba(37, 99, 235, 0.1)',
+                background: 'var(--white)',
+                borderRadius: '16px',
+                minWidth: '85px',
+                flexShrink: 0,
+                zIndex: 5
+              }}
+              onClick={() => navigate('/questions-hub')}
+            >
+              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <LayoutGrid size={20} />
+              </div>
+              <span className="category-grid-label" style={{ fontWeight: 800 }}>{isEn ? 'More' : 'আরও'}</span>
             </div>
           </div>
         </div>
