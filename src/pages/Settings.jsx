@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Shield, FileText, Share2, Star, Mail, Info, ChevronRight, X } from '../components/Icons';
 import BottomNav from '../components/BottomNav';
-import EditProfileModal from '../components/EditProfileModal';
 import Disclaimer from '../components/Disclaimer';
 
 const TrashIcon = ({ size = 20, color = 'currentColor' }) => (
@@ -102,6 +101,8 @@ export default function Settings() {
               onClick={() => {
                 if (item.key === 'delete') {
                   handleDeleteAccount();
+                } else if (item.key === 'account') {
+                  navigate('/edit-profile');
                 } else {
                   setActiveModal(item.key);
                 }
@@ -121,12 +122,6 @@ export default function Settings() {
           App Version 1.0.0
         </p>
       </div>
-
-      {/* 1. Account Settings Modal */}
-      <EditProfileModal 
-        isOpen={activeModal === 'account'} 
-        onClose={() => setActiveModal(null)} 
-      />
 
       {/* 2. Privacy Policy Modal */}
       {activeModal === 'privacy' && (
