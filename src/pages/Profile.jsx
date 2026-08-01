@@ -218,7 +218,7 @@ export default function Profile() {
         <div style={{ marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
             <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
-            <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.1px' }}>
+            <h3 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '-0.1px' }}>
               {isEn ? 'Account & Activity' : 'অ্যাকাউন্ট এবং কার্যক্রম'}
             </h3>
           </div>
@@ -285,7 +285,7 @@ export default function Profile() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
             <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
-            <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.1px' }}>
+            <h3 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '-0.1px' }}>
               {isEn ? 'Preferences & System' : 'পছন্দ এবং সিস্টেম'}
             </h3>
           </div>
