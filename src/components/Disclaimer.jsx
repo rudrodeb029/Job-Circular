@@ -68,10 +68,7 @@ export default function Disclaimer() {
           }}
         >
           <p style={{ margin: 0 }}>
-            <strong>English:</strong> Job Circular is an independent platform and has no affiliation with the government of Bangladesh or any government agency. All government job notices are aggregated from public official gazettes and portals.
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>বাংলা:</strong> জব সার্কুলার একটি স্বাধীন ব্যক্তিগত প্ল্যাটফর্ম। এটি বাংলাদেশ সরকার বা এর কোনো মন্ত্রণালয়/সংস্থার সাথে যুক্ত নয়। এখানে প্রদর্শিত সকল সরকারি চাকরির বিজ্ঞপ্তি পাবলিক সোর্স ও সরকারি ওয়েবসাইট থেকে সংগ্রহ করা হয়েছে।
+            Job Circular is an independent platform and has no affiliation with the government of Bangladesh or any government agency. All government job notices are aggregated from public official gazettes and portals.
           </p>
 
           <div style={{
