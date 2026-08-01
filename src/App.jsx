@@ -23,6 +23,12 @@ import AdmitCardResult from './pages/AdmitCardResult'
 import Profile from './pages/Profile'
 import EditProfile from './pages/EditProfile'
 import Settings from './pages/Settings'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsConditions from './pages/TermsConditions'
+import ShareApp from './pages/ShareApp'
+import RateUs from './pages/RateUs'
+import ContactUs from './pages/ContactUs'
+import AboutApp from './pages/AboutApp'
 import NotFound from './pages/NotFound'
 import QuestionsList from './pages/QuestionsList'
 import QuestionDetails from './pages/QuestionDetails'
@@ -156,6 +162,12 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsConditions />} />
+        <Route path="/share" element={<ShareApp />} />
+        <Route path="/rate" element={<RateUs />} />
+        <Route path="/contact" element={<ContactUs />} />
+        <Route path="/about" element={<AboutApp />} />
         <Route path="/questions/:category" element={<QuestionsList />} />
         <Route path="/question-details/:id" element={<QuestionDetails />} />
         <Route path="/questions-hub" element={<QuestionsHub />} />
