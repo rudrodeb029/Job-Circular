@@ -21,6 +21,7 @@ import SavedJobs from './pages/SavedJobs'
 import Notifications from './pages/Notifications'
 import AdmitCardResult from './pages/AdmitCardResult'
 import Profile from './pages/Profile'
+import EditProfile from './pages/EditProfile'
 import Settings from './pages/Settings'
 import NotFound from './pages/NotFound'
 import QuestionsList from './pages/QuestionsList'
@@ -153,6 +154,7 @@ function App() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/admit-card" element={<AdmitCardResult />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/questions/:category" element={<QuestionsList />} />
         <Route path="/question-details/:id" element={<QuestionDetails />} />

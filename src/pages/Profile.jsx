@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
-import EditProfileModal from '../components/EditProfileModal';
 import { notifications } from '../data/notifications';
 
 const toBengaliNumber = (num) => {
@@ -17,7 +16,6 @@ export default function Profile() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const isEn = state.language === 'en';
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const unreadNotifCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
 
@@ -128,7 +126,7 @@ export default function Profile() {
 
           {/* Edit Camera Badge */}
           <div
-            onClick={() => setIsEditModalOpen(true)}
+            onClick={() => navigate('/edit-profile')}
             title="Edit Profile & Picture"
             style={{
               position: 'absolute',
@@ -233,7 +231,7 @@ export default function Profile() {
             {/* Edit Profile Action */}
             <div
               className="menu-item"
-              onClick={() => setIsEditModalOpen(true)}
+              onClick={() => navigate('/edit-profile')}
               style={{ borderBottom: '1px solid var(--border-light)' }}
             >
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', color: 'white' }}>
@@ -337,12 +335,6 @@ export default function Profile() {
           </div>
         </div>
       </div>
-
-      {/* Edit Profile Interactive Modal */}
-      <EditProfileModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-      />
 
       <BottomNav />
     </div>
