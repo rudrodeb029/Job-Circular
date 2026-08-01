@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { X, User, Edit, Mail, FileText, Globe, MapPin } from './Icons';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, User, Edit, FileText, MapPin, X } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { CLOUDINARY_CONFIG } from '../cloudinary';
+import BottomNav from '../components/BottomNav';
 
 const PhoneIcon = ({ size = 16, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -12,8 +14,8 @@ const PhoneIcon = ({ size = 16, color = 'currentColor' }) => (
 function FormInput({ label, icon, type = 'text', value, onChange, placeholder, required = false }) {
   const [isFocused, setIsFocused] = useState(false);
   return (
-    <div style={{ marginBottom: '14px' }}>
-      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'block' }}>
+    <div style={{ marginBottom: '18px' }}>
+      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', display: 'block' }}>
         {label}
       </label>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -38,13 +40,13 @@ function FormInput({ label, icon, type = 'text', value, onChange, placeholder, r
           placeholder={placeholder}
           style={{
             width: '100%',
-            padding: '12px 14px 12px 40px',
-            fontSize: '13px',
+            padding: '12px 14px 12px 42px',
+            fontSize: '14px',
             fontWeight: 600,
-            background: isFocused ? 'var(--white)' : '#f8fafc',
-            border: isFocused ? '1.5px solid var(--primary)' : '1.5px solid #e2e8f0',
-            borderRadius: '12px',
-            color: 'var(--text-secondary)',
+            background: isFocused ? 'var(--white)' : 'var(--bg-secondary)',
+            border: isFocused ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
+            borderRadius: '14px',
+            color: 'var(--text-primary)',
             boxShadow: isFocused ? '0 0 0 4px rgba(26, 86, 219, 0.08)' : 'none',
             transition: 'all 0.2s',
             outline: 'none'
@@ -58,8 +60,8 @@ function FormInput({ label, icon, type = 'text', value, onChange, placeholder, r
 function FormSelect({ label, icon, value, onChange, children }) {
   const [isFocused, setIsFocused] = useState(false);
   return (
-    <div style={{ marginBottom: '14px' }}>
-      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '6px', display: 'block' }}>
+    <div style={{ marginBottom: '18px' }}>
+      <label style={{ fontSize: '11px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', display: 'block' }}>
         {label}
       </label>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
@@ -82,14 +84,14 @@ function FormSelect({ label, icon, value, onChange, children }) {
           onBlur={() => setIsFocused(false)}
           style={{
             width: '100%',
-            padding: '12px 34px 12px 40px',
-            fontSize: '13px',
+            padding: '12px 34px 12px 42px',
+            fontSize: '14px',
             fontWeight: 600,
-            background: isFocused ? 'var(--white)' : '#ffffff',
-            border: isFocused ? '1.5px solid var(--primary)' : '1.5px solid #e2e8f0',
-            borderRadius: '12px',
-            color: 'var(--text-secondary)',
-            boxShadow: isFocused ? '0 8px 20px rgba(26, 86, 219, 0.08)' : '0 2px 8px rgba(0,0,0,0.02)',
+            background: isFocused ? 'var(--white)' : 'var(--bg-secondary)',
+            border: isFocused ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
+            borderRadius: '14px',
+            color: 'var(--text-primary)',
+            boxShadow: isFocused ? '0 8px 20px rgba(26, 86, 219, 0.08)' : 'none',
             transition: 'all 0.25s ease',
             outline: 'none',
             appearance: 'none',
@@ -100,7 +102,6 @@ function FormSelect({ label, icon, value, onChange, children }) {
         >
           {children}
         </select>
-        {/* Custom Arrow for Professional Look */}
         <div style={{
           position: 'absolute',
           right: '14px',
@@ -121,7 +122,8 @@ function FormSelect({ label, icon, value, onChange, children }) {
   );
 }
 
-export default function EditProfileModal({ isOpen, onClose }) {
+export default function EditProfile() {
+  const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const isEn = state.language === 'en';
 
@@ -129,15 +131,12 @@ export default function EditProfileModal({ isOpen, onClose }) {
     name: state.user.name || '',
     phone: state.user.phone || '01712345678',
     qualification: state.user.qualification || 'স্নাতক (Bachelor)',
-    category: state.user.category || 'gov',
     location: state.user.location || 'ঢাকা',
     avatar: state.user.avatar || null
   });
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-
-  if (!isOpen) return null;
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -151,7 +150,7 @@ export default function EditProfileModal({ isOpen, onClose }) {
     const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
 
     if (!cloudName || !uploadPreset || cloudName === 'dqy39gghx') {
-      alert('Cloudinary is not connected yet. Please configure it in src/cloudinary.js');
+      alert('Cloudinary is not connected yet.');
       return;
     }
 
@@ -168,8 +167,6 @@ export default function EditProfileModal({ isOpen, onClose }) {
       const fileData = await res.json();
       if (fileData.secure_url) {
         setFormData(prev => ({ ...prev, avatar: fileData.secure_url }));
-      } else {
-        alert('Cloudinary upload error: ' + (fileData.error?.message || JSON.stringify(fileData)));
       }
     } catch (err) {
       console.error(err);
@@ -185,115 +182,41 @@ export default function EditProfileModal({ isOpen, onClose }) {
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
-      onClose();
+      navigate('/profile');
     }, 1200);
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      zIndex: 250,
-      background: 'rgba(15, 23, 42, 0.4)',
-      backdropFilter: 'blur(6px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
-    }} onClick={onClose}>
-      <div
-        className="animate-scale-in"
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          maxHeight: '90vh',
-          background: 'var(--white)',
-          borderRadius: '24px',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.12)',
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '16px 20px',
-          borderBottom: '1px solid var(--border-light)',
-          background: 'var(--white)'
-        }}>
-          <h3 style={{
-            fontSize: '15px',
-            fontWeight: 800,
-            color: 'var(--text-secondary)',
-            background: 'rgba(26, 86, 219, 0.04)',
-            borderLeft: '4px solid var(--primary)',
-            padding: '4px 12px',
-            borderRadius: '6px',
-            margin: 0
-          }}>
-            {isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}
-          </h3>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            style={{
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              background: 'var(--white)',
-              border: '1.5px solid var(--border-light)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-muted)',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
-            }}
-          >
-            <X size={16} />
-          </button>
-        </div>
+    <div className="page" style={{ background: 'var(--bg)', paddingBottom: '90px' }}>
+      {/* Modern Sticky Header */}
+      <div className="page-header">
+        <button className="back-btn" onClick={() => navigate(-1)}>
+          <ArrowLeft size={22} />
+        </button>
+        <h1 style={{ flex: 1 }}>{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}</h1>
+      </div>
 
-        {/* Modal Content / Form */}
-        <form onSubmit={handleSubmit} style={{ padding: '20px', overflowY: 'auto' }}>
-          {/* Avatar Upload Section */}
-          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '20px' }}>
+        <form onSubmit={handleSubmit}>
+          {/* Avatar Section */}
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
             <div style={{
               position: 'relative',
-              width: '84px',
-              height: '84px',
-              margin: '0 auto 8px auto'
+              width: '96px',
+              height: '96px',
+              margin: '0 auto 12px auto'
             }}>
-              {/* Outer Decorative Ring */}
-              <div style={{
-                position: 'absolute',
-                top: '-4px',
-                left: '-4px',
-                right: '-4px',
-                bottom: '-4px',
-                borderRadius: '50%',
-                border: '2px dashed var(--primary)',
-                opacity: 0.35
-              }}></div>
-
               {formData.avatar ? (
                 <img
                   src={formData.avatar}
-                  alt="Profile Avatar"
+                  alt="Profile"
                   style={{
                     width: '100%',
                     height: '100%',
                     borderRadius: '50%',
                     objectFit: 'cover',
-                    border: '3px solid var(--white)',
-                    boxShadow: '0 4px 14px rgba(0,0,0,0.08)',
+                    border: '4px solid var(--white)',
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                     opacity: uploadingImage ? 0.5 : 1
                   }}
                 />
@@ -307,9 +230,9 @@ export default function EditProfileModal({ isOpen, onClose }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '30px',
+                  fontSize: '34px',
                   fontWeight: 800,
-                  boxShadow: '0 4px 14px rgba(26,86,219,0.2)',
+                  boxShadow: '0 8px 24px rgba(26,86,219,0.2)',
                   opacity: uploadingImage ? 0.5 : 1
                 }}>
                   {formData.name ? formData.name[0].toUpperCase() : 'U'}
@@ -323,69 +246,64 @@ export default function EditProfileModal({ isOpen, onClose }) {
                   left: 0,
                   right: 0,
                   bottom: 0,
-                  background: 'rgba(15, 23, 42, 0.6)',
+                  background: 'rgba(0,0,0,0.4)',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#ffffff',
-                  fontSize: '9.5px',
-                  fontWeight: 800,
-                  letterSpacing: '0.2px',
-                  zIndex: 5
+                  color: 'white',
+                  fontSize: '10px',
+                  fontWeight: 800
                 }}>
                   UPLOADING...
                 </div>
               )}
 
-              {/* Upload Trigger Camera Badge */}
-              <label htmlFor="avatar-upload-input" style={{
+              <label htmlFor="avatar-upload" style={{
                 position: 'absolute',
-                bottom: '-2px',
-                right: '-2px',
-                width: '26px',
-                height: '26px',
+                bottom: '2px',
+                right: '2px',
+                width: '30px',
+                height: '30px',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                background: 'var(--primary)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                border: '2px solid var(--white)',
-                boxShadow: '0 2px 8px rgba(26,86,219,0.35)'
+                border: '3px solid var(--white)',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
               }}>
-                <Edit size={12} />
+                <Edit size={14} />
               </label>
               <input
-                id="avatar-upload-input"
+                id="avatar-upload"
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
                 style={{ display: 'none' }}
               />
             </div>
-            <p style={{ fontSize: '10.5px', color: 'var(--primary)', fontWeight: 700, margin: 0 }}>
-              {isEn ? 'Click pencil icon to upload profile photo' : 'পেন্সিল আইকন ক্লিক করে ছবি পরিবর্তন করুন'}
+            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>
+              {isEn ? 'Tap the icon to change photo' : 'ছবি পরিবর্তন করতে আইকনে ট্যাপ করুন'}
             </p>
           </div>
 
-          {/* Form Input Fields */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {/* Form Fields */}
+          <div className="card" style={{ padding: '20px', borderRadius: '20px' }}>
             <FormInput
               label={isEn ? 'Full Name' : 'পূর্ণ নাম'}
-              icon={<User size={16} />}
+              icon={<User size={18} />}
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder={isEn ? 'Enter full name' : 'আপনার নাম লিখুন'}
+              placeholder={isEn ? 'Enter your name' : 'আপনার নাম লিখুন'}
               required
             />
 
-
-
             <FormInput
               label={isEn ? 'Phone Number' : 'মোবাইল নম্বর'}
-              icon={<PhoneIcon size={16} />}
+              icon={<PhoneIcon size={18} />}
               type="tel"
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
@@ -393,8 +311,8 @@ export default function EditProfileModal({ isOpen, onClose }) {
             />
 
             <FormSelect
-              label={isEn ? 'Education Qualification' : 'শিক্ষাগত যোগ্যতা'}
-              icon={<FileText size={16} />}
+              label={isEn ? 'Qualification' : 'শিক্ষাগত যোগ্যতা'}
+              icon={<FileText size={18} />}
               value={formData.qualification}
               onChange={(e) => handleChange('qualification', e.target.value)}
             >
@@ -406,48 +324,44 @@ export default function EditProfileModal({ isOpen, onClose }) {
             </FormSelect>
 
             <FormSelect
-              label={isEn ? 'City / Location' : 'জেলা / অবস্থান'}
-              icon={<MapPin size={16} />}
+              label={isEn ? 'Location' : 'জেলা / অবস্থান'}
+              icon={<MapPin size={18} />}
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
             >
-              <option value="ঢাকা">{isEn ? 'Dhaka (ঢাকা)' : 'ঢাকা (Dhaka)'}</option>
-              <option value="চট্টগ্রাম">{isEn ? 'Chattogram (চট্টগ্রাম)' : 'চট্টগ্রাম (Chattogram)'}</option>
-              <option value="রাজশাহী">{isEn ? 'Rajshahi (রাজশাহী)' : 'রাজশাহী (Rajshahi)'}</option>
-              <option value="খুলনা">{isEn ? 'Khulna (খুলনা)' : 'খুলনা (Khulna)'}</option>
-              <option value="সিলেট">{isEn ? 'Sylhet (সিলেট)' : 'সিলেট (Sylhet)'}</option>
-              <option value="বরিশাল">{isEn ? 'Barishal (বরিশাল)' : 'বরিশাল (Barishal)'}</option>
-              <option value="রংপুর">{isEn ? 'Rangpur (রংপুর)' : 'রংপুর (Rangpur)'}</option>
-              <option value="ময়মনসিংহ">{isEn ? 'Mymensingh (ময়মনসিংহ)' : 'ময়মনসিংহ (Mymensingh)'}</option>
+              <option value="ঢাকা">Dhaka (ঢাকা)</option>
+              <option value="চট্টগ্রাম">Chattogram (চট্টগ্রাম)</option>
+              <option value="রাজশাহী">Rajshahi (রাজশাহী)</option>
+              <option value="খুলনা">Khulna (খুলনা)</option>
+              <option value="সিলেট">Sylhet (সিলেট)</option>
+              <option value="বরিশাল">Barishal (বরিশাল)</option>
+              <option value="রংপুর">Rangpur (রংপুর)</option>
+              <option value="ময়মনসিংহ">Mymensingh (ময়মনসিংহ)</option>
             </FormSelect>
           </div>
 
-          {/* Submit Button */}
-          <div style={{ marginTop: '20px' }}>
+          <div style={{ marginTop: '24px' }}>
             <button
               type="submit"
               className="btn btn-primary btn-block"
               style={{
-                width: '100%',
-                padding: '12px 14px',
-                borderRadius: '12px',
-                fontWeight: 800,
-                fontSize: '13px',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'white',
                 background: savedSuccess ? '#10b981' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-                boxShadow: savedSuccess ? '0 4px 14px rgba(16,185,129,0.3)' : '0 4px 14px rgba(26,86,219,0.2)',
-                transition: 'all 0.3s ease'
+                height: '52px',
+                borderRadius: '16px',
+                fontSize: '15px',
+                fontWeight: 800,
+                boxShadow: savedSuccess ? '0 8px 20px rgba(16,185,129,0.3)' : '0 8px 20px rgba(26,86,219,0.3)'
               }}
             >
-              {savedSuccess 
-                ? (isEn ? '✓ Profile Saved!' : '✓ সফলভাবে সংরক্ষণ করা হয়েছে!') 
+              {savedSuccess
+                ? (isEn ? '✓ Profile Updated!' : '✓ সফলভাবে আপডেট হয়েছে!')
                 : (isEn ? 'Save Profile Changes' : 'পরিবর্তন সংরক্ষণ করুন')}
             </button>
           </div>
         </form>
       </div>
+
+      <BottomNav />
     </div>
   );
 }
