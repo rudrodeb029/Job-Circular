@@ -378,36 +378,29 @@ export default function Home() {
                     key={`${cat.id}-${idx}`}
                     className="category-grid-item"
                     style={{
-                      border: 'none',
-                      boxShadow: 'none',
-                      background: 'transparent',
+                      border: '1px solid rgba(37, 99, 235, 0.12)',
+                      boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                      background: 'var(--white)',
                       borderRadius: '16px',
                       minWidth: '85px',
                       flexShrink: 0
                     }}
                     onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
                   >
-                    <div className="category-grid-icon" style={{
-                      background: cat.color,
-                      fontSize: '16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 4px 10px rgba(0,0,0,0.03)' // Keep a very subtle shadow only on the icon circle
-                    }}>{cat.icon}</div>
+                    <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
                     <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* FIXED MORE CARD - STATIONARY ON THE RIGHT - CLEAN STYLE */}
+            {/* FIXED MORE CARD - STATIONARY ON THE RIGHT */}
             <div
-              className="category-grid-item"
+              className="category-grid-item animate-scale-in"
               style={{
-                border: 'none',
-                boxShadow: 'none',
-                background: 'transparent',
+                border: '1.5px solid rgba(37, 99, 235, 0.15)',
+                boxShadow: '0 6px 20px rgba(37, 99, 235, 0.1)',
+                background: 'var(--white)',
                 borderRadius: '16px',
                 minWidth: '85px',
                 flexShrink: 0,
@@ -415,14 +408,7 @@ export default function Home() {
               }}
               onClick={() => navigate('/questions-hub')}
             >
-              <div className="category-grid-icon" style={{
-                background: 'var(--bg-secondary)',
-                color: 'var(--primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
-              }}>
+              <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <LayoutGrid size={20} />
               </div>
               <span className="category-grid-label" style={{ fontWeight: 800 }}>{isEn ? 'More' : 'আরও'}</span>
