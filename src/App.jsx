@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { App as CapacitorApp } from '@capacitor/app'
+import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
@@ -58,7 +59,13 @@ function App() {
       initializePushNotifications();
     }
 
-    // 2. Handle Android Hardware Back Button
+    // 2. Set StatusBar Color to White for Professional look
+    if (!isAdminRoute) {
+      StatusBar.setBackgroundColor({ color: '#ffffff' });
+      StatusBar.setStyle({ style: Style.Default }); // Smart default (usually dark icons on light bg)
+    }
+
+    // 3. Handle Android Hardware Back Button
     const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
       if (location.pathname === '/home' || location.pathname === '/' || location.pathname === '/onboarding') {
         // Exit app if on root pages

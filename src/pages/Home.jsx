@@ -189,8 +189,8 @@ export default function Home() {
 
   return (
     <div className="page">
-      <div className="page-content">
-        <AppHeader />
+      <AppHeader />
+      <div className="page-content" style={{ paddingTop: 0 }}>
 
         <div className="mb-lg" onClick={() => navigate('/search')} style={{ cursor: 'pointer' }}>
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />

@@ -23,9 +23,7 @@ export default function AppHeader() {
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        background: 'var(--header-bg)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        background: '#ffffff',
         borderBottom: '1px solid var(--border)',
         boxShadow: 'var(--shadow-sm)',
         height: '56px',
@@ -33,7 +31,7 @@ export default function AppHeader() {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 14px',
-        margin: '0 -14px 14px -14px'
+        marginBottom: '14px'
       }}>
         {/* Left: Hamburger Menu Icon Button */}
         <button
@@ -445,7 +443,8 @@ export default function AppHeader() {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 14px',
-              background: 'var(--bg-secondary)',
+              background: '#ffffff',
+              border: '1px solid var(--border-light)',
               borderRadius: '12px',
               marginTop: 'auto'
             }}>
