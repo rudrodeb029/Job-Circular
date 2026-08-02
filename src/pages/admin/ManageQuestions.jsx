@@ -28,6 +28,7 @@ export default function ManageQuestions() {
       explanationEn: ''
     }
   ]);
+  const [bulkInput, setBulkInput] = useState('');
 
   useEffect(() => {
     setPapers(getQuestionsData());
@@ -114,6 +115,44 @@ export default function ManageQuestions() {
       }
       return q;
     }));
+  };
+
+  const handleBulkImport = () => {
+    if (!bulkInput.trim()) return;
+
+    const lines = bulkInput.trim().split('\n');
+    const newQuestions = lines.map((line, index) => {
+      const parts = line.split(',').map(p => p.trim());
+      // Minimum required parts: Question + 4 Options + Correct Choice = 6
+      if (parts.length < 6) return null;
+
+      const [question, opt1, opt2, opt3, opt4, correctIndex, explanation] = parts;
+
+      return {
+        id: `q-bulk-${Date.now()}-${index}`,
+        question: question || '',
+        questionEn: '',
+        options: [opt1 || '', opt2 || '', opt3 || '', opt4 || ''],
+        optionsEn: ['', '', '', ''],
+        correctIndex: isNaN(parseInt(correctIndex, 10)) ? 0 : Math.min(3, Math.max(0, parseInt(correctIndex, 10))),
+        explanation: explanation || '',
+        explanationEn: ''
+      };
+    }).filter(q => q !== null);
+
+    if (newQuestions.length > 0) {
+      // If the first question is empty, replace it, otherwise append
+      setQuestions(prev => {
+        if (prev.length === 1 && !prev[0].question && prev[0].options.every(o => !o)) {
+          return newQuestions;
+        }
+        return [...prev, ...newQuestions];
+      });
+      setBulkInput('');
+      triggerToast(`${newQuestions.length} questions imported successfully!`);
+    } else {
+      triggerToast('Invalid format. Please use: Question, Opt1, Opt2, Opt3, Opt4, CorrectIndex (0-3), Explanation', 'error');
+    }
   };
 
   const handleOptionChange = (qIndex, oIndex, isEn, value) => {
@@ -287,6 +326,29 @@ export default function ManageQuestions() {
                  ))}
               </div>
               <button type="button" onClick={handleAddQuestionRow} style={{ marginTop: '8px', width: '100%', padding: '14px', background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', color: '#1a56db', fontWeight: 700, cursor: 'pointer' }}>+ Add MCQ Question Row</button>
+            </div>
+
+            {/* Bulk Import Section */}
+            <div style={{ borderTop: '2px solid #f1f5f9', marginTop: '40px', paddingTop: '32px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', marginBottom: '16px' }}>🚀 Bulk MCQ Import</h3>
+              <p style={{ color: '#64748b', fontSize: '12px', marginBottom: '16px' }}>
+                Format: <strong>Question, Option1, Option2, Option3, Option4, CorrectChoice(0-3), Explanation</strong><br/>
+                Place each new question on its own line.
+              </p>
+              <textarea
+                className="modern-input"
+                style={{ height: '150px', resize: 'vertical', background: '#fcfcfc', marginBottom: '16px', fontSize: '14px' }}
+                placeholder="মৌলিক অধিকার কয়টি?, ১২টি, ১৪টি, ৮টি, ১০টি, 0, সংবিধানের তৃতীয় ভাগে উল্লেখ আছে"
+                value={bulkInput}
+                onChange={e => setBulkInput(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={handleBulkImport}
+                style={{ width: '100%', padding: '12px', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 6px rgba(79, 70, 229, 0.2)' }}
+              >
+                ⚡ Process & Import Questions
+              </button>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '40px', borderTop: '2px solid #f1f5f9', paddingTop: '32px' }}>
