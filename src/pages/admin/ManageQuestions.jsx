@@ -126,15 +126,32 @@ export default function ManageQuestions() {
       // Minimum required parts: Question + 4 Options + Correct Choice = 6
       if (parts.length < 6) return null;
 
-      const [question, opt1, opt2, opt3, opt4, correctIndex, explanation] = parts;
+      let [question, opt1, opt2, opt3, opt4, correctVal, explanation] = parts;
+
+      // Smart Correct Index Detection (Handles 0-3 AND Bengali ক, খ, গ, ঘ)
+      let finalIndex = 0;
+      const cleanVal = String(correctVal).toLowerCase();
+
+      if (cleanVal.includes('ক') || cleanVal === '0') finalIndex = 0;
+      else if (cleanVal.includes('খ') || cleanVal === '1') finalIndex = 1;
+      else if (cleanVal.includes('গ') || cleanVal === '2') finalIndex = 2;
+      else if (cleanVal.includes('ঘ') || cleanVal === '3') finalIndex = 3;
+      else {
+        // Fallback to numeric check
+        const parsed = parseInt(cleanVal, 10);
+        finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
+      }
+
+      // Cleanup options (remove (ক), (খ) prefixes if present)
+      const cleanOpt = (opt) => opt.replace(/^[\(\[]?[কখগঘ][\)\]]?\s*/, '').trim();
 
       return {
         id: `q-bulk-${Date.now()}-${index}`,
         question: question || '',
         questionEn: '',
-        options: [opt1 || '', opt2 || '', opt3 || '', opt4 || ''],
+        options: [cleanOpt(opt1), cleanOpt(opt2), cleanOpt(opt3), cleanOpt(opt4)],
         optionsEn: ['', '', '', ''],
-        correctIndex: isNaN(parseInt(correctIndex, 10)) ? 0 : Math.min(3, Math.max(0, parseInt(correctIndex, 10))),
+        correctIndex: finalIndex,
         explanation: explanation || '',
         explanationEn: ''
       };
