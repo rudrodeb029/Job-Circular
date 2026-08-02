@@ -48,6 +48,7 @@ import ManageQuestions from './pages/admin/ManageQuestions'
 import Statistics from './pages/admin/Statistics'
 import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
+import AiManager from './pages/admin/AiManager'
 
 function App() {
   const { state } = useAppContext()
@@ -139,6 +140,7 @@ function App() {
           <Route path="stats" element={<Statistics />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<AdminSettings />} />
+          <Route path="ai-manager" element={<AiManager />} />
         </Route>
       </Routes>
     )
