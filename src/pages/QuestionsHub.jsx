@@ -256,10 +256,15 @@ export default function QuestionsHub() {
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center' }}>
                       <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '4px', background: '#f8fafc', padding: '2px 8px', borderRadius: '6px' }}>
-                        📅 {isEn ? paper.dateEn : paper.date}
+                        📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}
                       </span>
                       <span style={{ fontSize: '10.5px', color: 'var(--primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                        ⏱️ {isEn ? paper.timeLimitEn : paper.timeLimit}
+                        ⏱️ {isEn ? paper.timeLimitEn : (
+                            // Auto-fix for stored "10 mins" if timeLimitEn is different
+                            (paper.timeLimit === '১০ মিনিট' && paper.timeLimitEn !== '10 Mins')
+                            ? paper.timeLimitEn.split('').map(c => ({'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'}[c] || c)).join('').replace(/Mins|Min/gi, 'মিনিট')
+                            : paper.timeLimit
+                        )}
                       </span>
                       <span style={{ fontSize: '10.5px', color: '#059669', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         📝 {isEn ? `${paper.questions.length} Items` : `${toBengaliNumber(paper.questions.length)}টি প্রশ্ন`}

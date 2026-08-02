@@ -428,7 +428,7 @@ export default function ManageQuestions() {
                       <div style={{ fontSize: '12px', color: '#64748b' }}>{paper.title}</div>
                     </td>
                     <td><span className="cat-pill">{paper.category}</span></td>
-                    <td style={{ color: '#475569', fontWeight: 600 }}>{paper.dateEn || 'N/A'}</td>
+                    <td style={{ color: '#475569', fontWeight: 600 }}>{paper.dateEn || paper.date || 'N/A'}</td>
                     <td style={{ color: '#475569', fontWeight: 600 }}>{paper.timeLimitEn}</td>
                     <td style={{ textAlign: 'center' }}>
                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
