@@ -6,7 +6,7 @@ import { categories } from '../../data/categories';
 export default function AiManager() {
   const { dispatch } = useAdminContext();
 
-  // Pre-configured User Key
+  // User's OpenRouter API Key
   const PROVIDED_KEY = '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';
 
   // Multi-API Configuration
@@ -14,15 +14,16 @@ export default function AiManager() {
   const [geminiKey, setGeminiKey] = useState(localStorage.getItem('gemini_api_key') || '');
   const [openRouterKey, setOpenRouterKey] = useState(localStorage.getItem('openrouter_api_key') || PROVIDED_KEY);
 
-  // OpenRouter Free Models
-  const [selectedModel, setSelectedModel] = useState(localStorage.getItem('openrouter_model') || 'google/gemini-flash-1.5-free:experimental');
+  // Specific OpenRouter Free Models requested by user
+  const [selectedModel, setSelectedModel] = useState(localStorage.getItem('openrouter_model') || 'nvidia/nemotron-3-ultra-550b-a55b:free');
   const freeModels = [
-    { id: 'google/gemini-flash-1.5-free:experimental', name: 'Gemini Flash 1.5 (Free)' },
-    { id: 'google/gemini-flash-1.5-8b-exp-0827:free', name: 'Gemini Flash 8B (Free)' },
-    { id: 'meta-llama/llama-3.1-8b-instruct:free', name: 'Llama 3.1 8B (Free)' },
-    { id: 'mistralai/pixtral-12b:free', name: 'Pixtral 12B (Free)' },
-    { id: 'qwen/qwen-2-7b-instruct:free', name: 'Qwen 2 7B (Free)' },
-    { id: 'microsoft/phi-3-mini-128k-instruct:free', name: 'Phi 3 Mini (Free)' }
+    { id: 'nvidia/nemotron-3-ultra-550b-a55b:free', name: 'Nvidia Nemotron 550B (Ultra Free)' },
+    { id: 'nvidia/nemotron-3-super-120b-a12b:free', name: 'Nvidia Nemotron 120B (Super Free)' },
+    { id: 'google/gemma-4-26b-a4b-it:free', name: 'Google Gemma 4 26B (Free)' },
+    { id: 'google/gemma-4-31b-it:free', name: 'Google Gemma 4 31B (Free)' },
+    { id: 'openai/gpt-oss-20b:free', name: 'OpenAI GPT-OSS 20B (Free)' },
+    { id: 'nvidia/nemotron-3-embed-1b:free', name: 'Nvidia Nemotron Embed 1B (Free)' },
+    { id: 'google/gemini-flash-1.5-free:experimental', name: 'Gemini Flash 1.5 (Free)' }
   ];
 
   const [prompt, setPrompt] = useState('');
@@ -32,7 +33,7 @@ export default function AiManager() {
   const [status, setStatus] = useState({ type: '', message: '' });
 
   useEffect(() => {
-    // Ensure provided key is saved if no key exists
+    // Auto-save the provided key if not already present
     if (!localStorage.getItem('openrouter_api_key')) {
         localStorage.setItem('openrouter_api_key', PROVIDED_KEY);
     }
@@ -48,7 +49,7 @@ export default function AiManager() {
     localStorage.setItem('gemini_api_key', geminiKey);
     localStorage.setItem('openrouter_api_key', openRouterKey);
     localStorage.setItem('openrouter_model', selectedModel);
-    showStatus('success', 'AI configurations saved successfully!');
+    showStatus('success', 'Configurations for ' + activeProvider + ' saved!');
   };
 
   const testConnection = async () => {
@@ -81,9 +82,9 @@ export default function AiManager() {
             const data = await response.json();
             if (data.error) throw new Error(data.error.message);
         }
-        showStatus('success', activeProvider + ' API is working correctly!');
+        showStatus('success', activeProvider + ' is ready and working!');
     } catch (err) {
-        showStatus('error', 'API Test Failed: ' + err.message);
+        showStatus('error', 'Test Failed: ' + err.message);
     } finally {
         setTestLoading(false);
     }
@@ -103,8 +104,8 @@ export default function AiManager() {
       headers: {
         "Authorization": "Bearer " + openRouterKey,
         "Content-Type": "application/json",
-        "HTTP-Referer": window.location.origin,
-        "X-Title": "Job Circular Admin"
+        "HTTP-Referer": "https://job-circular-75dbb.web.app",
+        "X-Title": "Job Circular Pro Admin"
       },
       body: JSON.stringify({
         "model": selectedModel,
@@ -120,8 +121,8 @@ export default function AiManager() {
 
   const generatePost = async () => {
     const currentKey = activeProvider === 'gemini' ? geminiKey : openRouterKey;
-    if (!currentKey) return showStatus('error', 'Please enter API Key for ' + activeProvider);
-    if (!prompt) return showStatus('error', 'Please enter a description of the job.');
+    if (!currentKey) return showStatus('error', 'Please configure ' + activeProvider + ' API key');
+    if (!prompt) return showStatus('error', 'Please provide job information to analyze.');
 
     setLoading(true);
     try {
@@ -138,10 +139,10 @@ export default function AiManager() {
       const cleanedJson = text.replace(/```json/g, '').replace(/```/g, '').trim();
       const jobData = JSON.parse(cleanedJson);
       setResult(jobData);
-      showStatus('success', 'AI Data Generated via ' + activeProvider);
+      showStatus('success', 'Content generated using ' + selectedModel);
     } catch (error) {
       console.error(error);
-      showStatus('error', 'AI Generation failed (' + activeProvider + '): ' + error.message);
+      showStatus('error', 'Generation failed: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -159,7 +160,7 @@ export default function AiManager() {
       images: []
     };
     dispatch({ type: 'ADD_JOB', payload: finalData });
-    showStatus('success', 'Job Circular posted successfully!');
+    showStatus('success', 'Job Circular posted to live app!');
     setResult(null);
     setPrompt('');
   };
@@ -167,149 +168,152 @@ export default function AiManager() {
   return (
     <div className="admin-page" style={{ padding: '20px', background: '#f8fafc', minHeight: '100vh' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h1 style={{ color: '#1e293b', margin: 0 }}>🤖 AI Manager Pro</h1>
+        <h1 style={{ color: '#1e293b', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '32px' }}>🤖</span> AI Manager Pro
+        </h1>
         <button
             onClick={testConnection}
             disabled={testLoading}
-            style={{ padding: '10px 20px', background: '#f59e0b', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}
+            style={{ padding: '12px 24px', background: '#f59e0b', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '10px', boxShadow: '0 4px 6px rgba(245, 158, 11, 0.2)' }}
         >
-            {testLoading ? 'Testing...' : '⚡ Test API Connection'}
+            {testLoading ? '⏳ Testing...' : '⚡ Test API Connection'}
         </button>
       </div>
 
       {status.message && (
-        <div style={{ padding: '15px', borderRadius: '10px', marginBottom: '20px', background: status.type === 'success' ? '#dcfce7' : '#fee2e2', color: status.type === 'success' ? '#166534' : '#991b1b', fontWeight: '500', border: '1px solid ' + (status.type === 'success' ? '#bbf7d0' : '#fecaca') }}>
-          {status.message}
+        <div className="animate-fade-in" style={{ padding: '15px 20px', borderRadius: '12px', marginBottom: '25px', background: status.type === 'success' ? '#dcfce7' : '#fee2e2', color: status.type === 'success' ? '#166534' : '#991b1b', fontWeight: '600', border: '1px solid ' + (status.type === 'success' ? '#bbf7d0' : '#fecaca'), display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {status.type === 'success' ? '✅' : '❌'} {status.message}
         </div>
       )}
 
-      <div className="admin-chart-card" style={{ background: '#ffffff', padding: '25px', borderRadius: '16px', marginBottom: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-        <h3 style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            Provider Configuration
+      <div className="admin-chart-card" style={{ background: '#ffffff', padding: '30px', borderRadius: '20px', marginBottom: '30px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+        <h3 style={{ marginBottom: '20px', color: '#334155', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+            Select AI Engine & Model
         </h3>
 
-        <div style={{ display: 'flex', gap: '15px', marginBottom: '25px' }}>
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
             <div
                 onClick={() => setActiveProvider('gemini')}
-                style={{ flex: 1, padding: '18px', borderRadius: '12px', border: activeProvider === 'gemini' ? '2.5px solid #1a56db' : '1.5px solid #e2e8f0', background: activeProvider === 'gemini' ? '#eff6ff' : '#ffffff', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s' }}
+                style={{ flex: 1, padding: '20px', borderRadius: '15px', border: activeProvider === 'gemini' ? '3px solid #1a56db' : '1px solid #e2e8f0', background: activeProvider === 'gemini' ? '#eff6ff' : '#ffffff', cursor: 'pointer', textAlign: 'center', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
-                <div style={{ fontWeight: '800', color: activeProvider === 'gemini' ? '#1a56db' : '#64748b' }}>GOOGLE GEMINI</div>
-                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>Fast Direct SDK</div>
+                <div style={{ fontWeight: '900', fontSize: '14px', color: activeProvider === 'gemini' ? '#1a56db' : '#64748b' }}>GOOGLE GEMINI</div>
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>Direct integration</div>
             </div>
             <div
                 onClick={() => setActiveProvider('openrouter')}
-                style={{ flex: 1, padding: '18px', borderRadius: '12px', border: activeProvider === 'openrouter' ? '2.5px solid #1a56db' : '1.5px solid #e2e8f0', background: activeProvider === 'openrouter' ? '#eff6ff' : '#ffffff', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s' }}
+                style={{ flex: 1, padding: '20px', borderRadius: '15px', border: activeProvider === 'openrouter' ? '3px solid #1a56db' : '1px solid #e2e8f0', background: activeProvider === 'openrouter' ? '#eff6ff' : '#ffffff', cursor: 'pointer', textAlign: 'center', transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
             >
-                <div style={{ fontWeight: '800', color: activeProvider === 'openrouter' ? '#1a56db' : '#64748b' }}>OPENROUTER (FREE)</div>
-                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>GPT-4 / Claude / Llama</div>
+                <div style={{ fontWeight: '900', fontSize: '14px', color: activeProvider === 'openrouter' ? '#1a56db' : '#64748b' }}>OPENROUTER FREE</div>
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>Nvidia / Gemma / GPT</div>
             </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {activeProvider === 'gemini' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b' }}>Gemini API Key</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <label style={{ fontSize: '13px', fontWeight: '800', color: '#4b5563' }}>GOOGLE API KEY</label>
                 <input
                     type="password"
-                    placeholder="Paste Google Gemini Key"
+                    placeholder="Enter your Google Gemini API Key"
                     value={geminiKey}
                     onChange={(e) => setGeminiKey(e.target.value)}
-                    style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc' }}
+                    style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', fontSize: '14px' }}
                 />
             </div>
           ) : (
             <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b' }}>OpenRouter API Key</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '800', color: '#4b5563' }}>OPENROUTER API KEY</label>
                     <input
                         type="password"
                         placeholder="sk-or-v1-..."
                         value={openRouterKey}
                         onChange={(e) => setOpenRouterKey(e.target.value)}
-                        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc' }}
+                        style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', fontSize: '14px' }}
                     />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b' }}>Select Free Model</label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <label style={{ fontSize: '13px', fontWeight: '800', color: '#4b5563' }}>SELECT FREE HIGH-PERFORMANCE MODEL</label>
                     <select
                         value={selectedModel}
                         onChange={(e) => setSelectedModel(e.target.value)}
-                        style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', background: '#f8fafc', cursor: 'pointer' }}
+                        style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc', cursor: 'pointer', fontSize: '14px', fontWeight: '600' }}
                     >
                         {freeModels.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
                     </select>
                 </div>
             </>
           )}
-          <button onClick={handleSaveConfigs} style={{ width: '100%', padding: '14px', background: '#1a56db', color: 'white', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', fontSize: '15px', marginTop: '10px', boxShadow: '0 4px 12px rgba(26, 86, 219, 0.2)' }}>
-            💾 Save Configuration
+          <button onClick={handleSaveConfigs} style={{ width: '100%', padding: '16px', background: '#1a56db', color: 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', marginTop: '10px', boxShadow: '0 4px 12px rgba(26, 86, 219, 0.3)', transition: 'transform 0.2s' }}>
+            💾 Save & Apply AI Config
           </button>
         </div>
       </div>
 
-      <div className="admin-chart-card" style={{ background: '#ffffff', padding: '25px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
-        <h3 style={{ marginBottom: '15px' }}>Write Job Details</h3>
+      <div className="admin-chart-card" style={{ background: '#ffffff', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
+        <h3 style={{ marginBottom: '15px' }}>Job Circular Information</h3>
+        <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px' }}>Describe the job or paste raw text from a website. AI will analyze and create a professional post.</p>
         <textarea
-          placeholder="e.g. 'Post circular for Primary Teacher Exam 2024, 5000 seats, deadline Dec 30'"
+          placeholder="Example: 'Create circular for Bank Asia PO post, vacancy 50, location all over Bangladesh, salary 50000, deadline June 2025'"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          style={{ width: '100%', height: '150px', padding: '15px', border: '1px solid #e2e8f0', borderRadius: '12px', marginBottom: '20px', resize: 'vertical', fontSize: '14px', lineHeight: '1.6' }}
+          style={{ width: '100%', height: '180px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '15px', marginBottom: '25px', resize: 'vertical', fontSize: '15px', lineHeight: '1.7', background: '#fcfcfc' }}
         />
 
         <button
           onClick={generatePost}
           disabled={loading}
-          style={{ width: '100%', padding: '16px', background: loading ? '#94a3b8' : 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)', color: 'white', border: 'none', borderRadius: '12px', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: '800', fontSize: '16px', boxShadow: '0 4px 15px rgba(124, 58, 237, 0.3)' }}
+          style={{ width: '100%', padding: '18px', background: loading ? '#94a3b8' : 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)', color: 'white', border: 'none', borderRadius: '15px', cursor: loading ? 'not-allowed' : 'pointer', fontWeight: '900', fontSize: '18px', boxShadow: '0 8px 20px rgba(124, 58, 237, 0.3)' }}
         >
-          {loading ? '🤖 AI Analysing Data...' : '✨ Magic Generate Professional Post'}
+          {loading ? '🤖 AI Generating Circular...' : '✨ Magic Create Post'}
         </button>
       </div>
 
       {result && (
-        <div className="admin-chart-card animate-fade-in" style={{ background: '#ffffff', padding: '25px', borderRadius: '16px', marginTop: '24px', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', border: '1px solid #1a56db' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '15px', borderBottom: '1px solid #f1f5f9' }}>
-            <h3 style={{ margin: 0, color: '#1a56db' }}>Preview & Edit Result</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#64748b' }}>Category:</span>
+        <div className="admin-chart-card animate-fade-in" style={{ background: '#ffffff', padding: '30px', borderRadius: '20px', marginTop: '30px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', border: '2px solid #1a56db' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', paddingBottom: '15px', borderBottom: '1px solid #f1f5f9' }}>
+            <h3 style={{ margin: 0, color: '#1a56db', fontWeight: '900' }}>AI ANALYZED PREVIEW</h3>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                <span style={{ fontSize: '13px', fontWeight: 'bold', color: '#64748b' }}>App Category:</span>
                 <select
                     value={result.categoryId}
                     onChange={(e) => setResult({...result, categoryId: e.target.value})}
-                    style={{ padding: '6px 12px', background: '#eff6ff', borderRadius: '6px', fontSize: '0.85rem', border: '1px solid #bfdbfe', color: '#1e40af', fontWeight: 'bold' }}
+                    style={{ padding: '8px 16px', background: '#eff6ff', borderRadius: '8px', fontSize: '0.9rem', border: '1px solid #bfdbfe', color: '#1e40af', fontWeight: '800' }}
                 >
                     {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
                 </select>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '25px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '30px' }}>
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', marginBottom: '5px', display: 'block' }}>Job Title (Bengali)</label>
-              <input value={result.title} onChange={(e) => setResult({...result, title: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px', fontWeight: '600' }} />
+              <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Job Title (Bengali)</label>
+              <input value={result.title} onChange={(e) => setResult({...result, title: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px', fontWeight: '700', fontSize: '16px' }} />
             </div>
             <div>
-              <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', marginBottom: '5px', display: 'block' }}>Organization</label>
-              <input value={result.organization} onChange={(e) => setResult({...result, organization: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
+              <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Organization Name</label>
+              <input value={result.organization} onChange={(e) => setResult({...result, organization: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px', fontWeight: '600' }} />
             </div>
             <div>
-              <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', marginBottom: '5px', display: 'block' }}>Vacancy</label>
-              <input value={result.vacancy} onChange={(e) => setResult({...result, vacancy: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
+              <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Total Vacancy</label>
+              <input value={result.vacancy} onChange={(e) => setResult({...result, vacancy: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px' }} />
             </div>
             <div>
-              <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', marginBottom: '5px', display: 'block' }}>Deadline</label>
-              <input type="date" value={result.deadline} onChange={(e) => setResult({...result, deadline: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
+              <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Application Deadline</label>
+              <input type="date" value={result.deadline} onChange={(e) => setResult({...result, deadline: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px', fontWeight: 'bold' }} />
             </div>
             <div>
-                <label style={{ fontSize: '11px', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', marginBottom: '5px', display: 'block' }}>Salary</label>
-                <input value={result.salary} onChange={(e) => setResult({...result, salary: e.target.value})} style={{ width: '100%', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '8px' }} />
+                <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Salary Info</label>
+                <input value={result.salary} onChange={(e) => setResult({...result, salary: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px' }} />
             </div>
           </div>
 
           <button
             onClick={handlePost}
-            style={{ width: '100%', padding: '18px', background: '#16a34a', color: 'white', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: '900', fontSize: '17px', boxShadow: '0 4px 15px rgba(22, 163, 74, 0.3)' }}
+            style={{ width: '100%', padding: '20px', background: '#16a34a', color: 'white', border: 'none', borderRadius: '15px', cursor: 'pointer', fontWeight: '900', fontSize: '18px', boxShadow: '0 10px 20px rgba(22, 163, 74, 0.4)', transition: 'all 0.3s' }}
           >
-            🚀 Publish Now & Send Push Notification
+            🚀 Publish Circular & Push to All Users
           </button>
         </div>
       )}
