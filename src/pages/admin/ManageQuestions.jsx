@@ -135,7 +135,8 @@ export default function ManageQuestions() {
       const correctVal = parts[5];
 
       // Join everything from index 6 onwards as the explanation (to handle commas in explanation)
-      const explanation = parts.slice(6).join(', ');
+      // and remove any '|' characters as requested
+      const explanation = parts.slice(6).join(', ').replace(/\|/g, '').trim();
 
       // Smart Correct Index Detection (Handles 0-3 AND Bengali ক, খ, গ, ঘ)
       let finalIndex = 0;
