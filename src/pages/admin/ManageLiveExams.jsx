@@ -34,6 +34,7 @@ export default function ManageLiveExams() {
       explanation: '', explanationEn: ''
     }
   ]);
+  const [bulkInput, setBulkInput] = useState('');
 
   const handleAddSubjectTopicRow = () => {
     setSubjectTopics(prev => [...prev, { subject: '', subjectEn: '', topics: '', topicsEn: '' }]);
@@ -68,6 +69,60 @@ export default function ManageLiveExams() {
 
   const handleQuestionFieldChange = (index, field, value) => {
     setQuestions(prev => prev.map((q, i) => i === index ? { ...q, [field]: value } : q));
+  };
+
+  const handleBulkImport = () => {
+    if (!bulkInput.trim()) return;
+
+    const lines = bulkInput.trim().split('\n');
+    const newQuestions = lines.map((line, index) => {
+      const parts = line.split(',').map(p => p.trim());
+      if (parts.length < 6) return null;
+
+      const question = parts[0];
+      const opt1 = parts[1];
+      const opt2 = parts[2];
+      const opt3 = parts[3];
+      const opt4 = parts[4];
+      const correctVal = parts[5];
+      const explanation = parts.slice(6).join(', ').replace(/\|/g, '').trim();
+
+      let finalIndex = 0;
+      const cleanVal = String(correctVal).toLowerCase();
+      if (cleanVal.includes('ক') || cleanVal === '0') finalIndex = 0;
+      else if (cleanVal.includes('খ') || cleanVal === '1') finalIndex = 1;
+      else if (cleanVal.includes('গ') || cleanVal === '2') finalIndex = 2;
+      else if (cleanVal.includes('ঘ') || cleanVal === '3') finalIndex = 3;
+      else {
+        const parsed = parseInt(cleanVal, 10);
+        finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
+      }
+
+      const cleanOpt = (opt) => opt.replace(/^[\(\[]?[কখগঘ][\)\]]?\s*/, '').trim();
+
+      return {
+        question: question || '',
+        questionEn: '',
+        options: [cleanOpt(opt1), cleanOpt(opt2), cleanOpt(opt3), cleanOpt(opt4)],
+        optionsEn: ['', '', '', ''],
+        correctIndex: finalIndex,
+        explanation: explanation || '',
+        explanationEn: ''
+      };
+    }).filter(q => q !== null);
+
+    if (newQuestions.length > 0) {
+      setQuestions(prev => {
+        if (prev.length === 1 && !prev[0].question && prev[0].options.every(o => !o)) {
+          return newQuestions;
+        }
+        return [...prev, ...newQuestions];
+      });
+      setBulkInput('');
+      triggerToast(`${newQuestions.length} questions imported to exam!`);
+    } else {
+      triggerToast('Invalid format. Use: Question, Opt1, Opt2, Opt3, Opt4, CorrectIndex, Explanation', 'error');
+    }
   };
 
   const handleOptionChange = (qIndex, oIndex, isEn, value) => {
@@ -229,6 +284,28 @@ export default function ManageLiveExams() {
                    ))}
                 </div>
                 <button type="button" onClick={handleAddQuestion} style={{ marginTop: '16px', width: '100%', padding: '14px', background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', color: '#64748b', fontWeight: 700, cursor: 'pointer' }}>+ Add Another Question</button>
+             </div>
+
+             <div className="form-section" style={{ background: '#f1f5f9' }}>
+                <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>🚀 Bulk MCQ Import</h3>
+                <p style={{ color: '#64748b', fontSize: '12px', marginBottom: '16px' }}>
+                   Format: <strong>Question, Opt1, Opt2, Opt3, Opt4, Correct(0-3/ক-ঘ), Explanation</strong><br/>
+                   One question per line.
+                </p>
+                <textarea
+                   className="modern-input"
+                   style={{ height: '120px', resize: 'vertical', background: 'white', marginBottom: '16px' }}
+                   placeholder="মৌলিক অধিকার কয়টি?, ১২টি, ১৪টি, ৮টি, ১০টি, ক, সংবিধানের ৩য় ভাগে আছে"
+                   value={bulkInput}
+                   onChange={e => setBulkInput(e.target.value)}
+                />
+                <button
+                   type="button"
+                   onClick={handleBulkImport}
+                   style={{ width: '100%', padding: '12px', background: '#4f46e5', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}
+                >
+                   ⚡ Import Questions to Exam
+                </button>
              </div>
 
              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px' }}>
