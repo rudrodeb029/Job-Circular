@@ -327,8 +327,8 @@ export default function LiveExamRoom() {
                   {/* Question Text */}
                   <h4 style={{
                     fontSize: '15px',
-                    fontWeight: 700,
-                    color: 'var(--text-secondary)',
+                    fontWeight: 600,
+                    color: '#64748b',
                     marginBottom: '16px',
                     lineHeight: '1.5',
                     display: 'flex',
@@ -394,15 +394,15 @@ export default function LiveExamRoom() {
                             alignItems: 'center',
                             padding: '12px 14px',
                             borderRadius: '12px',
-                            background: bg,
-                            color: color,
-                            border: border,
-                            cursor: !currentResult ? 'pointer' : 'default',
-                            fontSize: '13px',
-                            fontWeight: 600,
-                            transition: 'all 0.2s ease',
-                            gap: '10px'
-                          }}
+                          background: bg,
+                          color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
+                          border: border,
+                          cursor: !currentResult ? 'pointer' : 'default',
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          transition: 'all 0.2s ease',
+                          gap: '10px'
+                        }}
                         >
                           <span style={{
                             width: '24px',

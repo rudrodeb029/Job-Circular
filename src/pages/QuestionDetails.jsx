@@ -215,8 +215,8 @@ export default function QuestionDetails() {
                 {/* Question Label */}
                 <h4 style={{
                   fontSize: '14.5px',
-                  fontWeight: 700,
-                  color: 'var(--text-secondary)',
+                  fontWeight: 600,
+                  color: '#64748b',
                   marginBottom: '16px',
                   lineHeight: '1.5',
                   display: 'flex',
@@ -273,11 +273,11 @@ export default function QuestionDetails() {
                           padding: '10px 12px',
                           borderRadius: '10px',
                           background: bg,
-                          color: color,
+                          color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
                           border: border,
                           cursor: (mode === 'practice' && !hasAnswered) ? 'pointer' : 'default',
                           fontSize: '12px',
-                          fontWeight: 600,
+                          fontWeight: 500,
                           transition: 'all 0.2s ease',
                           gap: '10px'
                         }}
