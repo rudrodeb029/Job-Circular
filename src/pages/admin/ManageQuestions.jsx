@@ -311,7 +311,11 @@ export default function ManageQuestions() {
               </div>
               <div className="input-group">
                 <label>Exam Date (Bengali)</label>
-                <input className="modern-input" value={date} onChange={e => setDate(e.target.value)} />
+                <input className="modern-input" value={date} onChange={e => setDate(e.target.value)} placeholder="৩০ জানুয়ারি ২০২৬" />
+              </div>
+              <div className="input-group">
+                <label>Exam Date (English)</label>
+                <input className="modern-input" value={dateEn} onChange={e => setDateEn(e.target.value)} placeholder="30 Jan 2026" />
               </div>
             </div>
 
