@@ -126,7 +126,16 @@ export default function ManageQuestions() {
       // Minimum required parts: Question + 4 Options + Correct Choice = 6
       if (parts.length < 6) return null;
 
-      let [question, opt1, opt2, opt3, opt4, correctVal, explanation] = parts;
+      // Extract fixed parts
+      const question = parts[0];
+      const opt1 = parts[1];
+      const opt2 = parts[2];
+      const opt3 = parts[3];
+      const opt4 = parts[4];
+      const correctVal = parts[5];
+
+      // Join everything from index 6 onwards as the explanation (to handle commas in explanation)
+      const explanation = parts.slice(6).join(', ');
 
       // Smart Correct Index Detection (Handles 0-3 AND Bengali ক, খ, গ, ঘ)
       let finalIndex = 0;
@@ -137,7 +146,6 @@ export default function ManageQuestions() {
       else if (cleanVal.includes('গ') || cleanVal === '2') finalIndex = 2;
       else if (cleanVal.includes('ঘ') || cleanVal === '3') finalIndex = 3;
       else {
-        // Fallback to numeric check
         const parsed = parseInt(cleanVal, 10);
         finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
       }
