@@ -196,6 +196,15 @@ export default function ManageQuestions() {
   const handleSave = (e) => {
     e.preventDefault();
 
+    const generateBengaliTime = (timeStr) => {
+      if (!timeStr) return '';
+      const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
+      let converted = timeStr.split('').map(char => bengaliDigits[char] || char).join('');
+      converted = converted.replace(/Mins|Min|minutes|minute/gi, 'মিনিট');
+      converted = converted.replace(/Hours|Hour|hrs|hr/gi, 'ঘণ্টা');
+      return converted;
+    };
+
     const newPaper = {
       id: currentPaper ? currentPaper.id : `paper-${Date.now()}`,
       category,
@@ -204,7 +213,7 @@ export default function ManageQuestions() {
       date,
       dateEn,
       totalQuestions: String(questions.length),
-      timeLimit: '১০ মিনিট',
+      timeLimit: generateBengaliTime(timeLimitEn),
       timeLimitEn,
       questions,
       createdAt: currentPaper ? (currentPaper.createdAt || new Date().toISOString()) : new Date().toISOString(),
