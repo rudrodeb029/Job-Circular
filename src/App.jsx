@@ -7,7 +7,7 @@ import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
 import { initializePushNotifications } from './utils/notifications'
 
-const CURRENT_VERSION = "1.0.0";
+const CURRENT_VERSION = "1.0.3";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
 import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
