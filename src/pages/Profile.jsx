@@ -29,7 +29,7 @@ export default function Profile() {
       {/* Glassmorphism Gradient Header */}
       <div style={{
         background: 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
-        padding: '36px 20px 60px 20px',
+        padding: 'calc(var(--safe-area-top) + 20px) 20px 60px 20px',
         color: 'white',
         textAlign: 'center',
         borderRadius: '0 0 28px 28px',
@@ -66,7 +66,7 @@ export default function Profile() {
           aria-label="Settings"
           style={{
             position: 'absolute',
-            top: '16px',
+            top: 'calc(var(--safe-area-top) + 4px)',
             right: '16px',
             width: '38px',
             height: '38px',

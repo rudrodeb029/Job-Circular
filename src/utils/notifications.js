@@ -27,11 +27,9 @@ export const initializePushNotifications = async () => {
 
   // 2. Add listeners FIRST before registering
   PushNotifications.addListener('registration', async (token) => {
+    // Log token
     console.log('Push registration success, token: ' + token.value);
     localStorage.setItem('fcm_token', token.value);
-
-    // DEBUG ALERT
-    alert('FCM Registered Successfully!');
 
     try {
       // Always subscribe to topic on registration
@@ -44,7 +42,6 @@ export const initializePushNotifications = async () => {
 
   PushNotifications.addListener('registrationError', (error) => {
     console.error('Push registration error:', error);
-    alert('Push Registration Error: ' + JSON.stringify(error));
   });
 
   PushNotifications.addListener('pushNotificationReceived', (notification) => {
@@ -79,7 +76,7 @@ export const initializePushNotifications = async () => {
       }
     }
   } else {
-    alert('Notification permission denied by user.');
+    console.warn('Notification permission denied by user (silent)');
   }
 };
 

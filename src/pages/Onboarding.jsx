@@ -75,7 +75,7 @@ export default function Onboarding() {
   return (
     <div className="onboarding-screen">
       {/* Top Header Controls */}
-      <div className="onboarding-top-bar">
+      <div className="onboarding-top-bar" style={{ paddingTop: 'var(--safe-area-top)' }}>
         <span className="onboarding-step-chip">
           {currentSlide + 1} / {slides.length}
         </span>

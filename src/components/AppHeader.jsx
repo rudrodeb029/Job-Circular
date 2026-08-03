@@ -25,87 +25,101 @@ export default function AppHeader() {
         zIndex: 100,
         background: '#ffffff',
         borderBottom: '1px solid var(--border)',
-        boxShadow: 'var(--shadow-sm)',
-        height: '56px',
-        display: 'flex',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
+        minHeight: 'calc(64px + var(--safe-area-top))',
+        padding: 'calc(var(--safe-area-top) + 4px) 16px 4px 16px',
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 14px',
         marginBottom: '14px'
       }}>
         {/* Left: Hamburger Menu Icon Button */}
-        <button
-          onClick={() => setDrawerOpen(true)}
-          aria-label="Open Menu"
-          className={`hamburger-btn ${drawerOpen ? 'open' : ''}`}
-        >
-          <Menu size={20} className="hamburger-icon" />
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+          <button
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open Menu"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--bg-secondary)',
+              border: '1.5px solid var(--border)',
+              cursor: 'pointer',
+              color: 'var(--text-primary)',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary-lightest)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
+            onMouseOut={(e) => { e.currentTarget.style.background = 'var(--bg-secondary)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
+          >
+            <Menu size={22} />
+          </button>
+        </div>
 
         {/* Center: Polished Brand Logo Badge (BBC News Inspired Style) */}
-        <Link to="/home" style={{ display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none' }}>
+        <Link to="/home" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
           <div style={{
             background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
             color: 'white',
-            padding: '3px 7px',
-            borderRadius: '5px',
+            padding: '4px 8px',
+            borderRadius: '6px',
             fontWeight: 900,
-            fontSize: '13.5px',
-            letterSpacing: '0.5px',
-            boxShadow: '0 2px 6px rgba(26, 86, 219, 0.3)'
+            fontSize: '14px',
+            letterSpacing: '0.8px',
+            boxShadow: '0 4px 10px rgba(26, 86, 219, 0.25)'
           }}>
             JOB
           </div>
           <span style={{
             fontWeight: 900,
-            fontSize: '16px',
-            color: 'var(--text-primary)',
-            letterSpacing: '-0.4px'
+            fontSize: '17px',
+            color: '#0f172a',
+            letterSpacing: '-0.5px'
           }}>
             CIRCULAR
           </span>
         </Link>
 
         {/* Right: Action Buttons (Notifications Icon & User Profile Icon) */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          {/* Notifications Icon Button (Animated Ringing Bell + Pulsing Badge) */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' }}>
+          {/* Notifications Icon Button */}
           <button
             onClick={() => navigate('/notifications')}
-            aria-label="Notifications"
-            title="Notifications"
             style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
               color: '#1a56db',
-              background: 'transparent',
+              background: 'rgba(26, 86, 219, 0.05)',
               border: 'none',
               position: 'relative'
             }}
           >
-            <Bell size={22} className="bell-animated" color="#1a56db" />
+            <Bell size={24} className="bell-animated" />
             {unreadCount > 0 && (
               <span
                 style={{
                   position: 'absolute',
-                  top: '1px',
-                  right: '1px',
+                  top: '-4px',
+                  right: '-4px',
                   background: '#ef4444',
                   color: 'white',
                   borderRadius: '50%',
-                  fontSize: '9px',
-                  fontWeight: '800',
-                  width: '15px',
-                  height: '15px',
+                  fontSize: '10px',
+                  fontWeight: '900',
+                  width: '18px',
+                  height: '18px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1.5px solid var(--white)',
-                  boxShadow: '0 2px 6px rgba(239, 68, 68, 0.4)',
+                  border: '2.5px solid #ffffff',
+                  boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)',
                   lineHeight: 1
                 }}
               >
@@ -114,18 +128,17 @@ export default function AppHeader() {
             )}
           </button>
 
-          {/* User Profile Avatar Icon (Dynamic Image / Initial) */}
+          {/* User Profile Avatar Icon */}
           <div
             onClick={() => navigate('/profile')}
-            title="Profile"
             style={{
               position: 'relative',
-              width: '36px',
-              height: '36px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
               padding: '2px',
-              boxShadow: '0 3px 10px rgba(26,86,219,0.25)',
+              boxShadow: '0 4px 12px rgba(26,86,219,0.2)',
               flexShrink: 0,
               cursor: 'pointer'
             }}
