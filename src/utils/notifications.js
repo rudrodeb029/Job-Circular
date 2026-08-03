@@ -18,7 +18,10 @@ export const initializePushNotifications = async () => {
       description: 'General Notifications',
       importance: 5,
       visibility: 1,
-      sound: 'default'
+      sound: 'default',
+      vibration: true,
+      lights: true,
+      lightColor: '#1a56db'
     });
     console.log('Notification channel created');
   } catch (err) {
@@ -56,28 +59,30 @@ export const initializePushNotifications = async () => {
     }
   });
 
-  // 3. Request permissions and register
-  let permStatus = await PushNotifications.checkPermissions();
-  if (permStatus.receive !== 'granted') {
-    permStatus = await PushNotifications.requestPermissions();
-  }
-
-  if (permStatus.receive === 'granted') {
-    await PushNotifications.register();
-
-    // 4. Fallback: If already registered, manually subscribe to topic
-    const existingToken = localStorage.getItem('fcm_token');
-    if (existingToken) {
-      try {
-        await FCM.subscribeTo({ topic: 'all' });
-        console.log('Topic subscription refreshed (fallback)');
-      } catch (err) {
-        console.warn('Refresh topic failed:', err);
+  // 3. Wait a moment to ensure native bridge is fully stable
+  setTimeout(async () => {
+    try {
+      let permStatus = await PushNotifications.checkPermissions();
+      if (permStatus.receive !== 'granted') {
+        permStatus = await PushNotifications.requestPermissions();
       }
+
+      if (permStatus.receive === 'granted') {
+        await PushNotifications.register();
+
+        // Manual topic refresh
+        const existingToken = localStorage.getItem('fcm_token');
+        if (existingToken) {
+          await FCM.subscribeTo({ topic: 'all' });
+          console.log('Topic subscription refreshed (fallback)');
+        }
+      } else {
+        console.warn('Notification permission denied by user (silent)');
+      }
+    } catch (err) {
+      console.error('Permission flow failed:', err);
     }
-  } else {
-    console.warn('Notification permission denied by user (silent)');
-  }
+  }, 1000);
 };
 
 /**
@@ -89,7 +94,7 @@ export const sendPushToAll = async (title, body, data = {}) => {
 
   const serverKey = localStorage.getItem('fcm_server_key') || FCM_LEGACY_SERVER_KEY;
 
-  if (serverKey && (serverKey.startsWith('AAAA') || serverKey.startsWith('AIza'))) {
+  if (serverKey && serverKey.length > 50 && (serverKey.startsWith('AAAA') || serverKey.startsWith('AIza'))) {
     try {
       const response = await fetch('https://fcm.googleapis.com/fcm/send', {
         method: 'POST',
@@ -122,7 +127,8 @@ export const sendPushToAll = async (title, body, data = {}) => {
       throw error;
     }
   } else {
-    console.warn('FCM Server Key not configured correctly in Admin panel.');
+    console.warn('Valid FCM Server Key missing. Push skipped.');
+    return null;
   }
 };
 
@@ -135,7 +141,11 @@ export const triggerLocalNotification = async (title, body) => {
             title,
             body,
             id: Date.now(),
-            schedule: { at: new Date(Date.now() + 500) }
+            schedule: { at: new Date(Date.now() + 500) },
+            channelId: 'default_channel_id',
+            smallIcon: 'ic_launcher',
+            actionTypeId: '',
+            extra: null
           }
         ]
       });
