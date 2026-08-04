@@ -138,21 +138,21 @@ export default function ManageQuestions() {
       // and remove any '|' characters as requested
       const explanation = parts.slice(6).join(', ').replace(/\|/g, '').trim();
 
-      // Smart Correct Index Detection (Handles 0-3 AND Bengali ক, খ, গ, ঘ)
+      // Smart Correct Index Detection (Handles 0-3, Bengali ক, খ, গ, ঘ, and English a, b, c, d)
       let finalIndex = 0;
-      const cleanVal = String(correctVal).toLowerCase();
+      const cleanVal = String(correctVal).toLowerCase().trim();
 
-      if (cleanVal.includes('ক') || cleanVal === '0') finalIndex = 0;
-      else if (cleanVal.includes('খ') || cleanVal === '1') finalIndex = 1;
-      else if (cleanVal.includes('গ') || cleanVal === '2') finalIndex = 2;
-      else if (cleanVal.includes('ঘ') || cleanVal === '3') finalIndex = 3;
+      if (cleanVal.includes('ক') || cleanVal === '0' || cleanVal === 'a') finalIndex = 0;
+      else if (cleanVal.includes('খ') || cleanVal === '1' || cleanVal === 'b') finalIndex = 1;
+      else if (cleanVal.includes('গ') || cleanVal === '2' || cleanVal === 'c') finalIndex = 2;
+      else if (cleanVal.includes('ঘ') || cleanVal === '3' || cleanVal === 'd') finalIndex = 3;
       else {
         const parsed = parseInt(cleanVal, 10);
         finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
       }
 
-      // Cleanup options (remove (ক), (খ) prefixes if present)
-      const cleanOpt = (opt) => opt.replace(/^[\(\[]?[কখগঘ][\)\]]?\s*/, '').trim();
+      // Cleanup options (remove (a), (b), (ক), (খ) prefixes if present)
+      const cleanOpt = (opt) => opt.replace(/^[\(\[]?([a-d]|[ক-ঘ])[\)\]]?\s*/i, '').trim();
 
       return {
         id: `q-bulk-${Date.now()}-${index}`,
