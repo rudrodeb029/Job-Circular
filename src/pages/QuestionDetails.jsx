@@ -229,8 +229,23 @@ export default function QuestionDetails() {
                 {/* Option Choices */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {qn.options.map((option, oIndex) => {
-                    const optText = isEn ? qn.optionsEn[oIndex] : option;
+                    let optText = isEn ? qn.optionsEn[oIndex] : option;
                     
+                    // CLEANUP: Remove double prefixes if present in data (e.g. "(a) Apple" -> "Apple")
+                    if (optText) {
+                      const prefixPatterns = [
+                        /^\([a-d]\)\s*/i,   // (a), (b), (c), (d)
+                        /^[a-d][\.\)]\s*/i, // a., a), b., b)
+                        /^\([ক-ঘ]\)\s*/,   // (ক), (খ), (গ), (ঘ)
+                        /^[ক-ঘ][\।\)]\s*/, // ক।, ক), খ।, খ)
+                        /^\(\d+\)\s*/,     // (1), (2)
+                        /^\d+[\.\)]\s*/    // 1., 1)
+                      ];
+                      prefixPatterns.forEach(pattern => {
+                        optText = optText.replace(pattern, '');
+                      });
+                    }
+
                     let bg = 'var(--bg)';
                     let color = 'var(--text-primary)';
                     let border = '1px solid var(--border)';
