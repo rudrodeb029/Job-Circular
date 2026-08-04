@@ -345,22 +345,19 @@ export default function ManageQuestions() {
                           </div>
                        </div>
 
-                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'flex-end' }}>
-                          <div style={{ marginBottom: '20px' }}>
+                       <div style={{ marginBottom: '20px' }}>
                              <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Choice (0-3)</label>
-                             <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
+                             <select
+                                className="modern-input"
+                                value={qn.correctIndex}
+                                onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}
+                             >
                                 <option value="0">Option 1 / ক</option>
                                 <option value="1">Option 2 / খ</option>
                                 <option value="2">Option 3 / গ</option>
                                 <option value="3">Option 4 / ঘ</option>
                              </select>
                           </div>
-
-                          <div className="input-group" style={{ marginBottom: '20px' }}>
-                             <label>Answer Explanation (Bengali)</label>
-                             <textarea className="modern-input" style={{ height: '50px', resize: 'none' }} value={qn.explanation} onChange={e => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} />
-                          </div>
-                       </div>
                     </div>
                  ))}
               </div>
