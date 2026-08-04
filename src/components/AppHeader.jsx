@@ -207,7 +207,7 @@ export default function AppHeader() {
               boxShadow: '4px 0 24px rgba(0,0,0,0.15)',
               display: 'flex',
               flexDirection: 'column',
-              padding: '20px 16px',
+              padding: 'calc(var(--safe-area-top) + 20px) 16px 20px 16px',
               animation: 'slideInRight 0.3s ease'
             }}
             onClick={(e) => e.stopPropagation()}
