@@ -122,7 +122,8 @@ export default function ManageQuestions() {
 
     const lines = bulkInput.trim().split('\n');
     const newQuestions = lines.map((line, index) => {
-      const parts = line.split(',').map(p => p.trim());
+      // Support for double comma (,,) delimiter as requested
+      const parts = line.split(',,').map(p => p.trim());
       // Minimum required parts: Question + 4 Options + Correct Choice = 6
       if (parts.length < 6) return null;
 
