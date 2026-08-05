@@ -8,7 +8,7 @@ import VersionUpdateModal from './components/VersionUpdateModal'
 import { initializePushNotifications } from './utils/notifications'
 import { initializeOneSignal } from './utils/oneSignalWrapper'
 
-const CURRENT_VERSION = "1.0.5";
+const CURRENT_VERSION = "1.0.6";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
 import Onboarding from './pages/Onboarding'
 import Home from './pages/Home'
