@@ -5,7 +5,6 @@ import { categories } from '../data/categories';
 import { defaultLiveExams } from '../data/liveExams';
 import { questionsData } from '../data/questionsData';
 import { triggerLocalNotification, sendPushToAll } from '../utils/notifications';
-import { broadcastPush } from '../utils/oneSignalWrapper';
 import {
   getCollection,
   setDocument,
