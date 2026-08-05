@@ -5,7 +5,6 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
-import { initializePushNotifications } from './utils/notifications'
 import { initializeOneSignal } from './utils/oneSignalWrapper'
 
 const CURRENT_VERSION = "1.0.6";
@@ -65,7 +64,6 @@ function App() {
   useEffect(() => {
     // 1. Initialize Push Notifications for non-admin users
     if (!isAdminRoute) {
-      initializePushNotifications();
       initializeOneSignal();
     }
 
