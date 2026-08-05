@@ -109,10 +109,12 @@ export const sendPushToAll = async (title, body, data = {}) => {
             body: body,
             sound: 'default',
             icon: 'ic_launcher',
+            android_channel_id: 'default_channel_id',
             click_action: 'FCM_PLUGIN_ACTIVITY'
           },
           data: {
             ...data,
+            android_channel_id: 'default_channel_id',
             click_action: 'FCM_PLUGIN_ACTIVITY'
           },
           priority: 'high'
