@@ -249,6 +249,15 @@ const adminReducer = (state, action) => {
       if (notif) {
         const { id, ...data } = notif;
         setDocument(COLLECTIONS.NOTIFICATIONS, id, data).catch(console.error);
+
+        // TRIGGER BROADCAST NOTIFICATION on New Manual Broadcast Notification (client-side only for Free Firebase Plan)
+        if (action.type === 'ADD_NOTIFICATION') {
+          sendPushToAll(notif.title || notif.organization, notif.message, {
+            jobId: notif.jobId || '',
+            type: notif.type || 'general',
+            notificationId: id
+          }).catch(err => console.error('Global push failed for manual notification:', err));
+        }
       }
     } else if (action.type === 'DELETE_NOTIFICATION') {
       deleteDocument(COLLECTIONS.NOTIFICATIONS, action.payload).catch(console.error);
