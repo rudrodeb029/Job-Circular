@@ -5,6 +5,7 @@ import { categories } from '../data/categories';
 import { defaultLiveExams } from '../data/liveExams';
 import { questionsData } from '../data/questionsData';
 import { triggerLocalNotification, sendPushToAll } from '../utils/notifications';
+import { broadcastPush } from '../utils/oneSignalWrapper';
 import {
   getCollection,
   setDocument,
@@ -228,11 +229,15 @@ const adminReducer = (state, action) => {
            };
            setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifPayload).catch(console.error);
 
-           // TRIGGER GLOBAL PUSH NOTIFICATION (FCM)
-           sendPushToAll(job.organization, msgBn, {
-             jobId: job.id,
-             type: type
-           }).catch(err => console.error('Global push failed:', err));
+           // TRIGGER GLOBAL PUSH NOTIFICATION (FCM or OneSignal)
+           if (localStorage.getItem('onesignal_rest_api_key')) {
+             broadcastPush(job.organization, msgBn, { jobId: job.id, type: type }).catch(console.error);
+           } else {
+             sendPushToAll(job.organization, msgBn, {
+               jobId: job.id,
+               type: type
+             }).catch(err => console.error('Global push failed:', err));
+           }
 
            // Also trigger a professional local notification for the admin as feedback
            triggerLocalNotification(job.organization, msgBn);

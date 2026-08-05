@@ -6,6 +6,7 @@ import { useAppContext } from './context/AppContext'
 import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
 import { initializePushNotifications } from './utils/notifications'
+import { initializeOneSignal } from './utils/oneSignalWrapper'
 
 const CURRENT_VERSION = "1.0.3";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
@@ -65,6 +66,7 @@ function App() {
     // 1. Initialize Push Notifications for non-admin users
     if (!isAdminRoute) {
       initializePushNotifications();
+      initializeOneSignal();
     }
 
     // 2. Set StatusBar Color to White for Professional look
