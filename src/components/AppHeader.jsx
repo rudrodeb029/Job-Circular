@@ -26,8 +26,8 @@ export default function AppHeader() {
         background: '#ffffff',
         borderBottom: '1px solid var(--border)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-        minHeight: 'calc(64px + var(--safe-area-top))',
-        padding: 'calc(var(--safe-area-top) + 4px) 16px 4px 16px',
+        minHeight: '64px',
+        padding: 'calc(env(safe-area-inset-top, 0px) + 8px) 16px 8px 16px',
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
@@ -202,12 +202,12 @@ export default function AppHeader() {
           <div
             style={{
               width: '280px',
-              height: '100%',
               background: 'var(--white)',
               boxShadow: '4px 0 24px rgba(0,0,0,0.15)',
               display: 'flex',
               flexDirection: 'column',
               padding: 'calc(var(--safe-area-top) + 20px) 16px 20px 16px',
+              height: '100dvh',
               animation: 'slideInRight 0.3s ease'
             }}
             onClick={(e) => e.stopPropagation()}
