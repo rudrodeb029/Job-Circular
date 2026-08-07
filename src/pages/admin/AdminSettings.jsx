@@ -14,6 +14,7 @@ const AdminSettings = () => {
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [showExpired, setShowExpired] = useState(false);
   const [fcmServerKey, setFcmServerKey] = useState(localStorage.getItem('fcm_server_key') || '');
+  const [onesignalAppId, setOnesignalAppId] = useState(localStorage.getItem('onesignal_app_id') || '54decc7c-7653-48d2-bf9d-dc1bc0ff0307');
   const [onesignalRestKey, setOnesignalRestKey] = useState(localStorage.getItem('onesignal_rest_api_key') || '');
 
   const handleUpdateProfile = (e) => {
@@ -31,29 +32,29 @@ const AdminSettings = () => {
     alert('FCM Server Key saved successfully!');
   };
 
-  const handleSaveOnesignalKey = (e) => {
+  const handleSaveOnesignalConfig = (e) => {
     e.preventDefault();
+    localStorage.setItem('onesignal_app_id', onesignalAppId);
     localStorage.setItem('onesignal_rest_api_key', onesignalRestKey);
-    alert('OneSignal REST API Key saved successfully!');
+    alert('OneSignal configuration saved successfully!');
   };
 
   const handleTestNotification = async () => {
-    if (!fcmServerKey && !onesignalRestKey) {
-      alert('Please save an FCM or OneSignal Key first!');
+    if (!onesignalRestKey) {
+      alert('Please save your OneSignal REST API Key first!');
       return;
     }
     try {
-      if (onesignalRestKey) {
         const { broadcastPush } = await import('../../utils/oneSignalWrapper');
-        await broadcastPush('Test Notification 🔔', 'If you see this, OneSignal setup is working!', { type: 'test' });
-        alert('OneSignal Test sent!');
-      } else {
-        const { sendPushToAll } = await import('../../utils/notifications');
-        await sendPushToAll('Test Notification 🔔', 'If you see this, your FCM setup is working correctly!', { type: 'test' });
-        alert('FCM Test notification sent!');
-      }
+        const result = await broadcastPush('Test Notification 🔔', 'If you see this, OneSignal setup is working correctly!', { type: 'test' });
+
+        if (result.success) {
+            alert('OneSignal Test sent successfully!');
+        } else {
+            alert('OneSignal Error: ' + JSON.stringify(result.error));
+        }
     } catch (err) {
-      alert('Failed: ' + err.message);
+      alert('System Failed: ' + err.message);
     }
   };
 
@@ -212,13 +213,24 @@ const AdminSettings = () => {
             <div style={{ width: '36px', height: '36px', background: '#eff6ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
             </div>
-            <h3>OneSignal (Free Alternative)</h3>
+            <h3>OneSignal Settings</h3>
           </div>
-          <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px', lineHeight: 1.5 }}>Configure your OneSignal REST API Key for free unlimited alerts.</p>
-          <form onSubmit={handleSaveOnesignalKey} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <input type="password" className="modern-input" placeholder="REST API Key (OS_...)" value={onesignalRestKey} onChange={e => setOnesignalRestKey(e.target.value)} />
+          <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px', lineHeight: 1.5 }}>Configure your OneSignal App ID and REST API Key to enable push notifications.</p>
+          <form onSubmit={handleSaveOnesignalConfig} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', marginBottom: '4px', display: 'block' }}>ONE SIGNAL APP ID</label>
+                <input className="modern-input" placeholder="App ID (e.g. 54de...)" value={onesignalAppId} onChange={e => setOnesignalAppId(e.target.value)} />
+            </div>
+            <div>
+                <label style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', marginBottom: '4px', display: 'block' }}>REST API KEY (SECRET)</label>
+                <input type="password" className="modern-input" placeholder="REST API Key (starts with os_v2...)" value={onesignalRestKey} onChange={e => setOnesignalRestKey(e.target.value)} />
+            </div>
             <div style={{ display: 'flex', gap: '12px' }}>
-              <button type="submit" style={{ flex: 1, padding: '14px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.15)' }}>Save Key</button>
+              <button type="submit" style={{ flex: 1, padding: '14px', background: '#2563eb', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(37, 99, 235, 0.15)' }}>Save Config</button>
+              <button type="button" onClick={handleTestNotification} style={{ padding: '14px 20px', background: '#f8fafc', color: '#1e293b', border: '1.5px solid #e2e8f0', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                Test
+              </button>
             </div>
           </form>
         </div>

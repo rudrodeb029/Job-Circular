@@ -1,6 +1,11 @@
 import { Capacitor } from '@capacitor/core';
 
-const ONESIGNAL_APP_ID = "54decc7c-7653-48d2-bf9d-dc1bc0ff0307";
+// Hardcoded Default App ID (can be overridden in settings)
+const DEFAULT_APP_ID = "54decc7c-7653-48d2-bf9d-dc1bc0ff0307";
+
+export const getOneSignalAppId = () => {
+    return localStorage.getItem('onesignal_app_id') || DEFAULT_APP_ID;
+};
 
 /**
  * OneSignal JavaScript Wrapper for Capacitor
@@ -10,28 +15,27 @@ export const initializeOneSignal = () => {
 
   const performInit = () => {
     const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+    const appId = getOneSignalAppId();
 
     if (OneSignal) {
       try {
-        console.log('OneSignal: Initializing with ID:', ONESIGNAL_APP_ID);
+        console.log('OneSignal: Initializing with ID:', appId);
 
         if (typeof OneSignal.initialize === 'function') {
-            OneSignal.initialize(ONESIGNAL_APP_ID);
+            OneSignal.initialize(appId);
         } else if (typeof OneSignal.setAppId === 'function') {
-            OneSignal.setAppId(ONESIGNAL_APP_ID);
+            OneSignal.setAppId(appId);
         }
 
-        const requestPermission = () => {
-            const OS = window.OneSignal || (window.plugins && window.plugins.OneSignal);
-            if (OS && OS.Notifications && typeof OS.Notifications.requestPermission === 'function') {
+        // Configure foreground behavior to show notifications even when app is open
+        if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
+            // Delay the prompt slightly to ensure app UI is loaded
+            setTimeout(() => {
                 console.log('OneSignal: Prompting for push permission...');
-                OS.Notifications.requestPermission(true);
-            } else if (OS && typeof OS.promptForPushNotificationsWithUserResponse === 'function') {
-                OS.promptForPushNotificationsWithUserResponse();
-            }
-        };
+                OneSignal.Notifications.requestPermission(true);
+            }, 5000);
+        }
 
-        setTimeout(requestPermission, 5000);
         console.log('OneSignal: JS initialization complete');
       } catch (e) {
         console.error('OneSignal: JS initialization error:', e);
@@ -54,42 +58,51 @@ export const initializeOneSignal = () => {
 
 /**
  * Broadcast a push notification via OneSignal REST API.
- * HEADS UP: This requires the OneSignal REST API Key to be set in Admin Settings.
  */
 export const broadcastPush = async (title, message, data = {}) => {
     const restKey = localStorage.getItem('onesignal_rest_api_key');
+    const appId = getOneSignalAppId();
 
     if (!restKey) {
-        console.error('OneSignal: REST API Key missing. Please set it in Admin Settings.');
+        console.error('OneSignal: REST API Key missing. Check Admin Settings.');
         return { success: false, error: 'REST API Key missing' };
     }
 
+    console.log('OneSignal: Initiating broadcast fetch...', { title, appId });
+
     try {
+        // OneSignal v2 keys (App JSON Web Tokens) use "Authorization: Key <app_jwt>"
+        // Older REST API keys use "Authorization: Basic <rest_api_key>"
+        const authHeader = restKey.startsWith('os_v2_app_') ? `Key ${restKey}` : `Basic ${restKey}`;
+
         const response = await fetch('https://onesignal.com/api/v1/notifications', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
-                'Authorization': `Basic ${restKey}`
+                'Authorization': authHeader
             },
             body: JSON.stringify({
-                app_id: ONESIGNAL_APP_ID,
+                app_id: appId,
                 included_segments: ['Subscribed Users'],
                 headings: { en: title, bn: title },
                 contents: { en: message, bn: message },
                 data: data,
-                android_accent_color: 'FF1A56DB',
-                // Professional icon settings
-                small_icon: 'ic_stat_onesignal_default',
-                large_icon: 'ic_launcher',
-                priority: 10 // High priority
+                android_visibility: 1,
+                priority: 10
             })
         });
 
         const result = await response.json();
-        console.log('OneSignal: Broadcast result:', result);
-        return { success: !result.errors, data: result };
+
+        if (result.errors) {
+            console.error('OneSignal API Error:', result.errors);
+            return { success: false, error: result.errors };
+        }
+
+        console.log('OneSignal: Push sent successfully:', result);
+        return { success: true, data: result };
     } catch (error) {
-        console.error('OneSignal: Broadcast error:', error);
+        console.error('OneSignal Fetch Error:', error.message);
         return { success: false, error: error.message };
     }
 };
@@ -101,7 +114,6 @@ export const loginOneSignal = (externalId) => {
   if (OneSignal && typeof OneSignal.login === 'function') {
     try {
       OneSignal.login(externalId);
-      console.log('OneSignal: Logged in user:', externalId);
     } catch (e) {
       console.error('OneSignal: Login error:', e);
     }
