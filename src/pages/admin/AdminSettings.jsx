@@ -34,9 +34,9 @@ const AdminSettings = () => {
 
   const handleSaveOnesignalConfig = (e) => {
     e.preventDefault();
-    localStorage.setItem('onesignal_app_id', onesignalAppId);
-    localStorage.setItem('onesignal_rest_api_key', onesignalRestKey);
-    alert('OneSignal configuration saved successfully!');
+    localStorage.setItem('onesignal_app_id', (onesignalAppId || '').trim());
+    localStorage.setItem('onesignal_rest_api_key', (onesignalRestKey || '').trim());
+    alert('OneSignal configuration saved and trimmed successfully!');
   };
 
   const handleTestNotification = async () => {
