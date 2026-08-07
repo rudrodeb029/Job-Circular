@@ -4,7 +4,6 @@ import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 import com.onesignal.OneSignal;
 import com.onesignal.debug.LogLevel;
-import com.onesignal.Continue;
 
 public class MainActivity extends BridgeActivity {
     private static final String ONESIGNAL_APP_ID = "54decc7c-7653-48d2-bf9d-dc1bc0ff0307";
@@ -13,11 +12,9 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // OneSignal Initialization
+        // OneSignal Initialization (Silent)
+        // JS side will handle the permission prompt with a delay for better stability
         OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
         OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
-
-        // Explicitly request permission on launch for Android 13+
-        OneSignal.getNotifications().requestPermission(true, Continue.none());
     }
 }
