@@ -8,8 +8,8 @@ android {
         applicationId "com.jobcircular.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 6
-        versionName "1.0.6"
+        versionCode 8
+        versionName "1.0.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -38,9 +38,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$rootProject.ext.androidxAppCompatVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$rootProject.ext.androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$rootProject.ext.coreSplashScreenVersion"
-    implementation platform('com.google.firebase:firebase-bom:33.1.2')
-    implementation 'com.google.firebase:firebase-messaging'
-    implementation 'com.onesignal:OneSignal:[5.0.0, 5.99.99]'
+    implementation 'com.onesignal:OneSignal:5.1.21'
 }
 
 apply from: 'capacitor.build.gradle'

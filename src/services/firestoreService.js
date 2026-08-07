@@ -1,4 +1,4 @@
-// Firestore service layer — centralizes all Firestore CRUD operations
+// Firestore service layer — centralizes all Firestore CRUD operations (Local Dependency Version)
 import { db } from '../firebase';
 import {
   collection,
@@ -13,14 +13,10 @@ import {
   query,
   orderBy,
   writeBatch
-} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+} from 'firebase/firestore';
 
 // ─── Generic CRUD Helpers ───────────────────────────────────────
 
-/**
- * Get all documents from a collection.
- * Returns an array of { id, ...data } objects.
- */
 export const getCollection = async (collectionName) => {
   try {
     const snapshot = await getDocs(collection(db, collectionName));
@@ -31,9 +27,6 @@ export const getCollection = async (collectionName) => {
   }
 };
 
-/**
- * Get a single document by ID.
- */
 export const getDocument = async (collectionName, docId) => {
   try {
     const docSnap = await getDoc(doc(db, collectionName, docId));
@@ -47,9 +40,6 @@ export const getDocument = async (collectionName, docId) => {
   }
 };
 
-/**
- * Add a new document with auto-generated ID.
- */
 export const addDocument = async (collectionName, data) => {
   try {
     const docRef = await addDoc(collection(db, collectionName), data);
@@ -60,9 +50,6 @@ export const addDocument = async (collectionName, data) => {
   }
 };
 
-/**
- * Set a document with a specific ID (creates or overwrites).
- */
 export const setDocument = async (collectionName, docId, data) => {
   try {
     await setDoc(doc(db, collectionName, docId), data);
@@ -73,9 +60,6 @@ export const setDocument = async (collectionName, docId, data) => {
   }
 };
 
-/**
- * Partially update a document.
- */
 export const updateDocument = async (collectionName, docId, updates) => {
   try {
     await updateDoc(doc(db, collectionName, docId), updates);
@@ -86,9 +70,6 @@ export const updateDocument = async (collectionName, docId, updates) => {
   }
 };
 
-/**
- * Delete a document by ID.
- */
 export const deleteDocument = async (collectionName, docId) => {
   try {
     await deleteDoc(doc(db, collectionName, docId));
@@ -99,10 +80,6 @@ export const deleteDocument = async (collectionName, docId) => {
   }
 };
 
-/**
- * Subscribe to real-time updates on a collection.
- * Returns an unsubscribe function.
- */
 export const onCollectionSnapshot = (collectionName, callback) => {
   return onSnapshot(collection(db, collectionName), (snapshot) => {
     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -112,10 +89,6 @@ export const onCollectionSnapshot = (collectionName, callback) => {
   });
 };
 
-/**
- * Batch write multiple documents to a collection.
- * items should be an array of { id, ...data } objects.
- */
 export const batchSetDocuments = async (collectionName, items) => {
   try {
     const batch = writeBatch(db);
@@ -132,12 +105,13 @@ export const batchSetDocuments = async (collectionName, items) => {
   }
 };
 
-// ─── Collection Names (centralized constants) ───────────────────
+// ─── Collection Names ──────────────────────────────────────────
 export const COLLECTIONS = {
   JOBS: 'jobs',
   NOTIFICATIONS: 'notifications',
   ADMITS: 'admits',
   ACTIVITIES: 'activities',
   LIVE_EXAMS: 'liveExams',
-  QUESTIONS: 'questions'
+  QUESTIONS: 'questions',
+  USERS: 'users'
 };

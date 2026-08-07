@@ -1,105 +1,57 @@
 import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
-import { jobs as initialJobs } from '../data/jobs';
-import { notifications as initialNotifications, admitCardsAndResults as initialAdmits } from '../data/notifications';
 import { categories } from '../data/categories';
-import { defaultLiveExams } from '../data/liveExams';
-import { questionsData } from '../data/questionsData';
 import { triggerLocalNotification, sendPushToAll } from '../utils/notifications';
 import {
   getCollection,
   setDocument,
   deleteDocument,
   onCollectionSnapshot,
-  getDocument,
   COLLECTIONS
 } from '../services/firestoreService';
 
 const AdminContext = createContext();
 
-// Map items to ensure they have timestamps
-const mapWithTimestamps = (items) => {
-  return items.map(item => {
-    let stableDate = item.createdAt;
-    if (!stableDate) {
-      const matches = String(item.id).match(/\d{10,13}/);
-      if (matches) {
-        stableDate = new Date(parseInt(matches[0], 10)).toISOString();
-      } else {
-        stableDate = '2024-05-20T10:00:00.000Z'; // Stable old date
-      }
-    }
-    return {
-      ...item,
-      createdAt: stableDate,
-      updatedAt: item.updatedAt || stableDate
-    };
-  });
-};
-
-const mapJobs = (jobs) => {
-  return jobs.map(job => {
-    let stableDate = job.createdAt;
-    if (!stableDate) {
-      const matches = String(job.id).match(/\d{10,13}/);
-      if (matches) {
-        stableDate = new Date(parseInt(matches[0], 10)).toISOString();
-      } else {
-        stableDate = '2024-05-20T10:00:00.000Z'; // Stable old date
-      }
-    }
-    return {
-      ...job,
-      status: job.status || 'active',
-      createdAt: stableDate,
-      updatedAt: job.updatedAt || stableDate
-    };
-  });
-};
-
-// Fallback: load from localStorage if Firestore unavailable
-const loadLocalState = (key, defaultData) => {
-  try {
-    const saved = localStorage.getItem(`admin_${key}`);
-    return saved ? JSON.parse(saved) : defaultData;
-  } catch (error) {
-    console.error(`Error loading ${key} from localStorage:`, error);
-    return defaultData;
+const getItemTimestamp = (item) => {
+  if (item.createdAt) {
+    const ms = new Date(item.createdAt).getTime();
+    if (!isNaN(ms)) return ms;
   }
+  if (item.id) {
+    const matches = String(item.id).match(/\d{10,13}/);
+    if (matches) return parseInt(matches[0], 10);
+  }
+  return 0;
+};
+
+const sortByCreatedAt = (a, b) => {
+  const tsA = getItemTimestamp(a);
+  const tsB = getItemTimestamp(b);
+  if (tsA !== tsB) return tsB - tsA;
+  return String(b.id || '').localeCompare(String(a.id || ''));
+};
+
+const mapWithTimestamps = (items) => {
+  return items.map(item => ({
+    ...item,
+    createdAt: item.createdAt || new Date(getItemTimestamp(item) || Date.now()).toISOString()
+  }));
 };
 
 const initialState = {
-  jobs: loadLocalState('jobs', []),
-  notifications: loadLocalState('notifications', []),
-  admits: loadLocalState('admits', []),
+  jobs: JSON.parse(localStorage.getItem('admin_jobs')) || [],
+  notifications: JSON.parse(localStorage.getItem('admin_notifications')) || [],
+  admits: JSON.parse(localStorage.getItem('admin_admits')) || [],
+  questions: JSON.parse(localStorage.getItem('admin_questions')) || [],
+  liveExams: JSON.parse(localStorage.getItem('admin_live_exams')) || [],
   categories: categories,
-  activities: loadLocalState('activities', []),
-  adminUser: loadLocalState('user', null),
+  activities: [],
+  adminUser: JSON.parse(localStorage.getItem('admin_user')) || null,
   firestoreReady: false
 };
 
 const adminReducer = (state, action) => {
   let newState;
-  const getItemTimestamp = (item) => {
-    if (item.createdAt) {
-      const ms = new Date(item.createdAt).getTime();
-      if (!isNaN(ms)) return ms;
-    }
-    if (item.id) {
-      const matches = String(item.id).match(/\d{10,13}/);
-      if (matches) return parseInt(matches[0], 10);
-    }
-    return 0;
-  };
-
-  const sortByCreatedAt = (a, b) => {
-    const tsA = getItemTimestamp(a);
-    const tsB = getItemTimestamp(b);
-    if (tsA !== tsB) return tsB - tsA; // Newest first (LIFO)
-    return String(b.id || '').localeCompare(String(a.id || ''));
-  };
-
   switch (action.type) {
-    // ─── Firestore sync actions (bulk replace from snapshot) ────
     case 'SET_JOBS':
       newState = { ...state, jobs: [...action.payload].sort(sortByCreatedAt) };
       break;
@@ -109,177 +61,36 @@ const adminReducer = (state, action) => {
     case 'SET_ADMITS':
       newState = { ...state, admits: [...action.payload].sort(sortByCreatedAt) };
       break;
-    case 'SET_ACTIVITIES':
-      newState = { ...state, activities: [...action.payload].sort(sortByCreatedAt) };
+    case 'SET_QUESTIONS':
+      newState = { ...state, questions: [...action.payload].sort(sortByCreatedAt) };
+      break;
+    case 'SET_LIVE_EXAMS':
+      newState = { ...state, liveExams: [...action.payload].sort(sortByCreatedAt) };
       break;
     case 'SET_FIRESTORE_READY':
       return { ...state, firestoreReady: true };
-
-    // ─── Job CRUD (optimistic local update) ────────────────────
-    case 'ADD_JOB':
-      newState = { ...state, jobs: [action.payload, ...state.jobs] };
-      break;
-    case 'UPDATE_JOB':
-      newState = {
-        ...state,
-        jobs: state.jobs.map(job => (job.id === action.payload.id ? { ...job, ...action.payload, updatedAt: new Date().toISOString() } : job))
-      };
-      break;
-    case 'DELETE_JOB':
-      newState = { ...state, jobs: state.jobs.filter(job => job.id !== action.payload) };
-      break;
-    case 'TOGGLE_JOB_STATUS':
-      newState = {
-        ...state,
-        jobs: state.jobs.map(job => {
-          if (job.id === action.payload) {
-            const nextStatus = job.status === 'active' ? 'draft' : job.status === 'draft' ? 'expired' : 'active';
-            return { ...job, status: nextStatus, updatedAt: new Date().toISOString() };
-          }
-          return job;
-        })
-      };
-      break;
-
-    // ─── Notification CRUD ─────────────────────────────────────
-    case 'ADD_NOTIFICATION':
-      newState = { ...state, notifications: [action.payload, ...state.notifications] };
-      break;
-    case 'UPDATE_NOTIFICATION':
-      newState = {
-        ...state,
-        notifications: state.notifications.map(n => (n.id === action.payload.id ? { ...n, ...action.payload } : n))
-      };
-      break;
-    case 'DELETE_NOTIFICATION':
-      newState = { ...state, notifications: state.notifications.filter(n => n.id !== action.payload) };
-      break;
-
-    // ─── Admit CRUD ────────────────────────────────────────────
-    case 'ADD_ADMIT':
-      newState = { ...state, admits: [action.payload, ...state.admits] };
-      break;
-    case 'UPDATE_ADMIT':
-      newState = {
-        ...state,
-        admits: state.admits.some(a => a.id === action.payload.id)
-          ? state.admits.map(a => (a.id === action.payload.id ? { ...a, ...action.payload } : a))
-          : [action.payload, ...state.admits]
-      };
-      break;
-    case 'DELETE_ADMIT':
-      newState = { ...state, admits: state.admits.filter(a => a.id !== action.payload) };
-      break;
-
-    // ─── Activity log ──────────────────────────────────────────
-    case 'ADD_ACTIVITY':
-      newState = { ...state, activities: [action.payload, ...state.activities] };
-      break;
-
-    // ─── Admin session (stays in localStorage) ─────────────────
     case 'ADMIN_LOGIN':
-      newState = { ...state, adminUser: action.payload };
       localStorage.setItem('admin_user', JSON.stringify(action.payload));
-      return newState;
+      return { ...state, adminUser: action.payload };
     case 'ADMIN_LOGOUT':
-      newState = { ...state, adminUser: null };
-      localStorage.setItem('admin_user', JSON.stringify(null));
-      return newState;
-
+      localStorage.removeItem('admin_user');
+      return { ...state, adminUser: null };
     default:
       return state;
   }
 
-  // ─── Persist to Firestore (async, fire-and-forget) ──────────
-  try {
-    if (['ADD_JOB', 'UPDATE_JOB', 'TOGGLE_JOB_STATUS'].includes(action.type)) {
-      const job = newState.jobs.find(j => j.id === (action.payload?.id || action.payload));
-      if (job) {
-        const { id, ...data } = job;
-        setDocument(COLLECTIONS.JOBS, id, data).catch(console.error);
-
-        // TRIGGER BROADCAST NOTIFICATION on New Job or Significant Update
-        if (action.type === 'ADD_JOB' || (action.type === 'UPDATE_JOB' && (job.showInExamDate || job.showInResult))) {
-           const notifId = `broadcast_${Date.now()}`;
-           let type = 'new_job';
-           let msg = `${job.organization} has published a new circular: ${job.title}`;
-           let msgBn = `${job.organization}-এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
-
-           if (job.showInResult) {
-             type = 'result';
-             msg = `Result published for ${job.title} at ${job.organization}`;
-             msgBn = `${job.organization}-এ "${job.title}" পদের ফলাফল প্রকাশিত হয়েছে।`;
-           } else if (job.showInExamDate) {
-             type = 'admit_card';
-             msg = `Exam date announced for ${job.title} at ${job.organization}`;
-             msgBn = `${job.organization}-এ "${job.title}" পদের পরীক্ষার তারিখ ঘোষণা করা হয়েছে।`;
-           }
-
-           const notifPayload = {
-             id: notifId,
-             jobId: job.id,
-             type: type,
-             title: job.organization,
-             organization: job.organization,
-             message: msgBn,
-             messageEn: msg,
-             isRead: false,
-             createdAt: new Date().toISOString()
-           };
-           setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifPayload).catch(console.error);
-
-           // TRIGGER GLOBAL PUSH NOTIFICATION (FCM or OneSignal)
-           if (localStorage.getItem('onesignal_rest_api_key')) {
-             broadcastPush(job.organization, msgBn, { jobId: job.id, type: type }).catch(console.error);
-           } else {
-             sendPushToAll(job.organization, msgBn, {
-               jobId: job.id,
-               type: type
-             }).catch(err => console.error('Global push failed:', err));
-           }
-
-           // Also trigger a professional local notification for the admin as feedback
-           triggerLocalNotification(job.organization, msgBn);
-        }
-      }
-    } else if (action.type === 'DELETE_JOB') {
-      deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
-    } else if (['ADD_NOTIFICATION', 'UPDATE_NOTIFICATION'].includes(action.type)) {
-      const notif = newState.notifications.find(n => n.id === action.payload?.id);
-      if (notif) {
-        const { id, ...data } = notif;
-        setDocument(COLLECTIONS.NOTIFICATIONS, id, data).catch(console.error);
-      }
-    } else if (action.type === 'DELETE_NOTIFICATION') {
-      deleteDocument(COLLECTIONS.NOTIFICATIONS, action.payload).catch(console.error);
-    } else if (['ADD_ADMIT', 'UPDATE_ADMIT'].includes(action.type)) {
-      const admit = newState.admits.find(a => a.id === action.payload?.id);
-      if (admit) {
-        const { id, ...data } = admit;
-        setDocument(COLLECTIONS.ADMITS, id, data).catch(console.error);
-      }
-    } else if (action.type === 'DELETE_ADMIT') {
-      deleteDocument(COLLECTIONS.ADMITS, action.payload).catch(console.error);
-    } else if (action.type === 'ADD_ACTIVITY') {
-      const activity = action.payload;
-      if (activity && activity.id) {
-        const { id, ...data } = activity;
-        setDocument(COLLECTIONS.ACTIVITIES, id, data).catch(console.error);
-      }
+  // Persist to localStorage as cache
+  if (action.type.startsWith('SET_')) {
+    const keyMap = {
+      'SET_JOBS': 'admin_jobs',
+      'SET_NOTIFICATIONS': 'admin_notifications',
+      'SET_ADMITS': 'admin_admits',
+      'SET_QUESTIONS': 'admin_questions',
+      'SET_LIVE_EXAMS': 'admin_live_exams'
+    };
+    if (keyMap[action.type]) {
+      localStorage.setItem(keyMap[action.type], JSON.stringify(action.payload));
     }
-  } catch (err) {
-    console.error('Firestore persist error:', err);
-  }
-
-  // Also keep localStorage as fallback cache
-  if (['ADD_JOB', 'UPDATE_JOB', 'DELETE_JOB', 'TOGGLE_JOB_STATUS', 'SET_JOBS'].includes(action.type)) {
-    localStorage.setItem('admin_jobs', JSON.stringify(newState.jobs));
-  } else if (['ADD_NOTIFICATION', 'UPDATE_NOTIFICATION', 'DELETE_NOTIFICATION', 'SET_NOTIFICATIONS'].includes(action.type)) {
-    localStorage.setItem('admin_notifications', JSON.stringify(newState.notifications));
-  } else if (['ADD_ADMIT', 'UPDATE_ADMIT', 'DELETE_ADMIT', 'SET_ADMITS'].includes(action.type)) {
-    localStorage.setItem('admin_admits', JSON.stringify(newState.admits));
-  } else if (['ADD_ACTIVITY', 'SET_ACTIVITIES'].includes(action.type)) {
-    localStorage.setItem('admin_activities', JSON.stringify(newState.activities));
   }
 
   return newState;
@@ -289,83 +100,31 @@ export const AdminProvider = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
   const [loading, setLoading] = useState(true);
 
-  // Subscribe to Firestore real-time snapshots on mount
   useEffect(() => {
     const unsubscribers = [];
 
-    const seedInitialData = async () => {
-      // Auto-seeding is now permanently disabled to keep the database clear
-      console.log('Database seeding disabled by request.');
-      return;
-    };
-
-    const setupListeners = () => {
-      seedInitialData();
+    const startListeners = () => {
       try {
-        // Jobs collection
-        unsubscribers.push(
-          onCollectionSnapshot(COLLECTIONS.JOBS, (data) => {
-            const mapped = mapJobs(data);
-            dispatch({ type: 'SET_JOBS', payload: mapped });
-
-            if (data.length === 0) {
-              localStorage.removeItem('admin_jobs');
-            } else {
-              // AUTO-REPAIR: If any job in Firestore is missing createdAt, fix it permanently
-              const needsFix = data.some(j => !j.createdAt);
-              if (needsFix) {
-                console.log('Auto-repairing missing job timestamps in Firestore...');
-                mapped.forEach(j => {
-                  const { id, ...payload } = j;
-                  setDocument(COLLECTIONS.JOBS, id, payload).catch(console.error);
-                });
-              }
-            }
-          })
-        );
-
-        // Notifications collection
-        unsubscribers.push(
-          onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (data) => {
-            const mapped = mapWithTimestamps(data);
-            dispatch({ type: 'SET_NOTIFICATIONS', payload: mapped });
-            if (data.length === 0) localStorage.removeItem('admin_notifications');
-          })
-        );
-
-        // Admits collection
-        unsubscribers.push(
-          onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => {
-            const mapped = mapWithTimestamps(data);
-            dispatch({ type: 'SET_ADMITS', payload: mapped });
-            if (data.length === 0) localStorage.removeItem('admin_admits');
-          })
-        );
-
-        // Activities collection
-        unsubscribers.push(
-          onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (data) => {
-            if (data.length > 0) {
-              dispatch({ type: 'SET_ACTIVITIES', payload: mapWithTimestamps(data) });
-            }
-          })
-        );
+        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.JOBS, (data) => dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(data) })));
+        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (data) => dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(data) })));
+        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(data) })));
+        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.QUESTIONS, (data) => dispatch({ type: 'SET_QUESTIONS', payload: mapWithTimestamps(data) })));
+        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => dispatch({ type: 'SET_LIVE_EXAMS', payload: mapWithTimestamps(data) })));
 
         dispatch({ type: 'SET_FIRESTORE_READY' });
-        setLoading(false);
-      } catch (error) {
-        console.error('Firestore listener setup failed, using localStorage fallback:', error);
+
+        // Safety timeout to ensure app loads even if Firestore is slow
+        const timer = setTimeout(() => setLoading(false), 3000);
+        return () => clearTimeout(timer);
+      } catch (err) {
+        console.error('Firestore listener error:', err);
         setLoading(false);
       }
     };
 
-    setupListeners();
+    startListeners();
 
-    return () => {
-      unsubscribers.forEach(unsub => {
-        if (typeof unsub === 'function') unsub();
-      });
-    };
+    return () => unsubscribers.forEach(unsub => unsub && unsub());
   }, []);
 
   return (
@@ -377,29 +136,6 @@ export const AdminProvider = ({ children }) => {
 
 export const useAdminContext = () => {
   const context = useContext(AdminContext);
-  if (!context) {
-    throw new Error('useAdminContext must be used within an AdminProvider');
-  }
+  if (!context) throw new Error('useAdminContext must be used within an AdminProvider');
   return context;
-};
-
-export const getJobStats = (jobs) => {
-  const stats = {
-    total: jobs.length,
-    active: 0,
-    draft: 0,
-    expired: 0,
-    byCategory: {}
-  };
-
-  jobs.forEach(job => {
-    if (job.status === 'active') stats.active++;
-    else if (job.status === 'draft') stats.draft++;
-    else if (job.status === 'expired') stats.expired++;
-    if (job.category) {
-      stats.byCategory[job.category] = (stats.byCategory[job.category] || 0) + 1;
-    }
-  });
-
-  return stats;
 };

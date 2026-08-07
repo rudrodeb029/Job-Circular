@@ -1,6 +1,4 @@
-import { PushNotifications } from '@capacitor/push-notifications';
 import { LocalNotifications } from '@capacitor/local-notifications';
-import { FCM } from '@capacitor-community/fcm';
 import { Capacitor } from '@capacitor/core';
 
 // Note: Replace this with your actual Legacy Server Key from Firebase Console
@@ -12,77 +10,23 @@ export const initializePushNotifications = async () => {
 
   // 1. Create Notification Channel (Required for Android 8+)
   try {
-    await PushNotifications.createChannel({
-      id: 'default_channel_id',
-      name: 'Default',
-      description: 'General Notifications',
-      importance: 5,
-      visibility: 1,
-      sound: 'default',
-      vibration: true,
-      lights: true,
-      lightColor: '#1a56db'
-    });
-    console.log('Notification channel created');
+    if (Capacitor.isNativePlatform()) {
+      await LocalNotifications.createChannel({
+        id: 'default_channel_id',
+        name: 'Default',
+        description: 'General Notifications',
+        importance: 5,
+        visibility: 1,
+        sound: 'default',
+        vibration: true,
+        lights: true,
+        lightColor: '#1a56db'
+      });
+      console.log('Notification channel created via LocalNotifications');
+    }
   } catch (err) {
     console.error('Channel creation failed:', err);
   }
-
-  // 2. Add listeners FIRST before registering
-  PushNotifications.addListener('registration', async (token) => {
-    // Log token
-    console.log('Push registration success, token: ' + token.value);
-    localStorage.setItem('fcm_token', token.value);
-
-    try {
-      // Always subscribe to topic on registration
-      await FCM.subscribeTo({ topic: 'all' });
-      console.log('Subscribed to "all" topic');
-    } catch (err) {
-      console.error('FCM topic subscription failed:', err);
-    }
-  });
-
-  PushNotifications.addListener('registrationError', (error) => {
-    console.error('Push registration error:', error);
-  });
-
-  PushNotifications.addListener('pushNotificationReceived', (notification) => {
-    console.log('Push received in foreground:', notification);
-    triggerLocalNotification(notification.title, notification.body);
-  });
-
-  PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
-    console.log('Push action performed:', action);
-    if (action.notification.data.jobId) {
-      window.location.href = `/job/${action.notification.data.jobId}`;
-    }
-  });
-
-  // 3. Wait a moment to ensure native bridge is fully stable
-  setTimeout(async () => {
-    try {
-      let permStatus = await PushNotifications.checkPermissions();
-      if (permStatus.receive !== 'granted') {
-        permStatus = await PushNotifications.requestPermissions();
-      }
-
-      if (permStatus.receive === 'granted') {
-        await PushNotifications.register();
-
-        // Manual topic refresh
-        const existingToken = localStorage.getItem('fcm_token');
-        if (existingToken) {
-          await FCM.subscribeTo({ topic: 'all' });
-          console.log('Topic subscription refreshed (fallback)');
-        }
-      } else {
-        console.warn('Notification permission denied by user (silent)');
-      }
-    } catch (err) {
-      console.error('Permission flow failed:', err);
-    }
-  }, 1000);
 };
 
 /**

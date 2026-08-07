@@ -42,3 +42,5 @@ android/app/src/main/assets/public/
 /ios/App/App/public
 /ios/App/Pods
 /android/app/src/main/assets/public
+
+*.apk
