@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
 import { categories } from '../data/categories';
-import { triggerLocalNotification, sendPushToAll } from '../utils/notifications';
-import { broadcastPush } from '../utils/oneSignalWrapper';
+import { broadcastPush, sendExamCountdownPush } from '../utils/oneSignalWrapper';
 import {
   getCollection,
   setDocument,
@@ -38,12 +37,13 @@ const mapWithTimestamps = (items) => {
   }));
 };
 
+// ─── Initial state: empty arrays, Firestore snapshots will populate ───
 const initialState = {
-  jobs: JSON.parse(localStorage.getItem('admin_jobs')) || [],
-  notifications: JSON.parse(localStorage.getItem('admin_notifications')) || [],
-  admits: JSON.parse(localStorage.getItem('admin_admits')) || [],
-  questions: JSON.parse(localStorage.getItem('admin_questions')) || [],
-  liveExams: JSON.parse(localStorage.getItem('admin_live_exams')) || [],
+  jobs: [],
+  notifications: [],
+  admits: [],
+  questions: [],
+  liveExams: [],
   categories: categories,
   adminUser: JSON.parse(localStorage.getItem('admin_user')) || null,
   firestoreReady: false
@@ -81,7 +81,15 @@ const adminReducer = (state, action) => {
       if (action.type === 'ADD_JOB' || job.shouldNotify) {
           const title = job.organization;
           const msg = `নতুন সার্কুলার: ${job.title}`;
-          broadcastPush(title, msg, { jobId: job.id, type: 'new_job' });
+          broadcastPush(title, msg, { jobId: job.id, type: 'new_job' })
+              .then(res => {
+                  if (res.success) {
+                      console.log(`✅ Push sent for new circular: "${job.title}" → ${res.recipients} device(s)`);
+                  } else {
+                      console.error(`❌ Push failed for circular: "${job.title}" →`, res.error);
+                  }
+              })
+              .catch(err => console.error('Push error for circular:', err));
       }
       return state;
 
@@ -95,10 +103,16 @@ const adminReducer = (state, action) => {
       setDocument(COLLECTIONS.LIVE_EXAMS, exam.id, exam).catch(console.error);
 
       if (action.type === 'ADD_EXAM') {
-          const startTime = new Date(exam.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          const title = "লাইভ পরীক্ষা শিডিউল";
-          const msg = `${exam.title} শুরু হবে আজ ${startTime} টায়। অংশ নিন!`;
-          broadcastPush(title, msg, { examId: exam.id, type: 'live_exam' });
+          // Send countdown push + schedule 5-min reminder
+          sendExamCountdownPush(exam)
+              .then(res => {
+                  if (res.success) {
+                      console.log(`✅ Exam push sent: "${exam.title}" → ${res.recipients} device(s)`);
+                  } else {
+                      console.error(`❌ Exam push failed: "${exam.title}" →`, res.error);
+                  }
+              })
+              .catch(err => console.error('Push error for exam:', err));
       }
       return state;
 
@@ -112,7 +126,15 @@ const adminReducer = (state, action) => {
         setDocument(COLLECTIONS.NOTIFICATIONS, notif.id, notif).catch(console.error);
 
         if (action.type === 'ADD_NOTIFICATION') {
-            broadcastPush(notif.title || notif.organization, notif.message, { jobId: notif.jobId, type: notif.type });
+            broadcastPush(notif.title || notif.organization, notif.message, { jobId: notif.jobId, type: notif.type })
+                .then(res => {
+                    if (res.success) {
+                        console.log(`✅ Notification push sent: "${notif.title}" → ${res.recipients} device(s)`);
+                    } else {
+                        console.error(`❌ Notification push failed:`, res.error);
+                    }
+                })
+                .catch(err => console.error('Push error for notification:', err));
         }
         return state;
 
@@ -126,7 +148,15 @@ const adminReducer = (state, action) => {
       setDocument(COLLECTIONS.QUESTIONS, paper.id, paper).catch(console.error);
 
       if (action.type === 'ADD_QUESTION_PAPER') {
-          broadcastPush("নতুন প্রশ্নপত্র", `${paper.title} - প্রস্তুতি নিন এখনই!`, { paperId: paper.id, type: 'new_paper' });
+          broadcastPush("নতুন প্রশ্নপত্র", `${paper.title} - প্রস্তুতি নিন এখনই!`, { paperId: paper.id, type: 'new_paper' })
+              .then(res => {
+                  if (res.success) {
+                      console.log(`✅ Question paper push sent: "${paper.title}" → ${res.recipients} device(s)`);
+                  } else {
+                      console.error(`❌ Question paper push failed:`, res.error);
+                  }
+              })
+              .catch(err => console.error('Push error for question paper:', err));
       }
       return state;
 
@@ -150,19 +180,6 @@ const adminReducer = (state, action) => {
       return { ...state, adminUser: null };
     default:
       return state;
-  }
-
-  if (action.type.startsWith('SET_')) {
-    const keyMap = {
-      'SET_JOBS': 'admin_jobs',
-      'SET_NOTIFICATIONS': 'admin_notifications',
-      'SET_ADMITS': 'admin_admits',
-      'SET_QUESTIONS': 'admin_questions',
-      'SET_LIVE_EXAMS': 'admin_live_exams'
-    };
-    if (keyMap[action.type]) {
-      localStorage.setItem(keyMap[action.type], JSON.stringify(action.payload));
-    }
   }
 
   return newState;

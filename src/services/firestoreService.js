@@ -113,5 +113,6 @@ export const COLLECTIONS = {
   ACTIVITIES: 'activities',
   LIVE_EXAMS: 'liveExams',
   QUESTIONS: 'questions',
-  USERS: 'users'
+  USERS: 'users',
+  APP_CONFIG: 'appConfig'
 };

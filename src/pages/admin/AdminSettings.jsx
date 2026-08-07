@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { useNavigate } from 'react-router-dom';
+import { getDocument, COLLECTIONS } from '../../services/firestoreService';
+import { saveOneSignalConfig, broadcastPush } from '../../utils/oneSignalWrapper';
 
 const AdminSettings = () => {
   const { state, dispatch } = useAdminContext();
@@ -13,9 +15,28 @@ const AdminSettings = () => {
   const [autoPublish, setAutoPublish] = useState(true);
   const [emailNotifs, setEmailNotifs] = useState(true);
   const [showExpired, setShowExpired] = useState(false);
-  const [fcmServerKey, setFcmServerKey] = useState(localStorage.getItem('fcm_server_key') || '');
-  const [onesignalAppId, setOnesignalAppId] = useState(localStorage.getItem('onesignal_app_id') || '54decc7c-7653-48d2-bf9d-dc1bc0ff0307');
-  const [onesignalRestKey, setOnesignalRestKey] = useState(localStorage.getItem('onesignal_rest_api_key') || '');
+  const [fcmServerKey, setFcmServerKey] = useState('');
+  const [onesignalAppId, setOnesignalAppId] = useState('54decc7c-7653-48d2-bf9d-dc1bc0ff0307');
+  const [onesignalRestKey, setOnesignalRestKey] = useState('');
+  const [configLoading, setConfigLoading] = useState(true);
+
+  // Load OneSignal config from Firestore on mount
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const doc = await getDocument(COLLECTIONS.APP_CONFIG, 'onesignal');
+        if (doc) {
+          if (doc.appId) setOnesignalAppId(doc.appId);
+          if (doc.restApiKey) setOnesignalRestKey(doc.restApiKey);
+        }
+      } catch (err) {
+        console.error('Failed to load OneSignal config from Firestore:', err);
+      } finally {
+        setConfigLoading(false);
+      }
+    };
+    loadConfig();
+  }, []);
 
   const handleUpdateProfile = (e) => {
     e.preventDefault();
@@ -28,15 +49,17 @@ const AdminSettings = () => {
       alert('Invalid Key Format! FCM Keys usually start with "AAAA..." or "AIza..."');
       return;
     }
-    localStorage.setItem('fcm_server_key', fcmServerKey);
-    alert('FCM Server Key saved successfully!');
+    alert('FCM Server Key noted! (FCM is legacy — OneSignal is the primary push system)');
   };
 
-  const handleSaveOnesignalConfig = (e) => {
+  const handleSaveOnesignalConfig = async (e) => {
     e.preventDefault();
-    localStorage.setItem('onesignal_app_id', (onesignalAppId || '').trim());
-    localStorage.setItem('onesignal_rest_api_key', (onesignalRestKey || '').trim());
-    alert('OneSignal configuration saved and trimmed successfully!');
+    try {
+      await saveOneSignalConfig(onesignalAppId, onesignalRestKey);
+      alert('✅ OneSignal configuration saved to Firebase successfully!');
+    } catch (err) {
+      alert('❌ Failed to save OneSignal config: ' + err.message);
+    }
   };
 
   const handleTestNotification = async () => {
@@ -45,12 +68,13 @@ const AdminSettings = () => {
       return;
     }
     try {
-        const { broadcastPush } = await import('../../utils/oneSignalWrapper');
+        // Save config first to make sure Firestore has the latest keys
+        await saveOneSignalConfig(onesignalAppId, onesignalRestKey);
         const result = await broadcastPush('Test Notification 🔔', 'If you see this, OneSignal setup is working correctly!', { type: 'test' });
 
         if (result.success) {
             if (result.recipients > 0) {
-                alert(`Success! OneSignal has queued the notification for ${result.recipients} device(s). Check your phone now! 🔔`);
+                alert(`✅ Success! OneSignal has queued the notification for ${result.recipients} device(s). Check your phone now! 🔔`);
             } else {
                 alert('Sent to OneSignal, but 0 devices matched your segments. Make sure you have at least one user with notifications ALLOWED in the app.');
             }

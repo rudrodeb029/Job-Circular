@@ -44,3 +44,7 @@ android/app/src/main/assets/public/
 /android/app/src/main/assets/public
 
 *.apk
+
+# Agents / MCP Config (contains secrets)
+.agents/
+
