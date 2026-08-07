@@ -9,58 +9,89 @@ export const initializeOneSignal = () => {
   if (!Capacitor.isNativePlatform()) return;
 
   const performInit = () => {
-    // OneSignal is often injected into window.plugins
     const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
 
     if (OneSignal) {
       try {
         console.log('OneSignal: Initializing with ID:', ONESIGNAL_APP_ID);
 
-        // OneSignal v5 initialization
         if (typeof OneSignal.initialize === 'function') {
             OneSignal.initialize(ONESIGNAL_APP_ID);
         } else if (typeof OneSignal.setAppId === 'function') {
             OneSignal.setAppId(ONESIGNAL_APP_ID);
         }
 
-        // Request permission
-        // We use a safe check because the plugin might still be initializing its sub-objects
         const requestPermission = () => {
             const OS = window.OneSignal || (window.plugins && window.plugins.OneSignal);
             if (OS && OS.Notifications && typeof OS.Notifications.requestPermission === 'function') {
                 console.log('OneSignal: Prompting for push permission...');
                 OS.Notifications.requestPermission(true);
             } else if (OS && typeof OS.promptForPushNotificationsWithUserResponse === 'function') {
-                // Fallback for older SDK versions
                 OS.promptForPushNotificationsWithUserResponse();
             }
         };
 
-        // Delay the prompt slightly to ensure app UI is loaded and bridge is fully ready
         setTimeout(requestPermission, 5000);
-
         console.log('OneSignal: JS initialization complete');
       } catch (e) {
         console.error('OneSignal: JS initialization error:', e);
       }
-    } else {
-      console.warn('OneSignal: Plugin not found. This is normal if called before deviceready.');
     }
   };
 
-  // Ensure we wait for deviceready
   if (window.cordova) {
       document.addEventListener('deviceready', performInit, false);
   } else {
-      // Fallback if cordova object is not yet present
       setTimeout(() => {
           if (window.cordova) {
               document.addEventListener('deviceready', performInit, false);
           } else {
-              performInit(); // Try anyway
+              performInit();
           }
       }, 1000);
   }
+};
+
+/**
+ * Broadcast a push notification via OneSignal REST API.
+ * HEADS UP: This requires the OneSignal REST API Key to be set in Admin Settings.
+ */
+export const broadcastPush = async (title, message, data = {}) => {
+    const restKey = localStorage.getItem('onesignal_rest_api_key');
+
+    if (!restKey) {
+        console.error('OneSignal: REST API Key missing. Please set it in Admin Settings.');
+        return { success: false, error: 'REST API Key missing' };
+    }
+
+    try {
+        const response = await fetch('https://onesignal.com/api/v1/notifications', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'Authorization': `Basic ${restKey}`
+            },
+            body: JSON.stringify({
+                app_id: ONESIGNAL_APP_ID,
+                included_segments: ['Subscribed Users'],
+                headings: { en: title, bn: title },
+                contents: { en: message, bn: message },
+                data: data,
+                android_accent_color: 'FF1A56DB',
+                // Professional icon settings
+                small_icon: 'ic_stat_onesignal_default',
+                large_icon: 'ic_launcher',
+                priority: 10 // High priority
+            })
+        });
+
+        const result = await response.json();
+        console.log('OneSignal: Broadcast result:', result);
+        return { success: !result.errors, data: result };
+    } catch (error) {
+        console.error('OneSignal: Broadcast error:', error);
+        return { success: false, error: error.message };
+    }
 };
 
 export const loginOneSignal = (externalId) => {

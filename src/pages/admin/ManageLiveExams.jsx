@@ -1,14 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { getLiveExams, saveLiveExams } from '../../data/liveExams';
+import React, { useState } from 'react';
+import { useAdminContext } from '../../context/AdminContext';
 
 export default function ManageLiveExams() {
-  const [exams, setExams] = useState([]);
+  const { state, dispatch } = useAdminContext();
+  const exams = state.liveExams || [];
   const [showAddForm, setShowAddForm] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-
-  useEffect(() => {
-    setExams(getLiveExams());
-  }, []);
 
   const triggerToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
@@ -148,17 +145,13 @@ export default function ManageLiveExams() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    const updatedList = [newExam, ...exams];
-    setExams(updatedList);
-    saveLiveExams(updatedList);
+    dispatch({ type: 'ADD_EXAM', payload: newExam });
     triggerToast('Live exam scheduled successfully!');
     setShowAddForm(false);
   };
 
   const handleDeleteExam = (id) => {
-    const list = exams.filter(e => e.id !== id);
-    setExams(list);
-    saveLiveExams(list);
+    dispatch({ type: 'DELETE_EXAM', payload: id });
     triggerToast('Exam deleted successfully!', 'info');
   };
 

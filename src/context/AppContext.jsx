@@ -94,12 +94,13 @@ function appReducer(state, action) {
   // Sync profile/saved data to Firestore
   if (['UPDATE_USER_PROFILE', 'TOGGLE_SAVE_JOB', 'TOGGLE_APPLY_JOB', 'MARK_APPLIED'].includes(action.type)) {
       const { id, ...userData } = newState.user;
+      console.log('Syncing user profile to Firestore:', id);
       setDocument(COLLECTIONS.USERS, id, {
           ...userData,
           savedJobs: newState.savedJobs,
           appliedJobs: newState.appliedJobs,
           updatedAt: new Date().toISOString()
-      }).catch(err => console.error('Firestore sync error:', err));
+      }).catch(err => console.error('Firestore sync error details:', err.message || err));
   }
 
   return newState;

@@ -273,3 +273,10 @@ export const AlertCircle = ({ size = 22, color = 'currentColor', className = '' 
     <line x1="12" x2="12.01" y1="16" y2="16" />
   </svg>
 );
+
+export const Award = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <circle cx="12" cy="8" r="7" />
+    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+  </svg>
+);

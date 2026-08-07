@@ -42,7 +42,8 @@ export default function ManageJobs() {
     examResult: '',
     showInExamDate: false,
     showInResult: false,
-    linkedCircularId: ''
+    linkedCircularId: '',
+    shouldNotify: true
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -459,6 +460,11 @@ export default function ManageJobs() {
                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 600, color: '#334155', cursor: 'pointer' }}>
                  <input type="checkbox" checked={!!formData.showInResult} onChange={e => setFormData(prev => ({ ...prev, showInResult: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
                  Result
+               </label>
+               <div style={{ width: '2px', height: '20px', background: '#e2e8f0', margin: '0 8px' }}></div>
+               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', fontWeight: 700, color: '#1a56db', cursor: 'pointer' }}>
+                 <input type="checkbox" checked={!!formData.shouldNotify} onChange={e => setFormData(prev => ({ ...prev, shouldNotify: e.target.checked }))} style={{ width: '18px', height: '18px' }} />
+                 Send Push Notification
                </label>
             </div>
 

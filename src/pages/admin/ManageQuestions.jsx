@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { getQuestionsData, saveQuestionsData } from '../../data/questionsData';
+import React, { useState } from 'react';
+import { useAdminContext } from '../../context/AdminContext';
 
 export default function ManageQuestions() {
-  const [papers, setPapers] = useState([]);
+  const { state, dispatch } = useAdminContext();
+  const papers = state.questions || [];
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showForm, setShowForm] = useState(false);
@@ -29,10 +30,6 @@ export default function ManageQuestions() {
     }
   ]);
   const [bulkInput, setBulkInput] = useState('');
-
-  useEffect(() => {
-    setPapers(getQuestionsData());
-  }, []);
 
   const triggerToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
@@ -122,24 +119,17 @@ export default function ManageQuestions() {
 
     const lines = bulkInput.trim().split('\n');
     const newQuestions = lines.map((line, index) => {
-      // Support for double comma (,,) delimiter as requested
       const parts = line.split(',,').map(p => p.trim());
-      // Minimum required parts: Question + 4 Options + Correct Choice = 6
       if (parts.length < 6) return null;
 
-      // Extract fixed parts
       const question = parts[0];
       const opt1 = parts[1];
       const opt2 = parts[2];
       const opt3 = parts[3];
       const opt4 = parts[4];
       const correctVal = parts[5];
-
-      // Join everything from index 6 onwards as the explanation (to handle commas in explanation)
-      // and remove any '|' characters as requested
       const explanation = parts.slice(6).join(', ').replace(/\|/g, '').trim();
 
-      // Smart Correct Index Detection (Handles 0-3, Bengali ক, খ, গ, ঘ, and English a, b, c, d)
       let finalIndex = 0;
       const cleanVal = String(correctVal).toLowerCase().trim();
 
@@ -152,7 +142,6 @@ export default function ManageQuestions() {
         finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
       }
 
-      // Cleanup options (remove (a), (b), (ক), (খ) prefixes if present)
       const cleanOpt = (opt) => opt.replace(/^[\(\[]?([a-d]|[ক-ঘ])[\)\]]?\s*/i, '').trim();
 
       return {
@@ -168,7 +157,6 @@ export default function ManageQuestions() {
     }).filter(q => q !== null);
 
     if (newQuestions.length > 0) {
-      // If the first question is empty, replace it, otherwise append
       setQuestions(prev => {
         if (prev.length === 1 && !prev[0].question && prev[0].options.every(o => !o)) {
           return newQuestions;
@@ -221,25 +209,19 @@ export default function ManageQuestions() {
       updatedAt: new Date().toISOString()
     };
 
-    let updatedPapers;
     if (currentPaper) {
-      updatedPapers = papers.map(p => p.id === currentPaper.id ? newPaper : p);
+      dispatch({ type: 'ADD_QUESTION_PAPER', payload: newPaper });
       triggerToast('Question paper updated successfully!');
     } else {
-      updatedPapers = [newPaper, ...papers];
+      dispatch({ type: 'ADD_QUESTION_PAPER', payload: newPaper });
       triggerToast('New question paper created successfully!');
     }
-
-    setPapers(updatedPapers);
-    saveQuestionsData(updatedPapers);
     setShowForm(false);
   };
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this question paper?')) {
-      const updated = papers.filter(p => p.id !== id);
-      setPapers(updated);
-      saveQuestionsData(updated);
+      dispatch({ type: 'DELETE_QUESTION_PAPER', payload: id });
       triggerToast('Question paper deleted.');
     }
   };
@@ -437,7 +419,7 @@ export default function ManageQuestions() {
                   </tr>
                 ))}
                 {papers.length === 0 && (
-                  <tr><td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>No question papers found.</td></tr>
+                  <tr><td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: '15px' }}>No question papers found.</td></tr>
                 )}
               </tbody>
             </table>

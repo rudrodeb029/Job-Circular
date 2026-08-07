@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, Calendar, Users, ChevronRight, Award } from '../components/Icons';
+import { ArrowLeft, Clock, Calendar, Users, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import BottomNav from '../components/BottomNav';

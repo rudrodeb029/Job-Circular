@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useState } from 'react';
 import { categories } from '../data/categories';
 import { triggerLocalNotification, sendPushToAll } from '../utils/notifications';
+import { broadcastPush } from '../utils/oneSignalWrapper';
 import {
   getCollection,
   setDocument,
@@ -44,31 +45,103 @@ const initialState = {
   questions: JSON.parse(localStorage.getItem('admin_questions')) || [],
   liveExams: JSON.parse(localStorage.getItem('admin_live_exams')) || [],
   categories: categories,
-  activities: [],
   adminUser: JSON.parse(localStorage.getItem('admin_user')) || null,
   firestoreReady: false
 };
 
 const adminReducer = (state, action) => {
-  let newState;
+  let newState = { ...state };
+
   switch (action.type) {
     case 'SET_JOBS':
-      newState = { ...state, jobs: [...action.payload].sort(sortByCreatedAt) };
+      newState.jobs = [...action.payload].sort(sortByCreatedAt);
       break;
     case 'SET_NOTIFICATIONS':
-      newState = { ...state, notifications: [...action.payload].sort(sortByCreatedAt) };
+      newState.notifications = [...action.payload].sort(sortByCreatedAt);
       break;
     case 'SET_ADMITS':
-      newState = { ...state, admits: [...action.payload].sort(sortByCreatedAt) };
+      newState.admits = [...action.payload].sort(sortByCreatedAt);
       break;
     case 'SET_QUESTIONS':
-      newState = { ...state, questions: [...action.payload].sort(sortByCreatedAt) };
+      newState.questions = [...action.payload].sort(sortByCreatedAt);
       break;
     case 'SET_LIVE_EXAMS':
-      newState = { ...state, liveExams: [...action.payload].sort(sortByCreatedAt) };
+      newState.liveExams = [...action.payload].sort(sortByCreatedAt);
       break;
     case 'SET_FIRESTORE_READY':
-      return { ...state, firestoreReady: true };
+      newState.firestoreReady = true;
+      return newState;
+
+    // --- CRUD Actions (triggered by Admin Panel) ---
+    case 'ADD_JOB':
+    case 'UPDATE_JOB':
+      const job = action.payload;
+      setDocument(COLLECTIONS.JOBS, job.id, job).catch(console.error);
+
+      if (action.type === 'ADD_JOB' || job.shouldNotify) {
+          const title = job.organization;
+          const msg = `নতুন সার্কুলার: ${job.title}`;
+          broadcastPush(title, msg, { jobId: job.id, type: 'new_job' });
+      }
+      return state;
+
+    case 'DELETE_JOB':
+      deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
+      return state;
+
+    case 'ADD_EXAM':
+    case 'UPDATE_EXAM':
+      const exam = action.payload;
+      setDocument(COLLECTIONS.LIVE_EXAMS, exam.id, exam).catch(console.error);
+
+      if (action.type === 'ADD_EXAM') {
+          const startTime = new Date(exam.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const title = "লাইভ পরীক্ষা শিডিউল";
+          const msg = `${exam.title} শুরু হবে আজ ${startTime} টায়। অংশ নিন!`;
+          broadcastPush(title, msg, { examId: exam.id, type: 'live_exam' });
+      }
+      return state;
+
+    case 'DELETE_EXAM':
+      deleteDocument(COLLECTIONS.LIVE_EXAMS, action.payload).catch(console.error);
+      return state;
+
+    case 'ADD_NOTIFICATION':
+    case 'UPDATE_NOTIFICATION':
+        const notif = action.payload;
+        setDocument(COLLECTIONS.NOTIFICATIONS, notif.id, notif).catch(console.error);
+
+        if (action.type === 'ADD_NOTIFICATION') {
+            broadcastPush(notif.title || notif.organization, notif.message, { jobId: notif.jobId, type: notif.type });
+        }
+        return state;
+
+    case 'DELETE_NOTIFICATION':
+        deleteDocument(COLLECTIONS.NOTIFICATIONS, action.payload).catch(console.error);
+        return state;
+
+    case 'ADD_QUESTION_PAPER':
+    case 'UPDATE_QUESTION_PAPER':
+      const paper = action.payload;
+      setDocument(COLLECTIONS.QUESTIONS, paper.id, paper).catch(console.error);
+
+      if (action.type === 'ADD_QUESTION_PAPER') {
+          broadcastPush("নতুন প্রশ্নপত্র", `${paper.title} - প্রস্তুতি নিন এখনই!`, { paperId: paper.id, type: 'new_paper' });
+      }
+      return state;
+
+    case 'DELETE_QUESTION_PAPER':
+      deleteDocument(COLLECTIONS.QUESTIONS, action.payload).catch(console.error);
+      return state;
+
+    case 'UPDATE_ADMIT':
+        setDocument(COLLECTIONS.ADMITS, action.payload.id, action.payload).catch(console.error);
+        return state;
+
+    case 'DELETE_ADMIT':
+        deleteDocument(COLLECTIONS.ADMITS, action.payload).catch(console.error);
+        return state;
+
     case 'ADMIN_LOGIN':
       localStorage.setItem('admin_user', JSON.stringify(action.payload));
       return { ...state, adminUser: action.payload };
@@ -79,7 +152,6 @@ const adminReducer = (state, action) => {
       return state;
   }
 
-  // Persist to localStorage as cache
   if (action.type.startsWith('SET_')) {
     const keyMap = {
       'SET_JOBS': 'admin_jobs',
@@ -113,8 +185,7 @@ export const AdminProvider = ({ children }) => {
 
         dispatch({ type: 'SET_FIRESTORE_READY' });
 
-        // Safety timeout to ensure app loads even if Firestore is slow
-        const timer = setTimeout(() => setLoading(false), 3000);
+        const timer = setTimeout(() => setLoading(false), 5000);
         return () => clearTimeout(timer);
       } catch (err) {
         console.error('Firestore listener error:', err);
@@ -128,9 +199,11 @@ export const AdminProvider = ({ children }) => {
   }, []);
 
   return (
-    <AdminContext.Provider value={{ state, dispatch, loading }}>
-      {children}
-    </AdminContext.Provider>
+    <div className="admin-context-provider">
+        <AdminContext.Provider value={{ state, dispatch, loading }}>
+        {children}
+        </AdminContext.Provider>
+    </div>
   );
 };
 
