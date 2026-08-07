@@ -153,6 +153,12 @@ export default function Profile() {
         <h2 style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
           {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
         </h2>
+        {localStorage.getItem('onesignal_subscribed') === 'true' && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '10px', color: '#4ade80', fontWeight: 700 }}>
+                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></div>
+                {isEn ? 'Notifications Active' : 'নোটিফিকেশন সক্রিয়'}
+            </div>
+        )}
       </div>
 
       {/* Floating Activity Stats Bar */}

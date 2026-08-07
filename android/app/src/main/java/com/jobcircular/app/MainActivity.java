@@ -13,8 +13,9 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
 
         // OneSignal Initialization (Silent)
-        // JS side will handle the permission prompt with a delay for better stability
-        OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
+        // We set the log level and initialize, but don't request permissions here
+        // to ensure the app UI remains responsive during cold boot.
+        OneSignal.getDebug().setLogLevel(LogLevel.NONE);
         OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
     }
 }

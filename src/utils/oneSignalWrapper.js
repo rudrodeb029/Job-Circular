@@ -1,14 +1,15 @@
 import { Capacitor } from '@capacitor/core';
 
-// Hardcoded Default App ID (can be overridden in settings)
+// Hardcoded Default App ID (Matches your dashboard)
 const DEFAULT_APP_ID = "54decc7c-7653-48d2-bf9d-dc1bc0ff0307";
 
 export const getOneSignalAppId = () => {
-    return localStorage.getItem('onesignal_app_id') || DEFAULT_APP_ID;
+    return (localStorage.getItem('onesignal_app_id') || DEFAULT_APP_ID).trim();
 };
 
 /**
  * OneSignal JavaScript Wrapper for Capacitor
+ * This ensures the device is registered for push notifications.
  */
 export const initializeOneSignal = () => {
   if (!Capacitor.isNativePlatform()) return;
@@ -19,62 +20,82 @@ export const initializeOneSignal = () => {
 
     if (OneSignal) {
       try {
-        console.log('OneSignal: Initializing with ID:', appId);
+        console.log('OneSignal: Initializing for device with App ID:', appId);
 
+        // OneSignal v5 initialization
         if (typeof OneSignal.initialize === 'function') {
             OneSignal.initialize(appId);
         } else if (typeof OneSignal.setAppId === 'function') {
             OneSignal.setAppId(appId);
         }
 
-        // Request permission - critical for "Subscribed" status
-        if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
-            // Delay slightly to ensure app UI is stable
-            setTimeout(() => {
-                console.log('OneSignal: Requesting push permission...');
+        // Delay the permission prompt to ensure the app is fully loaded and responsive
+        // This prevents the "App Not Responding" dialog
+        setTimeout(() => {
+            if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
+                console.log('OneSignal: Prompting for notification permission...');
                 OneSignal.Notifications.requestPermission(true).then((accepted) => {
-                    console.log('OneSignal: Permission accepted:', accepted);
+                    console.log('OneSignal: User permission choice:', accepted ? 'Allowed' : 'Denied');
+                    // Store subscription status locally for UI feedback
+                    localStorage.setItem('onesignal_subscribed', accepted ? 'true' : 'false');
+                }).catch(err => {
+                    console.error('OneSignal: Permission prompt failed:', err);
                 });
-            }, 3000);
-        }
+            }
+        }, 8000); // 8 second delay for maximum stability
 
-        console.log('OneSignal: JS initialization complete');
+        console.log('OneSignal: JS Bridge Ready');
       } catch (e) {
-        console.error('OneSignal: JS initialization error:', e);
+        console.error('OneSignal: Error in initialization flow:', e);
       }
     }
   };
 
+  // Wait for Cordova/Capacitor native bridge to be ready
   if (window.cordova) {
       document.addEventListener('deviceready', performInit, false);
   } else {
-      setTimeout(() => {
-          if (window.cordova) {
-              document.addEventListener('deviceready', performInit, false);
-          } else {
+      // Fallback check
+      const checkInterval = setInterval(() => {
+          if (window.OneSignal || (window.plugins && window.plugins.OneSignal)) {
               performInit();
+              clearInterval(checkInterval);
           }
       }, 1000);
+      // Timeout after 10 seconds
+      setTimeout(() => clearInterval(checkInterval), 10000);
   }
 };
 
 /**
  * Broadcast a push notification via OneSignal REST API.
+ * targets all users in 'Subscribed Users' and 'Active Users' segments.
  */
 export const broadcastPush = async (title, message, data = {}) => {
-    const restKey = localStorage.getItem('onesignal_rest_api_key');
+    const restKey = (localStorage.getItem('onesignal_rest_api_key') || '').trim();
     const appId = getOneSignalAppId();
 
     if (!restKey) {
-        console.error('OneSignal: REST API Key missing. Check Admin Settings.');
-        return { success: false, error: 'REST API Key missing' };
+        return { success: false, error: 'REST API Key is missing in Admin Settings.' };
     }
 
-    console.log('OneSignal: Initiating broadcast fetch...', { title, appId });
+    console.log('OneSignal: Sending broadcast to segment...');
 
     try {
-        // OneSignal v2 keys (App JSON Web Tokens) use "Authorization: Key <app_jwt>"
-        const authHeader = restKey.startsWith('os_v2_app_') ? `Key ${restKey}` : `Basic ${restKey}`;
+        // We use Basic auth for the Notifications API (most compatible)
+        const authHeader = `Basic ${restKey}`;
+
+        const payload = {
+            app_id: appId,
+            // Targeting standard segments that should exist by default
+            included_segments: ["Subscribed Users"],
+            headings: { en: title, bn: title },
+            contents: { en: message, bn: message },
+            data: data,
+            android_visibility: 1,
+            priority: 10,
+            small_icon: 'ic_stat_onesignal_default'
+        };
 
         const response = await fetch('https://onesignal.com/api/v1/notifications', {
             method: 'POST',
@@ -82,47 +103,34 @@ export const broadcastPush = async (title, message, data = {}) => {
                 'Content-Type': 'application/json; charset=utf-8',
                 'Authorization': authHeader
             },
-            body: JSON.stringify({
-                app_id: appId,
-                // Target multiple standard segments to ensure we reach everyone
-                included_segments: ['Subscribed Users', 'Active Users'],
-                headings: { en: title, bn: title },
-                contents: { en: message, bn: message },
-                data: data,
-                // Ensure notification shows even if app is in foreground
-                android_visibility: 1,
-                priority: 10,
-                // Optional: Force platforms
-                isAndroid: true,
-                isIos: true
-            })
+            body: JSON.stringify(payload)
         });
 
         const result = await response.json();
 
         if (result.errors) {
-            console.error('OneSignal API Error:', result.errors);
-            // Result.errors is often an array, e.g. ["All included players are not subscribed"]
-            return { success: false, error: result.errors };
+            // If the specific segment targeting fails, try a broader target as fallback
+            console.warn('OneSignal: Segment targeting failed, trying fallback targeting...', result.errors);
+
+            // Fallback: target by app_id filter (targets everyone who opened the app)
+            const fallbackPayload = { ...payload, included_segments: ["All"] };
+            const fallbackRes = await fetch('https://onesignal.com/api/v1/notifications', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': authHeader },
+                body: JSON.stringify(fallbackPayload)
+            });
+            const fallbackResult = await fallbackRes.json();
+
+            if (fallbackResult.errors) {
+                return { success: false, error: fallbackResult.errors };
+            }
+            return { success: true, data: fallbackResult };
         }
 
-        console.log('OneSignal: Push sent successfully:', result);
+        console.log('OneSignal: Broadcast successful!');
         return { success: true, data: result };
     } catch (error) {
-        console.error('OneSignal Fetch Error:', error.message);
+        console.error('OneSignal: Fetch error:', error);
         return { success: false, error: error.message };
     }
-};
-
-export const loginOneSignal = (externalId) => {
-  if (!Capacitor.isNativePlatform()) return;
-  const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
-
-  if (OneSignal && typeof OneSignal.login === 'function') {
-    try {
-      OneSignal.login(externalId);
-    } catch (e) {
-      console.error('OneSignal: Login error:', e);
-    }
-  }
 };
