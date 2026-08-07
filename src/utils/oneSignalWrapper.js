@@ -161,6 +161,14 @@ export const broadcastPush = async (title, message, data = {}) => {
 
         if (result.errors) {
             console.error('OneSignal: API errors:', result.errors);
+            if (Array.isArray(result.errors) && result.errors.includes("All included players are not subscribed")) {
+                console.log('OneSignal: Connected successfully but no active subscribers found.');
+                return {
+                    success: true,
+                    recipients: 0,
+                    warning: "All included players are not subscribed"
+                };
+            }
             return { success: false, error: result.errors };
         }
 
