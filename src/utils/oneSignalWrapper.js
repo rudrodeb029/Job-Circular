@@ -31,15 +31,7 @@ export const initializeOneSignal = () => {
             OneSignal.setAppId(appId);
         }
 
-        // Foreground notification behavior
-        if (typeof OneSignal.setNotificationWillShowInForegroundHandler === 'function') {
-            OneSignal.setNotificationWillShowInForegroundHandler((event) => {
-                console.log('OneSignal: Foreground notification received');
-                event.complete(event.getNotification());
-            });
-        }
-
-        // DELAYED PERMISSION PROMPT
+        // DELAYED PERMISSION PROMPT: Prevents "App Not Responding"
         setTimeout(() => {
             if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
                 console.log('OneSignal: Requesting push permission...');
@@ -48,7 +40,7 @@ export const initializeOneSignal = () => {
                     console.log('OneSignal: Permission result:', accepted);
                 });
             }
-        }, 8000);
+        }, 8000); // 8 second delay for boot stability
 
         console.log('OneSignal: SDK Initialized');
       } catch (e) {
@@ -80,17 +72,19 @@ export const broadcastPush = async (title, message, data = {}) => {
 
         const payload = {
             app_id: appId,
-            // Targeting "All" to ensure widest possible reach
-            included_segments: ["All"],
+            // Targeting standard segments for maximum reach
+            included_segments: ["Total Subscriptions", "Subscribed Users"],
             headings: { en: title, bn: title },
             contents: { en: message, bn: message },
             data: data,
-            // Essential Android settings
+            // Android delivery optimization
             android_visibility: 1,
             priority: 10,
             android_accent_color: 'FF1A56DB',
             small_icon: 'ic_stat_onesignal_default',
-            // Explicitly enable platforms
+            android_sound: 'notification',
+            android_channel_id: 'onesignal_default_channel',
+            // Explicitly target mobile
             isAndroid: true,
             isIos: true
         };
@@ -111,7 +105,7 @@ export const broadcastPush = async (title, message, data = {}) => {
         }
 
         // Return recipients count so we can verify targeting
-        return { success: true, recipients: result.recipients, data: result };
+        return { success: true, recipients: result.recipients || 0, data: result };
     } catch (error) {
         return { success: false, error: error.message };
     }

@@ -49,7 +49,11 @@ const AdminSettings = () => {
         const result = await broadcastPush('Test Notification 🔔', 'If you see this, OneSignal setup is working correctly!', { type: 'test' });
 
         if (result.success) {
-            alert(`OneSignal Test sent successfully! Recipients: ${result.recipients || 0}`);
+            if (result.recipients > 0) {
+                alert(`Success! OneSignal has queued the notification for ${result.recipients} device(s). Check your phone now! 🔔`);
+            } else {
+                alert('Sent to OneSignal, but 0 devices matched your segments. Make sure you have at least one user with notifications ALLOWED in the app.');
+            }
         } else {
             alert('OneSignal Error: ' + JSON.stringify(result.error));
         }
