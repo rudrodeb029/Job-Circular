@@ -49,7 +49,7 @@ const AdminSettings = () => {
         const result = await broadcastPush('Test Notification 🔔', 'If you see this, OneSignal setup is working correctly!', { type: 'test' });
 
         if (result.success) {
-            alert('OneSignal Test sent successfully!');
+            alert(`OneSignal Test sent successfully! Recipients: ${result.recipients || 0}`);
         } else {
             alert('OneSignal Error: ' + JSON.stringify(result.error));
         }

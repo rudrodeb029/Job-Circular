@@ -31,7 +31,15 @@ export const initializeOneSignal = () => {
             OneSignal.setAppId(appId);
         }
 
-        // DELAYED PERMISSION PROMPT: Prevents "App Not Responding" by letting UI load first
+        // Foreground notification behavior
+        if (typeof OneSignal.setNotificationWillShowInForegroundHandler === 'function') {
+            OneSignal.setNotificationWillShowInForegroundHandler((event) => {
+                console.log('OneSignal: Foreground notification received');
+                event.complete(event.getNotification());
+            });
+        }
+
+        // DELAYED PERMISSION PROMPT
         setTimeout(() => {
             if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
                 console.log('OneSignal: Requesting push permission...');
@@ -40,7 +48,7 @@ export const initializeOneSignal = () => {
                     console.log('OneSignal: Permission result:', accepted);
                 });
             }
-        }, 8000); // 8 second delay for boot stability
+        }, 8000);
 
         console.log('OneSignal: SDK Initialized');
       } catch (e) {
@@ -58,32 +66,33 @@ export const initializeOneSignal = () => {
 
 /**
  * Broadcast a push notification via OneSignal REST API.
- * targets everyone in the 'Subscribed Users' segment.
  */
 export const broadcastPush = async (title, message, data = {}) => {
     const restKey = (localStorage.getItem('onesignal_rest_api_key') || '').trim();
     const appId = getOneSignalAppId();
 
     if (!restKey) {
-        console.error('OneSignal: REST Key missing.');
-        return { success: false, error: 'REST API Key is missing in Admin Settings.' };
+        return { success: false, error: 'REST API Key is missing.' };
     }
 
-    console.log('OneSignal: Sending broadcast to App ID:', appId);
-
     try {
-        // v2 Keys (os_v2_app_...) use "Key", others use "Basic"
         const authHeader = restKey.startsWith('os_v2_app_') ? `Key ${restKey}` : `Basic ${restKey}`;
 
         const payload = {
             app_id: appId,
-            // "Subscribed Users" is the standard segment for all opted-in users
-            included_segments: ["Subscribed Users"],
+            // Targeting "All" to ensure widest possible reach
+            included_segments: ["All"],
             headings: { en: title, bn: title },
             contents: { en: message, bn: message },
             data: data,
+            // Essential Android settings
             android_visibility: 1,
-            priority: 10
+            priority: 10,
+            android_accent_color: 'FF1A56DB',
+            small_icon: 'ic_stat_onesignal_default',
+            // Explicitly enable platforms
+            isAndroid: true,
+            isIos: true
         };
 
         const response = await fetch('https://onesignal.com/api/v1/notifications', {
@@ -98,25 +107,12 @@ export const broadcastPush = async (title, message, data = {}) => {
         const result = await response.json();
 
         if (result.errors) {
-            console.error('OneSignal Error Response:', result.errors);
-            // If segment targeting fails, try to target by specific platform as fallback
-            if (result.errors.includes("All included players are not subscribed")) {
-                console.log('OneSignal: Retrying with platform targeting...');
-                const retryPayload = { ...payload, included_segments: ["Active Users", "All"] };
-                const retryRes = await fetch('https://onesignal.com/api/v1/notifications', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': authHeader },
-                    body: JSON.stringify(retryPayload)
-                });
-                return { success: true, data: await retryRes.json() };
-            }
             return { success: false, error: result.errors };
         }
 
-        console.log('OneSignal: Notification queued successfully');
-        return { success: true, data: result };
+        // Return recipients count so we can verify targeting
+        return { success: true, recipients: result.recipients, data: result };
     } catch (error) {
-        console.error('OneSignal: Fetch error:', error);
         return { success: false, error: error.message };
     }
 };
