@@ -142,7 +142,6 @@ export const broadcastPush = async (title, message, data = {}) => {
             android_accent_color: 'FF1A56DB',
             small_icon: 'ic_stat_onesignal_default',
             android_sound: 'notification',
-            android_channel_id: 'onesignal_default_channel',
             isAndroid: true,
             isIos: true
         };
