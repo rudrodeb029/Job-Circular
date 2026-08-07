@@ -27,13 +27,15 @@ export const initializeOneSignal = () => {
             OneSignal.setAppId(appId);
         }
 
-        // Configure foreground behavior to show notifications even when app is open
+        // Request permission - critical for "Subscribed" status
         if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
-            // Delay the prompt slightly to ensure app UI is loaded
+            // Delay slightly to ensure app UI is stable
             setTimeout(() => {
-                console.log('OneSignal: Prompting for push permission...');
-                OneSignal.Notifications.requestPermission(true);
-            }, 5000);
+                console.log('OneSignal: Requesting push permission...');
+                OneSignal.Notifications.requestPermission(true).then((accepted) => {
+                    console.log('OneSignal: Permission accepted:', accepted);
+                });
+            }, 3000);
         }
 
         console.log('OneSignal: JS initialization complete');
@@ -72,7 +74,6 @@ export const broadcastPush = async (title, message, data = {}) => {
 
     try {
         // OneSignal v2 keys (App JSON Web Tokens) use "Authorization: Key <app_jwt>"
-        // Older REST API keys use "Authorization: Basic <rest_api_key>"
         const authHeader = restKey.startsWith('os_v2_app_') ? `Key ${restKey}` : `Basic ${restKey}`;
 
         const response = await fetch('https://onesignal.com/api/v1/notifications', {
@@ -83,12 +84,17 @@ export const broadcastPush = async (title, message, data = {}) => {
             },
             body: JSON.stringify({
                 app_id: appId,
-                included_segments: ['Subscribed Users'],
+                // Target multiple standard segments to ensure we reach everyone
+                included_segments: ['Subscribed Users', 'Active Users'],
                 headings: { en: title, bn: title },
                 contents: { en: message, bn: message },
                 data: data,
+                // Ensure notification shows even if app is in foreground
                 android_visibility: 1,
-                priority: 10
+                priority: 10,
+                // Optional: Force platforms
+                isAndroid: true,
+                isIos: true
             })
         });
 
@@ -96,6 +102,7 @@ export const broadcastPush = async (title, message, data = {}) => {
 
         if (result.errors) {
             console.error('OneSignal API Error:', result.errors);
+            // Result.errors is often an array, e.g. ["All included players are not subscribed"]
             return { success: false, error: result.errors };
         }
 
