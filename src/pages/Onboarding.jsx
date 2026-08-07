@@ -59,6 +59,20 @@ export default function Onboarding() {
 
   const finishOnboarding = () => {
     dispatch({ type: 'SET_ONBOARDING_SEEN' });
+
+    // Request OneSignal push permission on onboarding completion
+    try {
+      const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+      if (OneSignal && OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
+        console.log('Onboarding: Requesting notification permission...');
+        OneSignal.Notifications.requestPermission(true).then((accepted) => {
+          console.log('Onboarding: Push permission accepted:', accepted);
+        }).catch(err => console.error('Onboarding: Permission error:', err));
+      }
+    } catch (e) {
+      console.error('Onboarding: Push prompt failed:', e);
+    }
+
     navigate('/home', { replace: true });
   };
 
