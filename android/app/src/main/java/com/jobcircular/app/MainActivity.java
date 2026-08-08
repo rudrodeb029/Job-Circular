@@ -3,6 +3,7 @@ package com.jobcircular.app;
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;
 import com.onesignal.OneSignal;
+import com.onesignal.Continue;
 import com.onesignal.debug.LogLevel;
 
 public class MainActivity extends BridgeActivity {
@@ -12,10 +13,11 @@ public class MainActivity extends BridgeActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // OneSignal Initialization (Silent)
-        // We set the log level and initialize, but don't request permissions here
-        // to ensure the app UI remains responsive during cold boot.
-        OneSignal.getDebug().setLogLevel(LogLevel.NONE);
+        // OneSignal Initialization with verbose debug logging for emulator testing
+        OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
         OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
+
+        // Request push notification permission natively on startup
+        OneSignal.getNotifications().requestPermission(true, Continue.none());
     }
 }
