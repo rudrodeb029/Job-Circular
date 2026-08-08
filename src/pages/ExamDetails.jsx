@@ -168,7 +168,7 @@ export default function ExamDetails() {
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           <h3 className="font-bold mb-xs" style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
-            Job Description
+            {state.language === 'en' ? 'Description' : 'পরীক্ষার বিবরণ'}
           </h3>
           <p className="text-secondary" style={{
             fontSize: '13px',
@@ -222,12 +222,12 @@ export default function ExamDetails() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
               <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
-                Official Exam Notice
+                {state.language === 'en' ? 'Exam Notice' : 'পরীক্ষার নোটিশ'}
               </h3>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
                 {state.language === 'en' 
-                  ? `Official Exam Notice (${circularImages.length} Page${circularImages.length > 1 ? 's' : ''})` 
-                  : `অফিসিয়াল নোটিশ (${circularImages.length}টি পেজ)`}
+                  ? `Exam Notice (${circularImages.length} Page${circularImages.length > 1 ? 's' : ''})` 
+                  : `পরীক্ষার নোটিশ (${circularImages.length}টি পেজ)`}
               </p>
             </div>
 
