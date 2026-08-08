@@ -171,10 +171,10 @@ export default function ResultDetails() {
           </h2>
         </div>
 
-        {/* Job Description Section */}
+        {/* Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           <h3 className="font-bold mb-xs" style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
-            Job Description
+            {isEn ? 'Description' : 'পরীক্ষার বিবরণ'}
           </h3>
           <p className="text-secondary" style={{
             fontSize: '13px',
@@ -212,12 +212,12 @@ export default function ResultDetails() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
               <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
-                Official Result Sheet
+                {isEn ? 'Result Sheet' : 'ফলাফল বিজ্ঞপ্তি'}
               </h3>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
                 {isEn 
-                  ? `Official Result Document (${circularImages.length} Page${circularImages.length > 1 ? 's' : ''})` 
-                  : `অফিসিয়াল ফলাফল বিজ্ঞপ্তি (${circularImages.length}টি পেজ)`}
+                  ? `Result Document (${circularImages.length} Page${circularImages.length > 1 ? 's' : ''})` 
+                  : `ফলাফল বিজ্ঞপ্তি (${circularImages.length}টি পেজ)`}
               </p>
             </div>
 
