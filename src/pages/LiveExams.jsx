@@ -4,6 +4,7 @@ import { ArrowLeft, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { getLiveExams } from '../data/liveExams';
 import BottomNav from '../components/BottomNav';
+import { onCollectionSnapshot, COLLECTIONS } from '../services/firestoreService';
 
 export default function LiveExams() {
   const navigate = useNavigate();
@@ -16,11 +17,20 @@ export default function LiveExams() {
   const [toastMessage, setToastMessage] = useState('');
   const [activeTab, setActiveTab] = useState('live'); // 'live' | 'history'
 
-  // Ticks the clock every second and reads databases
+  // Ticks the clock every second and reads databases reactively
   useEffect(() => {
+    // 1. Initial load from local cache/defaults
     setExams(getLiveExams());
+
+    // 2. Real-time Firestore sync
+    const unsubscribe = onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => {
+      if (data && data.length > 0) {
+        const sorted = [...data].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        setExams(sorted);
+      }
+    });
     
-    // Load registrations
+    // 3. Load registrations
     try {
       const saved = JSON.parse(localStorage.getItem('registered_exams')) || {};
       setRegistrations(saved);
@@ -31,7 +41,11 @@ export default function LiveExams() {
     const interval = setInterval(() => {
       setNow(Date.now());
     }, 1000);
-    return () => clearInterval(interval);
+
+    return () => {
+      unsubscribe && unsubscribe();
+      clearInterval(interval);
+    };
   }, []);
 
   const getExamStatus = (exam) => {
@@ -111,7 +125,7 @@ export default function LiveExams() {
         </button>
         <h1 style={{ flex: 1, fontSize: '18px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
           <FileText size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
-          <span>Live MCQ Exam</span>
+          <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
         </h1>
       </div>
 
