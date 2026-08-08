@@ -234,50 +234,40 @@ export default function LiveExams() {
                 key={exam.id}
                 style={{
                   background: 'var(--white)',
-                  border: status === 'running' 
-                    ? '1.5px solid var(--primary)' 
-                    : '1px solid var(--border-light)',
-                  borderRadius: '20px',
-                  padding: '20px',
-                  boxShadow: '0 4px 18px rgba(0, 0, 0, 0.03)',
+                  border: '1px solid rgba(226, 232, 240, 0.8)',
+                  borderLeft: status === 'running'
+                    ? '4px solid #ef4444'
+                    : status === 'upcoming'
+                      ? '4px solid var(--primary)'
+                      : '4px solid #94a3b8',
+                  borderRadius: '16px',
+                  padding: '16px',
+                  boxShadow: '0 4px 16px rgba(15, 23, 42, 0.02)',
                   position: 'relative',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  transition: 'all 0.3s'
                 }}
               >
-                {/* Visual Status Indicator Line */}
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: '4px',
-                  background: status === 'running' 
-                    ? 'linear-gradient(90deg, #3b82f6, #2563eb)' 
-                    : status === 'upcoming' 
-                      ? 'linear-gradient(90deg, #f59e0b, #d97706)' 
-                      : 'linear-gradient(90deg, #94a3b8, #cbd5e1)'
-                }}></div>
-
                 {/* Card Header row 1: Badges */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                   {/* Status Badge */}
                   {status === 'running' && (
                     <span style={{
-                      fontSize: '10px',
+                      fontSize: '9.5px',
                       fontWeight: 800,
-                      color: 'var(--primary)',
-                      background: 'rgba(26, 86, 219, 0.08)',
-                      padding: '5px 12px',
+                      color: '#ef4444',
+                      background: '#fee2e2',
+                      padding: '4px 10px',
                       borderRadius: '30px',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '5px'
+                      gap: '4px'
                     }}>
                       <span style={{
-                        width: '6px',
-                        height: '6px',
+                        width: '5px',
+                        height: '5px',
                         borderRadius: '50%',
-                        background: 'var(--primary)',
+                        background: '#ef4444',
                         display: 'inline-block',
                         animation: 'pulse 1.5s infinite'
                       }}></span>
@@ -287,11 +277,11 @@ export default function LiveExams() {
 
                   {status === 'upcoming' && (
                     <span style={{
-                      fontSize: '10px',
+                      fontSize: '9.5px',
                       fontWeight: 800,
-                      color: '#b45309',
-                      background: 'rgba(245, 158, 11, 0.12)',
-                      padding: '5px 12px',
+                      color: 'var(--primary)',
+                      background: '#eff6ff',
+                      padding: '4px 10px',
                       borderRadius: '30px'
                     }}>
                       {isEn ? 'UPCOMING' : 'আসন্ন পরীক্ষা'}
@@ -300,11 +290,11 @@ export default function LiveExams() {
 
                   {status === 'completed' && (
                     <span style={{
-                      fontSize: '10px',
+                      fontSize: '9.5px',
                       fontWeight: 800,
-                      color: 'var(--text-muted)',
-                      background: 'var(--bg-secondary)',
-                      padding: '5px 12px',
+                      color: '#64748b',
+                      background: '#f1f5f9',
+                      padding: '4px 10px',
                       borderRadius: '30px'
                     }}>
                       {isEn ? 'COMPLETED' : 'শেষ হয়েছে'}
@@ -313,18 +303,18 @@ export default function LiveExams() {
 
                   {/* Duration Badge */}
                   <span style={{
-                    fontSize: '10px',
+                    fontSize: '9.5px',
                     fontWeight: 800,
-                    color: 'var(--primary)',
-                    background: 'rgba(26, 86, 219, 0.06)',
-                    padding: '5px 12px',
+                    color: '#2563eb',
+                    background: 'rgba(37, 99, 235, 0.08)',
+                    padding: '4px 10px',
                     borderRadius: '30px',
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
                     whiteSpace: 'nowrap'
                   }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10"></circle>
                       <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
@@ -338,14 +328,13 @@ export default function LiveExams() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    background: 'var(--bg-secondary)',
-                    border: '1.5px solid var(--border-light)',
+                    background: '#f8fafc',
                     borderRadius: '10px',
-                    padding: '8px 12px',
-                    marginBottom: '14px'
+                    padding: '6px 10px',
+                    marginBottom: '10px'
                   }}>
-                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <span style={{ fontSize: '10px', color: '#475569', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -358,8 +347,8 @@ export default function LiveExams() {
                         minute: '2-digit'
                       })}
                     </span>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--warning)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
+                    <span style={{ fontSize: '10px', fontWeight: 700, color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ color: '#64748b', fontWeight: 500 }}>
                         {isEn ? 'Left:' : 'বাকি:'}
                       </span>
                       <span style={{ fontFamily: 'monospace' }}>
@@ -370,10 +359,10 @@ export default function LiveExams() {
                 )}
 
                 <h4 style={{
-                  fontSize: '14.5px',
+                  fontSize: '13.5px',
                   fontWeight: 700,
-                  color: 'var(--text-primary)',
-                  marginBottom: '14px',
+                  color: '#0f172a',
+                  marginBottom: '10px',
                   lineHeight: '1.4'
                 }}>
                   {isEn ? exam.titleEn : exam.title}
@@ -381,30 +370,30 @@ export default function LiveExams() {
 
                 {/* Subjects & Topics separately */}
                 <div style={{
-                  background: 'var(--bg-secondary)',
-                  borderRadius: '14px',
-                  padding: '14px',
-                  marginBottom: '16px',
+                  background: 'rgba(241, 245, 249, 0.4)',
+                  borderRadius: '12px',
+                  padding: '10px 12px',
+                  marginBottom: '12px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '12px'
+                  gap: '8px'
                 }}>
                   {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
                     exam.subjectTopics.map((st, idx) => (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                        <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: '3px solid var(--primary)', paddingLeft: '8px' }}>
+                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <span style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: '2px solid var(--primary)', paddingLeft: '6px' }}>
                           {isEn ? st.subjectEn : st.subject}
                         </span>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '4px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '2px' }}>
                           {(isEn ? st.topicsEn : st.topics)?.split(',').map((t, tIdx) => (
                             <span key={tIdx} style={{
-                              fontSize: '10px',
+                              fontSize: '9px',
                               fontWeight: 600,
                               background: 'var(--white)',
-                              border: '1px solid var(--border-light)',
-                              color: 'var(--text-secondary)',
-                              padding: '3px 8px',
-                              borderRadius: '6px'
+                              border: '1px solid rgba(226, 232, 240, 0.7)',
+                              color: '#64748b',
+                              padding: '2px 6px',
+                              borderRadius: '5px'
                             }}>
                               {t.trim()}
                             </span>
@@ -413,20 +402,20 @@ export default function LiveExams() {
                       </div>
                     ))
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 700, borderLeft: '3px solid var(--primary)', paddingLeft: '8px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: 700, borderLeft: '2px solid var(--primary)', paddingLeft: '6px' }}>
                         {isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ'}
                       </span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                         {(isEn ? exam.topicsEn : exam.topics)?.split(',').map((t, idx) => (
                           <span key={idx} style={{
-                            fontSize: '10px',
+                            fontSize: '9px',
                             fontWeight: 600,
                             background: 'var(--white)',
-                            border: '1px solid var(--border-light)',
-                            color: 'var(--text-secondary)',
-                            padding: '3px 8px',
-                            borderRadius: '6px'
+                            border: '1px solid rgba(226, 232, 240, 0.7)',
+                            color: '#64748b',
+                            padding: '2px 6px',
+                            borderRadius: '5px'
                           }}>
                             {t.trim()}
                           </span>
@@ -437,39 +426,39 @@ export default function LiveExams() {
                 </div>
 
                 {/* Bottom Actions */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   
                   {status === 'upcoming' && (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <button
                         onClick={() => handleRegister(exam.id)}
                         style={{
                           width: 'auto',
-                          padding: '10px 24px',
-                          borderRadius: '12px',
-                          border: isRegistered ? '1.5px solid #10b981' : 'none',
-                          background: isRegistered ? 'rgba(16, 185, 129, 0.05)' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-                          color: isRegistered ? '#047857' : 'white',
+                          padding: '8px 20px',
+                          borderRadius: '10px',
+                          border: isRegistered ? '1px solid #10b981' : 'none',
+                          background: isRegistered ? '#ecfdf5' : 'linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%)',
+                          color: isRegistered ? '#065f46' : 'white',
                           fontWeight: 800,
-                          fontSize: '12.5px',
+                          fontSize: '11.5px',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           gap: '6px',
-                          boxShadow: isRegistered ? 'none' : '0 4px 14px rgba(26, 86, 219, 0.15)'
+                          boxShadow: isRegistered ? 'none' : '0 4px 10px rgba(26, 86, 219, 0.12)'
                         }}
                       >
                         {isRegistered ? (
                           <>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
                               <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
                             <span>{isEn ? 'Registered & Participating' : 'অংশগ্রহণ নিশ্চিত করা হয়েছে'}</span>
                           </>
                         ) : (
                           <>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
                               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
                             </svg>
                             <span>{isEn ? 'Participate in Exam' : 'পরীক্ষায় অংশগ্রহণ করুন'}</span>
@@ -485,15 +474,15 @@ export default function LiveExams() {
                         onClick={() => navigate(`/live-exam-room/${exam.id}`)}
                         style={{
                           width: 'auto',
-                          padding: '10px 28px',
-                          borderRadius: '12px',
+                          padding: '8px 24px',
+                          borderRadius: '10px',
                           border: 'none',
                           background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
                           color: 'white',
                           fontWeight: 800,
-                          fontSize: '12.5px',
+                          fontSize: '11.5px',
                           cursor: 'pointer',
-                          boxShadow: '0 4px 14px rgba(239, 68, 68, 0.2)'
+                          boxShadow: '0 4px 10px rgba(239, 68, 68, 0.15)'
                         }}
                       >
                         {isEn ? 'Enter Exam Room Now' : 'পরীক্ষায় অংশ নিন (লাইভ)'} ➔
@@ -504,13 +493,13 @@ export default function LiveExams() {
                   {status === 'completed' && (
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       {result ? (
-                        <div style={{ fontSize: '12px', color: 'var(--success)', fontWeight: 800 }}>
+                        <div style={{ fontSize: '11.5px', color: '#10b981', fontWeight: 800 }}>
                           🏆 {isEn 
                             ? `Score: ${result.score}/${result.total}`
                             : `স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`}
                         </div>
                       ) : (
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 500 }}>
+                        <span style={{ fontSize: '10.5px', color: '#64748b', fontWeight: 500 }}>
                           {isEn ? 'You did not attend' : 'আপনি অংশ নেননি'}
                         </span>
                       )}
@@ -518,12 +507,12 @@ export default function LiveExams() {
                       <button
                         onClick={() => navigate(`/live-exam-room/${exam.id}`)}
                         style={{
-                          padding: '8px 14px',
+                          padding: '6px 12px',
                           borderRadius: '8px',
-                          border: '1px solid var(--border)',
+                          border: '1px solid rgba(226, 232, 240, 0.8)',
                           background: 'transparent',
                           color: 'var(--primary)',
-                          fontSize: '11px',
+                          fontSize: '10.5px',
                           fontWeight: 800,
                           cursor: 'pointer'
                         }}
