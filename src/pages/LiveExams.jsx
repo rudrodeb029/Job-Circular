@@ -229,17 +229,38 @@ export default function LiveExams() {
             const result = getExamResult(exam.id);
             const isRegistered = !!registrations[exam.id];
 
+            // Define colors dynamically based on status
+            const theme = status === 'running'
+              ? {
+                  borderLeft: '4px solid #ef4444',
+                  badgeColor: '#dc2626',
+                  badgeBg: '#fee2e2',
+                  accentColor: '#ef4444',
+                  boxBg: 'rgba(239, 68, 68, 0.03)'
+                }
+              : status === 'upcoming'
+                ? {
+                    borderLeft: '4px solid #d97706',
+                    badgeColor: '#b45309',
+                    badgeBg: '#fef3c7',
+                    accentColor: '#d97706',
+                    boxBg: '#fffbeb'
+                  }
+                : {
+                    borderLeft: '4px solid #64748b',
+                    badgeColor: '#475569',
+                    badgeBg: '#f1f5f9',
+                    accentColor: '#64748b',
+                    boxBg: '#f8fafc'
+                  };
+
             return (
               <div
                 key={exam.id}
                 style={{
                   background: 'var(--white)',
                   border: '1px solid rgba(226, 232, 240, 0.8)',
-                  borderLeft: status === 'running'
-                    ? '4px solid #ef4444'
-                    : status === 'upcoming'
-                      ? '4px solid var(--primary)'
-                      : '4px solid #94a3b8',
+                  borderLeft: theme.borderLeft,
                   borderRadius: '16px',
                   padding: '16px',
                   boxShadow: '0 4px 16px rgba(15, 23, 42, 0.02)',
@@ -255,8 +276,8 @@ export default function LiveExams() {
                     <span style={{
                       fontSize: '9.5px',
                       fontWeight: 800,
-                      color: '#ef4444',
-                      background: '#fee2e2',
+                      color: theme.badgeColor,
+                      background: theme.badgeBg,
                       padding: '4px 10px',
                       borderRadius: '30px',
                       display: 'inline-flex',
@@ -279,8 +300,8 @@ export default function LiveExams() {
                     <span style={{
                       fontSize: '9.5px',
                       fontWeight: 800,
-                      color: 'var(--primary)',
-                      background: '#eff6ff',
+                      color: theme.badgeColor,
+                      background: theme.badgeBg,
                       padding: '4px 10px',
                       borderRadius: '30px'
                     }}>
@@ -292,8 +313,8 @@ export default function LiveExams() {
                     <span style={{
                       fontSize: '9.5px',
                       fontWeight: 800,
-                      color: '#64748b',
-                      background: '#f1f5f9',
+                      color: theme.badgeColor,
+                      background: theme.badgeBg,
                       padding: '4px 10px',
                       borderRadius: '30px'
                     }}>
@@ -328,7 +349,7 @@ export default function LiveExams() {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    background: '#f8fafc',
+                    background: theme.boxBg,
                     borderRadius: '10px',
                     padding: '6px 10px',
                     marginBottom: '10px'
@@ -381,7 +402,7 @@ export default function LiveExams() {
                   {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
                     exam.subjectTopics.map((st, idx) => (
                       <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: '2px solid var(--primary)', paddingLeft: '6px' }}>
+                        <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
                           {isEn ? st.subjectEn : st.subject}
                         </span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '2px' }}>
@@ -403,7 +424,7 @@ export default function LiveExams() {
                     ))
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      <span style={{ fontSize: '10px', color: 'var(--primary)', fontWeight: 700, borderLeft: '2px solid var(--primary)', paddingLeft: '6px' }}>
+                      <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
                         {isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ'}
                       </span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
