@@ -157,19 +157,17 @@ export default function QuestionsHub() {
                 onClick={() => navigate(`/question-details/${paper.id}`)}
                 style={{ padding: '14px', border: '1px solid rgba(37, 99, 235, 0.12)' }}
               >
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    {categoryConfig[paper.category]?.icon || '📚'}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <h3 style={{ fontSize: '13.5px', fontWeight: 700, marginBottom: '4px' }}>{isEn ? paper.titleEn : paper.title}</h3>
-                    <div style={{ display: 'flex', gap: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
-                      <span>📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}</span>
-                      <span>📝 {isEn ? `${paper.questions.length} Items` : `${paper.questions.length}টি প্রশ্ন`}</span>
-                    </div>
-                  </div>
-                  <ChevronRight size={18} color="var(--border)" />
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  {categoryConfig[paper.category]?.icon || '📚'}
                 </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <h3 style={{ fontSize: '13.5px', fontWeight: 700, marginBottom: '4px' }}>{isEn ? paper.titleEn : paper.title}</h3>
+                  <div style={{ display: 'flex', gap: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
+                    <span>📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}</span>
+                    <span>📝 {isEn ? `${paper.questions.length} Items` : `${paper.questions.length}টি প্রশ্ন`}</span>
+                  </div>
+                </div>
+                <ChevronRight size={18} color="var(--border)" style={{ flexShrink: 0, marginLeft: 'auto' }} />
               </div>
             ))}
           </div>
