@@ -29,11 +29,27 @@ export default function Notifications() {
 
   return (
     <div className="page">
-      <div className="page-header flex-between">
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <div className="page-header flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
           <Bell size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
           <span>{isEn ? 'Notifications' : 'নোটিফিকেশন'}</span>
         </h1>
+        {notificationsList.some(n => !state.readNotifications.includes(n.id)) && (
+          <button
+            onClick={handleMarkAllRead}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--primary)',
+              fontSize: '12px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              padding: '4px 8px'
+            }}
+          >
+            {isEn ? 'Mark all' : 'সব পঠিত'}
+          </button>
+        )}
       </div>
 
       <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>

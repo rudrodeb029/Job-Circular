@@ -77,6 +77,22 @@ function appReducer(state, action) {
       newState = { ...state, language: action.payload };
       localStorage.setItem('language', action.payload);
       break;
+    case 'MARK_NOTIFICATION_READ':
+      if (state.readNotifications.includes(action.payload)) return state;
+      newState = {
+        ...state,
+        readNotifications: [...state.readNotifications, action.payload]
+      };
+      localStorage.setItem('readNotifications', JSON.stringify(newState.readNotifications));
+      break;
+    case 'MARK_ALL_NOTIFICATIONS_READ':
+      const newRead = Array.from(new Set([...state.readNotifications, ...action.payload]));
+      newState = {
+        ...state,
+        readNotifications: newRead
+      };
+      localStorage.setItem('readNotifications', JSON.stringify(newState.readNotifications));
+      break;
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload };
     case 'SET_FILTERS':
