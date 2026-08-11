@@ -13,6 +13,10 @@ export default function Notifications() {
   const { state: adminState, refreshData } = useAdminContext();
   const isEn = state.language === 'en';
 
+  useEffect(() => {
+    refreshData(true);
+  }, []);
+
   const notificationsList = useMemo(() => {
     const raw = adminState.notifications || [];
     // Only show notifications created after the user installed the app

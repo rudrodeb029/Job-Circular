@@ -206,7 +206,7 @@ export const AdminProvider = ({ children }) => {
         getCollectionCached(COLLECTIONS.NOTIFICATIONS, forceServer),
         getCollectionCached(COLLECTIONS.ADMITS, forceServer),
         getCollectionCached(COLLECTIONS.QUESTIONS, forceServer),
-        getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer)
+        getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer, 2)
       ]);
 
       dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(jobsData) });

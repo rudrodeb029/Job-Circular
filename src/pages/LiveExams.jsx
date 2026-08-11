@@ -24,8 +24,19 @@ export default function LiveExams() {
     const liveFromAdmin = adminState.liveExams;
     if (liveFromAdmin && liveFromAdmin.length > 0) {
       setExams(liveFromAdmin);
+
+      // Check if any exam is starting in < 10 mins or currently running -> fetch fresh server data
+      const hasTimeSensitiveExam = liveFromAdmin.some(exam => {
+        const startMs = new Date(exam.startTime).getTime();
+        const diffMs = startMs - Date.now();
+        return (diffMs > -3600000 && diffMs < 600000); // Between -1h and +10m
+      });
+      if (hasTimeSensitiveExam) {
+        refreshData(true);
+      }
     } else {
       setExams(getLiveExams());
+      refreshData(true);
     }
     
     try {
