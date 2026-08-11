@@ -5,6 +5,8 @@ import {
   doc,
   getDocs,
   getDoc,
+  getDocsFromCache,
+  getDocsFromServer,
   addDoc,
   setDoc,
   updateDoc,
@@ -24,6 +26,75 @@ export const getCollection = async (collectionName) => {
   } catch (error) {
     console.error(`Error fetching ${collectionName}:`, error);
     return [];
+  }
+};
+
+/**
+ * Intelligent Caching Collection Fetcher
+ * @param {string} collectionName - Firestore collection name
+ * @param {boolean} forceServer - Force network fetch from Firestore server (e.g. Pull to Refresh)
+ * @param {number} ttlMinutes - Cache validity time in minutes (default 15 mins)
+ */
+export const getCollectionCached = async (collectionName, forceServer = false, ttlMinutes = 15) => {
+  const cacheKey = `cache_data_${collectionName}`;
+  const timeKey = `cache_time_${collectionName}`;
+  const now = Date.now();
+  const cachedTime = localStorage.getItem(timeKey);
+  const cachedDataStr = localStorage.getItem(cacheKey);
+
+  const isCacheValid = cachedTime && cachedDataStr && (now - parseInt(cachedTime, 10) < ttlMinutes * 60 * 1000);
+
+  // 1. If cache is valid and user didn't force server refresh, return cached data instantly (0 Firestore reads)
+  if (isCacheValid && !forceServer) {
+    try {
+      return JSON.parse(cachedDataStr);
+    } catch (e) {
+      console.warn(`Cache parse error for ${collectionName}:`, e);
+    }
+  }
+
+  // 2. Try fetching fresh data from Firestore Server
+  try {
+    const colRef = collection(db, collectionName);
+    let snapshot;
+    if (forceServer) {
+      snapshot = await getDocsFromServer(colRef);
+    } else {
+      snapshot = await getDocs(colRef);
+    }
+
+    const data = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    
+    // Save to localStorage cache if non-empty
+    if (data && data.length > 0) {
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(timeKey, String(now));
+      } catch (e) {
+        console.warn(`Failed to write ${collectionName} to localStorage cache:`, e);
+      }
+    }
+    return data;
+  } catch (error) {
+    console.warn(`Server fetch for ${collectionName} failed/offline, attempting fallback cache:`, error.message);
+    
+    // 3. Offline fallback to local cache
+    if (cachedDataStr) {
+      try {
+        return JSON.parse(cachedDataStr);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 4. Try Firestore IndexedDB SDK Cache fallback
+    try {
+      const cacheSnapshot = await getDocsFromCache(collection(db, collectionName));
+      return cacheSnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    } catch (cacheErr) {
+      console.error(`Cache fallback for ${collectionName} failed:`, cacheErr);
+      return [];
+    }
   }
 };
 

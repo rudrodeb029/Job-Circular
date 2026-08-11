@@ -8,6 +8,7 @@ import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import { formatTimeAgo } from '../utils/timeUtils';
 import { categories } from '../data/categories';
+import PullToRefresh from '../components/PullToRefresh';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -66,7 +67,7 @@ export default function AllCirculars() {
   };
 
   // Combine all circulars, exam dates, and results
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, refreshData } = useAdminContext();
   const allFeedItems = useMemo(() => {
     const localJobs = adminState.jobs;
     const localAdmits = adminState.admits || [];
@@ -231,7 +232,8 @@ export default function AllCirculars() {
         </h1>
       </div>
 
-      <div className="page-content animate-fade-in">
+      <PullToRefresh onRefresh={refreshData}>
+        <div className="page-content animate-fade-in">
         {/* Polished Modern Search Bar */}
         <div style={{ marginBottom: 'var(--space-md)' }}>
           <SearchBar
@@ -496,6 +498,7 @@ export default function AllCirculars() {
           </div>
         )}
       </div>
+      </PullToRefresh>
 
       <BottomNav />
     </div>

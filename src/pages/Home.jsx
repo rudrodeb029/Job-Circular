@@ -12,6 +12,7 @@ import { HomeSkeleton } from '../components/SkeletonLoader';
 import { categories } from '../data/categories';
 import Disclaimer from '../components/Disclaimer';
 import { formatTimeAgo } from '../utils/timeUtils';
+import PullToRefresh from '../components/PullToRefresh';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -71,7 +72,7 @@ export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const isEn = state.language === 'en';
-  const { state: adminState, loading: adminLoading } = useAdminContext();
+  const { state: adminState, loading: adminLoading, refreshData } = useAdminContext();
   const localJobs = adminState.jobs;
   const localAdmits = adminState.admits || [];
   const [loading, setLoading] = useState(true);
@@ -190,7 +191,8 @@ export default function Home() {
   return (
     <div className="page">
       <AppHeader />
-      <div className="page-content" style={{ paddingTop: 0 }}>
+      <PullToRefresh onRefresh={refreshData}>
+        <div className="page-content" style={{ paddingTop: 0 }}>
 
         <div className="mb-lg" onClick={() => navigate('/search')} style={{ cursor: 'pointer' }}>
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
@@ -493,6 +495,7 @@ export default function Home() {
         </div>
         <Disclaimer />
       </div>
+      </PullToRefresh>
       <BottomNav />
     </div>
   );

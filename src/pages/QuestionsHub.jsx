@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
+import PullToRefresh from '../components/PullToRefresh';
 
 const categoryConfig = {
   bcs: { name: 'বিসিএস', nameEn: 'BCS', color: 'rgba(26, 86, 219, 0.05)', icon: '🎓' },
@@ -18,7 +19,7 @@ export default function QuestionsHub() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { state } = useAppContext();
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, refreshData } = useAdminContext();
   const isEn = state.language === 'en';
 
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
@@ -68,7 +69,8 @@ export default function QuestionsHub() {
         </h1>
       </div>
 
-      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+      <PullToRefresh onRefresh={refreshData}>
+        <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
         
         {/* Live MCQ Section */}
         <div style={{ marginBottom: '24px' }}>
@@ -173,6 +175,7 @@ export default function QuestionsHub() {
           </div>
         </div>
       </div>
+      </PullToRefresh>
       <BottomNav />
     </div>
   );

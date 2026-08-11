@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 import { getLiveExams } from '../data/liveExams';
 import BottomNav from '../components/BottomNav';
-import { onCollectionSnapshot, COLLECTIONS } from '../services/firestoreService';
+import PullToRefresh from '../components/PullToRefresh';
 
 export default function LiveExams() {
   const navigate = useNavigate();
   const { state } = useAppContext();
+  const { state: adminState, refreshData } = useAdminContext();
   const isEn = state.language === 'en';
   
   const [exams, setExams] = useState([]);
@@ -19,18 +21,13 @@ export default function LiveExams() {
 
   // Ticks the clock every second and reads databases reactively
   useEffect(() => {
-    // 1. Initial load from local cache/defaults
-    setExams(getLiveExams());
-
-    // 2. Real-time Firestore sync
-    const unsubscribe = onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => {
-      if (data && data.length > 0) {
-        const sorted = [...data].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-        setExams(sorted);
-      }
-    });
+    const liveFromAdmin = adminState.liveExams;
+    if (liveFromAdmin && liveFromAdmin.length > 0) {
+      setExams(liveFromAdmin);
+    } else {
+      setExams(getLiveExams());
+    }
     
-    // 3. Load registrations
     try {
       const saved = JSON.parse(localStorage.getItem('registered_exams')) || {};
       setRegistrations(saved);
@@ -43,10 +40,9 @@ export default function LiveExams() {
     }, 1000);
 
     return () => {
-      unsubscribe && unsubscribe();
       clearInterval(interval);
     };
-  }, []);
+  }, [adminState.liveExams]);
 
   const getExamStatus = (exam) => {
     const startMs = new Date(exam.startTime).getTime();
@@ -193,7 +189,8 @@ export default function LiveExams() {
         </div>
       )}
 
-      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+      <PullToRefresh onRefresh={refreshData}>
+        <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
         
         {/* Sleek, Premium Regulations Card (Only shown in Live tab) */}
         {activeTab === 'live' && (
@@ -559,6 +556,7 @@ export default function LiveExams() {
           )}
         </div>
       </div>
+      </PullToRefresh>
 
       <BottomNav />
     </div>

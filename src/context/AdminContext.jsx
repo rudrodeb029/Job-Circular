@@ -3,9 +3,9 @@ import { categories } from '../data/categories';
 import { broadcastPush, sendExamCountdownPush } from '../utils/oneSignalWrapper';
 import {
   getCollection,
+  getCollectionCached,
   setDocument,
   deleteDocument,
-  onCollectionSnapshot,
   COLLECTIONS
 } from '../services/firestoreService';
 
@@ -37,16 +37,25 @@ const mapWithTimestamps = (items) => {
   }));
 };
 
-// ─── Initial state: empty arrays, Firestore snapshots will populate ───
+// ─── Initial state: loaded instantly from local cache if present ───
+const getLocalCache = (key) => {
+  try {
+    const data = localStorage.getItem(`cache_data_${key}`);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    return [];
+  }
+};
+
 const initialState = {
-  jobs: [],
-  notifications: [],
-  admits: [],
-  questions: [],
-  liveExams: [],
+  jobs: getLocalCache(COLLECTIONS.JOBS),
+  notifications: getLocalCache(COLLECTIONS.NOTIFICATIONS),
+  admits: getLocalCache(COLLECTIONS.ADMITS),
+  questions: getLocalCache(COLLECTIONS.QUESTIONS),
+  liveExams: getLocalCache(COLLECTIONS.LIVE_EXAMS),
   categories: categories,
   adminUser: JSON.parse(localStorage.getItem('admin_user')) || null,
-  firestoreReady: false
+  firestoreReady: true
 };
 
 const adminReducer = (state, action) => {
@@ -187,37 +196,43 @@ const adminReducer = (state, action) => {
 
 export const AdminProvider = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const loadAllData = async (forceServer = false) => {
+    try {
+      setLoading(true);
+      const [jobsData, notifsData, admitsData, questionsData, liveExamsData] = await Promise.all([
+        getCollectionCached(COLLECTIONS.JOBS, forceServer),
+        getCollectionCached(COLLECTIONS.NOTIFICATIONS, forceServer),
+        getCollectionCached(COLLECTIONS.ADMITS, forceServer),
+        getCollectionCached(COLLECTIONS.QUESTIONS, forceServer),
+        getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer)
+      ]);
+
+      dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(jobsData) });
+      dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(notifsData) });
+      dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(admitsData) });
+      dispatch({ type: 'SET_QUESTIONS', payload: mapWithTimestamps(questionsData) });
+      dispatch({ type: 'SET_LIVE_EXAMS', payload: mapWithTimestamps(liveExamsData) });
+      dispatch({ type: 'SET_FIRESTORE_READY' });
+    } catch (err) {
+      console.error('Error fetching cached data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const unsubscribers = [];
-
-    const startListeners = () => {
-      try {
-        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.JOBS, (data) => dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(data) })));
-        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (data) => dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(data) })));
-        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.ADMITS, (data) => dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(data) })));
-        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.QUESTIONS, (data) => dispatch({ type: 'SET_QUESTIONS', payload: mapWithTimestamps(data) })));
-        unsubscribers.push(onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => dispatch({ type: 'SET_LIVE_EXAMS', payload: mapWithTimestamps(data) })));
-
-        dispatch({ type: 'SET_FIRESTORE_READY' });
-
-        const timer = setTimeout(() => setLoading(false), 5000);
-        return () => clearTimeout(timer);
-      } catch (err) {
-        console.error('Firestore listener error:', err);
-        setLoading(false);
-      }
-    };
-
-    startListeners();
-
-    return () => unsubscribers.forEach(unsub => unsub && unsub());
+    loadAllData(false);
   }, []);
+
+  const refreshData = async (forceServer = true) => {
+    await loadAllData(forceServer);
+  };
 
   return (
     <div className="admin-context-provider">
-        <AdminContext.Provider value={{ state, dispatch, loading }}>
+        <AdminContext.Provider value={{ state, dispatch, loading, refreshData }}>
         {children}
         </AdminContext.Provider>
     </div>

@@ -6,10 +6,11 @@ import EmptyState from '../components/EmptyState';
 import BottomNav from '../components/BottomNav';
 import { getNotifications } from '../data/notifications';
 import { useAdminContext } from '../context/AdminContext';
+import PullToRefresh from '../components/PullToRefresh';
 
 export default function Notifications() {
   const { state, dispatch } = useAppContext();
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, refreshData } = useAdminContext();
   const isEn = state.language === 'en';
 
   const notificationsList = useMemo(() => {
@@ -52,21 +53,23 @@ export default function Notifications() {
         )}
       </div>
 
-      <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
-        {notificationsList.length > 0 ? (
-          <div>
-            {notificationsList.map(item => (
-              <NotificationItem key={item.id} notification={item} />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={Bell}
-            title={isEn ? "No Notifications" : "কোনো নোটিফিকেশন নেই"}
-            description={isEn ? "You don't have any notifications right now." : "আপনার কাছে এই মুহূর্তে কোনো নোটিফিকেশন নেই।"}
-          />
-        )}
-      </div>
+      <PullToRefresh onRefresh={refreshData}>
+        <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
+          {notificationsList.length > 0 ? (
+            <div>
+              {notificationsList.map(item => (
+                <NotificationItem key={item.id} notification={item} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icon={Bell}
+              title={isEn ? "No Notifications" : "কোনো নোটিফিকেশন নেই"}
+              description={isEn ? "You don't have any notifications right now." : "আপনার কাছে এই মুহূর্তে কোনো নোটিফিকেশন নেই।"}
+            />
+          )}
+        </div>
+      </PullToRefresh>
 
       <BottomNav />
     </div>
