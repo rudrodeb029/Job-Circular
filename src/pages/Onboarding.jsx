@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, Bell, Search, ChevronRight } from '../components/Icons';
+import { Briefcase, Bell, Search, ChevronRight, Shield } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 
 const slides = [
@@ -55,6 +55,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [hasAgreedDisclaimer, setHasAgreedDisclaimer] = useState(false);
   const isEn = state.language === 'en';
 
   const finishOnboarding = () => {
@@ -85,6 +86,110 @@ export default function Onboarding() {
   };
 
   const slide = slides[currentSlide];
+
+  if (!hasAgreedDisclaimer) {
+    return (
+      <div className="onboarding-screen disclaimer-screen animate-fade-in" style={{ justifyContent: 'space-between' }}>
+        {/* Top Header Placeholder to keep spacing */}
+        <div style={{ height: '36px', paddingTop: 'var(--safe-area-top)' }} />
+
+        {/* Hero Card Container */}
+        <div className="onboarding-hero animate-scale-in" style={{ padding: '0 10px', width: '100%', boxSizing: 'border-box' }}>
+          <div 
+            style={{
+              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+              border: '2px solid #e2e8f0',
+              borderRadius: '24px',
+              padding: '32px 24px',
+              width: '100%',
+              maxWidth: '360px',
+              boxShadow: '0 20px 40px rgba(15, 23, 42, 0.08)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              position: 'relative',
+              boxSizing: 'border-box'
+            }}
+          >
+            {/* Shield Warning Badge */}
+            <div 
+              style={{
+                width: '76px',
+                height: '76px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 24px rgba(239, 68, 68, 0.4)',
+                marginBottom: '24px',
+                color: 'white'
+              }}
+            >
+              <Shield size={36} color="white" />
+            </div>
+
+            {/* Header */}
+            <h2 
+              style={{
+                fontSize: '24px',
+                fontWeight: 900,
+                color: '#0f172a',
+                marginBottom: '16px',
+                letterSpacing: '-0.5px',
+                textAlign: 'center',
+                marginTop: 0
+              }}
+            >
+              Disclaimer
+            </h2>
+
+            {/* Content Text */}
+            <p 
+              style={{
+                fontSize: '15px',
+                lineHeight: '1.7',
+                color: '#334155',
+                textAlign: 'center',
+                margin: 0,
+                fontWeight: '500'
+              }}
+            >
+              <span style={{ fontWeight: '800', color: '#1e293b' }}>Job Circular</span> is an <span style={{ fontWeight: '700', color: '#dc2626' }}>independent platform</span> and has <span style={{ fontWeight: '700', color: '#dc2626' }}>no affiliation</span> with the government of Bangladesh or any government agency. All government job notices are <span style={{ fontWeight: '700', color: '#1e293b' }}>aggregated</span> from public official gazettes and portals.
+            </p>
+          </div>
+        </div>
+
+        {/* Bottom Button Action */}
+        <div style={{ width: '100%', boxSizing: 'border-box' }}>
+          <button
+            className="btn btn-block btn-lg animate-slide-up"
+            onClick={() => setHasAgreedDisclaimer(true)}
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: 'white',
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)',
+              borderRadius: '14px',
+              fontWeight: '800',
+              fontSize: '16px',
+              padding: '16px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              border: 'none',
+              cursor: 'pointer',
+              width: '100%',
+              boxSizing: 'border-box'
+            }}
+          >
+            <span>I Understand</span>
+            <ChevronRight size={20} />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="onboarding-screen">
