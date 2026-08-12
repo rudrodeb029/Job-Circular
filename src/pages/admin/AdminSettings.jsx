@@ -73,12 +73,10 @@ const AdminSettings = () => {
         const result = await broadcastPush('Test Notification 🔔', 'If you see this, OneSignal setup is working correctly!', { type: 'test' });
 
         if (result.success) {
-            if (result.recipients > 0) {
-                alert(`✅ Success! OneSignal has queued the notification for ${result.recipients} device(s). Check your phone now! 🔔`);
-            } else if (result.warning) {
+            if (result.warning) {
                 alert(`ℹ️ OneSignal Connection Verified successfully!\n\nHowever, 0 active subscribers were found in your OneSignal dashboard.\n\nTo see push notifications, please install your Android app on a phone and tap 'Allow Notifications'.`);
             } else {
-                alert('Sent to OneSignal, but 0 devices matched your segments. Make sure you have at least one user with notifications ALLOWED in the app.');
+                alert(`✅ Success! OneSignal has queued the notification successfully. Check your device/browser now! 🔔`);
             }
         } else {
             alert('OneSignal Error: ' + JSON.stringify(result.error));
