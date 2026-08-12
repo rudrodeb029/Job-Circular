@@ -173,9 +173,7 @@ export const broadcastPush = async (title, message, data = {}) => {
             priority: 10,
             android_accent_color: 'FF1A56DB',
             small_icon: 'ic_stat_onesignal_default',
-            android_sound: 'notification',
-            isAndroid: true,
-            isIos: true
+            android_sound: 'notification'
         };
 
         console.log('OneSignal: Sending push →', title);
