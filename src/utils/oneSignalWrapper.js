@@ -164,7 +164,7 @@ export const broadcastPush = async (title, message, data = {}) => {
 
         const payload = {
             app_id: appId,
-            included_segments: ["Subscribed Users"],
+            included_segments: ["Total Subscriptions", "Subscribed Users"],
             headings: { en: title, bn: title },
             contents: { en: message, bn: message },
             data: data,
