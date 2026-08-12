@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Bell } from '../components/Icons';
 import NotificationItem from '../components/NotificationItem';
