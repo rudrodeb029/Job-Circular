@@ -19,13 +19,13 @@ export default function Notifications() {
 
   const notificationsList = useMemo(() => {
     const raw = adminState.notifications || [];
-    // Only show notifications created after the user installed the app
-    return raw.filter(n => {
-      const created = n.createdAt ? new Date(n.createdAt).getTime() : 0;
-      const installed = state.installTime ? new Date(state.installTime).getTime() : 0;
-      return created >= installed;
+    // Sort by newest first
+    return [...raw].sort((a, b) => {
+      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return timeB - timeA;
     });
-  }, [adminState.notifications, state.installTime]);
+  }, [adminState.notifications]);
 
   const handleMarkAllRead = () => {
     const allIds = notificationsList.map(n => n.id);
