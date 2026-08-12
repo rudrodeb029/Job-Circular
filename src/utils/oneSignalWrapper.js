@@ -67,11 +67,43 @@ export const getOneSignalAppId = () => {
  * OneSignal JavaScript Wrapper for Capacitor — SDK initialization on-device.
  */
 export const initializeOneSignal = () => {
-  if (!Capacitor.isNativePlatform()) return;
+  const appId = getOneSignalAppId();
 
+  if (!Capacitor.isNativePlatform()) {
+    // ─── Web Push Initialization ───
+    if (window.OneSignalInitialized) return;
+    window.OneSignalInitialized = true;
+
+    // Load OneSignal Web SDK dynamically
+    const script = document.createElement('script');
+    script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+    script.defer = true;
+    script.onload = () => {
+      window.OneSignal = window.OneSignal || [];
+      window.OneSignal.push(async () => {
+        try {
+          await window.OneSignal.init({
+            appId: appId,
+            allowLocalhostAsSecureOrigin: true, // Enables testing on http://localhost:5173 / localhost:3000
+            notifyButton: {
+              enable: true, // Display small bell icon at the bottom for easy opt-in and testing
+              position: 'bottom-left',
+              size: 'medium'
+            }
+          });
+          console.log('OneSignal: Web Push SDK initialized successfully');
+        } catch (err) {
+          console.warn('OneSignal Web SDK Init failed:', err);
+        }
+      });
+    };
+    document.head.appendChild(script);
+    return;
+  }
+
+  // ─── Native Platform Push Initialization ───
   const performInit = () => {
     const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
-    const appId = getOneSignalAppId();
 
     if (OneSignal) {
       try {
