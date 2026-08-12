@@ -81,8 +81,8 @@ export default function LiveExamRoom() {
       // Calculate scaled score out of 100 if questions are different than 100
       const scaledScore = Math.round((currentResult.score / currentResult.total) * 100);
       list.push({
-        name: 'সুব্রত দাস (আপনি)',
-        nameEn: 'Suvro (You)',
+        name: `${state.user.name || (isEn ? 'Candidate' : 'পরীক্ষার্থী')} (আপনি)`,
+        nameEn: `${state.user.name || 'Candidate'} (You)`,
         score: scaledScore,
         time: isEn ? '45m 00s' : '৪৫মি: ০০সে:',
         avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',

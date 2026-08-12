@@ -186,7 +186,7 @@ export default function Home() {
     );
   }
 
-  const userName = state.user.name || (isEn ? 'Suvro' : 'সুভ্র');
+  const userName = state.user.name || (isEn ? 'Job Seeker' : 'চাকরিপ্রার্থী');
 
   return (
     <div className="page">
