@@ -79,10 +79,10 @@ export const initializeOneSignal = () => {
     script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
     script.defer = true;
     script.onload = () => {
-      window.OneSignal = window.OneSignal || [];
-      window.OneSignal.push(async () => {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push(async (OneSignal) => {
         try {
-          await window.OneSignal.init({
+          await OneSignal.init({
             appId: appId,
             allowLocalhostAsSecureOrigin: true, // Enables testing on http://localhost:5173 / localhost:3000
             notifyButton: {
