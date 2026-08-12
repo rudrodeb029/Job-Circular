@@ -89,7 +89,7 @@ export default function Onboarding() {
 
   if (!hasAgreedDisclaimer) {
     return (
-      <div className="onboarding-screen disclaimer-screen animate-fade-in" style={{ justifyContent: 'space-between' }}>
+      <div className="onboarding-screen disclaimer-screen animate-fade-in" style={{ justifyContent: 'space-between', background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
         {/* Top Header Placeholder to keep spacing */}
         <div style={{ height: '36px', paddingTop: 'var(--safe-area-top)' }} />
 
@@ -97,13 +97,10 @@ export default function Onboarding() {
         <div className="onboarding-hero animate-scale-in" style={{ padding: '0 10px', width: '100%', boxSizing: 'border-box' }}>
           <div 
             style={{
-              background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
-              border: '2px solid #e2e8f0',
-              borderRadius: '24px',
-              padding: '32px 24px',
+              background: 'transparent',
+              border: 'none',
               width: '100%',
               maxWidth: '360px',
-              boxShadow: '0 20px 40px rgba(15, 23, 42, 0.08)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -161,26 +158,14 @@ export default function Onboarding() {
         </div>
 
         {/* Bottom Button Action */}
-        <div style={{ width: '100%', boxSizing: 'border-box' }}>
+        <div>
           <button
             className="btn btn-block btn-lg animate-slide-up"
             onClick={() => setHasAgreedDisclaimer(true)}
             style={{
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               color: 'white',
-              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)',
-              borderRadius: '14px',
-              fontWeight: '800',
-              fontSize: '16px',
-              padding: '16px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              width: '100%',
-              boxSizing: 'border-box'
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)'
             }}
           >
             <span>I Understand</span>
