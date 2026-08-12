@@ -108,24 +108,6 @@ export default function Onboarding() {
               boxSizing: 'border-box'
             }}
           >
-            {/* Shield Warning Badge */}
-            <div 
-              style={{
-                width: '76px',
-                height: '76px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 8px 24px rgba(239, 68, 68, 0.4)',
-                marginBottom: '24px',
-                color: 'white'
-              }}
-            >
-              <Shield size={36} color="white" />
-            </div>
-
             {/* Header */}
             <h2 
               style={{
