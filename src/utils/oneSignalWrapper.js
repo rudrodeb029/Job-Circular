@@ -220,16 +220,24 @@ export const sendExamCountdownPush = async (exam) => {
     const diffMs = examStartTime.getTime() - now.getTime();
     const diffMinutes = Math.round(diffMs / 60000);
 
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    const examDateStr = examStartTime.toLocaleDateString('bn-BD', { day: 'numeric', month: 'long' });
+    const startTimeStr = examStartTime.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+
     let timeMessage;
     if (diffMinutes <= 0) {
         timeMessage = 'এখনই শুরু হচ্ছে!';
     } else if (diffMinutes < 60) {
         timeMessage = `${diffMinutes} মিনিটে শুরু হবে!`;
-    } else {
-        const hours = Math.floor(diffMinutes / 60);
-        const mins = diffMinutes % 60;
-        const startTimeStr = examStartTime.toLocaleTimeString('bn-BD', { hour: '2-digit', minute: '2-digit' });
+    } else if (examStartTime.toDateString() === today.toDateString()) {
         timeMessage = `আজ ${startTimeStr} টায় শুরু হবে`;
+    } else if (examStartTime.toDateString() === tomorrow.toDateString()) {
+        timeMessage = `আগামীকাল ${startTimeStr} টায় শুরু হবে`;
+    } else {
+        timeMessage = `${examDateStr}, ${startTimeStr} টায় শুরু হবে`;
     }
 
     const title = '🔔 লাইভ পরীক্ষা শিডিউল';
