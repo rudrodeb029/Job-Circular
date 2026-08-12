@@ -47,6 +47,15 @@ const getLocalCache = (key) => {
   }
 };
 
+const saveLocalCache = (key, data) => {
+  try {
+    localStorage.setItem(`cache_data_${key}`, JSON.stringify(data));
+    localStorage.setItem(`cache_time_${key}`, Date.now().toString());
+  } catch (e) {
+    console.error('Error saving local cache:', e);
+  }
+};
+
 const initialState = {
   jobs: getLocalCache(COLLECTIONS.JOBS),
   notifications: getLocalCache(COLLECTIONS.NOTIFICATIONS),
@@ -100,11 +109,20 @@ const adminReducer = (state, action) => {
               })
               .catch(err => console.error('Push error for circular:', err));
       }
-      return state;
+
+      if (action.type === 'ADD_JOB') {
+        newState.jobs = [job, ...state.jobs.filter(j => j.id !== job.id)].sort(sortByCreatedAt);
+      } else {
+        newState.jobs = state.jobs.map(j => j.id === job.id ? job : j).sort(sortByCreatedAt);
+      }
+      saveLocalCache(COLLECTIONS.JOBS, newState.jobs);
+      return newState;
 
     case 'DELETE_JOB':
       deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
-      return state;
+      newState.jobs = state.jobs.filter(j => j.id !== action.payload);
+      saveLocalCache(COLLECTIONS.JOBS, newState.jobs);
+      return newState;
 
     case 'ADD_EXAM':
     case 'UPDATE_EXAM':
@@ -123,11 +141,20 @@ const adminReducer = (state, action) => {
               })
               .catch(err => console.error('Push error for exam:', err));
       }
-      return state;
+
+      if (action.type === 'ADD_EXAM') {
+        newState.liveExams = [exam, ...state.liveExams.filter(e => e.id !== exam.id)].sort(sortByCreatedAt);
+      } else {
+        newState.liveExams = state.liveExams.map(e => e.id === exam.id ? exam : e).sort(sortByCreatedAt);
+      }
+      saveLocalCache(COLLECTIONS.LIVE_EXAMS, newState.liveExams);
+      return newState;
 
     case 'DELETE_EXAM':
       deleteDocument(COLLECTIONS.LIVE_EXAMS, action.payload).catch(console.error);
-      return state;
+      newState.liveExams = state.liveExams.filter(e => e.id !== action.payload);
+      saveLocalCache(COLLECTIONS.LIVE_EXAMS, newState.liveExams);
+      return newState;
 
     case 'ADD_NOTIFICATION':
     case 'UPDATE_NOTIFICATION':
@@ -145,11 +172,20 @@ const adminReducer = (state, action) => {
                 })
                 .catch(err => console.error('Push error for notification:', err));
         }
-        return state;
+
+        if (action.type === 'ADD_NOTIFICATION') {
+          newState.notifications = [notif, ...state.notifications.filter(n => n.id !== notif.id)].sort(sortByCreatedAt);
+        } else {
+          newState.notifications = state.notifications.map(n => n.id === notif.id ? notif : n).sort(sortByCreatedAt);
+        }
+        saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
+        return newState;
 
     case 'DELETE_NOTIFICATION':
         deleteDocument(COLLECTIONS.NOTIFICATIONS, action.payload).catch(console.error);
-        return state;
+        newState.notifications = state.notifications.filter(n => n.id !== action.payload);
+        saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
+        return newState;
 
     case 'ADD_QUESTION_PAPER':
     case 'UPDATE_QUESTION_PAPER':
@@ -167,19 +203,33 @@ const adminReducer = (state, action) => {
               })
               .catch(err => console.error('Push error for question paper:', err));
       }
-      return state;
+
+      if (action.type === 'ADD_QUESTION_PAPER') {
+        newState.questions = [paper, ...state.questions.filter(p => p.id !== paper.id)].sort(sortByCreatedAt);
+      } else {
+        newState.questions = state.questions.map(p => p.id === paper.id ? paper : p).sort(sortByCreatedAt);
+      }
+      saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
+      return newState;
 
     case 'DELETE_QUESTION_PAPER':
       deleteDocument(COLLECTIONS.QUESTIONS, action.payload).catch(console.error);
-      return state;
+      newState.questions = state.questions.filter(p => p.id !== action.payload);
+      saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
+      return newState;
 
     case 'UPDATE_ADMIT':
-        setDocument(COLLECTIONS.ADMITS, action.payload.id, action.payload).catch(console.error);
-        return state;
+        const admit = action.payload;
+        setDocument(COLLECTIONS.ADMITS, admit.id, admit).catch(console.error);
+        newState.admits = [admit, ...state.admits.filter(a => a.id !== admit.id)].sort(sortByCreatedAt);
+        saveLocalCache(COLLECTIONS.ADMITS, newState.admits);
+        return newState;
 
     case 'DELETE_ADMIT':
         deleteDocument(COLLECTIONS.ADMITS, action.payload).catch(console.error);
-        return state;
+        newState.admits = state.admits.filter(a => a.id !== action.payload);
+        saveLocalCache(COLLECTIONS.ADMITS, newState.admits);
+        return newState;
 
     case 'ADMIN_LOGIN':
       localStorage.setItem('admin_user', JSON.stringify(action.payload));
