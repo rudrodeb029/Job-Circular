@@ -226,7 +226,7 @@ export default function EditProfile() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          marginBottom: '20px',
+          marginBottom: '12px',
           position: 'relative',
           zIndex: 2
         }}>
@@ -249,18 +249,6 @@ export default function EditProfile() {
           >
             <ArrowLeft size={20} />
           </button>
-
-          <h1 style={{
-            fontSize: '18px',
-            fontWeight: 800,
-            color: '#ffffff',
-            margin: 0,
-            letterSpacing: '-0.3px'
-          }}>
-            {isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}
-          </h1>
-
-          <div style={{ width: '38px' }} />
         </div>
 
         {/* Integrated Avatar Section */}
@@ -269,7 +257,7 @@ export default function EditProfile() {
             position: 'relative',
             width: '96px',
             height: '96px',
-            margin: '0 auto 10px auto'
+            margin: '0 auto'
           }}>
             {formData.avatar ? (
               <img
@@ -352,15 +340,6 @@ export default function EditProfile() {
               disabled={uploadingImage}
             />
           </div>
-
-          <p style={{
-            fontSize: '12px',
-            color: 'rgba(255, 255, 255, 0.85)',
-            fontWeight: 500,
-            margin: 0
-          }}>
-            {isEn ? 'Tap icon to change photo' : 'ছবি পরিবর্তন করতে আইকনে ট্যাপ করুন'}
-          </p>
         </div>
       </div>
 
