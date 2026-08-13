@@ -74,7 +74,7 @@ export default function CategoryCard({ category }) {
         <h4 style={{
           fontSize: '15px',
           fontWeight: 700,
-          color: '#475569',
+          color: 'var(--text-primary)',
           marginBottom: '4px'
         }}>
           {category.name}
