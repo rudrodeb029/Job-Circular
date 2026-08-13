@@ -130,8 +130,8 @@ export default function LiveExams() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1 style={{ flex: 1, fontSize: '18px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <FileText size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+        <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FileText size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
           <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
         </h1>
       </div>
