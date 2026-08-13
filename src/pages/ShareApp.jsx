@@ -1,112 +1,245 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Share2 } from '../components/Icons';
+import { ArrowLeft, Share2, CheckCircle, ExternalLink } from '../components/Icons';
 import BottomNav from '../components/BottomNav';
+import { useAppContext } from '../context/AppContext';
+import { getAppInfoConfig, DEFAULT_APP_INFO } from '../utils/appInfoService';
 
 export default function ShareApp() {
   const navigate = useNavigate();
+  const { state } = useAppContext();
+  const isEn = state.language === 'en';
+
+  const [info, setInfo] = useState(DEFAULT_APP_INFO);
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    const fetchInfo = async () => {
+      try {
+        const data = await getAppInfoConfig();
+        if (data) setInfo(data);
+      } catch (err) {
+        console.error('Failed to load Share App link:', err);
+      }
+    };
+    fetchInfo();
+  }, []);
+
+  const shareUrl = info.shareAppUrl || 'https://job-circular-75dbb.web.app';
+
   const handleCopyLink = () => {
-    navigator.clipboard.writeText('https://jobcircular.app/download');
+    navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shareOptions = [
-    { name: 'Facebook', color: '#1877f2', bg: '#e7f3ff', icon: 'M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z' },
-    { name: 'WhatsApp', color: '#25d366', bg: '#e8f7ed', icon: 'M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z' },
-    { name: 'Twitter', color: '#1da1f2', bg: '#e8f2fe', icon: 'M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z' },
-    { name: 'Email', color: '#ff9900', bg: '#fef3e7', icon: 'M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z M22,6 12,13 2,6' }
+  const handleNativeShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Job Circular BD',
+          text: isEn 
+            ? 'Download Job Circular BD app for latest government, bank, and private job notices & live MCQ preparation!'
+            : 'বাংলাদেশের সকল চাকরির সার্কুলার, পরীক্ষার প্রবেশপত্র ও প্রস্তুতির জন্য Job Circular অ্যাপটি ডাউনলোড করুন!',
+          url: shareUrl
+        });
+      } catch (err) {
+        console.log('Share dismissed or failed:', err);
+      }
+    } else {
+      handleCopyLink();
+    }
+  };
+
+  const shareChannels = [
+    { 
+      name: 'WhatsApp', 
+      color: '#25d366', 
+      bg: 'rgba(37, 211, 102, 0.12)', 
+      url: `https://api.whatsapp.com/send?text=${encodeURIComponent((isEn ? 'Download Job Circular BD App: ' : 'সকল চাকরির খবর একসাথে পেতে অ্যাপটি ডাউনলোড করুন: ') + shareUrl)}`
+    },
+    { 
+      name: 'Facebook', 
+      color: '#1877f2', 
+      bg: 'rgba(24, 119, 242, 0.12)', 
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+    },
+    { 
+      name: 'Telegram', 
+      color: '#0088cc', 
+      bg: 'rgba(0, 136, 204, 0.12)', 
+      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(isEn ? 'Job Circular BD App' : 'জব সার্কুলার বিডি অ্যাপ')}`
+    },
+    { 
+      name: 'Email', 
+      color: '#ea4335', 
+      bg: 'rgba(234, 67, 53, 0.12)', 
+      url: `mailto:?subject=${encodeURIComponent(isEn ? 'Download Job Circular BD App' : 'জব সার্কুলার বিডি অ্যাপ লিঙ্ক')}&body=${encodeURIComponent(shareUrl)}`
+    }
   ];
 
   return (
-    <div className="page">
+    <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
+      {/* Header */}
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1>Share App</h1>
+        <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Share2 size={18} color="#7c3aed" />
+          <span>{isEn ? 'Share App with Friends' : 'বন্ধুদের সাথে শেয়ার করুন'}</span>
+        </h1>
       </div>
 
-      <div className="page-content animate-fade-in">
-        <div className="card" style={{ textAlign: 'center', padding: '32px 20px', marginBottom: '20px' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+        
+        {/* Soft Pastel Hero Card */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(109, 40, 217, 0.03) 100%)',
+          border: '1px solid rgba(124, 58, 237, 0.15)',
+          borderRadius: '24px',
+          padding: '24px 20px',
+          textAlign: 'center',
+          marginBottom: '20px',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
           <div style={{
             width: '64px',
             height: '64px',
-            background: 'var(--primary-bg)',
-            color: 'var(--primary)',
-            borderRadius: '50%',
+            borderRadius: '20px',
+            background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+            color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 20px auto'
+            margin: '0 auto 16px auto',
+            boxShadow: '0 8px 20px rgba(124, 58, 237, 0.28)',
+            transform: 'rotate(-3deg)'
           }}>
-            <Share2 size={32} />
+            <Share2 size={32} color="#ffffff" />
           </div>
 
-          <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
-            Spread the Word!
+          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>
+            {isEn ? 'Spread the Word!' : 'চাকরিপ্রার্থী বন্ধুদের শেয়ার করুন'}
           </h2>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6, maxWidth: '280px', margin: '0 auto 24px auto' }}>
-            Help your friends find their dream job by sharing Job Circular with them.
+          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
+            {isEn 
+              ? 'Help your friends, family, and colleagues find their dream jobs by sharing Job Circular BD.'
+              : 'আপনার ১টি শেয়ার আপনার বন্ধুকে স্বপ্নের ক্যারিয়ার গঠনে সাহায্য করতে পারে।'}
           </p>
+        </div>
+
+        {/* Share Link Copy Card */}
+        <div className="card" style={{ padding: '20px', borderRadius: '20px', marginBottom: '20px' }}>
+          <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px', display: 'block' }}>
+            {isEn ? 'APP DOWNLOAD LINK' : 'অ্যাপ ডাউনলোড লিঙ্ক'}
+          </label>
 
           <div style={{
             display: 'flex',
             background: 'var(--bg-secondary)',
-            border: '1.5px solid var(--border)',
+            border: '1px solid var(--border)',
             borderRadius: '14px',
-            padding: '10px 14px',
+            padding: '8px 12px',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '32px'
+            gap: '8px',
+            marginBottom: '16px'
           }}>
-            <span style={{ fontSize: '13px', color: 'var(--text-primary)', fontWeight: 600 }}>
-              jobcircular.app/download
+            <span style={{ flex: 1, fontSize: '12.5px', color: 'var(--text-primary)', fontWeight: 600, wordBreak: 'break-all' }}>
+              {shareUrl}
             </span>
             <button
               onClick={handleCopyLink}
               style={{
-                background: copied ? 'var(--success)' : 'var(--primary)',
-                color: 'white',
-                padding: '8px 16px',
+                background: copied ? '#10b981' : 'var(--primary)',
+                color: '#ffffff',
+                padding: '8px 14px',
                 borderRadius: '10px',
                 fontSize: '12px',
                 fontWeight: 700,
                 border: 'none',
+                cursor: 'pointer',
                 transition: 'all 0.2s ease',
-                minWidth: '80px'
+                flexShrink: 0
               }}
             >
-              {copied ? 'Copied!' : 'Copy Link'}
+              {copied ? (isEn ? 'Copied!' : 'কপি হয়েছে!') : (isEn ? 'Copy Link' : 'লিঙ্ক কপি')}
             </button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
-            {shareOptions.map((option, idx) => (
-              <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <div style={{
-                  width: '50px',
-                  height: '50px',
+          {/* Native Web Share Button */}
+          <button
+            onClick={handleNativeShare}
+            style={{
+              width: '100%',
+              height: '48px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
+              color: '#ffffff',
+              border: 'none',
+              fontWeight: 700,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              boxShadow: '0 4px 14px rgba(124, 58, 237, 0.25)'
+            }}
+          >
+            <Share2 size={18} color="#ffffff" />
+            <span>{isEn ? 'Share via Any App' : 'সরাসরি অ্যাপের মাধ্যমে শেয়ার করুন'}</span>
+          </button>
+        </div>
+
+        {/* Social Share Grid */}
+        <div className="card" style={{ padding: '20px', borderRadius: '20px' }}>
+          <h3 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '14px' }}>
+            {isEn ? 'Share Directly on Social Media' : 'সোশ্যাল মিডিয়ায় শেয়ার করুন'}
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+            {shareChannels.map((channel, idx) => (
+              <a
+                key={idx}
+                href={channel.url}
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '12px',
                   borderRadius: '14px',
-                  background: option.bg,
-                  color: option.color,
+                  background: channel.bg,
+                  textDecoration: 'none',
+                  border: '1px solid transparent',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '10px',
+                  background: '#ffffff',
+                  color: channel.color,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                  transition: 'transform 0.2s ease'
+                  fontWeight: 800,
+                  fontSize: '14px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
                 }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d={option.icon} />
-                  </svg>
+                  {channel.name[0]}
                 </div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)' }}>{option.name}</span>
-              </div>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: channel.color }}>
+                  {channel.name}
+                </span>
+              </a>
             ))}
           </div>
         </div>
+
       </div>
       <BottomNav />
     </div>

@@ -3,6 +3,7 @@ import { useAdminContext } from '../../context/AdminContext';
 import { useNavigate } from 'react-router-dom';
 import { getDocument, COLLECTIONS } from '../../services/firestoreService';
 import { saveOneSignalConfig, broadcastPush } from '../../utils/oneSignalWrapper';
+import { getAppInfoConfig, saveAppInfoConfig, DEFAULT_APP_INFO } from '../../utils/appInfoService';
 
 const AdminSettings = () => {
   const { state, dispatch } = useAdminContext();
@@ -20,7 +21,11 @@ const AdminSettings = () => {
   const [onesignalRestKey, setOnesignalRestKey] = useState('');
   const [configLoading, setConfigLoading] = useState(true);
 
-  // Load OneSignal config from Firestore on mount
+  // Dynamic Contact Us, Rate Us, Share App Config State
+  const [appInfo, setAppInfo] = useState(DEFAULT_APP_INFO);
+  const [appInfoSaving, setAppInfoSaving] = useState(false);
+
+  // Load Configs from Firestore on mount
   useEffect(() => {
     const loadConfig = async () => {
       try {
@@ -29,8 +34,12 @@ const AdminSettings = () => {
           if (doc.appId) setOnesignalAppId(doc.appId);
           if (doc.restApiKey) setOnesignalRestKey(doc.restApiKey);
         }
+
+        // Load App Info (Contact Us, Rate Us, Share App)
+        const info = await getAppInfoConfig(true);
+        if (info) setAppInfo(info);
       } catch (err) {
-        console.error('Failed to load OneSignal config from Firestore:', err);
+        console.error('Failed to load Configs from Firestore:', err);
       } finally {
         setConfigLoading(false);
       }
@@ -59,6 +68,19 @@ const AdminSettings = () => {
       alert('✅ OneSignal configuration saved to Firebase successfully!');
     } catch (err) {
       alert('❌ Failed to save OneSignal config: ' + err.message);
+    }
+  };
+
+  const handleSaveAppInfo = async (e) => {
+    e.preventDefault();
+    setAppInfoSaving(true);
+    try {
+      await saveAppInfoConfig(appInfo);
+      alert('✅ Contact Us, Rate Us & Share App info saved to Firestore successfully!');
+    } catch (err) {
+      alert('❌ Failed to save App Info: ' + err.message);
+    } finally {
+      setAppInfoSaving(false);
     }
   };
 
@@ -282,6 +304,57 @@ const AdminSettings = () => {
               Reset
             </button>
           </div>
+        </div>
+
+        {/* Contact Us, Rate Us & Share App Admin Configuration Card */}
+        <div className="settings-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="section-header">
+            <div style={{ width: '36px', height: '36px', background: '#e0e7ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4338ca' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+            </div>
+            <h3>Contact Us, Rate Us & Share App Configuration</h3>
+          </div>
+          <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px', lineHeight: 1.5 }}>
+            Manage support email, WhatsApp number, Play Store rating link, and Share App URLs displayed across all user devices.
+          </p>
+
+          <form onSubmit={handleSaveAppInfo} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>SUPPORT EMAIL ADDRESS</label>
+              <input className="modern-input" type="email" placeholder="e.g. support@jobcircularbd.app" value={appInfo.contactEmail || ''} onChange={e => setAppInfo({ ...appInfo, contactEmail: e.target.value })} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>WHATSAPP / SUPPORT PHONE</label>
+              <input className="modern-input" type="text" placeholder="e.g. +8801700000000" value={appInfo.whatsappNumber || ''} onChange={e => setAppInfo({ ...appInfo, whatsappNumber: e.target.value })} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>PLAY STORE RATE US LINK</label>
+              <input className="modern-input" type="url" placeholder="https://play.google.com/store/apps/details?id=..." value={appInfo.playStoreUrl || ''} onChange={e => setAppInfo({ ...appInfo, playStoreUrl: e.target.value })} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>SHARE APP DOWNLOAD URL</label>
+              <input className="modern-input" type="url" placeholder="https://job-circular-75dbb.web.app" value={appInfo.shareAppUrl || ''} onChange={e => setAppInfo({ ...appInfo, shareAppUrl: e.target.value })} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>FACEBOOK PAGE URL</label>
+              <input className="modern-input" type="url" placeholder="https://facebook.com/..." value={appInfo.facebookPageUrl || ''} onChange={e => setAppInfo({ ...appInfo, facebookPageUrl: e.target.value })} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>TELEGRAM CHANNEL URL</label>
+              <input className="modern-input" type="url" placeholder="https://t.me/..." value={appInfo.telegramChannelUrl || ''} onChange={e => setAppInfo({ ...appInfo, telegramChannelUrl: e.target.value })} />
+            </div>
+
+            <div style={{ gridColumn: '1 / -1', marginTop: '8px', display: 'flex', gap: '12px' }}>
+              <button type="submit" disabled={appInfoSaving} style={{ padding: '14px 28px', background: '#4338ca', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(67, 56, 202, 0.2)' }}>
+                {appInfoSaving ? 'Saving Info...' : '💾 Save Contact, Rate & Share Config'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
 
