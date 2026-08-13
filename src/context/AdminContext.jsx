@@ -97,8 +97,8 @@ const adminReducer = (state, action) => {
       setDocument(COLLECTIONS.JOBS, job.id, job).catch(console.error);
 
       if (action.type === 'ADD_JOB' || job.shouldNotify) {
-          const title = job.organization;
-          const msg = `নতুন সার্কুলার: ${job.title}`;
+          const title = job.organization || job.title;
+          const msg = `${job.organization || ''} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
           broadcastPush(title, msg, { jobId: job.id, type: 'new_job' })
               .then(res => {
                   if (res.success) {
@@ -108,6 +108,21 @@ const adminReducer = (state, action) => {
                   }
               })
               .catch(err => console.error('Push error for circular:', err));
+
+          // Auto-generate and save in-app notification record
+          const notifId = `notif-job-${job.id}`;
+          const notifObj = {
+            id: notifId,
+            title: job.organization || job.title,
+            organization: job.organization || '',
+            message: msg,
+            type: 'new_job',
+            jobId: job.id,
+            createdAt: job.createdAt || new Date().toISOString()
+          };
+          setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj).catch(console.error);
+          newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
+          saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
       }
 
       if (action.type === 'ADD_JOB') {
@@ -140,6 +155,21 @@ const adminReducer = (state, action) => {
                   }
               })
               .catch(err => console.error('Push error for exam:', err));
+
+          // Auto-generate and save in-app notification record for live exam
+          const notifId = `notif-exam-${exam.id}`;
+          const notifObj = {
+            id: notifId,
+            title: exam.title || 'লাইভ এমসিকিউ পরীক্ষা',
+            organization: 'MCQ Exam',
+            message: `নতুন লাইভ পরীক্ষা তৈরি করা হয়েছে: ${exam.title}`,
+            type: 'live_exam',
+            examId: exam.id,
+            createdAt: exam.createdAt || new Date().toISOString()
+          };
+          setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj).catch(console.error);
+          newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
+          saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
       }
 
       if (action.type === 'ADD_EXAM') {
@@ -202,6 +232,21 @@ const adminReducer = (state, action) => {
                   }
               })
               .catch(err => console.error('Push error for question paper:', err));
+
+          // Auto-generate and save in-app notification record for question paper
+          const notifId = `notif-paper-${paper.id}`;
+          const notifObj = {
+            id: notifId,
+            title: paper.title || 'নতুন প্রশ্নপত্র',
+            organization: paper.organization || 'প্রশ্নব্যাংক',
+            message: `${paper.title} - প্রস্তুতি নিন এখনই!`,
+            type: 'new_paper',
+            paperId: paper.id,
+            createdAt: paper.createdAt || new Date().toISOString()
+          };
+          setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj).catch(console.error);
+          newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
+          saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
       }
 
       if (action.type === 'ADD_QUESTION_PAPER') {
@@ -223,6 +268,23 @@ const adminReducer = (state, action) => {
         setDocument(COLLECTIONS.ADMITS, admit.id, admit).catch(console.error);
         newState.admits = [admit, ...state.admits.filter(a => a.id !== admit.id)].sort(sortByCreatedAt);
         saveLocalCache(COLLECTIONS.ADMITS, newState.admits);
+
+        // Auto-generate and save in-app notification for exam date / result update
+        if (admit && (admit.type === 'admit_card' || admit.type === 'result')) {
+          const notifId = `notif-admit-${admit.id}`;
+          const notifObj = {
+            id: notifId,
+            title: admit.organization || admit.examName,
+            organization: admit.organization || '',
+            message: admit.examName,
+            type: admit.type === 'result' ? 'result' : 'admit_card',
+            jobId: admit.jobId,
+            createdAt: admit.createdAt || new Date().toISOString()
+          };
+          setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj).catch(console.error);
+          newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
+          saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
+        }
         return newState;
 
     case 'DELETE_ADMIT':
