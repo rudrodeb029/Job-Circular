@@ -1,71 +1,388 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Info, Briefcase } from '../components/Icons';
+import { 
+  ArrowLeft, 
+  Briefcase, 
+  Bell, 
+  FileText, 
+  Bookmark, 
+  Search, 
+  Users, 
+  Shield, 
+  Star, 
+  Award, 
+  CheckCircle, 
+  Download, 
+  Zap, 
+  Clock, 
+  Globe, 
+  Info,
+  ChevronRight
+} from '../components/Icons';
 import Disclaimer from '../components/Disclaimer';
 import BottomNav from '../components/BottomNav';
+import { useAppContext } from '../context/AppContext';
 
 export default function AboutApp() {
   const navigate = useNavigate();
+  const { state } = useAppContext();
+  const isEn = state.language === 'en';
+
+  const stats = [
+    {
+      number: isEn ? '10,000+' : '১০,০০০+',
+      label: isEn ? 'Active Job Notices' : 'সকল চাকরির সার্কুলার',
+      desc: isEn ? 'Govt, Bank, NGO & Private' : 'সরকারি, ব্যাংক, প্রাইভেট ও এনজিও',
+      bg: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
+      border: '1px solid rgba(37, 99, 235, 0.15)',
+      color: '#2563eb',
+      icon: Briefcase
+    },
+    {
+      number: isEn ? 'Instant' : 'তাত্ক্ষণিক',
+      label: isEn ? 'Push Alerts' : 'পুশ নোটিফিকেশন',
+      desc: isEn ? 'Never miss a deadline' : 'সার্কুলার প্রকাশের সাথে সাথে নোটিশ',
+      bg: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(217, 119, 6, 0.03) 100%)',
+      border: '1px solid rgba(245, 158, 11, 0.15)',
+      color: '#d97706',
+      icon: Bell
+    },
+    {
+      number: isEn ? 'Live MCQ' : 'লাইভ পরীক্ষা',
+      label: isEn ? 'Exam Room' : 'এমসিকিউ মডেল টেস্ট',
+      desc: isEn ? 'BCS, NTRCA & Primary' : 'লাইভ বিষয়ভিত্তিক পরীক্ষা ও রেজাল্ট',
+      bg: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.03) 100%)',
+      border: '1px solid rgba(16, 185, 129, 0.15)',
+      color: '#059669',
+      icon: Award
+    },
+    {
+      number: isEn ? '1-Click' : '১-ক্লিক',
+      label: isEn ? 'HD Offline Save' : 'এইচডি ইমেজ ডাউনলোড',
+      desc: isEn ? 'Original circular images' : 'অফিসিয়াল সার্কুলার পিকচার ফ্রিতে সেভ',
+      bg: 'linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(109, 40, 217, 0.03) 100%)',
+      border: '1px solid rgba(124, 58, 237, 0.15)',
+      color: '#7c3aed',
+      icon: Download
+    }
+  ];
+
+  const features = [
+    {
+      icon: Bell,
+      iconBg: 'rgba(37, 99, 235, 0.12)',
+      iconColor: '#2563eb',
+      title: isEn ? 'Instant Real-time Alerts' : 'তাত্ক্ষণিক নোটিফিকেশন অ্যালার্ট',
+      desc: isEn 
+        ? 'Get immediate notifications as soon as new job circulars, admit cards, or exam dates are published.'
+        : 'সরকারি, ব্যাংক বা অন্যান্য প্রতিষ্ঠানে নতুন চাকরির নিয়োগ বিজ্ঞপ্তি প্রকাশের সাথেই নোটিফিকেশন পান।'
+    },
+    {
+      icon: Award,
+      iconBg: 'rgba(16, 185, 129, 0.12)',
+      iconColor: '#059669',
+      title: isEn ? 'Live MCQ Exam Platform' : 'লাইভ এমসিকিউ ও মডেল টেস্ট',
+      desc: isEn 
+        ? 'Participate in live competitive exams for BCS, NTRCA, Bank & Primary Teacher Recruitment with instant scoring.'
+        : 'বিসিএস, ব্যাংক, শিক্ষক নিবন্ধন ও প্রাইমারি নিয়োগ পরীক্ষার জন্য লাইভ পরীক্ষা দিন ও মেরিট পজিশন দেখুন।'
+    },
+    {
+      icon: FileText,
+      iconBg: 'rgba(124, 58, 237, 0.12)',
+      iconColor: '#7c3aed',
+      title: isEn ? 'Previous Questions Hub' : 'বিগত বছরের প্রশ্ন ও উত্তর ব্যাংক',
+      desc: isEn 
+        ? 'Access thousands of previous job exam questions, detailed solutions, and subject-wise study archives.'
+        : 'বিভিন্ন সরকারি ও প্রাইভেট নিয়োগ পরীক্ষার বিগত বছরের প্রশ্ন ও ব্যাখ্যাসহ সমাধান খুব সহজেই পড়ুন।'
+    },
+    {
+      icon: Search,
+      iconBg: 'rgba(245, 158, 11, 0.12)',
+      iconColor: '#d97706',
+      title: isEn ? 'Smart Category Filters' : 'ক্যাটাগরি ভিত্তিক সহজ সার্চ',
+      desc: isEn 
+        ? 'Filter jobs effortlessly by Government, Bank, Autonomous, Ministry, Railway, or Private sectors.'
+        : 'বিসিএস, ব্যাংক, প্রাইমারি, প্রতিরক্ষা বা প্রাইভেট সেক্টরের চাকরির সার্কুলার আলাদাভাবে বেছে নিন।'
+    },
+    {
+      icon: Bookmark,
+      iconBg: 'rgba(236, 72, 153, 0.12)',
+      iconColor: '#db2777',
+      title: isEn ? 'Offline Bookmark & Save' : 'বুকমার্ক ও অফলাইন পঠন',
+      desc: isEn 
+        ? 'Save your favorite circulars and questions to read offline without any internet connection.'
+        : 'পছন্দের চাকরি বা প্রশ্নপত্র বুকমার্ক করে রাখুন এবং পরবর্তীতে ইন্টারনেট ছাড়াই যেকোনো সময় দেখুন।'
+    },
+    {
+      icon: Download,
+      iconBg: 'rgba(14, 165, 233, 0.12)',
+      iconColor: '#0284c7',
+      title: isEn ? 'High Definition Image Download' : 'অফিসিয়াল সার্কুলার ইমেজ ডাউনলোড',
+      desc: isEn 
+        ? 'Download full high-resolution official job notices directly to your phone gallery in 1-click.'
+        : 'অফিসিয়াল নিয়োগ বিজ্ঞপ্তির স্পষ্ট মূল সার্কুলার ছবি এক ক্লিকে ফোনে ডাউনলোড ও জুমিং করে দেখার সুবিধা।'
+    },
+    {
+      icon: Shield,
+      iconBg: 'rgba(99, 102, 241, 0.12)',
+      iconColor: '#4f46e5',
+      title: isEn ? 'Verified & Secure Source' : '১০০% যাচাইকৃত ও নির্ভরযোগ্য তথ্য',
+      desc: isEn 
+        ? 'All circulars are aggregated directly from official government gazettes, press releases, and newspapers.'
+        : 'সকল চাকরির সার্কুলার অফিশিয়াল পত্রিকা, সরকারি ওয়েবসাইট ও বিশ্বস্ত সোর্স থেকে নিয়ে নিয়মিত আপডেট করা হয়।'
+    },
+    {
+      icon: Zap,
+      iconBg: 'rgba(234, 88, 12, 0.12)',
+      iconColor: '#ea580c',
+      title: isEn ? 'Admit Card & Result Alerts' : 'পরীক্ষার প্রবেশপত্র ও ফলাফল অ্যালার্ট',
+      desc: isEn 
+        ? 'Track exam schedules, seat plans, admit card download links, and final recruitment results.'
+        : 'চাকরির পরীক্ষার তারিখ, সিট প্ল্যান, প্রবেশপত্র ডাউনলোড এবং চূড়ান্ত ফলাফলের আপডেট সবার আগে পান।'
+    }
+  ];
+
+  const benefits = [
+    {
+      title: isEn ? 'Save Precious Time' : 'আপনার মূল্যবান সময় বাঁচায়',
+      desc: isEn 
+        ? 'No need to visit dozens of websites daily. Get all Bangladesh job updates in a single, fast mobile application.'
+        : 'প্রতিদিন শত শত সরকারি ও বেসরকারি ওয়েবসাইট ঘুরে তথ্য খোঁজার দরকার নেই। এক অ্যাপেই পান সকল সার্কুলার।'
+    },
+    {
+      title: isEn ? 'Boost Exam Preparation' : 'চাকরি প্রস্তুতির সেরা সঙ্গী',
+      desc: isEn 
+        ? 'Practice live MCQ model tests, review past question solutions, and track your progress with realistic exam timers.'
+        : 'বিগত বছরের প্রশ্ন সমাধান ও নিয়মিত লাইভ এমসিকিউ মডেল টেস্টের মাধ্যমে প্রস্তুতিকে আরও মজবুত করুন।'
+    },
+    {
+      title: isEn ? 'Clean & Eye-Friendly UI' : 'সহজ, আধুনিক ও আই-ফ্রেন্ডলি ডিজাইন',
+      desc: isEn 
+        ? 'Designed with soft background colors, smooth animations, and eye-soothing Dark Mode for comfortable reading.'
+        : 'চোখের আরামদায়ক ডার্ক মোড এবং পরিচ্ছন্ন বাংলা ফন্ট দিয়ে তৈরি, যা ব্যবহারে দেয় প্রিমিয়াম অনুভূতি।'
+    }
+  ];
 
   return (
-    <div className="page">
+    <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
+      {/* Page Header */}
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1>About App</h1>
+        <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Info size={18} color="var(--primary)" />
+          <span>{isEn ? 'About Job Circular' : 'অ্যাপ সম্পর্কিত ও বৈশিষ্ট্য'}</span>
+        </h1>
       </div>
 
-      <div className="page-content animate-fade-in">
-        <div className="card" style={{ textAlign: 'center', padding: '32px 20px', marginBottom: '20px' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+        
+        {/* Hero Branding Banner Card */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(59, 130, 246, 0.03) 100%)',
+          border: '1px solid rgba(37, 99, 235, 0.15)',
+          borderRadius: '24px',
+          padding: '28px 20px',
+          textAlign: 'center',
+          marginBottom: '20px',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: 'var(--shadow-sm)'
+        }}>
+          {/* Subtle Decorative Background Glow */}
           <div style={{
-            width: '80px',
-            height: '80px',
-            background: 'linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%)',
-            borderRadius: '20px',
-            color: 'white',
+            position: 'absolute',
+            top: '-30px',
+            right: '-30px',
+            width: '120px',
+            height: '120px',
+            borderRadius: '50%',
+            background: 'rgba(37, 99, 235, 0.1)',
+            filter: 'blur(20px)',
+            pointerEvents: 'none'
+          }} />
+
+          {/* App Logo Emblem */}
+          <div style={{
+            width: '76px',
+            height: '76px',
+            background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+            borderRadius: '22px',
+            color: '#ffffff',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             margin: '0 auto 16px auto',
-            boxShadow: '0 8px 24px rgba(26,86,219,0.2)'
+            boxShadow: '0 10px 28px rgba(26, 86, 219, 0.28)',
+            transform: 'rotate(-2deg)'
           }}>
-            <Briefcase size={40} />
+            <Briefcase size={38} color="#ffffff" />
           </div>
-          <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Job Circular</h2>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 600 }}>Version 1.0.0 (Build 2026.07)</p>
 
-          <div style={{ marginTop: '24px', textAlign: 'left' }}>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              <strong>Job Circular</strong> is Bangladesh's premier platform offering up-to-the-minute recruitment notices from the Government, Banks, NGOs, and the Private Sector.
-            </p>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '12px', fontStyle: 'italic' }}>
-              জব সার্কুলার অ্যাপের মাধ্যমে সকল সরকারি চাকরি, ব্যাংকের চাকরি, প্রাইভেট সেক্টরের নিয়োগ এবং বিভিন্ন গুরুত্বপূর্ণ পরীক্ষার প্রবেশপত্র ও ফলাফল পাবেন সবার আগে, এক জায়গায়।
-            </p>
+          <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.3px' }}>
+            Job Circular BD
+          </h2>
+
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--white)', border: '1px solid var(--border)', padding: '4px 12px', borderRadius: '30px', marginTop: '8px' }}>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+              {isEn ? 'Version 1.0.9 (Professional Edition)' : 'ভার্সন ১.০.৯ (প্রফেশনাল এডিশন)'}
+            </span>
           </div>
+
+          <p style={{ fontSize: '13.5px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '16px', fontWeight: 600 }}>
+            {isEn 
+              ? "Bangladesh's most trusted recruitment portal providing real-time government, bank, NGO, and private job circulars, admit cards, exam schedules, and live MCQ preparation."
+              : "বাংলাদেশের ১ নম্বর বিশ্বস্ত চাকরি সংক্রান্ত পোর্টাল। এখানে সকল সরকারি চাকরি, ব্যাংকের চাকরি, প্রাইভেট সেক্টরের সার্কুলার, পরীক্ষার প্রবেশপত্র, ফলাফল এবং লাইভ এমসিকিউ প্রস্তুতি নিন এক অ্যাপে।"}
+          </p>
         </div>
 
-        <div className="card" style={{ marginBottom: '20px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        {/* Live Impact & Capability Stats */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '12px',
+          marginBottom: '24px'
+        }}>
+          {stats.map((item, idx) => {
+            const IconComp = item.icon;
+            return (
+              <div key={idx} style={{
+                background: item.bg,
+                border: item.border,
+                borderRadius: '18px',
+                padding: '16px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <div style={{
+                  width: '34px',
+                  height: '34px',
+                  borderRadius: '10px',
+                  background: 'var(--white)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: item.color,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                }}>
+                  <IconComp size={18} color={item.color} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, lineHeight: 1.2 }}>
+                    {item.number}
+                  </h3>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: item.color, margin: '2px 0 0 0' }}>
+                    {item.label}
+                  </p>
+                  <p style={{ fontSize: '10.5px', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: 500 }}>
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Section Heading: Key Features */}
+        <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: '4px', height: '16px', background: 'var(--primary)', borderRadius: '2px' }}></div>
-            Key Features
+            <span>{isEn ? 'All Features & Capabilities' : 'অ্যাপের সকল ফিচার ও সুবিধাসমূহ'}</span>
           </h3>
-          <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {[
-              { t: 'Real-time push alerts for new circulars', icon: '🔔' },
-              { t: 'Download notices offline with 1-click', icon: '📥' },
-              { t: 'Interactive sector-wise search filters', icon: '🔍' },
-              { t: 'Built-in candidate profile management', icon: '👤' }
-            ].map((f, i) => (
-              <li key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <span style={{ fontSize: '18px' }}>{f.icon}</span>
-                {f.t}
-              </li>
-            ))}
-          </ul>
         </div>
 
+        {/* Features List Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+          {features.map((f, i) => {
+            const IconComponent = f.icon;
+            return (
+              <div key={i} className="card" style={{
+                padding: '16px',
+                display: 'flex',
+                gap: '14px',
+                alignItems: 'flex-start',
+                borderRadius: '18px',
+                transition: 'all 0.2s ease'
+              }}>
+                <div style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: '14px',
+                  background: f.iconBg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  color: f.iconColor
+                }}>
+                  <IconComponent size={22} color={f.iconColor} />
+                </div>
+                <div style={{ minWidth: 0, flex: 1 }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0', lineHeight: 1.3 }}>
+                    {f.title}
+                  </h4>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.55 }}>
+                    {f.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Section Heading: Why Choose Us / User Benefits */}
+        <div style={{ marginBottom: '14px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '4px', height: '16px', background: '#10b981', borderRadius: '2px' }}></div>
+            <span>{isEn ? 'Key Benefits for Job Seekers' : 'চাকরিপ্রার্থীদের জন্য কেন এটি সেরা?'}</span>
+          </h3>
+        </div>
+
+        {/* Benefits Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+          {benefits.map((b, idx) => (
+            <div key={idx} style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(5, 150, 105, 0.02) 100%)',
+              border: '1px solid rgba(16, 185, 129, 0.15)',
+              borderRadius: '18px',
+              padding: '16px',
+              display: 'flex',
+              gap: '12px',
+              alignItems: 'flex-start'
+            }}>
+              <div style={{
+                width: '26px',
+                height: '26px',
+                borderRadius: '50%',
+                background: '#10b981',
+                color: '#ffffff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: '1px'
+              }}>
+                <CheckCircle size={16} color="#ffffff" />
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <h4 style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
+                  {b.title}
+                </h4>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                  {b.desc}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Official Disclaimer & Source Trust Component */}
         <Disclaimer />
+
       </div>
       <BottomNav />
     </div>

@@ -280,3 +280,16 @@ export const Award = ({ size = 22, color = 'currentColor', className = '' }) => 
     <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
   </svg>
 );
+
+export const Zap = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+  </svg>
+);
+
+export const CheckCircle = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
