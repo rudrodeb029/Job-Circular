@@ -24,7 +24,8 @@ export default function AppHeader() {
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        background: '#ffffff',
+        background: 'var(--header-bg)',
+        backdropFilter: 'blur(10px)',
         borderBottom: '1px solid var(--border)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
         minHeight: '64px',
@@ -76,7 +77,7 @@ export default function AppHeader() {
           <span style={{
             fontWeight: 900,
             fontSize: '17px',
-            color: '#0f172a',
+            color: 'var(--text-primary)',
             letterSpacing: '-0.5px'
           }}>
             CIRCULAR
