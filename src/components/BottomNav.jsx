@@ -3,12 +3,13 @@ import { NavLink } from 'react-router-dom';
 import { Home, LayoutGrid, Bookmark, Bell, User } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
+import { getFilteredNotifications } from '../utils/notificationHelpers';
 
 const BottomNav = () => {
   const { state } = useAppContext();
   const { state: adminState } = useAdminContext();
 
-  const notificationsList = adminState.notifications || [];
+  const notificationsList = getFilteredNotifications(adminState.notifications || [], state.installTime);
   const unreadCount = notificationsList.filter(n => !state.readNotifications.includes(n.id)).length;
 
   return (

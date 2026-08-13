@@ -7,6 +7,7 @@ import BottomNav from '../components/BottomNav';
 import { getNotifications } from '../data/notifications';
 import { useAdminContext } from '../context/AdminContext';
 import PullToRefresh from '../components/PullToRefresh';
+import { getFilteredNotifications, getNotificationTimestamp } from '../utils/notificationHelpers';
 
 export default function Notifications() {
   const { state, dispatch } = useAppContext();
@@ -19,13 +20,14 @@ export default function Notifications() {
 
   const notificationsList = useMemo(() => {
     const raw = adminState.notifications || [];
+    const filtered = getFilteredNotifications(raw, state.installTime);
     // Sort by newest first
-    return [...raw].sort((a, b) => {
-      const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return filtered.sort((a, b) => {
+      const timeA = getNotificationTimestamp(a);
+      const timeB = getNotificationTimestamp(b);
       return timeB - timeA;
     });
-  }, [adminState.notifications]);
+  }, [adminState.notifications, state.installTime]);
 
   const handleMarkAllRead = () => {
     const allIds = notificationsList.map(n => n.id);

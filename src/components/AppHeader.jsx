@@ -4,6 +4,7 @@ import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileTex
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsData } from '../data/questionsData';
+import { getFilteredNotifications } from '../utils/notificationHelpers';
 
 export default function AppHeader() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function AppHeader() {
   const [questionsMenuOpen, setQuestionsMenuOpen] = useState(true); // Default open for better discoverability
   const [expandedCategory, setExpandedCategory] = useState(null);
 
-  const notificationsList = adminState.notifications || [];
+  const notificationsList = getFilteredNotifications(adminState.notifications || [], state.installTime);
   const unreadCount = notificationsList.filter(n => !state.readNotifications.includes(n.id)).length;
 
   return (
