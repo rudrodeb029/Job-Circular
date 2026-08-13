@@ -188,107 +188,184 @@ export default function EditProfile() {
 
   return (
     <div className="page" style={{ background: 'var(--bg)', paddingBottom: '90px' }}>
-      {/* Modern Sticky Header */}
-      <div className="page-header">
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          <ArrowLeft size={22} />
-        </button>
-        <h1 style={{ flex: 1 }}>{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}</h1>
-      </div>
+      {/* Glassmorphism Gradient Hero Header */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
+        padding: 'calc(var(--safe-area-top) + 12px) 20px 48px 20px',
+        color: 'white',
+        textAlign: 'center',
+        borderRadius: '0 0 28px 28px',
+        position: 'relative',
+        boxShadow: '0 10px 30px -5px rgba(26, 86, 219, 0.35)',
+        overflow: 'hidden'
+      }}>
+        {/* Decorative Background Rings */}
+        <div style={{
+          position: 'absolute',
+          top: '-40px',
+          right: '-40px',
+          width: '160px',
+          height: '160px',
+          borderRadius: '50%',
+          background: 'rgba(255, 255, 255, 0.08)',
+          pointerEvents: 'none'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-30px',
+          left: '-30px',
+          width: '120px',
+          height: '120px',
+          borderRadius: '50%',
+          background: 'rgba(255, 255, 255, 0.05)',
+          pointerEvents: 'none'
+        }} />
 
-      <div className="page-content animate-fade-in" style={{ padding: '20px' }}>
-        <form onSubmit={handleSubmit}>
-          {/* Avatar Section */}
-          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-            <div style={{
-              position: 'relative',
-              width: '96px',
-              height: '96px',
-              margin: '0 auto 12px auto'
-            }}>
-              {formData.avatar ? (
-                <img
-                  src={formData.avatar}
-                  alt="Profile"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: '4px solid var(--white)',
-                    boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    opacity: uploadingImage ? 0.5 : 1
-                  }}
-                />
-              ) : (
-                <div style={{
+        {/* Top Header Controls */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          position: 'relative',
+          zIndex: 2
+        }}>
+          <button
+            onClick={() => navigate(-1)}
+            aria-label="Go back"
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              background: 'rgba(255, 255, 255, 0.18)',
+              backdropFilter: 'blur(8px)',
+              color: 'white',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+          >
+            <ArrowLeft size={20} />
+          </button>
+
+          <h1 style={{
+            fontSize: '18px',
+            fontWeight: 800,
+            color: '#ffffff',
+            margin: 0,
+            letterSpacing: '-0.3px'
+          }}>
+            {isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}
+          </h1>
+
+          <div style={{ width: '38px' }} />
+        </div>
+
+        {/* Integrated Avatar Section */}
+        <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
+          <div style={{
+            position: 'relative',
+            width: '96px',
+            height: '96px',
+            margin: '0 auto 10px auto'
+          }}>
+            {formData.avatar ? (
+              <img
+                src={formData.avatar}
+                alt="Profile"
+                style={{
                   width: '100%',
                   height: '100%',
                   borderRadius: '50%',
-                  background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '34px',
-                  fontWeight: 800,
-                  boxShadow: '0 8px 24px rgba(26,86,219,0.2)',
+                  objectFit: 'cover',
+                  border: '4px solid #ffffff',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
                   opacity: uploadingImage ? 0.5 : 1
-                }}>
-                  {formData.name ? formData.name[0].toUpperCase() : 'U'}
-                </div>
-              )}
-
-              {uploadingImage && (
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  background: 'rgba(0,0,0,0.4)',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'white',
-                  fontSize: '10px',
-                  fontWeight: 800
-                }}>
-                  UPLOADING...
-                </div>
-              )}
-
-              <label htmlFor="avatar-upload" style={{
-                position: 'absolute',
-                bottom: '2px',
-                right: '2px',
-                width: '30px',
-                height: '30px',
+                }}
+              />
+            ) : (
+              <div style={{
+                width: '100%',
+                height: '100%',
                 borderRadius: '50%',
-                background: 'var(--primary)',
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(10px)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                cursor: 'pointer',
-                border: '3px solid var(--white)',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.2)'
+                fontSize: '36px',
+                fontWeight: 800,
+                border: '4px solid #ffffff',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+                opacity: uploadingImage ? 0.5 : 1
               }}>
-                <Edit size={14} />
-              </label>
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
-              />
-            </div>
-            <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>
-              {isEn ? 'Tap the icon to change photo' : 'ছবি পরিবর্তন করতে আইকনে ট্যাপ করুন'}
-            </p>
+                {formData.name ? formData.name[0].toUpperCase() : 'U'}
+              </div>
+            )}
+
+            {uploadingImage && (
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0,0,0,0.5)',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '10px',
+                fontWeight: 800
+              }}>
+                UPLOADING...
+              </div>
+            )}
+
+            <label htmlFor="avatar-upload" style={{
+              position: 'absolute',
+              bottom: '2px',
+              right: '2px',
+              width: '32px',
+              height: '32px',
+              borderRadius: '50%',
+              background: '#ffffff',
+              color: '#2563eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.25)'
+            }}>
+              <Edit size={16} />
+            </label>
+            <input
+              id="avatar-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              style={{ display: 'none' }}
+              disabled={uploadingImage}
+            />
           </div>
+
+          <p style={{
+            fontSize: '12px',
+            color: 'rgba(255, 255, 255, 0.85)',
+            fontWeight: 500,
+            margin: 0
+          }}>
+            {isEn ? 'Tap icon to change photo' : 'ছবি পরিবর্তন করতে আইকনে ট্যাপ করুন'}
+          </p>
+        </div>
+      </div>
+
+      <div className="page-content animate-fade-in" style={{ padding: '0 20px 20px 20px', marginTop: '-20px', position: 'relative', zIndex: 3 }}>
+        <form onSubmit={handleSubmit}>
 
           {/* Form Fields */}
           <div className="card" style={{ padding: '20px', borderRadius: '20px' }}>
