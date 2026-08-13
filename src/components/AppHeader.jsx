@@ -458,15 +458,15 @@ export default function AppHeader() {
               alignItems: 'center',
               justifyContent: 'space-between',
               padding: '12px 14px',
-              background: '#ffffff',
-              border: '1px solid var(--border-light)',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border)',
               borderRadius: '12px',
               marginTop: 'auto'
             }}>
               <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {state.language === 'en' ? 'Dark Mode' : 'ডার্ক মোড'}
               </span>
-              <button onClick={() => dispatch({ type: 'TOGGLE_THEME' })} style={{ color: 'var(--primary)', border: 'none', background: 'transparent' }}>
+              <button onClick={() => dispatch({ type: 'TOGGLE_THEME' })} style={{ color: 'var(--primary)', border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 {state.theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
               </button>
             </div>
