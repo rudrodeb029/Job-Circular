@@ -229,13 +229,13 @@ export default function Home() {
             <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '10px', fontWeight: 600, marginBottom: '6px', letterSpacing: '0.3px' }}>
               {getGreeting(isEn)}, {userName} 👋
             </p>
-            <h2 style={{ color: '#ffffff', fontSize: '26px', fontWeight: 800, marginBottom: '0px', lineHeight: 1 }}>
+            <h2 style={{ color: '#ffffff', fontSize: '26px', fontWeight: 800, marginBottom: '2px', lineHeight: 1 }}>
               {isEn
                 ? `${activeJobCount}+`
-                : `${toBengaliNumber(activeJobCount)}+`}
+                : `${toBengaliNumber(activeJobCount)}+ টি`}
             </h2>
             <p style={{ color: '#ffffff', fontSize: '13.5px', fontWeight: 700, marginBottom: '4px', letterSpacing: '-0.1px' }}>
-              {isEn ? 'New Jobs Available' : 'টি নতুন নিয়োগ বিজ্ঞপ্তি'}
+              {isEn ? 'New Jobs Available' : 'নতুন নিয়োগ বিজ্ঞপ্তি'}
             </p>
             <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '9.5px', marginBottom: '14px', fontWeight: 500, letterSpacing: '0.1px' }}>
               {isEn ? 'Find your dream job today!' : 'আজই আপনার পছন্দের চাকরিটি খুঁজুন!'}
