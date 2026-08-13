@@ -18,7 +18,7 @@ export default function EmptyState({ icon: Icon, title, description, actionText,
           <Icon size={40} />
         </div>
       )}
-      <h3 className="empty-state-title">{title}</h3>
+      {title && <h3 className="empty-state-title">{title}</h3>}
       {description && <p className="empty-state-desc">{description}</p>}
       {actionText && onAction && (
         <button className="btn btn-primary" onClick={onAction}>

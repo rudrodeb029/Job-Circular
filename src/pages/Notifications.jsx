@@ -70,8 +70,6 @@ export default function Notifications() {
           ) : (
             <EmptyState
               icon={Bell}
-              title={isEn ? "No Notifications" : "কোনো নোটিফিকেশন নেই"}
-              description={isEn ? "You don't have any notifications right now." : "আপনার কাছে এই মুহূর্তে কোনো নোটিফিকেশন নেই।"}
             />
           )}
         </div>
