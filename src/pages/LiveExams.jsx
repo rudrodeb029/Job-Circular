@@ -206,14 +206,14 @@ export default function LiveExams() {
         {/* Sleek, Premium Regulations Card (Only shown in Live tab) */}
         {activeTab === 'live' && (
           <div style={{
-            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.09) 0%, rgba(220, 38, 38, 0.04) 100%)',
-            border: '1px solid rgba(239, 68, 68, 0.15)',
+            background: 'var(--primary-bg)',
+            border: '1px solid var(--chip-primary-border)',
             borderRadius: '20px',
             padding: '18px',
             marginBottom: '20px',
-            boxShadow: '0 4px 20px rgba(239, 68, 68, 0.03)'
+            boxShadow: 'var(--shadow-sm)'
           }}>
-            <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#991b1b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -221,7 +221,7 @@ export default function LiveExams() {
               </svg>
               <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
             </h3>
-            <p style={{ fontSize: '12px', lineHeight: 1.6, color: '#b91c1c', fontWeight: 500, margin: 0 }}>
+            <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
               {isEn 
                 ? 'Participate in real-time competitive exams. The exam starts exactly at the scheduled time. Results will be calculated instantly upon submission.'
                 : 'নির্ধারিত সময়ে সরাসরি লাইভ পরীক্ষায় অংশ নিন। পরীক্ষা শুরু হওয়ার পর সময়ের মধ্যে সাবমিট করতে হবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাবে।'}
@@ -362,7 +362,7 @@ export default function LiveExams() {
                     padding: '6px 10px',
                     marginBottom: '10px'
                   }}>
-                    <span style={{ fontSize: '10px', color: '#475569', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -377,7 +377,7 @@ export default function LiveExams() {
                       })}
                     </span>
                     <span style={{ fontSize: '10px', fontWeight: 700, color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                      <span style={{ color: '#64748b', fontWeight: 500 }}>
+                      <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
                         {isEn ? 'Left:' : 'বাকি:'}
                       </span>
                       <span style={{ fontFamily: 'monospace' }}>
@@ -390,7 +390,7 @@ export default function LiveExams() {
                 <h4 style={{
                   fontSize: '13.5px',
                   fontWeight: 700,
-                  color: '#0f172a',
+                  color: 'var(--text-primary)',
                   marginBottom: '10px',
                   lineHeight: '1.4'
                 }}>
@@ -399,13 +399,14 @@ export default function LiveExams() {
 
                 {/* Subjects & Topics separately */}
                 <div style={{
-                  background: 'rgba(241, 245, 249, 0.4)',
+                  background: 'var(--bg-secondary)',
                   borderRadius: '12px',
                   padding: '10px 12px',
                   marginBottom: '12px',
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '8px'
+                  gap: '8px',
+                  border: '1px solid var(--border-light)'
                 }}>
                   {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
                     exam.subjectTopics.map((st, idx) => (
@@ -416,12 +417,12 @@ export default function LiveExams() {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '2px' }}>
                           {(isEn ? st.topicsEn : st.topics)?.split(',').map((t, tIdx) => (
                             <span key={tIdx} style={{
-                              fontSize: '9px',
+                              fontSize: '9.5px',
                               fontWeight: 600,
                               background: 'var(--white)',
-                              border: '1px solid rgba(226, 232, 240, 0.7)',
-                              color: '#64748b',
-                              padding: '2px 6px',
+                              border: '1px solid var(--border)',
+                              color: 'var(--text-primary)',
+                              padding: '2px 7px',
                               borderRadius: '5px'
                             }}>
                               {t.trim()}
@@ -438,12 +439,12 @@ export default function LiveExams() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
                         {(isEn ? exam.topicsEn : exam.topics)?.split(',').map((t, idx) => (
                           <span key={idx} style={{
-                            fontSize: '9px',
+                            fontSize: '9.5px',
                             fontWeight: 600,
                             background: 'var(--white)',
-                            border: '1px solid rgba(226, 232, 240, 0.7)',
-                            color: '#64748b',
-                            padding: '2px 6px',
+                            border: '1px solid var(--border)',
+                            color: 'var(--text-primary)',
+                            padding: '2px 7px',
                             borderRadius: '5px'
                           }}>
                             {t.trim()}
