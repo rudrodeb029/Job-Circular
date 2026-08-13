@@ -8,44 +8,15 @@ export default function AboutApp() {
   const navigate = useNavigate();
 
   return (
-    <div className="page" style={{ background: 'var(--bg)' }}>
-      {/* Modern Gradient Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
-        padding: 'calc(var(--safe-area-top) + 14px) 20px 20px 20px',
-        color: 'white',
-        borderRadius: '0 0 20px 20px',
-        boxShadow: '0 8px 24px -4px rgba(26, 86, 219, 0.3)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
-      }}>
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Go back"
-          style={{
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.18)',
-            backdropFilter: 'blur(8px)',
-            color: 'white',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            flexShrink: 0
-          }}
-        >
-          <ArrowLeft size={20} />
+    <div className="page">
+      <div className="page-header">
+        <button className="back-btn" onClick={() => navigate(-1)}>
+          <ArrowLeft size={22} />
         </button>
-        <h1 style={{ fontSize: '19px', fontWeight: 800, color: '#ffffff', margin: 0 }}>
-          About App
-        </h1>
+        <h1>About App</h1>
       </div>
 
-      <div className="page-content animate-fade-in" style={{ padding: '20px' }}>
+      <div className="page-content animate-fade-in">
         <div className="card" style={{ textAlign: 'center', padding: '32px 20px', marginBottom: '20px' }}>
           <div style={{
             width: '80px',
