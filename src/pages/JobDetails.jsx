@@ -83,8 +83,8 @@ export default function JobDetails() {
     circularImages = job.circularImages;
   }
 
-  if (circularImages.length === 0) {
-    circularImages = [job.circularImage || defaultNoticeImg];
+  if (circularImages.length === 0 && job.circularImage && job.circularImage.trim()) {
+    circularImages = [job.circularImage];
   }
 
   const isSaved = state.savedJobs.includes(job.id);
@@ -211,264 +211,339 @@ export default function JobDetails() {
         </div>
 
         {/* Multi-Image Official Circular Notice Gallery Section */}
-        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          {/* Section Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '8px' }}>
-            <div style={{ minWidth: 0, flex: 1 }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                অফিসিয়াল নিয়োগ বিজ্ঞপ্তি
-              </h3>
-              <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                Official Job Circular Notice ({circularImages.length} Page{circularImages.length > 1 ? 's' : ''})
-              </p>
-            </div>
+        {circularImages.length > 0 ? (
+          <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+            {/* Section Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '8px' }}>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  অফিসিয়াল নিয়োগ বিজ্ঞপ্তি
+                </h3>
+                <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Official Job Circular Notice ({circularImages.length} Page{circularImages.length > 1 ? 's' : ''})
+                </p>
+              </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-              {/* Page Counter Badge */}
-              <span style={{
-                fontSize: '10px',
-                fontWeight: 800,
-                background: 'var(--primary-bg)',
-                color: 'var(--primary)',
-                padding: '3px 8px',
-                borderRadius: '8px',
-                whiteSpace: 'nowrap'
-              }}>
-                Page {activeImageIndex + 1} / {circularImages.length}
-              </span>
-              <button
-                onClick={() => setShowFullImage(!showFullImage)}
-                style={{
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                {/* Page Counter Badge */}
+                <span style={{
                   fontSize: '10px',
-                  fontWeight: 700,
-                  color: 'var(--text-secondary)',
-                  background: 'var(--bg-secondary)',
+                  fontWeight: 800,
+                  background: 'var(--primary-bg)',
+                  color: 'var(--primary)',
                   padding: '3px 8px',
                   borderRadius: '8px',
-                  border: 'none',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '3px',
-                  cursor: 'pointer',
                   whiteSpace: 'nowrap'
-                }}
-              >
-                <Eye size={11} /> {showFullImage ? 'Collapse' : 'Full'}
-              </button>
+                }}>
+                  Page {activeImageIndex + 1} / {circularImages.length}
+                </span>
+                <button
+                  onClick={() => setShowFullImage(!showFullImage)}
+                  style={{
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    color: 'var(--text-secondary)',
+                    background: 'var(--bg-secondary)',
+                    padding: '3px 8px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '3px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  <Eye size={11} /> {showFullImage ? 'Collapse' : 'Full'}
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
-          <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
-            <img
-              src={circularImages[activeImageIndex]}
-              alt={`Circular Notice Page ${activeImageIndex + 1}`}
-              onClick={() => setShowFullImage(!showFullImage)}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = defaultNoticeImg;
-              }}
-              style={{
-                width: '100%',
-                maxHeight: showFullImage ? 'none' : '380px',
-                objectFit: 'cover',
-                objectPosition: 'top',
-                display: 'block',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-            />
+            {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
+            <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
+              <img
+                src={circularImages[activeImageIndex]}
+                alt={`Circular Notice Page ${activeImageIndex + 1}`}
+                onClick={() => setShowFullImage(!showFullImage)}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = defaultNoticeImg;
+                }}
+                style={{
+                  width: '100%',
+                  maxHeight: showFullImage ? 'none' : '380px',
+                  objectFit: 'cover',
+                  objectPosition: 'top',
+                  display: 'block',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              />
 
-            {/* Prev & Next Floating Navigation Arrow Buttons */}
+              {/* Prev & Next Floating Navigation Arrow Buttons */}
+              {circularImages.length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImageIndex(prev => (prev > 0 ? prev - 1 : circularImages.length - 1));
+                    }}
+                    title="Previous Page"
+                    style={{
+                      position: 'absolute',
+                      left: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.92)',
+                      backdropFilter: 'blur(4px)',
+                      border: '1px solid var(--border-light)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      color: 'var(--text-primary)',
+                      fontSize: '20px',
+                      fontWeight: 800,
+                      zIndex: 10
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImageIndex(prev => (prev < circularImages.length - 1 ? prev + 1 : 0));
+                    }}
+                    title="Next Page"
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '50%',
+                      background: 'rgba(255, 255, 255, 0.92)',
+                      backdropFilter: 'blur(4px)',
+                      border: '1px solid var(--border-light)',
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      color: 'var(--text-primary)',
+                      fontSize: '20px',
+                      fontWeight: 800,
+                      zIndex: 10
+                    }}
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+
+              {!showFullImage && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: '60px',
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
+                  pointerEvents: 'none',
+                  zIndex: 6
+                }}></div>
+              )}
+
+              {/* Indicator Dots (Mark Options) */}
+              {circularImages.length > 1 && (
+                <div style={{
+                  position: 'absolute',
+                  bottom: '16px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  display: 'flex',
+                  gap: '6px',
+                  background: 'rgba(15, 23, 42, 0.45)',
+                  padding: '6px 10px',
+                  borderRadius: '20px',
+                  backdropFilter: 'blur(4px)',
+                  zIndex: 12
+                }}>
+                  {circularImages.map((_, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setActiveImageIndex(idx)}
+                      style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: activeImageIndex === idx ? 'var(--white)' : 'rgba(255, 255, 255, 0.5)',
+                        transition: 'all 0.2s',
+                        cursor: 'pointer'
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Thumbnail Strip / Page Selector Tabs */}
             {circularImages.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImageIndex(prev => (prev > 0 ? prev - 1 : circularImages.length - 1));
-                  }}
-                  title="Previous Page"
-                  style={{
-                    position: 'absolute',
-                    left: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
-                  }}
-                >
-                  ‹
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImageIndex(prev => (prev < circularImages.length - 1 ? prev + 1 : 0));
-                  }}
-                  title="Next Page"
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
-                  }}
-                >
-                  ›
-                </button>
-              </>
-            )}
-
-            {!showFullImage && (
-              <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '60px',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
-                pointerEvents: 'none',
-                zIndex: 6
-              }}></div>
-            )}
-
-            {/* Indicator Dots (Mark Options) */}
-            {circularImages.length > 1 && (
-              <div style={{
-                position: 'absolute',
-                bottom: '16px',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                gap: '6px',
-                background: 'rgba(15, 23, 42, 0.45)',
-                padding: '6px 10px',
-                borderRadius: '20px',
-                backdropFilter: 'blur(4px)',
-                zIndex: 12
-              }}>
-                {circularImages.map((_, idx) => (
-                  <div
+              <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
+                {circularImages.map((img, idx) => (
+                  <button
                     key={idx}
                     onClick={() => setActiveImageIndex(idx)}
                     style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      background: activeImageIndex === idx ? 'var(--white)' : 'rgba(255, 255, 255, 0.5)',
-                      transition: 'all 0.2s',
-                      cursor: 'pointer'
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: '10px',
+                      border: idx === activeImageIndex ? '2px solid var(--primary)' : '1px solid var(--border)',
+                      background: idx === activeImageIndex ? 'var(--primary-bg)' : 'var(--white)',
+                      color: idx === activeImageIndex ? 'var(--primary)' : 'var(--text-secondary)',
+                      fontWeight: idx === activeImageIndex ? 800 : 600,
+                      fontSize: '12px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
                     }}
-                  />
+                  >
+                    <span>Page {idx + 1}</span>
+                  </button>
                 ))}
               </div>
             )}
-          </div>
 
-          {/* Thumbnail Strip / Page Selector Tabs */}
-          {circularImages.length > 1 && (
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
-              {circularImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  style={{
-                    flex: '0 0 auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '8px 14px',
-                    borderRadius: '10px',
-                    border: idx === activeImageIndex ? '2px solid var(--primary)' : '1px solid var(--border)',
-                    background: idx === activeImageIndex ? 'var(--primary-bg)' : 'var(--white)',
-                    color: idx === activeImageIndex ? 'var(--primary)' : 'var(--text-secondary)',
-                    fontWeight: idx === activeImageIndex ? 800 : 600,
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <span>Page {idx + 1}</span>
-                </button>
-              ))}
+            <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+              <a
+                href={circularImages[activeImageIndex]}
+                download={`${job.title || 'Job'}_Circular_Notice_Page_${activeImageIndex + 1}.png`}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '10px 10px',
+                  borderRadius: '12px',
+                  background: 'var(--primary-bg)',
+                  color: 'var(--primary)',
+                  fontWeight: 700,
+                  fontSize: '12px',
+                  border: '1.5px solid #dbeafe',
+                  textDecoration: 'none',
+                  boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'center'
+                }}
+              >
+                <Download size={14} /> Notice {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
+              </a>
+
+              <button
+                onClick={handleOfficialApply}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px 10px',
+                  borderRadius: '12px',
+                  background: isApplied ? '#059669' : 'var(--primary)',
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: '12px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {isApplied ? "✓ Applied" : "Apply Now"}
+              </button>
             </div>
-          )}
-
-          <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
-            <a
-              href={circularImages[activeImageIndex]}
-              download={`${job.title || 'Job'}_Circular_Notice_Page_${activeImageIndex + 1}.png`}
-              style={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
-                padding: '10px 10px',
-                borderRadius: '12px',
-                background: 'var(--primary-bg)',
-                color: 'var(--primary)',
-                fontWeight: 700,
-                fontSize: '12px',
-                border: '1.5px solid #dbeafe',
-                textDecoration: 'none',
-                boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
-                transition: 'all 0.2s ease',
-                textAlign: 'center'
-              }}
-            >
-              <Download size={14} /> Notice {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
-            </a>
-
-            <button
-              onClick={handleOfficialApply}
-              style={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '10px 10px',
-                borderRadius: '12px',
-                background: isApplied ? '#059669' : 'var(--primary)',
-                color: '#fff',
-                fontWeight: 700,
-                fontSize: '12px',
-                border: 'none',
-                cursor: 'pointer',
-                boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              {isApplied ? "✓ Applied" : "Apply Now"}
-            </button>
           </div>
-        </div>
+        ) : (
+          <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+            {/* Section Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '8px' }}>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  অফিসিয়াল নিয়োগ বিজ্ঞপ্তি
+                </h3>
+                <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  Official Job Circular Notice (0 Pages)
+                </p>
+              </div>
+            </div>
+
+            {/* No Photo Available Placeholder */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '48px 24px',
+              background: 'var(--bg-secondary)',
+              borderRadius: '14px',
+              border: '1px dashed var(--border-light)',
+              textAlign: 'center',
+              gap: '12px',
+              marginBottom: '14px'
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                background: 'rgba(148, 163, 184, 0.1)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#94a3b8'
+              }}>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="1" y1="1" x2="23" y2="23"></line>
+                  <path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"></path>
+                  <path d="M8.17 11.17A4 4 0 0 0 12 15c.67 0 1.3-.17 1.83-.46"></path>
+                </svg>
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                no Photo available
+              </span>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+              <button
+                onClick={handleOfficialApply}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '10px 10px',
+                  borderRadius: '12px',
+                  background: isApplied ? '#059669' : 'var(--primary)',
+                  color: '#fff',
+                  fontWeight: 700,
+                  fontSize: '12px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: isApplied ? '0 4px 14px rgba(5,150,105,0.35)' : '0 4px 14px rgba(26,86,219,0.35)',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                {isApplied ? "✓ Applied" : "Apply Now"}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
       <BottomNav />
     </div>
