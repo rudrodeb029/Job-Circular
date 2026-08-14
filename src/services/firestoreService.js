@@ -111,9 +111,19 @@ export const getDocument = async (collectionName, docId) => {
   }
 };
 
+export const clearCollectionCache = (collectionName) => {
+  try {
+    localStorage.removeItem(`cache_data_${collectionName}`);
+    localStorage.removeItem(`cache_time_${collectionName}`);
+  } catch (e) {
+    console.warn(`Failed to clear cache for ${collectionName}:`, e);
+  }
+};
+
 export const addDocument = async (collectionName, data) => {
   try {
     const docRef = await addDoc(collection(db, collectionName), data);
+    clearCollectionCache(collectionName);
     return { id: docRef.id, ...data };
   } catch (error) {
     console.error(`Error adding to ${collectionName}:`, error);
@@ -124,6 +134,7 @@ export const addDocument = async (collectionName, data) => {
 export const setDocument = async (collectionName, docId, data) => {
   try {
     await setDoc(doc(db, collectionName, docId), data);
+    clearCollectionCache(collectionName);
     return { id: docId, ...data };
   } catch (error) {
     console.error(`Error setting ${collectionName}/${docId}:`, error);
@@ -134,6 +145,7 @@ export const setDocument = async (collectionName, docId, data) => {
 export const updateDocument = async (collectionName, docId, updates) => {
   try {
     await updateDoc(doc(db, collectionName, docId), updates);
+    clearCollectionCache(collectionName);
     return { id: docId, ...updates };
   } catch (error) {
     console.error(`Error updating ${collectionName}/${docId}:`, error);
@@ -144,6 +156,7 @@ export const updateDocument = async (collectionName, docId, updates) => {
 export const deleteDocument = async (collectionName, docId) => {
   try {
     await deleteDoc(doc(db, collectionName, docId));
+    clearCollectionCache(collectionName);
     return true;
   } catch (error) {
     console.error(`Error deleting ${collectionName}/${docId}:`, error);
