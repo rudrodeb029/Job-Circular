@@ -1,7 +1,7 @@
 /**
  * Generate Android Push Notification Icons directly from public/app-icon.png
- * Removes the white/light background from public/app-icon.png and converts the blue logo graphics
- * into a crisp pure white silhouette on transparent background for Android status bar & notifications.
+ * Removes white outer background, keeps original emblem silhouette for status bar.
+ * No circular mask, no artificial circle borders.
  */
 import sharp from 'sharp';
 import { existsSync, mkdirSync } from 'fs';
@@ -22,31 +22,31 @@ const NOTIFICATION_DENSITIES = [
 ];
 
 async function generateAppIconNotificationIcons() {
-  console.log('\n🔔 Processing public/app-icon.png into Push Notification Icons...\n');
+  console.log('\n🔔 Processing public/app-icon.png into Push Notification Icons (Original Shape, No Circle)...\n');
 
   if (!existsSync(APP_ICON_PATH)) {
     console.error(`❌ Source image not found: ${APP_ICON_PATH}`);
     return;
   }
 
-  // Step 1: Read raw pixel data of public/app-icon.png
+  // Read raw pixel data of public/app-icon.png
   const { data, info } = await sharp(APP_ICON_PATH)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
 
-  // Step 2: Extract logo emblem (remove near-white background > 235, make logo pixels white)
+  // Extract logo emblem (remove near-white background > 230, make logo pixels solid white for status bar silhouette)
   const processedData = Buffer.from(data);
   for (let i = 0; i < processedData.length; i += 4) {
     const r = processedData[i];
     const g = processedData[i + 1];
     const b = processedData[i + 2];
 
-    // If background (near white/light gray)
+    // Background (near white/light gray)
     if (r > 230 && g > 230 && b > 230) {
-      processedData[i + 3] = 0; // Make 100% transparent
+      processedData[i + 3] = 0; // 100% transparent background
     } else {
-      // Logo emblem pixel -> pure white #FFFFFF
+      // Logo emblem pixel -> pure white #FFFFFF for Android status bar stencil
       processedData[i] = 255;
       processedData[i + 1] = 255;
       processedData[i + 2] = 255;
@@ -54,7 +54,7 @@ async function generateAppIconNotificationIcons() {
     }
   }
 
-  // Create clean master logo PNG buffer (trimmed)
+  // Create clean master logo PNG buffer (trimmed of empty space)
   const masterLogoBuffer = await sharp(processedData, {
     raw: {
       width: info.width,
@@ -62,29 +62,17 @@ async function generateAppIconNotificationIcons() {
       channels: 4
     }
   })
-    .trim() // Trim empty transparent borders around logo graphic
+    .trim()
     .png({ compressionLevel: 9 })
     .toBuffer();
 
-  // Step 3: Resize master logo silhouette for all Android density folders
+  // Resize master logo silhouette for all Android density folders
   for (const density of NOTIFICATION_DENSITIES) {
     const dir = join(RES_DIR, density.folder);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
-    const innerSize = Math.round(density.size * 0.85); // 85% scale for neat padding
-    const innerBuffer = await sharp(masterLogoBuffer)
-      .resize(innerSize, innerSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      .toBuffer();
-
-    const resizedBuffer = await sharp({
-      create: {
-        width: density.size,
-        height: density.size,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 0 }
-      }
-    })
-      .composite([{ input: innerBuffer, gravity: 'center' }])
+    const resizedBuffer = await sharp(masterLogoBuffer)
+      .resize(density.size, density.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .png({ compressionLevel: 9 })
       .toBuffer();
 
@@ -94,10 +82,10 @@ async function generateAppIconNotificationIcons() {
     // Save as ic_notification.png (Firebase & Android default)
     await sharp(resizedBuffer).toFile(join(dir, 'ic_notification.png'));
 
-    console.log(`  ✅ ${density.folder}: ${density.size}×${density.size}px notification icon generated from public/app-icon.png`);
+    console.log(`  ✅ ${density.folder}: ${density.size}×${density.size}px status bar notification icon generated`);
   }
 
-  console.log('\n  ✅ All Push Notification Icons generated successfully from public/app-icon.png!\n');
+  console.log('\n  ✅ All Push Notification Icons generated successfully!\n');
 }
 
 generateAppIconNotificationIcons();
