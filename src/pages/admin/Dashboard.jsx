@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
-import { runDatabaseMigration } from '../../utils/dbMigration';
 import { formatTimeAgo } from '../../utils/timeUtils';
 
 const Dashboard = () => {
@@ -10,21 +9,6 @@ const Dashboard = () => {
   const jobs = adminState.jobs || [];
   const activities = adminState.activities || [];
   const navigate = useNavigate();
-  const [migrating, setMigrating] = useState(false);
-
-  const handleMigration = async () => {
-    if (window.confirm('This will update all old posts with a creation time to fix the "Just now" display. Proceed?')) {
-      setMigrating(true);
-      try {
-        await runDatabaseMigration();
-        alert('Database migration successful! All old posts now have timestamps.');
-      } catch (err) {
-        alert('Migration failed: ' + err.message);
-      } finally {
-        setMigrating(false);
-      }
-    }
-  };
 
   const formatNumber = (n) => {
     return n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : '0';
@@ -125,33 +109,7 @@ const Dashboard = () => {
         }
       `}</style>
 
-      <div className="admin-page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2.5rem' }}>
-        <div>
-          <h1 className="admin-page-title" style={{ color: '#0f172a', fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.025em', margin: 0 }}>Dashboard</h1>
-        </div>
-        <button
-          onClick={handleMigration}
-          disabled={migrating}
-          className="btn-modern"
-          style={{
-            padding: '12px 20px',
-            background: migrating ? '#94a3b8' : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
-            color: 'white',
-            border: 'none',
-            borderRadius: '12px',
-            cursor: migrating ? 'not-allowed' : 'pointer',
-            fontSize: '14px',
-            fontWeight: 700,
-            boxShadow: '0 4px 14px rgba(26, 86, 219, 0.25)',
-            transition: 'all 0.3s ease',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px'
-          }}
-        >
-          {migrating ? '🔄 Updating...' : '🧹 Fix Old Post Times'}
-        </button>
-      </div>
+
 
       {/* STATS GRID */}
       <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
