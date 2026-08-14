@@ -59,25 +59,39 @@ const initialState = {
   firestoreReady: false
 };
 
+// Track recently deleted IDs to prevent them from reappearing via snapshot race conditions
+const pendingDeletes = new Map(); // Map<id, timestamp>
+
+const registerPendingDelete = (id) => {
+  pendingDeletes.set(id, Date.now());
+  // Auto-cleanup after 10 seconds (by then Firestore has confirmed the delete)
+  setTimeout(() => pendingDeletes.delete(id), 10000);
+};
+
+const filterPendingDeletes = (items) => {
+  if (pendingDeletes.size === 0) return items;
+  return items.filter(item => !pendingDeletes.has(item.id));
+};
+
 const adminReducer = (state, action) => {
   let newState = { ...state };
 
   switch (action.type) {
     // --- Bulk Setters ---
     case 'SET_JOBS':
-      newState.jobs = [...action.payload].sort(sortByCreatedAt);
+      newState.jobs = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
       break;
     case 'SET_NOTIFICATIONS':
-      newState.notifications = [...action.payload].sort(sortByCreatedAt);
+      newState.notifications = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
       break;
     case 'SET_ADMITS':
-      newState.admits = [...action.payload].sort(sortByCreatedAt);
+      newState.admits = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
       break;
     case 'SET_QUESTIONS':
-      newState.questions = [...action.payload].sort(sortByCreatedAt);
+      newState.questions = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
       break;
     case 'SET_LIVE_EXAMS':
-      newState.liveExams = [...action.payload].sort(sortByCreatedAt);
+      newState.liveExams = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
       break;
     case 'SET_FIRESTORE_READY':
       newState.firestoreReady = true;
@@ -127,6 +141,7 @@ const adminReducer = (state, action) => {
       return newState;
 
     case 'DELETE_JOB': {
+      registerPendingDelete(action.payload);
       deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
       newState.jobs = state.jobs.filter(j => j.id !== action.payload);
       saveLocalCache(COLLECTIONS.JOBS, newState.jobs);
@@ -158,6 +173,7 @@ const adminReducer = (state, action) => {
     }
 
     case 'DELETE_NOTIFICATION': {
+      registerPendingDelete(action.payload);
       deleteDocument(COLLECTIONS.NOTIFICATIONS, action.payload).catch(console.error);
       newState.notifications = state.notifications.filter(n => n.id !== action.payload);
       saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
@@ -194,6 +210,7 @@ const adminReducer = (state, action) => {
     }
 
     case 'DELETE_ADMIT': {
+      registerPendingDelete(action.payload);
       deleteDocument(COLLECTIONS.ADMITS, action.payload).catch(console.error);
       newState.admits = state.admits.filter(a => a.id !== action.payload);
       saveLocalCache(COLLECTIONS.ADMITS, newState.admits);
@@ -214,6 +231,7 @@ const adminReducer = (state, action) => {
     }
 
     case 'DELETE_QUESTION': {
+      registerPendingDelete(action.payload);
       deleteDocument(COLLECTIONS.QUESTIONS, action.payload).catch(console.error);
       newState.questions = state.questions.filter(item => item.id !== action.payload);
       saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
@@ -258,6 +276,7 @@ const adminReducer = (state, action) => {
     }
 
     case 'DELETE_EXAM': {
+      registerPendingDelete(action.payload);
       deleteDocument(COLLECTIONS.LIVE_EXAMS, action.payload).catch(console.error);
       newState.liveExams = state.liveExams.filter(e => e.id !== action.payload);
       saveLocalCache(COLLECTIONS.LIVE_EXAMS, newState.liveExams);
