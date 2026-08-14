@@ -62,7 +62,7 @@ const initialState = {
       return null;
     }
   })(),
-  activities: [],
+  activities: getLocalCache(COLLECTIONS.ACTIVITIES) || [],
   firestoreReady: false
 };
 
@@ -73,6 +73,18 @@ const registerPendingDelete = (id) => {
   pendingDeletes.set(id, Date.now());
   // Auto-cleanup after 10 seconds (by then Firestore has confirmed the delete)
   setTimeout(() => pendingDeletes.delete(id), 10000);
+};
+
+const logActivity = (type, text) => {
+  const actId = `act-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  const act = {
+    id: actId,
+    type,
+    text,
+    time: 'Just now',
+    createdAt: new Date().toISOString()
+  };
+  setDocument(COLLECTIONS.ACTIVITIES, actId, act).catch(console.error);
 };
 
 const filterPendingDeletes = (items) => {
@@ -99,6 +111,9 @@ const adminReducer = (state, action) => {
       break;
     case 'SET_LIVE_EXAMS':
       newState.liveExams = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
+      break;
+    case 'SET_ACTIVITIES':
+      newState.activities = [...action.payload];
       break;
     case 'SET_FIRESTORE_READY':
       newState.firestoreReady = true;
@@ -140,8 +155,10 @@ const adminReducer = (state, action) => {
       }
 
       if (action.type === 'ADD_JOB') {
+        logActivity('add', `Added new circular: ${job.title}`);
         newState.jobs = [job, ...state.jobs.filter(j => j.id !== job.id)].sort(sortByCreatedAt);
       } else {
+        logActivity('update', `Updated circular: ${job.title}`);
         newState.jobs = state.jobs.map(j => j.id === job.id ? job : j).sort(sortByCreatedAt);
       }
       saveLocalCache(COLLECTIONS.JOBS, newState.jobs);
@@ -150,6 +167,8 @@ const adminReducer = (state, action) => {
     case 'DELETE_JOB': {
       const jobId = action.payload;
       registerPendingDelete(jobId);
+      const deletedJob = state.jobs.find(j => j.id === jobId);
+      logActivity('delete', `Deleted circular: ${deletedJob?.title || 'Circular'}`);
       
       // Delete from Firestore
       deleteDocument(COLLECTIONS.JOBS, jobId).catch(console.error);
@@ -281,6 +300,7 @@ const adminReducer = (state, action) => {
       setDocument(COLLECTIONS.LIVE_EXAMS, examItem.id, examItem).catch(console.error);
 
       if (action.type === 'ADD_LIVE_EXAM') {
+        logActivity('add', `Scheduled new live exam: ${examItem.title}`);
         sendExamCountdownPush(examItem)
           .then(res => {
             if (res.success) {
@@ -306,6 +326,7 @@ const adminReducer = (state, action) => {
         saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
         newState.liveExams = [examItem, ...state.liveExams.filter(e => e.id !== examItem.id)].sort(sortByCreatedAt);
       } else {
+        logActivity('update', `Updated live exam: ${examItem.title}`);
         newState.liveExams = state.liveExams.map(e => e.id === examItem.id ? examItem : e).sort(sortByCreatedAt);
       }
       saveLocalCache(COLLECTIONS.LIVE_EXAMS, newState.liveExams);
@@ -315,6 +336,8 @@ const adminReducer = (state, action) => {
     case 'DELETE_EXAM': {
       registerPendingDelete(action.payload);
       deleteDocument(COLLECTIONS.LIVE_EXAMS, action.payload).catch(console.error);
+      const deletedExam = state.liveExams.find(e => e.id === action.payload);
+      logActivity('delete', `Deleted live exam: ${deletedExam?.title || 'Exam'}`);
       newState.liveExams = state.liveExams.filter(e => e.id !== action.payload);
       saveLocalCache(COLLECTIONS.LIVE_EXAMS, newState.liveExams);
       return newState;
@@ -326,6 +349,7 @@ const adminReducer = (state, action) => {
       setDocument(COLLECTIONS.QUESTIONS, paperItem.id, paperItem).catch(console.error);
 
       if (action.type === 'ADD_QUESTION_PAPER') {
+        logActivity('add', `Created question paper: ${paperItem.title}`);
         broadcastPush("নতুন প্রশ্নপত্র", `${paperItem.title} - প্রস্তুতি নিন এখনই!`, { paperId: paperItem.id, type: 'new_paper' })
           .then(res => {
             if (res.success) {
@@ -351,6 +375,7 @@ const adminReducer = (state, action) => {
         saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
         newState.questions = [paperItem, ...state.questions.filter(p => p.id !== paperItem.id)].sort(sortByCreatedAt);
       } else {
+        logActivity('update', `Updated question paper: ${paperItem.title}`);
         newState.questions = state.questions.map(p => p.id === paperItem.id ? paperItem : p).sort(sortByCreatedAt);
       }
       saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
@@ -359,6 +384,8 @@ const adminReducer = (state, action) => {
 
     case 'DELETE_QUESTION_PAPER': {
       deleteDocument(COLLECTIONS.QUESTIONS, action.payload).catch(console.error);
+      const deletedPaper = state.questions.find(p => p.id === action.payload);
+      logActivity('delete', `Deleted question paper: ${deletedPaper?.title || 'Question Paper'}`);
       newState.questions = state.questions.filter(p => p.id !== action.payload);
       saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
       return newState;
@@ -462,12 +489,26 @@ export const AdminProvider = ({ children }) => {
       }
     });
 
+    // 7. Real-time snapshot listener for ACTIVITIES collection
+    const unsubscribeActivities = onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (activitiesData) => {
+      if (Array.isArray(activitiesData)) {
+        const sortedActivities = mapWithTimestamps(activitiesData).sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
+        dispatch({ type: 'SET_ACTIVITIES', payload: sortedActivities });
+        saveLocalCache(COLLECTIONS.ACTIVITIES, sortedActivities);
+      }
+    });
+
     return () => {
       unsubscribeJobs();
       unsubscribeLiveExams();
       unsubscribeAdmits();
       unsubscribeQuestions();
       unsubscribeNotifs();
+      unsubscribeActivities();
     };
   }, []);
 

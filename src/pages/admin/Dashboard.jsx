@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
 import { runDatabaseMigration } from '../../utils/dbMigration';
+import { formatTimeAgo } from '../../utils/timeUtils';
 
 const Dashboard = () => {
   const { state: adminState } = useAdminContext();
@@ -327,7 +328,7 @@ const Dashboard = () => {
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ margin: '0', fontSize: '0.9rem', color: '#1e293b', fontWeight: 600 }}>{act.text}</p>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 500 }}>{act.time}</span>
+                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 500 }}>{formatTimeAgo(act.createdAt || act.time, true)}</span>
                   </div>
                 </div>
               ))
