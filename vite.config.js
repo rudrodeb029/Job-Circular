@@ -8,12 +8,20 @@ export default defineConfig({
     open: true
   },
   build: {
+    minify: 'esbuild',
+    target: 'es2020',
+    cssMinify: true,
     rollupOptions: {
-      external: [
-        'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js',
-        'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js'
-      ]
+      output: {
+        manualChunks: {
+          firebase: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage'],
+          vendor: ['react', 'react-dom', 'react-router-dom']
+        }
+      }
+    },
+    // Drop console.log and debugger statements in production
+    esbuild: {
+      drop: ['console', 'debugger']
     }
   }
 })
-
