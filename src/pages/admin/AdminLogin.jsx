@@ -32,7 +32,7 @@ const AdminLogin = () => {
         navigate('/admin');
       } else {
         await auth.signOut();
-        setError('Unauthorized access: Only rudrodeb029@gmail.com is allowed to access the Admin Panel.');
+        setError('Unauthorized access.');
         setLoading(false);
       }
     } catch (err) {
