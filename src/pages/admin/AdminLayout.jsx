@@ -5,15 +5,31 @@ import { useAdminContext } from '../../context/AdminContext';
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { state: adminState } = useAdminContext() || { state: {} };
+  const { state: adminState, authChecked } = useAdminContext() || { state: {}, authChecked: false };
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Protect route: Redirect to login if not authenticated
   React.useEffect(() => {
-    if (!adminState.adminUser) {
+    if (authChecked && !adminState.adminUser) {
       navigate('/admin/login', { replace: true });
     }
-  }, [adminState.adminUser, navigate]);
+  }, [authChecked, adminState.adminUser, navigate]);
+
+  if (!authChecked) {
+    return (
+      <div style={{ display: 'flex', height: '100vh', width: '100vw', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', fontFamily: 'Inter, sans-serif' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          <div style={{ width: '36px', height: '36px', border: '3px solid #e2e8f0', borderTopColor: '#4f46e5', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}></div>
+          <p style={{ color: '#64748b', fontSize: '13px', fontWeight: 600, margin: 0 }}>Verifying session...</p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
   
   const notifications = adminState.notifications || [];
   const unreadNotifications = notifications.filter(n => !n.read).length;

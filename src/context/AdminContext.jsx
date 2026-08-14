@@ -12,6 +12,7 @@ import {
 } from '../services/firestoreService';
 
 import { getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
+import { auth } from '../firebase';
 
 const AdminContext = createContext();
 
@@ -407,6 +408,7 @@ const adminReducer = (state, action) => {
 export const AdminProvider = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
   const [loading, setLoading] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const loadAllData = async (forceServer = true) => {
     try {
@@ -502,6 +504,22 @@ export const AdminProvider = ({ children }) => {
       }
     });
 
+    // 8. Real-time Firebase Auth state change listener
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (user && user.email === 'rudrodeb029@gmail.com') {
+        const adminPayload = {
+          name: user.displayName || 'Super Admin',
+          email: user.email,
+          role: 'Super Admin',
+          photoURL: user.photoURL || null
+        };
+        dispatch({ type: 'ADMIN_LOGIN', payload: adminPayload });
+      } else if (!user) {
+        dispatch({ type: 'ADMIN_LOGOUT' });
+      }
+      setAuthChecked(true);
+    });
+
     return () => {
       unsubscribeJobs();
       unsubscribeLiveExams();
@@ -509,6 +527,7 @@ export const AdminProvider = ({ children }) => {
       unsubscribeQuestions();
       unsubscribeNotifs();
       unsubscribeActivities();
+      unsubscribeAuth();
     };
   }, []);
 
@@ -518,7 +537,7 @@ export const AdminProvider = ({ children }) => {
 
   return (
     <div className="admin-context-provider">
-        <AdminContext.Provider value={{ state, dispatch, loading, refreshData }}>
+        <AdminContext.Provider value={{ state, dispatch, loading, authChecked, refreshData }}>
         {children}
         </AdminContext.Provider>
     </div>

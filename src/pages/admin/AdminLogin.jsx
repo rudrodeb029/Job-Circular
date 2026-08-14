@@ -7,8 +7,14 @@ import { signInWithPopup } from 'firebase/auth';
 const AdminLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { dispatch } = useAdminContext();
+  const { state: adminState, dispatch, authChecked } = useAdminContext();
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    if (authChecked && adminState.adminUser) {
+      navigate('/admin', { replace: true });
+    }
+  }, [authChecked, adminState.adminUser, navigate]);
 
   const handleGoogleLogin = async () => {
     setError('');
