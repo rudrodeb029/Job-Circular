@@ -81,8 +81,8 @@ const Dashboard = () => {
   const expiredPct = totalCirculars ? (expiredJobs / totalCirculars) * 100 : 0;
   const conicString = `conic-gradient(#10b981 0% ${activePct}%, #f59e0b ${activePct}% ${activePct + draftPct}%, #ef4444 ${activePct + draftPct}% 100%)`;
 
-  const recentJobs = jobs.slice(0, 5);
-  const recentActivities = activities.slice(0, 8);
+  const recentJobs = jobs.slice(0, 15);
+  const recentActivities = activities.slice(0, 20);
 
   const getActivityColor = (type) => {
     if (type === 'add') return '#10b981'; // green
@@ -108,6 +108,20 @@ const Dashboard = () => {
         .btn-modern:hover {
           background: #1e40af !important;
           transform: scale(1.02);
+        }
+        .custom-scroll::-webkit-scrollbar {
+          width: 5px;
+          height: 5px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+          background: #e2e8f0;
+          border-radius: 99px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+          background: #cbd5e1;
         }
       `}</style>
 
@@ -263,22 +277,22 @@ const Dashboard = () => {
       </div>
 
       {/* RECENT DATA ROW */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
         {/* TABLE CARD */}
-        <div className="admin-table-wrapper animate-card" style={{ background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '600ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div className="admin-table-wrapper animate-card" style={{ display: 'flex', flexDirection: 'column', height: '450px', background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '600ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexShrink: 0 }}>
             <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Recent Circulars</h3>
             <Link to="/admin/jobs" style={{ color: '#1a56db', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700, background: 'rgba(26, 86, 219, 0.05)', padding: '6px 16px', borderRadius: '10px', transition: 'all 0.2s' }}>View All</Link>
           </div>
           
-          <div style={{ overflowX: 'auto' }}>
+          <div className="custom-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', paddingRight: '4px' }}>
             <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px', textAlign: 'left' }}>
-              <thead>
+              <thead style={{ position: 'sticky', top: 0, background: '#ffffff', zIndex: 1 }}>
                 <tr style={{ color: '#94a3b8', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  <th style={{ padding: '0 1rem', fontWeight: 700 }}>Information</th>
-                  <th style={{ padding: '0 1rem', fontWeight: 700 }}>Category</th>
-                  <th style={{ padding: '0 1rem', fontWeight: 700 }}>Status</th>
-                  <th style={{ padding: '0 1rem', fontWeight: 700 }}>Deadline</th>
+                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Information</th>
+                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Category</th>
+                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Status</th>
+                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Deadline</th>
                 </tr>
               </thead>
               <tbody>
@@ -317,12 +331,12 @@ const Dashboard = () => {
         </div>
 
         {/* ACTIVITY CARD */}
-        <div className="admin-chart-card animate-card" style={{ background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '700ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
-          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Recent Activity</h3>
-          <div className="activity-feed" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div className="admin-chart-card animate-card" style={{ display: 'flex', flexDirection: 'column', height: '450px', background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '700ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
+          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', flexShrink: 0 }}>Recent Activity</h3>
+          <div className="activity-feed custom-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingRight: '6px' }}>
             {recentActivities.length > 0 ? (
               recentActivities.map((act, idx) => (
-                <div key={idx} className="activity-item" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div key={idx} className="activity-item" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexShrink: 0 }}>
                   <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `${getActivityColor(act.type)}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
                     {act.type === 'add' ? '✨' : act.type === 'update' ? '🔄' : '🗑️'}
                   </div>
@@ -333,7 +347,7 @@ const Dashboard = () => {
                 </div>
               ))
             ) : (
-              <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+              <div style={{ textAlign: 'center', padding: '2rem 0', flexShrink: 0 }}>
                 <p style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: 500 }}>No recent activity to show.</p>
               </div>
             )}
