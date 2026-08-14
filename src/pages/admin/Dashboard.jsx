@@ -30,14 +30,20 @@ const Dashboard = () => {
   };
 
   const totalCirculars = jobs.length;
-  const activeJobs = jobs.filter(j => j.status === 'active').length;
-  const draftJobs = jobs.filter(j => j.status === 'draft').length;
-  const expiredJobs = jobs.filter(j => j.status === 'expired').length;
   
-  const totalVacancies = jobs.reduce((sum, j) => {
-    const v = parseInt(j.vacancy, 10);
-    return sum + (isNaN(v) ? 0 : v);
-  }, 0);
+  const activeJobs = jobs.filter(j => {
+    if (!j.deadline) return j.status === 'active';
+    const deadlineDate = new Date(`${j.deadline}T23:59:59`);
+    return deadlineDate.getTime() >= Date.now();
+  }).length;
+
+  const expiredJobs = jobs.filter(j => {
+    if (!j.deadline) return j.status === 'expired';
+    const deadlineDate = new Date(`${j.deadline}T23:59:59`);
+    return deadlineDate.getTime() < Date.now();
+  }).length;
+
+  const draftJobs = jobs.filter(j => j.status === 'draft').length;
 
   const liveExams = adminState.liveExams || [];
   const activeLiveExams = liveExams.filter(exam => {
@@ -47,7 +53,13 @@ const Dashboard = () => {
   }).length;
 
   const papers = adminState.questions || [];
-  const totalMCQs = papers.reduce((sum, p) => sum + (p.questions?.length || 0), 0);
+  const totalMCQs = papers.reduce((sum, p) => {
+    if (Array.isArray(p.questions)) {
+      return sum + p.questions.length;
+    }
+    const qCount = parseInt(p.totalQuestions || 0, 10);
+    return sum + (isNaN(qCount) ? 0 : qCount);
+  }, 0);
 
   const catList = ['gov', 'bank', 'ngo', 'private', 'it', 'defense', 'healthcare', 'teaching', 'engineering', 'parttime'];
   const categoryCounts = catList.map(catId => {

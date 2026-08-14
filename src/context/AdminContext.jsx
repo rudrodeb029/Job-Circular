@@ -419,7 +419,7 @@ export const AdminProvider = ({ children }) => {
 
     // 2. Real-time snapshot listener for JOBS collection
     const unsubscribeJobs = onCollectionSnapshot(COLLECTIONS.JOBS, (jobsData) => {
-      if (Array.isArray(jobsData) && jobsData.length > 0) {
+      if (Array.isArray(jobsData)) {
         const sortedJobs = mapWithTimestamps(jobsData).sort(sortByCreatedAt);
         dispatch({ type: 'SET_JOBS', payload: sortedJobs });
         saveLocalCache(COLLECTIONS.JOBS, sortedJobs);
@@ -428,7 +428,7 @@ export const AdminProvider = ({ children }) => {
 
     // 3. Real-time snapshot listener for LIVE_EXAMS collection
     const unsubscribeLiveExams = onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (liveExamsData) => {
-      if (Array.isArray(liveExamsData) && liveExamsData.length > 0) {
+      if (Array.isArray(liveExamsData)) {
         const sortedExams = mapWithTimestamps(liveExamsData).sort(sortByCreatedAt);
         dispatch({ type: 'SET_LIVE_EXAMS', payload: sortedExams });
         saveLocalCache(COLLECTIONS.LIVE_EXAMS, sortedExams);
@@ -437,7 +437,7 @@ export const AdminProvider = ({ children }) => {
 
     // 4. Real-time snapshot listener for ADMITS collection
     const unsubscribeAdmits = onCollectionSnapshot(COLLECTIONS.ADMITS, (admitsData) => {
-      if (Array.isArray(admitsData) && admitsData.length > 0) {
+      if (Array.isArray(admitsData)) {
         const sortedAdmits = mapWithTimestamps(admitsData).sort(sortByCreatedAt);
         dispatch({ type: 'SET_ADMITS', payload: sortedAdmits });
         saveLocalCache(COLLECTIONS.ADMITS, sortedAdmits);
@@ -446,7 +446,7 @@ export const AdminProvider = ({ children }) => {
 
     // 5. Real-time snapshot listener for QUESTIONS collection
     const unsubscribeQuestions = onCollectionSnapshot(COLLECTIONS.QUESTIONS, (questionsData) => {
-      if (Array.isArray(questionsData) && questionsData.length > 0) {
+      if (Array.isArray(questionsData)) {
         const sortedQuestions = mapWithTimestamps(questionsData).sort(sortByCreatedAt);
         dispatch({ type: 'SET_QUESTIONS', payload: sortedQuestions });
         saveLocalCache(COLLECTIONS.QUESTIONS, sortedQuestions);
@@ -455,7 +455,7 @@ export const AdminProvider = ({ children }) => {
 
     // 6. Real-time snapshot listener for NOTIFICATIONS collection
     const unsubscribeNotifs = onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (notifsData) => {
-      if (Array.isArray(notifsData) && notifsData.length > 0) {
+      if (Array.isArray(notifsData)) {
         const sortedNotifs = mapWithTimestamps(notifsData).sort(sortByCreatedAt);
         dispatch({ type: 'SET_NOTIFICATIONS', payload: sortedNotifs });
         saveLocalCache(COLLECTIONS.NOTIFICATIONS, sortedNotifs);
