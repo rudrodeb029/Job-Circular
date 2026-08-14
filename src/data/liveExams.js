@@ -174,6 +174,7 @@ export const defaultLiveExams = [
 ];
 
 import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/firestoreService';
+import { sortByCreatedAt } from '../utils/timeUtils';
 
 // Initialize cache with local storage or static fallback
 let cachedLiveExams = (() => {
@@ -190,7 +191,7 @@ try {
   onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => {
     if (data && data.length > 0) {
       // Sort LIFO (newest first)
-      cachedLiveExams = [...data].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+      cachedLiveExams = [...data].sort(sortByCreatedAt);
       localStorage.setItem('admin_live_exams', JSON.stringify(cachedLiveExams));
     }
   });

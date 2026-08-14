@@ -90,8 +90,14 @@ export default function Home() {
     if (localJobs.length === 0) return [];
 
     const jobItems = localJobs
-      .filter(job => !job.showInExamDate && !job.showInResult)
-      .map(job => ({ ...job, feedType: 'job' }));
+      .map(job => {
+        const hasAdmit = localAdmits.some(a => String(a.jobId) === String(job.id));
+        if ((job.showInExamDate || job.showInResult) && hasAdmit) {
+          return null;
+        }
+        return { ...job, feedType: 'job' };
+      })
+      .filter(Boolean);
 
     const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => {
       const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
