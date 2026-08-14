@@ -18,6 +18,11 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firestore with offline persistence
 export const db = getFirestore(app);
 
+// Initialize Firebase Auth
+import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
+
 try {
   enableIndexedDbPersistence(db).catch((err) => {
     if (err.code === 'failed-precondition') {

@@ -54,7 +54,14 @@ const initialState = {
   questions: getLocalCache(COLLECTIONS.QUESTIONS),
   liveExams: getLocalCache(COLLECTIONS.LIVE_EXAMS),
   categories: categories,
-  adminUser: null,
+  adminUser: (() => {
+    try {
+      const saved = localStorage.getItem('admin_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  })(),
   activities: [],
   firestoreReady: false
 };

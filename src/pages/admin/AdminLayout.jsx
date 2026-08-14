@@ -7,6 +7,13 @@ const AdminLayout = () => {
   const location = useLocation();
   const { state: adminState } = useAdminContext() || { state: {} };
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Protect route: Redirect to login if not authenticated
+  React.useEffect(() => {
+    if (!adminState.adminUser) {
+      navigate('/admin/login', { replace: true });
+    }
+  }, [adminState.adminUser, navigate]);
   
   const notifications = adminState.notifications || [];
   const unreadNotifications = notifications.filter(n => !n.read).length;

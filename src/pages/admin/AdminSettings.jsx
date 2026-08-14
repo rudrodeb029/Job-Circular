@@ -117,7 +117,13 @@ const AdminSettings = () => {
     linkElement.click();
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const { auth } = await import('../../firebase');
+      await auth.signOut();
+    } catch (e) {
+      console.error('Error signing out from Firebase:', e);
+    }
     if (dispatch) dispatch({ type: 'ADMIN_LOGOUT' });
     navigate('/admin/login');
   };
