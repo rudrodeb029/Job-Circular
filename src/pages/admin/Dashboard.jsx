@@ -63,7 +63,7 @@ const Dashboard = () => {
 
   const catList = ['gov', 'bank', 'ngo', 'private', 'it', 'defense', 'healthcare', 'teaching', 'engineering', 'parttime'];
   const categoryCounts = catList.map(catId => {
-    const count = jobs.filter(j => j.category === catId).length;
+    const count = jobs.filter(j => (j.categoryId || j.category) === catId).length;
     const catData = categories.find(c => c.id === catId);
     return {
       id: catId,
@@ -282,7 +282,7 @@ const Dashboard = () => {
               </thead>
               <tbody>
                 {recentJobs.map((job, i) => {
-                  const catData = categories.find(c => c.id === job.category);
+                  const catData = categories.find(c => c.id === (job.categoryId || job.category));
                   let statusBg = '#f1f5f9', statusColor = '#475569';
                   if (job.status === 'active') { statusBg = '#d1fae5'; statusColor = '#065f46'; }
                   if (job.status === 'draft') { statusBg = '#fef3c7'; statusColor = '#92400e'; }
@@ -296,7 +296,7 @@ const Dashboard = () => {
                       </td>
                       <td style={{ padding: '1rem', background: '#f8fafc' }}>
                         <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 700, background: `${catData?.textColor}15`, color: catData?.textColor }}>
-                          {catData?.name || job.category}
+                          {catData?.name || job.categoryId || job.category}
                         </span>
                       </td>
                       <td style={{ padding: '1rem', background: '#f8fafc' }}>
