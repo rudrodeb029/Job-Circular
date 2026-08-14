@@ -29,7 +29,7 @@ export default function AppHeader() {
         borderBottom: '1px solid var(--border)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
         minHeight: '64px',
-        padding: 'calc(env(safe-area-inset-top, 0px) + 8px) 16px 8px 16px',
+        padding: 'calc(max(env(safe-area-inset-top, 0px), 24px) + 8px) 16px 12px 16px',
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',

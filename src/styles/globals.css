@@ -80,7 +80,7 @@
   --z-toast: 300;
 
   /* Safe Area */
-  --safe-area-top: env(safe-area-inset-top, 44px);
+  --safe-area-top: max(env(safe-area-inset-top, 0px), 24px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
