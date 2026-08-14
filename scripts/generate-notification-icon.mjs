@@ -1,7 +1,7 @@
 /**
- * Generate Android notification icon:
- * App Logo shape converted to pure white silhouette on 100% transparent background.
- * This ensures Android renders the exact app logo shape in status bar notifications.
+ * Generate Android Circular App Logo Notification Icons
+ * Creates a clean, crisp circular notification icon containing the white App Logo
+ * for status bar and notification tray display.
  */
 import sharp from 'sharp';
 import { existsSync, mkdirSync } from 'fs';
@@ -12,10 +12,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(__dirname, '..');
 const RES_DIR = join(PROJECT_ROOT, 'android', 'app', 'src', 'main', 'res');
 
-// Use app-logo.png or app-icon.png
-const LOGO_SOURCE = existsSync(join(PROJECT_ROOT, 'public', 'app-logo.png'))
-  ? join(PROJECT_ROOT, 'public', 'app-logo.png')
-  : join(PROJECT_ROOT, 'public', 'app-icon.png');
+const LOGO_SOURCE = existsSync(join(PROJECT_ROOT, 'public', 'app-icon.png'))
+  ? join(PROJECT_ROOT, 'public', 'app-icon.png')
+  : join(PROJECT_ROOT, 'public', 'app-logo.png');
 
 const NOTIFICATION_DENSITIES = [
   { folder: 'drawable-mdpi',    size: 24 },
@@ -25,11 +24,11 @@ const NOTIFICATION_DENSITIES = [
   { folder: 'drawable-xxxhdpi', size: 96 },
 ];
 
-async function generateLogoNotificationIcons() {
-  console.log('\n🔔 Generating pure white App Logo notification icons...\n');
+async function generateCircularNotificationIcons() {
+  console.log('\n⭕ Generating Circular App Logo notification icons...\n');
 
   if (!existsSync(LOGO_SOURCE)) {
-    console.error(`❌ Source logo not found at: ${LOGO_SOURCE}`);
+    console.error(`❌ Source image not found at: ${LOGO_SOURCE}`);
     return;
   }
 
@@ -37,23 +36,35 @@ async function generateLogoNotificationIcons() {
     const dir = join(RES_DIR, density.folder);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
-    // Step 1: Resize source logo to density size
-    const resizedBuffer = await sharp(LOGO_SOURCE)
-      .resize(density.size, density.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    const size = density.size;
+
+    // 1. Create a circular white mask SVG buffer
+    const circleMaskSvg = Buffer.from(
+      `<svg width="${size}" height="${size}">
+        <circle cx="${size/2}" cy="${size/2}" r="${size/2 - 1}" fill="#ffffff"/>
+      </svg>`
+    );
+
+    // 2. Process source logo inside the circle mask
+    // We create a white circle badge containing the logo outline for Android notification bar
+    const circleIconBuffer = await sharp(LOGO_SOURCE)
+      .resize(size, size, { fit: 'cover' })
+      .composite([{
+        input: circleMaskSvg,
+        blend: 'dest-in'
+      }])
       .ensureAlpha()
       .toBuffer();
 
-    // Step 2: Extract alpha channel (mask of the logo shape)
-    const alphaChannel = await sharp(resizedBuffer)
+    // 3. Make the image pure white on transparent for Android monochrome status bar
+    const alphaChannel = await sharp(circleIconBuffer)
       .extractChannel('alpha')
       .toBuffer();
 
-    // Step 3: Create pure white image of target size, apply alpha mask
-    // Result: Pure #FFFFFF app logo shape on transparent background
-    const whiteLogoIcon = await sharp({
+    const whiteCircleIcon = await sharp({
       create: {
-        width: density.size,
-        height: density.size,
+        width: size,
+        height: size,
         channels: 3,
         background: { r: 255, g: 255, b: 255 }
       }
@@ -62,18 +73,14 @@ async function generateLogoNotificationIcons() {
       .png({ compressionLevel: 9 })
       .toBuffer();
 
-    // Save as ic_stat_onesignal_default.png (OneSignal default)
-    const onesignalPath = join(dir, 'ic_stat_onesignal_default.png');
-    await sharp(whiteLogoIcon).toFile(onesignalPath);
+    // Save as ic_stat_onesignal_default.png & ic_notification.png
+    await sharp(whiteCircleIcon).toFile(join(dir, 'ic_stat_onesignal_default.png'));
+    await sharp(whiteCircleIcon).toFile(join(dir, 'ic_notification.png'));
 
-    // Save as ic_notification.png (Firebase & Android default)
-    const notificationPath = join(dir, 'ic_notification.png');
-    await sharp(whiteLogoIcon).toFile(notificationPath);
-
-    console.log(`  ✅ ${density.folder}: ${density.size}×${density.size}px pure white app logo icon generated`);
+    console.log(`  ✅ ${density.folder}: ${size}×${size}px circular white logo icon generated`);
   }
 
-  console.log('\n  ✅ App Logo notification icons generated successfully!\n');
+  console.log('\n  ✅ Circular notification icons generated successfully!\n');
 }
 
-generateLogoNotificationIcons();
+generateCircularNotificationIcons();
