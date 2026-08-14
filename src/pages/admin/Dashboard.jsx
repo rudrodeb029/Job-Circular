@@ -39,6 +39,16 @@ const Dashboard = () => {
     return sum + (isNaN(v) ? 0 : v);
   }, 0);
 
+  const liveExams = adminState.liveExams || [];
+  const activeLiveExams = liveExams.filter(exam => {
+    const start = new Date(exam.startTime).getTime();
+    const end = start + (parseInt(exam.duration, 10) || 0) * 60000;
+    return Date.now() <= end;
+  }).length;
+
+  const papers = adminState.questions || [];
+  const totalMCQs = papers.reduce((sum, p) => sum + (p.questions?.length || 0), 0);
+
   const catList = ['gov', 'bank', 'ngo', 'private', 'it', 'defense', 'healthcare', 'teaching', 'engineering', 'parttime'];
   const categoryCounts = catList.map(catId => {
     const count = jobs.filter(j => j.category === catId).length;
@@ -117,11 +127,13 @@ const Dashboard = () => {
       </div>
 
       {/* STATS GRID */}
-      <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 280px))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
         {[
           { label: 'Total Circulars', val: totalCirculars },
           { label: 'Active Jobs', val: activeJobs },
-          { label: 'Expired', val: expiredJobs }
+          { label: 'Expired', val: expiredJobs },
+          { label: 'Active Live Exam', val: activeLiveExams },
+          { label: 'Total MCQ', val: totalMCQs }
         ].map((stat, i) => (
           <div
             key={i}
@@ -132,7 +144,7 @@ const Dashboard = () => {
               borderRadius: '20px',
               boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.01)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              animationDelay: `${i * 100}ms`,
+              animationDelay: `${i * 80}ms`,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
