@@ -1,6 +1,7 @@
 /**
- * Generate proper Android notification icon (monochrome white silhouette on transparent)
- * Android requires notification icons to be white-only with transparency
+ * Generate Android notification icon:
+ * App Logo shape converted to pure white silhouette on 100% transparent background.
+ * This ensures Android renders the exact app logo shape in status bar notifications.
  */
 import sharp from 'sharp';
 import { existsSync, mkdirSync } from 'fs';
@@ -10,9 +11,12 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(__dirname, '..');
 const RES_DIR = join(PROJECT_ROOT, 'android', 'app', 'src', 'main', 'res');
-const ICON_SOURCE = join(PROJECT_ROOT, 'public', 'app-icon.png');
 
-// Android notification icon density sizes
+// Use app-logo.png or app-icon.png
+const LOGO_SOURCE = existsSync(join(PROJECT_ROOT, 'public', 'app-logo.png'))
+  ? join(PROJECT_ROOT, 'public', 'app-logo.png')
+  : join(PROJECT_ROOT, 'public', 'app-icon.png');
+
 const NOTIFICATION_DENSITIES = [
   { folder: 'drawable-mdpi',    size: 24 },
   { folder: 'drawable-hdpi',    size: 36 },
@@ -21,11 +25,11 @@ const NOTIFICATION_DENSITIES = [
   { folder: 'drawable-xxxhdpi', size: 96 },
 ];
 
-async function generateNotificationIcon() {
-  console.log('\n🔔 Generating monochrome notification icons...\n');
+async function generateLogoNotificationIcons() {
+  console.log('\n🔔 Generating pure white App Logo notification icons...\n');
 
-  if (!existsSync(ICON_SOURCE)) {
-    console.error(`❌ Icon source not found: ${ICON_SOURCE}`);
+  if (!existsSync(LOGO_SOURCE)) {
+    console.error(`❌ Source logo not found at: ${LOGO_SOURCE}`);
     return;
   }
 
@@ -33,41 +37,43 @@ async function generateNotificationIcon() {
     const dir = join(RES_DIR, density.folder);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
-    // Create white silhouette: extract alpha channel, make white pixels on transparent
-    const outFile = join(dir, 'ic_stat_onesignal_default.png');
-    
-    await sharp(ICON_SOURCE)
-      .resize(density.size, density.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      // Convert to grayscale then threshold to create silhouette
-      .greyscale()
-      .threshold(128)
-      // Negate to get white on transparent
-      .negate({ alpha: false })
-      .flatten({ background: { r: 255, g: 255, b: 255 } })
-      .ensureAlpha()
-      .png({ compressionLevel: 9 })
-      .toFile(outFile);
-
-    console.log(`  ✅ ${density.folder}/ic_stat_onesignal_default.png: ${density.size}×${density.size}px`);
-  }
-
-  // Also create a simple white circle notification icon as fallback
-  // Using a simple white filled circle for clean notification appearance
-  for (const density of NOTIFICATION_DENSITIES) {
-    const dir = join(RES_DIR, density.folder);
-    const outFile = join(dir, 'ic_notification.png');
-    
-    // Create a white icon from the source, ensuring it's monochrome
-    await sharp(ICON_SOURCE)
+    // Step 1: Resize source logo to density size
+    const resizedBuffer = await sharp(LOGO_SOURCE)
       .resize(density.size, density.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .ensureAlpha()
+      .toBuffer();
+
+    // Step 2: Extract alpha channel (mask of the logo shape)
+    const alphaChannel = await sharp(resizedBuffer)
+      .extractChannel('alpha')
+      .toBuffer();
+
+    // Step 3: Create pure white image of target size, apply alpha mask
+    // Result: Pure #FFFFFF app logo shape on transparent background
+    const whiteLogoIcon = await sharp({
+      create: {
+        width: density.size,
+        height: density.size,
+        channels: 3,
+        background: { r: 255, g: 255, b: 255 }
+      }
+    })
+      .joinChannel(alphaChannel)
       .png({ compressionLevel: 9 })
-      .toFile(outFile);
-    
-    console.log(`  ✅ ${density.folder}/ic_notification.png: ${density.size}×${density.size}px`);
+      .toBuffer();
+
+    // Save as ic_stat_onesignal_default.png (OneSignal default)
+    const onesignalPath = join(dir, 'ic_stat_onesignal_default.png');
+    await sharp(whiteLogoIcon).toFile(onesignalPath);
+
+    // Save as ic_notification.png (Firebase & Android default)
+    const notificationPath = join(dir, 'ic_notification.png');
+    await sharp(whiteLogoIcon).toFile(notificationPath);
+
+    console.log(`  ✅ ${density.folder}: ${density.size}×${density.size}px pure white app logo icon generated`);
   }
 
-  console.log('\n  ✅ Notification icons generated!\n');
+  console.log('\n  ✅ App Logo notification icons generated successfully!\n');
 }
 
-generateNotificationIcon();
+generateLogoNotificationIcons();
