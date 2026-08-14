@@ -28,12 +28,12 @@ export default function AppHeader() {
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid var(--border)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-        minHeight: '64px',
-        padding: 'calc(max(env(safe-area-inset-top, 0px), 24px) + 8px) 16px 12px 16px',
+        minHeight: '50px',
+        padding: 'calc(max(env(safe-area-inset-top, 0px), 24px) + 4px) 14px 6px 14px',
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
-        marginBottom: '14px'
+        marginBottom: '10px'
       }}>
         {/* Left: Hamburger Menu Icon Button */}
         <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
@@ -41,9 +41,9 @@ export default function AppHeader() {
             onClick={() => setDrawerOpen(true)}
             aria-label="Open Menu"
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '12px',
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -56,19 +56,19 @@ export default function AppHeader() {
             onMouseOver={(e) => { e.currentTarget.style.background = 'var(--primary-lightest)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
             onMouseOut={(e) => { e.currentTarget.style.background = 'var(--bg-secondary)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
           >
-            <Menu size={22} />
+            <Menu size={20} />
           </button>
         </div>
 
-        {/* Center: Polished Brand Logo Badge (BBC News Inspired Style) */}
-        <Link to="/home" style={{ display: 'flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}>
+        {/* Center: Polished Brand Logo Badge */}
+        <Link to="/home" style={{ display: 'flex', alignItems: 'center', gap: '5px', textDecoration: 'none' }}>
           <div style={{
             background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
             color: 'white',
-            padding: '4px 8px',
+            padding: '3px 7px',
             borderRadius: '6px',
             fontWeight: 900,
-            fontSize: '14px',
+            fontSize: '13px',
             letterSpacing: '0.8px',
             boxShadow: '0 4px 10px rgba(26, 86, 219, 0.25)'
           }}>
@@ -76,7 +76,7 @@ export default function AppHeader() {
           </div>
           <span style={{
             fontWeight: 900,
-            fontSize: '17px',
+            fontSize: '16px',
             color: 'var(--text-primary)',
             letterSpacing: '-0.5px'
           }}>
@@ -90,9 +90,9 @@ export default function AppHeader() {
           <button
             onClick={() => navigate('/notifications')}
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '12px',
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -103,24 +103,24 @@ export default function AppHeader() {
               position: 'relative'
             }}
           >
-            <Bell size={24} className="bell-animated" />
+            <Bell size={20} className="bell-animated" />
             {unreadCount > 0 && (
               <span
                 style={{
                   position: 'absolute',
-                  top: '-4px',
-                  right: '-4px',
+                  top: '-3px',
+                  right: '-3px',
                   background: '#ef4444',
                   color: 'white',
                   borderRadius: '50%',
-                  fontSize: '10px',
+                  fontSize: '9px',
                   fontWeight: '900',
-                  width: '18px',
-                  height: '18px',
+                  width: '16px',
+                  height: '16px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '2.5px solid #ffffff',
+                  border: '2px solid #ffffff',
                   boxShadow: '0 2px 8px rgba(239, 68, 68, 0.35)',
                   lineHeight: 1
                 }}
@@ -135,8 +135,8 @@ export default function AppHeader() {
             onClick={() => navigate('/profile')}
             style={{
               position: 'relative',
-              width: '38px',
-              height: '38px',
+              width: '34px',
+              height: '34px',
               borderRadius: '50%',
               background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
               padding: '2px',

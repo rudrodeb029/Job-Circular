@@ -228,19 +228,20 @@ ul, ol {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 50;
-  padding: calc(14px + var(--safe-area-top)) 14px 14px 14px;
+  padding: calc(6px + var(--safe-area-top)) 14px 6px 14px;
+  min-height: 48px;
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  gap: 12px;
-  box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.1);
+  gap: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
 }
 
 .page-header h1 {
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.3px;
-  color: var(--text-secondary);
+  color: var(--text-primary);
 }
 
 .page-header-blue {
