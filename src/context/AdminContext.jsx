@@ -141,10 +141,40 @@ const adminReducer = (state, action) => {
       return newState;
 
     case 'DELETE_JOB': {
-      registerPendingDelete(action.payload);
-      deleteDocument(COLLECTIONS.JOBS, action.payload).catch(console.error);
-      newState.jobs = state.jobs.filter(j => j.id !== action.payload);
+      const jobId = action.payload;
+      registerPendingDelete(jobId);
+      
+      // Delete from Firestore
+      deleteDocument(COLLECTIONS.JOBS, jobId).catch(console.error);
+      
+      // Delete related admits/results
+      const admitId = `admit-${jobId}`;
+      const resultId = `result-${jobId}`;
+      registerPendingDelete(admitId);
+      registerPendingDelete(resultId);
+      deleteDocument(COLLECTIONS.ADMITS, admitId).catch(console.error);
+      deleteDocument(COLLECTIONS.ADMITS, resultId).catch(console.error);
+      
+      // Delete related notifications
+      const notifJobId = `notif-job-${jobId}`;
+      const notifAdmitId = `notif-admit-${jobId}`;
+      const notifResultId = `notif-result-${jobId}`;
+      registerPendingDelete(notifJobId);
+      registerPendingDelete(notifAdmitId);
+      registerPendingDelete(notifResultId);
+      deleteDocument(COLLECTIONS.NOTIFICATIONS, notifJobId).catch(console.error);
+      deleteDocument(COLLECTIONS.NOTIFICATIONS, notifAdmitId).catch(console.error);
+      deleteDocument(COLLECTIONS.NOTIFICATIONS, notifResultId).catch(console.error);
+      
+      // Update local state
+      newState.jobs = state.jobs.filter(j => j.id !== jobId);
+      newState.admits = (state.admits || []).filter(a => a.jobId !== jobId && a.id !== admitId && a.id !== resultId);
+      newState.notifications = (state.notifications || []).filter(n => n.jobId !== jobId && n.id !== notifJobId && n.id !== notifAdmitId && n.id !== notifResultId);
+      
       saveLocalCache(COLLECTIONS.JOBS, newState.jobs);
+      saveLocalCache(COLLECTIONS.ADMITS, newState.admits);
+      saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
+      
       return newState;
     }
 

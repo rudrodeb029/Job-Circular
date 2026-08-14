@@ -112,37 +112,45 @@ export default function AllCirculars() {
     }));
 
     // Notifications admit card items from database
-    const notifExamItems = localAdmits.filter(item => item.type === 'admit_card').map(item => {
-      const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
-      return {
-        ...item,
-        description: parentJob?.description || '',
-        originalId: item.jobId,
-        postTitle: item.examName,
-        postTitleEn: item.examNameEn,
-        examDate: item.date,
-        examDateEn: item.dateEn,
-        postedDate: item.date || '১ দিন আগে',
-        postedDateEn: item.dateEn || item.date || '1 day ago',
-        feedType: 'exam_date'
-      };
-    });
+    const notifExamItems = localAdmits
+      .filter(item => item.type === 'admit_card')
+      .map(item => {
+        const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
+        if (!parentJob) return null;
+        return {
+          ...item,
+          description: parentJob?.description || '',
+          originalId: item.jobId,
+          postTitle: item.examName,
+          postTitleEn: item.examNameEn,
+          examDate: item.date,
+          examDateEn: item.dateEn,
+          postedDate: item.date || '১ দিন আগে',
+          postedDateEn: item.dateEn || item.date || '1 day ago',
+          feedType: 'exam_date'
+        };
+      })
+      .filter(Boolean);
 
     // Notifications result items from database
-    const notifResultItems = localAdmits.filter(item => item.type === 'result').map(item => {
-      const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
-      return {
-        ...item,
-        description: parentJob?.description || '',
-        originalId: item.jobId,
-        postTitle: item.examName,
-        postTitleEn: item.examNameEn,
-        examResult: item.downloadLink,
-        postedDate: item.date || '১ দিন আগে',
-        postedDateEn: item.dateEn || item.date || '1 day ago',
-        feedType: 'result'
-      };
-    });
+    const notifResultItems = localAdmits
+      .filter(item => item.type === 'result')
+      .map(item => {
+        const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
+        if (!parentJob) return null;
+        return {
+          ...item,
+          description: parentJob?.description || '',
+          originalId: item.jobId,
+          postTitle: item.examName,
+          postTitleEn: item.examNameEn,
+          examResult: item.downloadLink,
+          postedDate: item.date || '১ দিন আগে',
+          postedDateEn: item.dateEn || item.date || '1 day ago',
+          feedType: 'result'
+        };
+      })
+      .filter(Boolean);
 
     const rawFeed = [...jobItems, ...examJobs, ...resultJobs, ...notifExamItems, ...notifResultItems];
 
