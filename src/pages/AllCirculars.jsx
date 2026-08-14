@@ -6,7 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import JobCard from '../components/JobCard';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
-import { formatTimeAgo } from '../utils/timeUtils';
+import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import { categories } from '../data/categories';
 import PullToRefresh from '../components/PullToRefresh';
 
@@ -144,22 +144,6 @@ export default function AllCirculars() {
       };
     });
 
-    const getItemTimestamp = (item) => {
-      if (item.createdAt) {
-        const ms = new Date(item.createdAt).getTime();
-        if (!isNaN(ms)) return ms;
-      }
-      if (item.id) {
-        const matches = String(item.id).match(/\d{10,13}/);
-        if (matches) return parseInt(matches[0], 10);
-      }
-      if (item.postedAt && item.postedAt.includes('-')) {
-        const ms = new Date(item.postedAt).getTime();
-        if (!isNaN(ms)) return ms;
-      }
-      return 0;
-    };
-
     const rawFeed = [...jobItems, ...examJobs, ...resultJobs, ...notifExamItems, ...notifResultItems];
 
     // DEDUPLICATION: Use a Map to keep only one item per original circular
@@ -182,13 +166,7 @@ export default function AllCirculars() {
       }
     });
 
-    return Array.from(deduplicatedMap.values())
-      .sort((a, b) => {
-        const tsA = getItemTimestamp(a);
-        const tsB = getItemTimestamp(b);
-        if (tsA !== tsB) return tsB - tsA; // LIFO (Newest first)
-        return String(b.id || '').localeCompare(String(a.id || ''));
-      });
+    return Array.from(deduplicatedMap.values()).sort(sortByCreatedAt);
   }, [adminState.jobs, adminState.admits]);
 
   // Filter jobs based on search query

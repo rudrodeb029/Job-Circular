@@ -11,7 +11,7 @@ import TabBar from '../components/TabBar';
 import { HomeSkeleton } from '../components/SkeletonLoader';
 import { categories } from '../data/categories';
 import Disclaimer from '../components/Disclaimer';
-import { formatTimeAgo } from '../utils/timeUtils';
+import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import PullToRefresh from '../components/PullToRefresh';
 
 const orgIconsMap = {
@@ -124,18 +124,6 @@ export default function Home() {
       };
     });
 
-    const getItemTimestamp = (item) => {
-      if (item.createdAt) {
-        const ms = new Date(item.createdAt).getTime();
-        if (!isNaN(ms)) return ms;
-      }
-      if (item.id) {
-        const matches = String(item.id).match(/\d{10,13}/);
-        if (matches) return parseInt(matches[0], 10);
-      }
-      return 0;
-    };
-
     const rawFeed = [...jobItems, ...notifExamItems, ...notifResultItems];
     const deduplicatedMap = new Map();
 
@@ -156,13 +144,7 @@ export default function Home() {
       }
     });
 
-    return Array.from(deduplicatedMap.values())
-      .sort((a, b) => {
-        const tsA = getItemTimestamp(a);
-        const tsB = getItemTimestamp(b);
-        if (tsA !== tsB) return tsB - tsA;
-        return String(b.id || '').localeCompare(String(a.id || ''));
-      });
+    return Array.from(deduplicatedMap.values()).sort(sortByCreatedAt);
   }, [localJobs, localAdmits]);
 
   const activeJobCount = useMemo(() => {

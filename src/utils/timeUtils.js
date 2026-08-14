@@ -50,3 +50,53 @@ const toBengaliNumber = (num) => {
   };
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
+
+/**
+ * Robust timestamp extractor supporting ISO strings, Date objects,
+ * Firestore Timestamps ({ seconds }), numbers, and timestamp IDs.
+ */
+export const getItemTimestamp = (item) => {
+  if (!item) return 0;
+
+  // 1. Check createdAt
+  if (item.createdAt) {
+    if (typeof item.createdAt === 'number') return item.createdAt;
+    if (typeof item.createdAt.toDate === 'function') return item.createdAt.toDate().getTime();
+    if (typeof item.createdAt.seconds === 'number') return item.createdAt.seconds * 1000;
+    const ms = new Date(item.createdAt).getTime();
+    if (!isNaN(ms) && ms > 0) return ms;
+  }
+
+  // 2. Check updatedAt
+  if (item.updatedAt) {
+    if (typeof item.updatedAt === 'number') return item.updatedAt;
+    if (typeof item.updatedAt.toDate === 'function') return item.updatedAt.toDate().getTime();
+    if (typeof item.updatedAt.seconds === 'number') return item.updatedAt.seconds * 1000;
+    const ms = new Date(item.updatedAt).getTime();
+    if (!isNaN(ms) && ms > 0) return ms;
+  }
+
+  // 3. Check postedAt
+  if (item.postedAt) {
+    if (typeof item.postedAt === 'number') return item.postedAt;
+    if (typeof item.postedAt.toDate === 'function') return item.postedAt.toDate().getTime();
+    if (typeof item.postedAt.seconds === 'number') return item.postedAt.seconds * 1000;
+    const ms = new Date(item.postedAt).getTime();
+    if (!isNaN(ms) && ms > 0) return ms;
+  }
+
+  // 4. Extract timestamp from ID like job_1723650000000
+  if (item.id) {
+    const matches = String(item.id).match(/\d{10,13}/);
+    if (matches) return parseInt(matches[0], 10);
+  }
+
+  return 0;
+};
+
+export const sortByCreatedAt = (a, b) => {
+  const tsA = getItemTimestamp(a);
+  const tsB = getItemTimestamp(b);
+  if (tsA !== tsB) return tsB - tsA;
+  return String(b.id || '').localeCompare(String(a.id || ''));
+};
