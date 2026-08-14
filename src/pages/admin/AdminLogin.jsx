@@ -108,16 +108,6 @@ const AdminLogin = () => {
             )}
           </button>
         </div>
-
-        <div className="admin-login-footer">
-          <Link to="/" className="back-to-app">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Back to Application
-          </Link>
-        </div>
       </div>
 
       <style>{`
@@ -279,27 +269,7 @@ const AdminLogin = () => {
           to { transform: rotate(360deg); }
         }
 
-        .admin-login-footer {
-          margin-top: 24px;
-          text-align: center;
-          border-top: 1px solid #f1f5f9;
-          padding-top: 16px;
-        }
 
-        .back-to-app {
-          color: #94a3b8;
-          text-decoration: none;
-          font-size: 13px;
-          font-weight: 600;
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          transition: color 0.2s ease;
-        }
-
-        .back-to-app:hover {
-          color: #6366f1;
-        }
 
         @media (max-width: 480px) {
           .admin-login-card {
