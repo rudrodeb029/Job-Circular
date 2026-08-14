@@ -57,6 +57,13 @@ const AdminLogin = () => {
       
       <div className="admin-login-card">
         <div className="admin-login-header">
+          {/* Subtle line-art graduation cap representing learning/education background */}
+          <div className="edu-badge">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+              <path d="M6 12v5c0 2 2 3 6 3s6-1 6-3v-5"></path>
+            </svg>
+          </div>
           <h2>Admin Portal</h2>
           <p>Secure authentication for Super User</p>
         </div>
@@ -82,12 +89,12 @@ const AdminLogin = () => {
               background: '#ffffff',
               color: '#334155',
               border: '1px solid #e2e8f0',
-              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
+              boxShadow: '0 4px 12px rgba(99, 102, 241, 0.04)',
               marginTop: '8px'
             }}
           >
             {loading ? (
-              <span className="spinner" style={{ borderTopColor: '#3b82f6' }}></span>
+              <span className="spinner" style={{ borderTopColor: '#6366f1' }}></span>
             ) : (
               <>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: '8px' }}>
@@ -119,7 +126,7 @@ const AdminLogin = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+          background: linear-gradient(135deg, #f5f3ff 0%, #e0e7ff 100%);
           position: relative;
           overflow: hidden;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -140,7 +147,7 @@ const AdminLogin = () => {
           width: 50vw;
           height: 50vw;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(59, 130, 246, 0.03) 0%, rgba(59, 130, 246, 0) 70%);
+          background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, rgba(99, 102, 241, 0) 70%);
         }
 
         .shape-2 {
@@ -150,37 +157,56 @@ const AdminLogin = () => {
           width: 60vw;
           height: 60vw;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(59, 130, 246, 0.02) 0%, rgba(59, 130, 246, 0) 70%);
+          background: radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, rgba(139, 92, 246, 0) 70%);
         }
 
         .admin-login-card {
           width: 100%;
-          max-width: 400px;
+          max-width: 330px;
           background: #ffffff;
-          border: 1px solid #f1f5f9;
+          border: 1px solid rgba(99, 102, 241, 0.08);
           border-radius: 24px;
-          padding: 40px;
-          box-shadow: 0 10px 30px -10px rgba(51, 65, 85, 0.08);
+          padding: 36px 32px;
+          box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.1);
           position: relative;
           z-index: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
         }
 
         .admin-login-header {
           text-align: center;
-          margin-bottom: 32px;
+          margin-bottom: 28px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .edu-badge {
+          width: 44px;
+          height: 44px;
+          border-radius: 12px;
+          background: #f5f3ff;
+          color: #6366f1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
         }
 
         .admin-login-header h2 {
-          color: #0f172a;
-          font-size: 26px;
+          color: #1e1b4b;
+          font-size: 24px;
           font-weight: 800;
-          margin: 0 0 8px 0;
+          margin: 0 0 6px 0;
           letter-spacing: -0.025em;
         }
 
         .admin-login-header p {
           color: #64748b;
-          font-size: 14px;
+          font-size: 13px;
           margin: 0;
           font-weight: 500;
         }
@@ -189,14 +215,14 @@ const AdminLogin = () => {
           background: #fef2f2;
           border: 1px solid #fee2e2;
           color: #dc2626;
-          padding: 12px 16px;
+          padding: 10px 14px;
           border-radius: 12px;
           display: flex;
           align-items: center;
-          gap: 10px;
-          font-size: 13px;
+          gap: 8px;
+          font-size: 12px;
           font-weight: 500;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
           animation: shake 0.5s ease-in-out;
         }
 
@@ -210,23 +236,24 @@ const AdminLogin = () => {
         .admin-login-btn {
           width: 100%;
           border-radius: 12px;
-          padding: 14px;
-          font-size: 15px;
+          padding: 12px;
+          font-size: 14.5px;
           font-weight: 700;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 10px;
-          transition: all 0.25s ease;
+          gap: 8px;
+          transition: all 0.2s ease;
           outline: none;
           box-sizing: border-box;
         }
 
         .admin-login-btn:hover {
           transform: translateY(-1.5px);
-          box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-          border-color: #cbd5e1;
+          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+          border-color: #c7d2fe;
+          background: #fafafa;
         }
 
         .admin-login-btn:active {
@@ -240,11 +267,11 @@ const AdminLogin = () => {
         }
 
         .spinner {
-          width: 20px;
-          height: 20px;
-          border: 2px solid rgba(0,0,0,0.1);
+          width: 18px;
+          height: 18px;
+          border: 2px solid rgba(0,0,0,0.08);
           border-radius: 50%;
-          border-top-color: #3b82f6;
+          border-top-color: #6366f1;
           animation: spin 1s ease-in-out infinite;
         }
 
@@ -253,16 +280,16 @@ const AdminLogin = () => {
         }
 
         .admin-login-footer {
-          margin-top: 28px;
+          margin-top: 24px;
           text-align: center;
           border-top: 1px solid #f1f5f9;
-          padding-top: 20px;
+          padding-top: 16px;
         }
 
         .back-to-app {
           color: #94a3b8;
           text-decoration: none;
-          font-size: 13.5px;
+          font-size: 13px;
           font-weight: 600;
           display: inline-flex;
           align-items: center;
@@ -271,12 +298,12 @@ const AdminLogin = () => {
         }
 
         .back-to-app:hover {
-          color: #3b82f6;
+          color: #6366f1;
         }
 
         @media (max-width: 480px) {
           .admin-login-card {
-            padding: 32px 20px;
+            padding: 28px 20px;
           }
         }
       `}</style>
