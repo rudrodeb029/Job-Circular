@@ -31,14 +31,12 @@ const AdminLogin = () => {
         });
         navigate('/admin');
       } else {
-        // Immediate sign out since user is unauthorized
         await auth.signOut();
         setError('Unauthorized access: Only rudrodeb029@gmail.com is allowed to access the Admin Panel.');
         setLoading(false);
       }
     } catch (err) {
       console.error('Google Auth Error:', err);
-      // Friendly message for cancel or other errors
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Login cancelled by user.');
       } else if (err.code === 'auth/configuration-not-found' || err.message?.includes('configuration-not-found')) {
@@ -59,11 +57,6 @@ const AdminLogin = () => {
       
       <div className="admin-login-card">
         <div className="admin-login-header">
-          <div className="admin-logo-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-            </svg>
-          </div>
           <h2>Admin Portal</h2>
           <p>Secure authentication for Super User</p>
         </div>
@@ -80,10 +73,6 @@ const AdminLogin = () => {
         )}
 
         <div className="admin-login-body">
-          <p style={{ textAlign: 'center', fontSize: '14px', color: '#64748b', marginBottom: '24px', lineHeight: 1.5 }}>
-            Access is restricted to Authorized Admin Accounts only. Log in with Google to continue.
-          </p>
-
           <button 
             type="button" 
             onClick={handleGoogleLogin}
@@ -92,9 +81,9 @@ const AdminLogin = () => {
             style={{
               background: '#ffffff',
               color: '#334155',
-              border: '1.5px solid #e2e8f0',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.03)',
-              marginTop: '16px'
+              border: '1px solid #e2e8f0',
+              boxShadow: '0 4px 12px rgba(15, 23, 42, 0.04)',
+              marginTop: '8px'
             }}
           >
             {loading ? (
@@ -130,7 +119,7 @@ const AdminLogin = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #f0f4ff;
+          background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
           position: relative;
           overflow: hidden;
           font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -151,7 +140,7 @@ const AdminLogin = () => {
           width: 50vw;
           height: 50vw;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(26,86,219,0.08) 0%, rgba(26,86,219,0) 70%);
+          background: radial-gradient(circle, rgba(59, 130, 246, 0.03) 0%, rgba(59, 130, 246, 0) 70%);
         }
 
         .shape-2 {
@@ -161,62 +150,51 @@ const AdminLogin = () => {
           width: 60vw;
           height: 60vw;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(26,86,219,0.05) 0%, rgba(26,86,219,0) 70%);
+          background: radial-gradient(circle, rgba(59, 130, 246, 0.02) 0%, rgba(59, 130, 246, 0) 70%);
         }
 
         .admin-login-card {
           width: 100%;
-          max-width: 440px;
+          max-width: 400px;
           background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 20px;
-          padding: 48px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+          border: 1px solid #f1f5f9;
+          border-radius: 24px;
+          padding: 40px;
+          box-shadow: 0 10px 30px -10px rgba(51, 65, 85, 0.08);
           position: relative;
           z-index: 1;
         }
 
         .admin-login-header {
           text-align: center;
-          margin-bottom: 36px;
-        }
-
-        .admin-logo-icon {
-          width: 64px;
-          height: 64px;
-          background: linear-gradient(135deg, #1a56db, #2563eb);
-          border-radius: 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 24px;
-          color: white;
-          box-shadow: 0 10px 25px rgba(37,99,235,0.3);
+          margin-bottom: 32px;
         }
 
         .admin-login-header h2 {
-          color: #1e293b;
-          font-size: 28px;
-          font-weight: 700;
+          color: #0f172a;
+          font-size: 26px;
+          font-weight: 800;
           margin: 0 0 8px 0;
+          letter-spacing: -0.025em;
         }
 
         .admin-login-header p {
           color: #64748b;
-          font-size: 15px;
+          font-size: 14px;
           margin: 0;
+          font-weight: 500;
         }
 
         .admin-error-message {
-          background: #fee2e2;
-          border: 1px solid #fecaca;
+          background: #fef2f2;
+          border: 1px solid #fee2e2;
           color: #dc2626;
-          padding: 14px 16px;
+          padding: 12px 16px;
           border-radius: 12px;
           display: flex;
           align-items: center;
           gap: 10px;
-          font-size: 14px;
+          font-size: 13px;
           font-weight: 500;
           margin-bottom: 24px;
           animation: shake 0.5s ease-in-out;
@@ -224,28 +202,30 @@ const AdminLogin = () => {
 
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          50% { transform: translateX(5px); }
-          75% { transform: translateX(-5px); }
+          25% { transform: translateX(-4px); }
+          50% { transform: translateX(4px); }
+          75% { transform: translateX(-4px); }
         }
 
         .admin-login-btn {
           width: 100%;
           border-radius: 12px;
-          padding: 16px;
-          font-size: 16px;
+          padding: 14px;
+          font-size: 15px;
           font-weight: 700;
           cursor: pointer;
           display: flex;
           align-items: center;
           justify-content: center;
           gap: 10px;
-          transition: all 0.3s ease;
+          transition: all 0.25s ease;
+          outline: none;
+          box-sizing: border-box;
         }
 
         .admin-login-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+          transform: translateY(-1.5px);
+          box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
           border-color: #cbd5e1;
         }
 
@@ -254,17 +234,17 @@ const AdminLogin = () => {
         }
 
         .admin-login-btn.loading {
-          opacity: 0.9;
+          opacity: 0.85;
           cursor: not-allowed;
           transform: none;
         }
 
         .spinner {
-          width: 24px;
-          height: 24px;
-          border: 3px solid rgba(0,0,0,0.1);
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(0,0,0,0.1);
           border-radius: 50%;
-          border-top-color: white;
+          border-top-color: #3b82f6;
           animation: spin 1s ease-in-out infinite;
         }
 
@@ -273,30 +253,30 @@ const AdminLogin = () => {
         }
 
         .admin-login-footer {
-          margin-top: 32px;
+          margin-top: 28px;
           text-align: center;
-          border-top: 1px solid #e2e8f0;
-          padding-top: 24px;
+          border-top: 1px solid #f1f5f9;
+          padding-top: 20px;
         }
 
         .back-to-app {
-          color: #64748b;
+          color: #94a3b8;
           text-decoration: none;
-          font-size: 14px;
-          font-weight: 500;
+          font-size: 13.5px;
+          font-weight: 600;
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           transition: color 0.2s ease;
         }
 
         .back-to-app:hover {
-          color: #1a56db;
+          color: #3b82f6;
         }
 
         @media (max-width: 480px) {
           .admin-login-card {
-            padding: 32px 24px;
+            padding: 32px 20px;
           }
         }
       `}</style>
