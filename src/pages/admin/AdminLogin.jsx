@@ -41,6 +41,8 @@ const AdminLogin = () => {
       // Friendly message for cancel or other errors
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Login cancelled by user.');
+      } else if (err.code === 'auth/configuration-not-found' || err.message?.includes('configuration-not-found')) {
+        setError('Google Sign-In is not enabled. Please go to your Firebase Console > Authentication > Sign-in method, click "Add new provider", and select & enable "Google".');
       } else {
         setError(err.message || 'Authentication failed. Please try again.');
       }
