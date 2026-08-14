@@ -117,42 +117,33 @@ const Dashboard = () => {
       </div>
 
       {/* STATS GRID */}
-      <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 280px))', gap: '1.5rem', marginBottom: '2.5rem' }}>
         {[
-          { label: 'Total Circulars', val: totalCirculars, icon: '💼', color: '#3b82f6', bg: 'rgba(59,130,246,0.1)', sub: '+12 this week' },
-          { label: 'Active Jobs', val: activeJobs, icon: '✅', color: '#10b981', bg: 'rgba(16,185,129,0.1)', sub: 'Currently publishing' },
-          { label: 'Total Vacancies', val: totalVacancies, icon: '👥', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)', sub: 'Across all jobs' },
-          { label: 'Expired', val: expiredJobs, icon: '⏰', color: '#ef4444', bg: 'rgba(239,68,68,0.1)', sub: 'Require attention' }
+          { label: 'Total Circulars', val: totalCirculars },
+          { label: 'Active Jobs', val: activeJobs },
+          { label: 'Expired', val: expiredJobs }
         ].map((stat, i) => (
           <div
             key={i}
             className="stat-card animate-card stat-card-hover"
             style={{
-              padding: '1.5rem',
+              padding: '1.25rem 1.5rem',
               background: '#ffffff',
               borderRadius: '20px',
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03)',
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.01)',
               transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               animationDelay: `${i * 100}ms`,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'space-between',
-              minHeight: '140px',
+              justifyContent: 'center',
+              minHeight: '100px',
               border: '1px solid rgba(241, 245, 249, 0.8)'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <p style={{ color: '#64748b', margin: 0, fontSize: '0.875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</p>
-                <h3 style={{ margin: '0.5rem 0', fontSize: '1.875rem', color: '#1e293b', fontWeight: 800 }}>{formatNumber(stat.val)}</h3>
-              </div>
-              <div style={{ width: '48px', height: '48px', background: stat.bg, borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px' }}>
-                {stat.icon}
-              </div>
+            <div>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '0.825rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</p>
+              <h3 style={{ margin: '0.25rem 0 0 0', fontSize: '1.75rem', color: '#1e293b', fontWeight: 800 }}>{formatNumber(stat.val)}</h3>
             </div>
-            <p style={{ color: i === 0 ? '#10b981' : '#94a3b8', margin: 0, fontSize: '0.8rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {i === 0 && <span style={{fontSize: '12px'}}>📈</span>} {stat.sub}
-            </p>
           </div>
         ))}
       </div>
