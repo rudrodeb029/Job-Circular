@@ -11,31 +11,20 @@ import {
   COLLECTIONS
 } from '../services/firestoreService';
 
+import { getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
+
 const AdminContext = createContext();
-
-const getItemTimestamp = (item) => {
-  if (item.createdAt) {
-    const ms = new Date(item.createdAt).getTime();
-    if (!isNaN(ms)) return ms;
-  }
-  if (item.id) {
-    const matches = String(item.id).match(/\d{10,13}/);
-    if (matches) return parseInt(matches[0], 10);
-  }
-  return 0;
-};
-
-const sortByCreatedAt = (a, b) => {
-  const tsA = getItemTimestamp(a);
-  const tsB = getItemTimestamp(b);
-  if (tsA !== tsB) return tsB - tsA;
-  return String(b.id || '').localeCompare(String(a.id || ''));
-};
 
 const mapWithTimestamps = (items) => {
   return items.map(item => ({
     ...item,
-    createdAt: item.createdAt || new Date(getItemTimestamp(item) || Date.now()).toISOString()
+    createdAt: item.createdAt
+      ? (typeof item.createdAt === 'object' && item.createdAt.seconds
+          ? new Date(item.createdAt.seconds * 1000).toISOString()
+          : typeof item.createdAt.toDate === 'function'
+            ? item.createdAt.toDate().toISOString()
+            : item.createdAt)
+      : new Date(getItemTimestamp(item) || Date.now()).toISOString()
   }));
 };
 

@@ -17,12 +17,33 @@ import {
   writeBatch
 } from 'firebase/firestore';
 
+// ─── Timestamp Conversion Helper ────────────────────────────────
+
+/**
+ * Convert Firestore Timestamp objects to ISO strings for safe serialization.
+ */
+const convertTimestamps = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  const result = { ...obj };
+  for (const key of Object.keys(result)) {
+    const val = result[key];
+    if (val && typeof val === 'object') {
+      if (typeof val.toDate === 'function') {
+        result[key] = val.toDate().toISOString();
+      } else if (typeof val.seconds === 'number' && typeof val.nanoseconds === 'number') {
+        result[key] = new Date(val.seconds * 1000).toISOString();
+      }
+    }
+  }
+  return result;
+};
+
 // ─── Generic CRUD Helpers ───────────────────────────────────────
 
 export const getCollection = async (collectionName) => {
   try {
     const snapshot = await getDocs(collection(db, collectionName));
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => convertTimestamps({ id: doc.id, ...doc.data() }));
   } catch (error) {
     console.error(`Error fetching ${collectionName}:`, error);
     return [];
@@ -63,7 +84,7 @@ export const getCollectionCached = async (collectionName, forceServer = false, t
       snapshot = await getDocs(colRef);
     }
 
-    const data = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    const data = snapshot.docs.map(docSnap => convertTimestamps({ id: docSnap.id, ...docSnap.data() }));
     
     // Save to localStorage cache if non-empty
     if (data && data.length > 0) {
@@ -90,7 +111,7 @@ export const getCollectionCached = async (collectionName, forceServer = false, t
     // 4. Try Firestore IndexedDB SDK Cache fallback
     try {
       const cacheSnapshot = await getDocsFromCache(collection(db, collectionName));
-      return cacheSnapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+      return cacheSnapshot.docs.map(docSnap => convertTimestamps({ id: docSnap.id, ...docSnap.data() }));
     } catch (cacheErr) {
       console.error(`Cache fallback for ${collectionName} failed:`, cacheErr);
       return [];
@@ -102,7 +123,7 @@ export const getDocument = async (collectionName, docId) => {
   try {
     const docSnap = await getDoc(doc(db, collectionName, docId));
     if (docSnap.exists()) {
-      return { id: docSnap.id, ...docSnap.data() };
+      return convertTimestamps({ id: docSnap.id, ...docSnap.data() });
     }
     return null;
   } catch (error) {
@@ -164,9 +185,10 @@ export const deleteDocument = async (collectionName, docId) => {
   }
 };
 
+
 export const onCollectionSnapshot = (collectionName, callback) => {
   return onSnapshot(collection(db, collectionName), (snapshot) => {
-    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const data = snapshot.docs.map(doc => convertTimestamps({ id: doc.id, ...doc.data() }));
     callback(data);
   }, (error) => {
     console.error(`Snapshot error on ${collectionName}:`, error);
