@@ -175,12 +175,12 @@ const Dashboard = () => {
       {/* CHARTS GRID */}
       <div className="admin-charts-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
         {/* BAR CHART */}
-        <div className="admin-chart-card animate-card" style={{ background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '400ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
+        <div className="admin-chart-card animate-card" style={{ display: 'flex', flexDirection: 'column', background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '400ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
             <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Jobs by Category</h3>
             <div style={{ fontSize: '12px', padding: '4px 12px', background: '#f8fafc', borderRadius: '20px', color: '#64748b', border: '1px solid #e2e8f0' }}>Last updated: Just now</div>
           </div>
-          <div className="bar-chart" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '220px', paddingBottom: '20px', gap: '12px' }}>
+          <div className="bar-chart" style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', minHeight: '220px', gap: '12px' }}>
             {categoryCounts.map((cat, idx) => (
               <div key={idx} className="bar-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
                 <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>{cat.count}</span>
