@@ -54,7 +54,7 @@ async function generateAppIconNotificationIcons() {
     }
   }
 
-  // Create clean master logo PNG buffer
+  // Create clean master logo PNG buffer (trimmed)
   const masterLogoBuffer = await sharp(processedData, {
     raw: {
       width: info.width,
@@ -62,6 +62,7 @@ async function generateAppIconNotificationIcons() {
       channels: 4
     }
   })
+    .trim() // Trim empty transparent borders around logo graphic
     .png({ compressionLevel: 9 })
     .toBuffer();
 
@@ -70,8 +71,20 @@ async function generateAppIconNotificationIcons() {
     const dir = join(RES_DIR, density.folder);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
-    const resizedBuffer = await sharp(masterLogoBuffer)
-      .resize(density.size, density.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    const innerSize = Math.round(density.size * 0.85); // 85% scale for neat padding
+    const innerBuffer = await sharp(masterLogoBuffer)
+      .resize(innerSize, innerSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .toBuffer();
+
+    const resizedBuffer = await sharp({
+      create: {
+        width: density.size,
+        height: density.size,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      }
+    })
+      .composite([{ input: innerBuffer, gravity: 'center' }])
       .png({ compressionLevel: 9 })
       .toBuffer();
 
