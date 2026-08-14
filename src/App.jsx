@@ -69,10 +69,19 @@ function App() {
       initializeOneSignal();
     }
 
-    // 2. Set StatusBar Color to White for Professional look
+    // 2. Set StatusBar - prevent overlay and set proper colors
     if (!isAdminRoute) {
-      StatusBar.setBackgroundColor({ color: '#ffffff' });
-      StatusBar.setStyle({ style: Style.Default }); // Smart default (usually dark icons on light bg)
+      try {
+        // CRITICAL: Prevent status bar from overlapping WebView content
+        StatusBar.setOverlaysWebView({ overlay: false });
+        
+        // Set status bar appearance based on theme
+        const isDark = state.theme === 'dark';
+        StatusBar.setBackgroundColor({ color: isDark ? '#0f172a' : '#ffffff' });
+        StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
+      } catch (e) {
+        // StatusBar plugin not available on web
+      }
     }
 
     // 3. Handle Android Hardware Back Button
@@ -89,7 +98,7 @@ function App() {
     return () => {
       backButtonListener.remove();
     };
-  }, [isAdminRoute, location.pathname, navigate]);
+  }, [isAdminRoute, location.pathname, navigate, state.theme]);
 
   useEffect(() => {
     const checkVersion = async () => {
