@@ -1,7 +1,6 @@
 /**
- * Generate Android Push Notification Icons directly from public/app-icon.png
- * Removes white outer background, keeps original emblem silhouette for status bar.
- * No circular mask, no artificial circle borders.
+ * Generate Android Push Notification Icons:
+ * Clean, sharp, white notification bell silhouette for status bar & small notification badge.
  */
 import sharp from 'sharp';
 import { existsSync, mkdirSync } from 'fs';
@@ -11,7 +10,6 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = join(__dirname, '..');
 const RES_DIR = join(PROJECT_ROOT, 'android', 'app', 'src', 'main', 'res');
-const APP_ICON_PATH = join(PROJECT_ROOT, 'public', 'app-icon.png');
 
 const NOTIFICATION_DENSITIES = [
   { folder: 'drawable-mdpi',    size: 24 },
@@ -21,71 +19,52 @@ const NOTIFICATION_DENSITIES = [
   { folder: 'drawable-xxxhdpi', size: 96 },
 ];
 
-async function generateAppIconNotificationIcons() {
-  console.log('\n🔔 Processing public/app-icon.png into Push Notification Icons (Original Shape, No Circle)...\n');
+async function generateBellNotificationIcons() {
+  console.log('\n🔔 Generating clean white Bell Notification Icons for Android status bar...\n');
 
-  if (!existsSync(APP_ICON_PATH)) {
-    console.error(`❌ Source image not found: ${APP_ICON_PATH}`);
-    return;
-  }
-
-  // Read raw pixel data of public/app-icon.png
-  const { data, info } = await sharp(APP_ICON_PATH)
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-
-  // Extract logo emblem (remove near-white background > 230, make logo pixels solid white for status bar silhouette)
-  const processedData = Buffer.from(data);
-  for (let i = 0; i < processedData.length; i += 4) {
-    const r = processedData[i];
-    const g = processedData[i + 1];
-    const b = processedData[i + 2];
-
-    // Background (near white/light gray)
-    if (r > 230 && g > 230 && b > 230) {
-      processedData[i + 3] = 0; // 100% transparent background
-    } else {
-      // Logo emblem pixel -> pure white #FFFFFF for Android status bar stencil
-      processedData[i] = 255;
-      processedData[i + 1] = 255;
-      processedData[i + 2] = 255;
-      processedData[i + 3] = 255;
-    }
-  }
-
-  // Create clean master logo PNG buffer (trimmed of empty space)
-  const masterLogoBuffer = await sharp(processedData, {
-    raw: {
-      width: info.width,
-      height: info.height,
-      channels: 4
-    }
-  })
-    .trim()
-    .png({ compressionLevel: 9 })
-    .toBuffer();
-
-  // Resize master logo silhouette for all Android density folders
   for (const density of NOTIFICATION_DENSITIES) {
     const dir = join(RES_DIR, density.folder);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
-    const resizedBuffer = await sharp(masterLogoBuffer)
-      .resize(density.size, density.size, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+    const size = density.size;
+    const padding = Math.round(size * 0.12);
+    const bellSize = size - (padding * 2);
+
+    // Create SVG crisp white notification bell shape
+    const bellSvg = Buffer.from(
+      `<svg width="${bellSize}" height="${bellSize}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" fill="#ffffff"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>`
+    );
+
+    const bellBuffer = await sharp(bellSvg)
+      .resize(bellSize, bellSize)
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+
+    const finalBuffer = await sharp({
+      create: {
+        width: size,
+        height: size,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      }
+    })
+      .composite([{ input: bellBuffer, gravity: 'center' }])
       .png({ compressionLevel: 9 })
       .toBuffer();
 
     // Save as ic_stat_onesignal_default.png (OneSignal default)
-    await sharp(resizedBuffer).toFile(join(dir, 'ic_stat_onesignal_default.png'));
+    await sharp(finalBuffer).toFile(join(dir, 'ic_stat_onesignal_default.png'));
 
     // Save as ic_notification.png (Firebase & Android default)
-    await sharp(resizedBuffer).toFile(join(dir, 'ic_notification.png'));
+    await sharp(finalBuffer).toFile(join(dir, 'ic_notification.png'));
 
-    console.log(`  ✅ ${density.folder}: ${density.size}×${density.size}px status bar notification icon generated`);
+    console.log(`  ✅ ${density.folder}: ${size}×${size}px clean white bell notification icon generated`);
   }
 
-  console.log('\n  ✅ All Push Notification Icons generated successfully!\n');
+  console.log('\n  ✅ Clean Bell Notification Icons generated successfully!\n');
 }
 
-generateAppIconNotificationIcons();
+generateBellNotificationIcons();

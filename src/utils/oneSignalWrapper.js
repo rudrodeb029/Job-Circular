@@ -171,6 +171,7 @@ export const broadcastPush = async (title, message, data = {}) => {
             // Android delivery optimization
             android_visibility: 1,
             priority: 10,
+            android_accent_color: 'FF1A56DB',
             large_icon: 'https://job-circular-75dbb.web.app/app-icon.png',
             chrome_web_icon: 'https://job-circular-75dbb.web.app/app-icon.png',
             small_icon: 'ic_stat_onesignal_default',
