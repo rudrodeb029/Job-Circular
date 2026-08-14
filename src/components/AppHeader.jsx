@@ -28,12 +28,13 @@ export default function AppHeader() {
         backdropFilter: 'blur(10px)',
         borderBottom: '1px solid var(--border)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-        minHeight: '50px',
-        padding: 'calc(max(env(safe-area-inset-top, 0px), 24px) + 4px) 14px 6px 14px',
+        minHeight: 'calc(52px + var(--safe-area-top))',
+        padding: 'calc(var(--safe-area-top) + 4px) 14px 6px 14px',
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
-        marginBottom: '10px'
+        marginBottom: '10px',
+        boxSizing: 'border-box'
       }}>
         {/* Left: Hamburger Menu Icon Button */}
         <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
