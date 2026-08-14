@@ -241,30 +241,23 @@ const AdminLayout = () => {
           </div>
           
           <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <div
-              className="notification-bell"
-              style={{ position: 'relative', cursor: 'pointer', color: '#64748b', padding: '10px', background: '#f8fafc', borderRadius: '12px', transition: 'all 0.2s' }}
-              onClick={() => navigate('/admin/notifications')}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-              </svg>
-              {unreadNotifications > 0 && (
-                <span style={{ position: 'absolute', top: '8px', right: '8px', backgroundColor: '#ef4444', color: 'white', fontSize: '9px', fontWeight: '900', width: '16px', height: '16px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid #ffffff', boxShadow: '0 4px 8px rgba(239, 68, 68, 0.2)' }}>
-                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
-                </span>
-              )}
-            </div>
-
             <div className="admin-profile" style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '6px 12px', background: '#f8fafc', borderRadius: '14px', border: '1px solid #f1f5f9' }}>
-              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '16px', boxShadow: '0 4px 10px rgba(16, 185, 129, 0.15)' }}>
-                A
-              </div>
+              {adminState.adminUser?.photoURL ? (
+                <img 
+                  src={adminState.adminUser.photoURL} 
+                  alt="Avatar" 
+                  style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)' }} 
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '16px', boxShadow: '0 4px 10px rgba(99, 102, 241, 0.15)' }}>
+                  {(adminState.adminUser?.name || 'A')[0].toUpperCase()}
+                </div>
+              )}
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', lineHeight: 1.2 }}>Admin</span>
-                  <span style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8' }}>Super User</span>
+                  <span style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', lineHeight: 1.2 }}>{adminState.adminUser?.name || 'Admin'}</span>
+                  <span style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8' }}>{adminState.adminUser?.role || 'Super User'}</span>
                 </div>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
                   <polyline points="6 9 12 15 18 9"></polyline>
