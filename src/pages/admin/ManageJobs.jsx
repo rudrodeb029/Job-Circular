@@ -93,7 +93,7 @@ export default function ManageJobs() {
     if (uploadedUrls.length > 0) {
       setFormData(prev => {
         const currentImages = prev.images ? prev.images.split(',').map(img => img.trim()).filter(img => img) : [];
-        const mergedImages = [...currentImages, ...uploadedUrls];
+        const mergedImages = Array.from(new Set([...currentImages, ...uploadedUrls]));
         return {
           ...prev,
           images: mergedImages.join(', ')
@@ -440,31 +440,53 @@ export default function ManageJobs() {
 
               {formData.images && (
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
-                  {formData.images.split(',').map(i => i.trim()).filter(i => i).map((fileUrl, index) => {
+                  {Array.from(new Set(formData.images.split(',').map(i => i.trim()).filter(i => i))).map((fileUrl, index) => {
                     const isPdf = fileUrl.toLowerCase().includes('.pdf');
                     return (
-                      <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #cbd5e1', overflow: 'hidden', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div key={index} style={{ position: 'relative', width: '90px', height: '90px', borderRadius: '12px', border: '1.5px solid #cbd5e1', overflow: 'hidden', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.06)' }}>
                         {isPdf ? (
-                          <div style={{ textAlign: 'center', padding: '4px', color: '#ef4444', fontSize: '10px', fontWeight: 'bold' }}>
+                          <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ textAlign: 'center', padding: '6px', color: '#ef4444', textDecoration: 'none', fontSize: '11px', fontWeight: 800 }}>
                             📄 PDF Doc
-                          </div>
+                          </a>
                         ) : (
-                          <img
-                            src={fileUrl}
-                            alt="Preview"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.style.display = 'none';
-                              e.target.parentNode.innerHTML = '<div style="font-size:10px;font-weight:bold;color:#475569;text-align:center;padding:4px">🖼️ Image</div>';
-                            }}
-                          />
+                          <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ width: '100%', height: '100%', display: 'block' }}>
+                            <img
+                              src={fileUrl}
+                              alt="Circular Preview"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          </a>
                         )}
-                        <button type="button" onClick={() => {
-                          const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
-                          current.splice(index, 1);
-                          setFormData(prev => ({ ...prev, images: current.join(', ') }));
-                        }} style={{ position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px', zIndex: 10 }}>✕</button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
+                            current.splice(index, 1);
+                            setFormData(prev => ({ ...prev, images: current.join(', ') }));
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: '4px',
+                            right: '4px',
+                            width: '22px',
+                            height: '22px',
+                            borderRadius: '50%',
+                            background: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                            zIndex: 10
+                          }}
+                          title="Remove item"
+                        >
+                          ✕
+                        </button>
                       </div>
                     );
                   })}
