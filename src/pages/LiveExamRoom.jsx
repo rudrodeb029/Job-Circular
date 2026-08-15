@@ -716,9 +716,12 @@ export default function LiveExamRoom() {
                   const isGold = rank === 1;
                   const isSilver = rank === 2;
                   const isBronze = rank === 3;
-                  const displayName = isEn ? user.nameEn : user.name;
+                  const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
+                  const displayTime = toSafeString(user.time, '0m 00s');
+                  const displayScore = toSafeString(user.score, '0');
+                  const avatarUrl = toSafeString(user.avatar, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150');
 
-                  const getAvatarBg = (name) => {
+                  const getAvatarBg = (nameStr) => {
                     const colors = [
                       'rgba(26, 86, 219, 0.06)',
                       'rgba(16, 185, 129, 0.06)',
@@ -736,8 +739,8 @@ export default function LiveExamRoom() {
                       '#0891b2'
                     ];
                     let hash = 0;
-                    for (let i = 0; i < (name || '').length; i++) {
-                      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                    for (let i = 0; i < (nameStr || '').length; i++) {
+                      hash = nameStr.charCodeAt(i) + ((hash << 5) - hash);
                     }
                     const index = Math.abs(hash) % colors.length;
                     return { bg: colors[index], text: textColors[index] };
@@ -792,7 +795,7 @@ export default function LiveExamRoom() {
 
                         {/* Profile Picture */}
                         <img 
-                          src={user.avatar} 
+                          src={avatarUrl} 
                           alt={displayName}
                           style={{
                             width: '36px',
@@ -812,7 +815,7 @@ export default function LiveExamRoom() {
                               <circle cx="12" cy="12" r="10"></circle>
                               <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
-                            {isEn ? user.time : toBengaliNumber(user.time)}
+                            {isEn ? displayTime : toBengaliNumber(displayTime)}
                           </span>
                         </div>
                       </div>
@@ -827,7 +830,7 @@ export default function LiveExamRoom() {
                           padding: '4px 10px',
                           borderRadius: '8px'
                         }}>
-                          {isEn ? `${user.score}/100` : `${toBengaliNumber(user.score)}/১০০`}
+                          {isEn ? `${displayScore}/100` : `${toBengaliNumber(displayScore)}/১০০`}
                         </span>
                         <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', marginTop: '2px', paddingRight: '4px' }}>
                           {isEn ? 'Points' : 'পয়েন্ট'}
