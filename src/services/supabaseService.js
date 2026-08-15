@@ -152,13 +152,73 @@ export const clearCollectionCache = (collectionName) => {
   }
 };
 
+// ─── Table Column Mappings ─────────────────────────────────────
+const TABLE_COLUMNS = {
+  [COLLECTIONS.JOBS]: [
+    'id', 'title', 'titleEn', 'organization', 'organizationEn',
+    'categoryId', 'category', 'description', 'salary', 'vacancy',
+    'deadline', 'applyLink', 'imageUrl', 'images', 'status',
+    'views', 'createdAt', 'updatedAt'
+  ],
+  [COLLECTIONS.LIVE_EXAMS]: [
+    'id', 'title', 'titleEn', 'duration', 'totalQuestions',
+    'subjects', 'questions', 'status', 'scheduledAt',
+    'createdAt', 'updatedAt'
+  ],
+  [COLLECTIONS.QUESTIONS]: [
+    'id', 'title', 'category', 'questions', 'duration',
+    'createdAt', 'updatedAt'
+  ],
+  [COLLECTIONS.NOTIFICATIONS]: [
+    'id', 'title', 'titleEn', 'message', 'messageEn', 'type',
+    'link', 'createdAt', 'read'
+  ],
+  [COLLECTIONS.ADMITS]: [
+    'id', 'jobId', 'type', 'examName', 'examNameEn', 'date',
+    'dateEn', 'link', 'createdAt'
+  ],
+  [COLLECTIONS.ACTIVITIES]: [
+    'id', 'action', 'description', 'createdAt'
+  ],
+  [COLLECTIONS.USERS]: [
+    'id', 'name', 'phone', 'qualification', 'category', 'location',
+    'avatar', 'savedJobs', 'appliedJobs', 'updatedAt'
+  ],
+  [COLLECTIONS.APP_CONFIG]: [
+    'id', 'contactEmail', 'contactPhone', 'whatsappNumber',
+    'playStoreUrl', 'shareAppUrl', 'facebookPageUrl',
+    'telegramChannelUrl', 'supportHours', 'updatedAt'
+  ]
+};
+
+/**
+ * Packs document fields into strict PostgreSQL table columns while preserving
+ * all rich arbitrary document properties inside the 'raw_data' JSONB column.
+ */
+const sanitizePayload = (collectionName, docId, data) => {
+  const allowed = TABLE_COLUMNS[collectionName] || ['id'];
+  const sanitized = { id: docId, raw_data: { id: docId, ...data } };
+
+  for (const key of allowed) {
+    if (key !== 'id' && data[key] !== undefined) {
+      sanitized[key] = data[key];
+    }
+  }
+
+  if (collectionName === COLLECTIONS.JOBS && Array.isArray(sanitized.images)) {
+    sanitized.images = sanitized.images.join(', ');
+  }
+
+  return sanitized;
+};
+
 /**
  * Insert a new document
  */
 export const addDocument = async (collectionName, data) => {
   try {
     const id = data.id || `${collectionName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const payload = { id, ...data };
+    const payload = sanitizePayload(collectionName, id, data);
     
     const { data: inserted, error } = await supabase
       .from(collectionName)
@@ -180,7 +240,7 @@ export const addDocument = async (collectionName, data) => {
  */
 export const setDocument = async (collectionName, docId, data) => {
   try {
-    const payload = { id: docId, ...data };
+    const payload = sanitizePayload(collectionName, docId, data);
     const { data: upserted, error } = await supabase
       .from(collectionName)
       .upsert(payload)
@@ -201,16 +261,16 @@ export const setDocument = async (collectionName, docId, data) => {
  */
 export const updateDocument = async (collectionName, docId, updates) => {
   try {
+    const payload = sanitizePayload(collectionName, docId, updates);
     const { data: updated, error } = await supabase
       .from(collectionName)
-      .update(updates)
-      .eq('id', docId)
+      .upsert(payload)
       .select()
       .single();
 
     if (error) throw error;
     clearCollectionCache(collectionName);
-    return normalizeDoc(updated || { id: docId, ...updates });
+    return normalizeDoc(updated || payload);
   } catch (error) {
     console.error(`Error updating ${collectionName}/${docId}:`, error);
     throw error;
@@ -280,9 +340,10 @@ export const onCollectionSnapshot = (collectionName, callback) => {
 export const batchSetDocuments = async (collectionName, items) => {
   try {
     if (!items || items.length === 0) return true;
+    const sanitizedItems = items.map(item => sanitizePayload(collectionName, item.id, item));
     const { error } = await supabase
       .from(collectionName)
-      .upsert(items);
+      .upsert(sanitizedItems);
 
     if (error) throw error;
     clearCollectionCache(collectionName);
