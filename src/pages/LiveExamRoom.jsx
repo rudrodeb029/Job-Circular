@@ -501,7 +501,7 @@ export default function LiveExamRoom() {
                   {isEn ? 'Total Questions' : 'মোট প্রশ্ন'}
                 </span>
                 <strong style={{ fontSize: '18px', color: 'var(--text-primary)', fontWeight: 800 }}>
-                  {isEn ? currentResult.total : toBengaliNumber(currentResult.total)}
+                  {isEn ? toSafeString(currentResult.total, '100') : toBengaliNumber(currentResult.total)}
                 </strong>
               </div>
               {!currentResult.didNotAttend && (
@@ -510,7 +510,7 @@ export default function LiveExamRoom() {
                     {isEn ? 'Your Score' : 'প্রাপ্ত নম্বর'}
                   </span>
                   <strong style={{ fontSize: '18px', color: 'var(--success)', fontWeight: 800 }}>
-                    {isEn ? currentResult.score : toBengaliNumber(currentResult.score)}
+                    {isEn ? toSafeString(currentResult.score, '0') : toBengaliNumber(currentResult.score)}
                   </strong>
                 </div>
               )}

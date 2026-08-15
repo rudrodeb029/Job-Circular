@@ -18,10 +18,6 @@ export default defineConfig({
           vendor: ['react', 'react-dom', 'react-router-dom']
         }
       }
-    },
-    // Drop console.log and debugger statements in production
-    esbuild: {
-      drop: ['console', 'debugger']
     }
   }
 })
