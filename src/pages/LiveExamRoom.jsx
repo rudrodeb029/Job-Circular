@@ -141,14 +141,24 @@ export default function LiveExamRoom() {
     }
   }, [id, submitted]);
 
+  const parseExamDate = (dateVal) => {
+    if (!dateVal) return null;
+    const d = new Date(dateVal);
+    return isNaN(d.getTime()) ? null : d.getTime();
+  };
+
   // Is exam currently running?
   const isRunning = useMemo(() => {
     if (!exam) return false;
-    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
-    const endMs = startMs + (exam.duration || 10) * 60 * 1000;
-    const now = Date.now();
-    return now >= startMs && now < endMs;
-  }, [exam]);
+    if (savedResult || submitted) return false;
+    if (exam.status === 'active' || exam.status === 'running') return true;
+    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+    if (!startMs) return true;
+    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
+    const endMs = startMs + durationMins * 60 * 1000;
+    const nowMs = Date.now();
+    return nowMs >= startMs && nowMs < endMs;
+  }, [exam, savedResult, submitted]);
 
   // Timer Tick
   useEffect(() => {
@@ -362,10 +372,14 @@ export default function LiveExamRoom() {
 
   const isCompleted = useMemo(() => {
     if (!exam) return false;
-    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
-    const endMs = startMs + (exam.duration || 10) * 60 * 1000;
+    if (savedResult || submitted) return true;
+    if (exam.status === 'active' || exam.status === 'running') return false;
+    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+    if (!startMs) return false;
+    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
+    const endMs = startMs + durationMins * 60 * 1000;
     return Date.now() >= endMs;
-  }, [exam]);
+  }, [exam, savedResult, submitted]);
 
   const currentResult = useMemo(() => {
     if (savedResult) return savedResult;

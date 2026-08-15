@@ -43,9 +43,35 @@ export default function LiveExams() {
     };
   }, [adminState.liveExams]);
 
+  const parseExamDate = (dateVal) => {
+    if (!dateVal) return null;
+    const d = new Date(dateVal);
+    return isNaN(d.getTime()) ? null : d.getTime();
+  };
+
   const getExamStatus = (exam) => {
-    const startMs = new Date(exam.startTime).getTime();
-    const endMs = startMs + exam.duration * 60 * 1000;
+    if (!exam) return 'completed';
+
+    const userResult = getExamResult(exam.id);
+
+    // If exam is explicitly marked as active/running by Admin
+    if (exam.status === 'active' || exam.status === 'running') {
+      if (userResult) return 'completed';
+      const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+      if (!startMs) return 'running';
+      const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
+      const endMs = startMs + durationMins * 60 * 1000;
+      if (now < startMs) return 'upcoming';
+      return 'running';
+    }
+
+    if (userResult) return 'completed';
+
+    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+    if (!startMs) return 'running';
+
+    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
+    const endMs = startMs + durationMins * 60 * 1000;
 
     if (now >= startMs && now < endMs) {
       return 'running';
