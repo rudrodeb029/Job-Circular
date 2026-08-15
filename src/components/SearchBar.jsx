@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, SlidersHorizontal } from './Icons';
 
 export default function SearchBar({ value, onChange, placeholder, onFilterClick, showFilter = false, activeFilterCount = 0 }) {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
-    <div className="search-bar" style={{
+    <div className={`search-bar ${isFocused ? 'is-focused' : ''} ${value ? 'has-value' : ''}`} style={{
       border: '1px solid rgba(37, 99, 235, 0.12)',
       boxShadow: '0 4px 18px rgba(37, 99, 235, 0.04)',
       background: 'var(--white)'
@@ -15,6 +17,8 @@ export default function SearchBar({ value, onChange, placeholder, onFilterClick,
         type="text"
         value={value}
         onChange={onChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
         placeholder={placeholder || 'Search jobs...'}
       />
       {showFilter && (

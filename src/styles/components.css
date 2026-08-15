@@ -209,10 +209,11 @@
   box-shadow: 0 4px 20px -2px rgba(26, 86, 219, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.search-bar:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(26, 86, 219, 0.12), 0 8px 24px -4px rgba(26, 86, 219, 0.15);
-  background: var(--white);
+.search-bar:focus-within,
+.search-bar.is-focused {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 4px rgba(26, 86, 219, 0.12), 0 8px 24px -4px rgba(26, 86, 219, 0.15) !important;
+  background: var(--white) !important;
 }
 .search-bar-icon-box {
   width: 34px;
@@ -224,6 +225,23 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+}
+.search-bar-icon-box svg {
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.search-bar:focus-within .search-bar-icon-box,
+.search-bar.is-focused .search-bar-icon-box,
+.search-bar.has-value .search-bar-icon-box {
+  transform: scale(0.65);
+  background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+}
+.search-bar:focus-within .search-bar-icon-box svg,
+.search-bar.is-focused .search-bar-icon-box svg,
+.search-bar.has-value .search-bar-icon-box svg {
+  transform: scale(0.8);
 }
 .search-bar input {
   flex: 1;
