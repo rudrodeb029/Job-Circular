@@ -5,7 +5,6 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
-import defaultNoticeImg from '../assets/job_circular_notice.png';
 import BottomNav from '../components/BottomNav';
 
 const categoryStyles = {
@@ -86,8 +85,8 @@ export default function ResultDetails() {
     circularImages = job.circularImages;
   }
 
-  if (circularImages.length === 0) {
-    circularImages = [job.circularImage || defaultNoticeImg];
+  if (circularImages.length === 0 && job.circularImage && job.circularImage.trim()) {
+    circularImages = [job.circularImage];
   }
 
   const isSaved = state.savedJobs.includes(job.id);

@@ -5,7 +5,6 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
-import defaultNoticeImg from '../assets/job_circular_notice.png';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
@@ -267,7 +266,10 @@ export default function JobDetails() {
                 onClick={() => setShowFullImage(!showFullImage)}
                 onError={(e) => {
                   e.target.onerror = null;
-                  e.target.src = defaultNoticeImg;
+                  e.target.style.display = 'none';
+                  if (e.target.parentNode) {
+                    e.target.parentNode.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;background:var(--bg-secondary)"><div style="width:48px;height:48px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px">📷</div><span style="font-size:14px;font-weight:800;color:var(--text-secondary)">No Photo</span></div>';
+                  }
                 }}
                 style={{
                   width: '100%',
