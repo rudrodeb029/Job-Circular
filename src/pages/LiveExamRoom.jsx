@@ -183,6 +183,8 @@ export default function LiveExamRoom() {
 
   // Generate 100% REAL dynamic Leaderboard list (ZERO dummy users)
   const leaderboardData = useMemo(() => {
+    const qTotal = (exam && Array.isArray(exam.questions) && exam.questions.length > 0) ? exam.questions.length : 100;
+
     const list = (realSubmissions || []).map(sub => {
       const uName = toSafeString(sub?.userName || sub?.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
       const uPhoto = toSafeString(sub?.userPhoto || sub?.avatar, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150');
@@ -191,14 +193,14 @@ export default function LiveExamRoom() {
                              (state.user?.email && sub?.userEmail === state.user.email));
 
       const rawScore = typeof sub?.score === 'number' ? sub.score : (parseInt(sub?.score) || 0);
-      const rawTotal = typeof sub?.total === 'number' ? sub.total : (parseInt(sub?.total) || 1);
-      const calcScore = typeof sub?.scaledScore === 'number' ? sub.scaledScore : Math.round((rawScore / rawTotal) * 100);
+      const rawTotal = typeof sub?.total === 'number' ? sub.total : (parseInt(sub?.total) || qTotal);
 
       return {
         id: toSafeString(sub?.id, `sub-${Math.random()}`),
         name: uName,
         nameEn: uName,
-        score: isNaN(calcScore) ? 0 : calcScore,
+        score: rawScore,
+        total: rawTotal,
         time: uTime,
         timeSec: typeof sub?.timeTakenSec === 'number' ? sub.timeTakenSec : (parseInt(sub?.timeTakenSec) || 9999),
         avatar: uPhoto,
@@ -219,14 +221,14 @@ export default function LiveExamRoom() {
       
       if (!existsInList) {
         const rawScore = typeof currentResult.score === 'number' ? currentResult.score : (parseInt(currentResult.score) || 0);
-        const rawTotal = typeof currentResult.total === 'number' ? currentResult.total : (parseInt(currentResult.total) || 1);
-        const scaledScore = typeof currentResult.scaledScore === 'number' ? currentResult.scaledScore : Math.round((rawScore / rawTotal) * 100);
+        const rawTotal = typeof currentResult.total === 'number' ? currentResult.total : (parseInt(currentResult.total) || qTotal);
         
         list.push({
           id: `local-sub-${id}`,
           name: `${currentUserName} (আপনি)`,
           nameEn: `${currentUserName} (You)`,
-          score: isNaN(scaledScore) ? 0 : scaledScore,
+          score: rawScore,
+          total: rawTotal,
           time: toSafeString(currentResult.timeTaken, '0m 00s'),
           timeSec: typeof currentResult.timeTakenSec === 'number' ? currentResult.timeTakenSec : 9999,
           avatar: toSafeString(state.user?.photoURL, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'),
@@ -235,12 +237,14 @@ export default function LiveExamRoom() {
       }
     }
 
-    // Sort by score DESCENDING, then by completion time ASCENDING
+    // Sort by ratio (score / total) DESCENDING, then by completion time ASCENDING
     return list.sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score;
+      const ratioA = a.score / (a.total || 1);
+      const ratioB = b.score / (b.total || 1);
+      if (ratioB !== ratioA) return ratioB - ratioA;
       return (a.timeSec || 0) - (b.timeSec || 0);
     });
-  }, [realSubmissions, savedResult, submitted, isEn, state.user, id]);
+  }, [realSubmissions, savedResult, submitted, isEn, state.user, id, exam]);
 
   const isCompleted = useMemo(() => {
     if (!exam) return false;
@@ -728,6 +732,7 @@ export default function LiveExamRoom() {
                   const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
                   const displayTime = toSafeString(user.time, '0m 00s');
                   const displayScore = toSafeString(user.score, '0');
+                  const displayTotal = toSafeString(user.total, (exam && Array.isArray(exam.questions) && exam.questions.length > 0 ? exam.questions.length : 100));
                   const avatarUrl = toSafeString(user.avatar, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150');
 
                   const getAvatarBg = (nameStr) => {
@@ -839,7 +844,7 @@ export default function LiveExamRoom() {
                           padding: '4px 10px',
                           borderRadius: '8px'
                         }}>
-                          {isEn ? `${displayScore}/100` : `${toBengaliNumber(displayScore)}/১০০`}
+                          {isEn ? `${displayScore}/${displayTotal}` : `${toBengaliNumber(displayScore)}/${toBengaliNumber(displayTotal)}`}
                         </span>
                         <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', marginTop: '2px', paddingRight: '4px' }}>
                           {isEn ? 'Points' : 'পয়েন্ট'}
