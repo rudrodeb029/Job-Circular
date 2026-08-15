@@ -30,10 +30,30 @@ const DEFAULT_TTL_MINUTES = 1440; // 24 Hours
 const normalizeDoc = (row) => {
   if (!row || typeof row !== 'object') return row;
   const { raw_data, ...rest } = row;
-  return {
+
+  let rawObj = raw_data;
+  if (typeof raw_data === 'string') {
+    try {
+      rawObj = JSON.parse(raw_data);
+    } catch (e) {
+      rawObj = {};
+    }
+  }
+
+  const merged = {
     ...rest,
-    ...(raw_data && typeof raw_data === 'object' ? raw_data : {})
+    ...(rawObj && typeof rawObj === 'object' ? rawObj : {})
   };
+
+  ['questions', 'subjects', 'subjectTopics', 'options', 'optionsEn', 'answers', 'savedJobs', 'appliedJobs'].forEach(key => {
+    if (typeof merged[key] === 'string') {
+      try {
+        merged[key] = JSON.parse(merged[key]);
+      } catch (e) {}
+    }
+  });
+
+  return merged;
 };
 
 // ─── Generic CRUD Helpers ───────────────────────────────────────

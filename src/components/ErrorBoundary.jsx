@@ -36,9 +36,14 @@ export default class ErrorBoundary extends React.Component {
           <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '8px' }}>
             সাময়িক সমস্যা দেখা দিয়েছে
           </h2>
-          <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '24px', maxWidth: '320px', lineHeight: 1.5 }}>
+          <p style={{ fontSize: '13px', color: '#64748b', marginBottom: '16px', maxWidth: '320px', lineHeight: 1.5 }}>
             পৃষ্ঠাটি লোড করার সময় একটি ত্রুটি ঘটেছে। পুনরায় চেষ্টা করুন বা হোম পেজে ফিরে যান।
           </p>
+          {this.state.error && (
+            <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: '8px', fontSize: '11px', fontFamily: 'monospace', maxWidth: '340px', wordBreak: 'break-all', marginBottom: '20px' }}>
+              {String(this.state.error?.message || this.state.error)}
+            </div>
+          )}
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
               onClick={() => {
