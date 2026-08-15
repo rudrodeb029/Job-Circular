@@ -186,9 +186,14 @@ CREATE INDEX IF NOT EXISTS idx_live_exams_status ON public.live_exams (status);
 CREATE INDEX IF NOT EXISTS idx_jobs_category ON public.jobs ("categoryId");
 
 -- 5. Enable Supabase Realtime for Admin Dashboard and Live Leaderboard
-ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.questions;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.admits;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
+DO $$ 
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.questions;
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.admits;
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
+EXCEPTION WHEN duplicate_object THEN
+  NULL;
+END $$;
