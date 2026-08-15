@@ -192,7 +192,12 @@ export default function LiveExamRoom() {
     const currentResult = savedResult || (submitted ? getExamResultLocal() : null);
     if (currentResult) {
       const currentUserName = state.user?.name || 'Suvo Roy';
-      const existsInList = list.some(item => item.isCurrentUser || item.name === currentUserName || item.name.includes('(আপনি)'));
+      const existsInList = list.some(item => 
+        item.isCurrentUser || 
+        item.name === currentUserName || 
+        (item.name && String(item.name).includes('(আপনি)')) ||
+        (item.name && String(item.name).includes(currentUserName))
+      );
       
       if (!existsInList) {
         const scaledScore = currentResult.scaledScore ?? Math.round(((currentResult.score || 0) / (currentResult.total || 1)) * 100);

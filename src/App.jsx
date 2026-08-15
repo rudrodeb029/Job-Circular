@@ -5,6 +5,7 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
+import ErrorBoundary from './components/ErrorBoundary'
 import { initializePushNotifications } from './utils/notifications'
 import { initializeOneSignal } from './utils/oneSignalWrapper'
 
@@ -158,44 +159,46 @@ function App() {
   }
 
   return (
-    <div className="container" data-theme={state.theme}>
-      <Routes location={location}>
-        <Route path="/" element={<SplashScreen />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/job/:id" element={<JobDetails />} />
-        <Route path="/exam-details/:id" element={<ExamDetails />} />
-        <Route path="/result-details/:id" element={<ResultDetails />} />
-        <Route path="/all-circulars" element={<AllCirculars />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/search" element={<SearchFilter />} />
-        <Route path="/saved" element={<SavedJobs />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/admit-card" element={<AdmitCardResult />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/privacy" element={<PrivacyPolicy />} />
-        <Route path="/terms" element={<TermsConditions />} />
-        <Route path="/share" element={<ShareApp />} />
-        <Route path="/rate" element={<RateUs />} />
-        <Route path="/contact" element={<ContactUs />} />
-        <Route path="/about" element={<AboutApp />} />
-        <Route path="/questions/:category" element={<QuestionsList />} />
-        <Route path="/question-details/:id" element={<QuestionDetails />} />
-        <Route path="/questions-hub" element={<QuestionsHub />} />
-        <Route path="/live-exams" element={<LiveExams />} />
-        <Route path="/live-exams-list" element={<LiveExams />} />
-        <Route path="/live-exam-room/:id" element={<LiveExamRoom />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <VersionUpdateModal 
-        isOpen={showUpdateModal}
-        updateInfo={updateInfo}
-        currentVersion={CURRENT_VERSION}
-        onClose={() => setShowUpdateModal(false)}
-      />
-    </div>
+    <ErrorBoundary>
+      <div className="container" data-theme={state.theme}>
+        <Routes location={location}>
+          <Route path="/" element={<SplashScreen />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/job/:id" element={<JobDetails />} />
+          <Route path="/exam-details/:id" element={<ExamDetails />} />
+          <Route path="/result-details/:id" element={<ResultDetails />} />
+          <Route path="/all-circulars" element={<AllCirculars />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/search" element={<SearchFilter />} />
+          <Route path="/saved" element={<SavedJobs />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/admit-card" element={<AdmitCardResult />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsConditions />} />
+          <Route path="/share" element={<ShareApp />} />
+          <Route path="/rate" element={<RateUs />} />
+          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/about" element={<AboutApp />} />
+          <Route path="/questions/:category" element={<QuestionsList />} />
+          <Route path="/question-details/:id" element={<QuestionDetails />} />
+          <Route path="/questions-hub" element={<QuestionsHub />} />
+          <Route path="/live-exams" element={<LiveExams />} />
+          <Route path="/live-exams-list" element={<LiveExams />} />
+          <Route path="/live-exam-room/:id" element={<LiveExamRoom />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <VersionUpdateModal 
+          isOpen={showUpdateModal}
+          updateInfo={updateInfo}
+          currentVersion={CURRENT_VERSION}
+          onClose={() => setShowUpdateModal(false)}
+        />
+      </div>
+    </ErrorBoundary>
   )
 }
 
