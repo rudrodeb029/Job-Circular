@@ -397,35 +397,46 @@ export default function LiveExams() {
                   border: '1px solid var(--border-light)'
                 }}>
                   {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
-                    exam.subjectTopics.map((st, idx) => (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
-                          {isEn ? st.subjectEn : st.subject}
-                        </span>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '2px' }}>
-                          {(isEn ? st.topicsEn : st.topics)?.split(',').map((t, tIdx) => (
-                            <span key={tIdx} style={{
-                              fontSize: '9.5px',
-                              fontWeight: 600,
-                              background: 'var(--white)',
-                              border: '1px solid var(--border)',
-                              color: 'var(--text-primary)',
-                              padding: '2px 7px',
-                              borderRadius: '5px'
-                            }}>
-                              {t.trim()}
-                            </span>
-                          ))}
+                    exam.subjectTopics.map((st, idx) => {
+                      const subjText = safeStringify(isEn ? st.subjectEn : st.subject, 'General');
+                      const rawTopics = isEn ? st.topicsEn : st.topics;
+                      const topicsList = Array.isArray(rawTopics) 
+                        ? rawTopics.map(t => safeStringify(t)) 
+                        : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
+
+                      return (
+                        <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
+                            {subjText}
+                          </span>
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '2px' }}>
+                            {topicsList.map((t, tIdx) => (
+                              <span key={tIdx} style={{
+                                fontSize: '9.5px',
+                                fontWeight: 600,
+                                background: 'var(--white)',
+                                border: '1px solid var(--border)',
+                                color: 'var(--text-primary)',
+                                padding: '2px 7px',
+                                borderRadius: '5px'
+                              }}>
+                                {t}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
-                        {isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ'}
+                        {safeStringify(isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ')}
                       </span>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                        {(isEn ? exam.topicsEn : exam.topics)?.split(',').map((t, idx) => (
+                        {(Array.isArray(isEn ? exam.topicsEn : exam.topics)
+                          ? (isEn ? exam.topicsEn : exam.topics)
+                          : safeStringify(isEn ? exam.topicsEn : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
+                        ).map((t, idx) => (
                           <span key={idx} style={{
                             fontSize: '9.5px',
                             fontWeight: 600,
@@ -435,7 +446,7 @@ export default function LiveExams() {
                             padding: '2px 7px',
                             borderRadius: '5px'
                           }}>
-                            {t.trim()}
+                            {t}
                           </span>
                         ))}
                       </div>
@@ -563,9 +574,22 @@ export default function LiveExams() {
   );
 }
 
+const safeStringify = (val, fallback = '') => {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === 'string') return val;
+  if (typeof val === 'number') return String(val);
+  if (Array.isArray(val)) return val.map(v => safeStringify(v)).join(', ');
+  if (typeof val === 'object') {
+    if (typeof val.name === 'string') return val.name;
+    if (typeof val.title === 'string') return val.title;
+    if (typeof val.text === 'string') return val.text;
+  }
+  return fallback;
+};
+
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
-  const engNum = String(num);
+  const engNum = safeStringify(num);
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };

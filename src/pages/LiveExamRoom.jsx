@@ -173,17 +173,25 @@ export default function LiveExamRoom() {
 
   // Generate 100% REAL dynamic Leaderboard list (ZERO dummy users)
   const leaderboardData = useMemo(() => {
-    const list = realSubmissions.map(sub => {
-      const isSelf = (state.user?.name && sub.userName === state.user.name) || 
-                     (state.user?.email && sub.userEmail === state.user.email);
+    const list = (realSubmissions || []).map(sub => {
+      const uName = toSafeString(sub?.userName || sub?.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
+      const uPhoto = toSafeString(sub?.userPhoto || sub?.avatar, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150');
+      const uTime = toSafeString(sub?.timeTaken || sub?.time, '0m 00s');
+      const isSelf = Boolean((state.user?.name && uName === state.user.name) || 
+                             (state.user?.email && sub?.userEmail === state.user.email));
+
+      const rawScore = typeof sub?.score === 'number' ? sub.score : (parseInt(sub?.score) || 0);
+      const rawTotal = typeof sub?.total === 'number' ? sub.total : (parseInt(sub?.total) || 1);
+      const calcScore = typeof sub?.scaledScore === 'number' ? sub.scaledScore : Math.round((rawScore / rawTotal) * 100);
+
       return {
-        id: sub.id,
-        name: sub.userName || (isEn ? 'Candidate' : 'পরীক্ষার্থী'),
-        nameEn: sub.userName || 'Candidate',
-        score: sub.scaledScore ?? Math.round(((sub.score || 0) / (sub.total || 1)) * 100),
-        time: sub.timeTaken || '0m 00s',
-        timeSec: sub.timeTakenSec || 9999,
-        avatar: sub.userPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+        id: toSafeString(sub?.id, `sub-${Math.random()}`),
+        name: uName,
+        nameEn: uName,
+        score: isNaN(calcScore) ? 0 : calcScore,
+        time: uTime,
+        timeSec: typeof sub?.timeTakenSec === 'number' ? sub.timeTakenSec : (parseInt(sub?.timeTakenSec) || 9999),
+        avatar: uPhoto,
         isCurrentUser: isSelf
       };
     });
@@ -191,7 +199,7 @@ export default function LiveExamRoom() {
     // Also include current user's score if present in localStorage but not yet synced
     const currentResult = savedResult || (submitted ? getExamResultLocal() : null);
     if (currentResult) {
-      const currentUserName = state.user?.name || 'Suvo Roy';
+      const currentUserName = toSafeString(state.user?.name, 'Suvo Roy');
       const existsInList = list.some(item => 
         item.isCurrentUser || 
         item.name === currentUserName || 
@@ -200,15 +208,18 @@ export default function LiveExamRoom() {
       );
       
       if (!existsInList) {
-        const scaledScore = currentResult.scaledScore ?? Math.round(((currentResult.score || 0) / (currentResult.total || 1)) * 100);
+        const rawScore = typeof currentResult.score === 'number' ? currentResult.score : (parseInt(currentResult.score) || 0);
+        const rawTotal = typeof currentResult.total === 'number' ? currentResult.total : (parseInt(currentResult.total) || 1);
+        const scaledScore = typeof currentResult.scaledScore === 'number' ? currentResult.scaledScore : Math.round((rawScore / rawTotal) * 100);
+        
         list.push({
           id: `local-sub-${id}`,
           name: `${currentUserName} (আপনি)`,
           nameEn: `${currentUserName} (You)`,
-          score: scaledScore,
-          time: currentResult.timeTaken || '0m 00s',
-          timeSec: currentResult.timeTakenSec || 9999,
-          avatar: state.user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+          score: isNaN(scaledScore) ? 0 : scaledScore,
+          time: toSafeString(currentResult.timeTaken, '0m 00s'),
+          timeSec: typeof currentResult.timeTakenSec === 'number' ? currentResult.timeTakenSec : 9999,
+          avatar: toSafeString(state.user?.photoURL, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'),
           isCurrentUser: true
         });
       }
@@ -539,13 +550,13 @@ export default function LiveExamRoom() {
                     gap: '8px'
                   }}>
                     <span>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                    <span>{isEn ? (qn.questionEn || qn.question) : qn.question}</span>
+                    <span>{toSafeString(isEn ? (qn.questionEn || qn.question) : qn.question)}</span>
                   </h4>
 
                   {/* Option Choices */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     {qOptions.map((option, oIndex) => {
-                      const optText = isEn ? (qOptionsEn[oIndex] || option) : option;
+                      const optText = toSafeString(isEn ? (qOptionsEn[oIndex] || option) : option);
                       const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
                       const prefix = optionPrefixes[oIndex];
 
@@ -642,7 +653,7 @@ export default function LiveExamRoom() {
                         💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
                       </h5>
                       <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
-                        {isEn ? (qn.explanationEn || qn.explanation) : qn.explanation}
+                        {toSafeString(isEn ? (qn.explanationEn || qn.explanation) : qn.explanation)}
                       </p>
                     </div>
                   )}
@@ -853,9 +864,24 @@ export default function LiveExamRoom() {
   );
 }
 
+const toSafeString = (val, fallback = '') => {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === 'string' || typeof val === 'number') return String(val);
+  if (typeof val === 'boolean') return String(val);
+  if (typeof val === 'object') {
+    if (typeof val.text === 'string') return val.text;
+    if (typeof val.title === 'string') return val.title;
+    if (typeof val.name === 'string') return val.name;
+    if (typeof val.value === 'string') return val.value;
+    if (typeof val.bn === 'string') return val.bn;
+    if (typeof val.en === 'string') return val.en;
+  }
+  return fallback;
+};
+
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
-  const engNum = String(num);
+  const engNum = toSafeString(num);
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
