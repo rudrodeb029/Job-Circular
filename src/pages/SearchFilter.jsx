@@ -67,8 +67,8 @@ export default function SearchFilter() {
       // Query filter
       if (query) {
         const q = query.toLowerCase();
-        const titleMatch = job.title.toLowerCase().includes(q) || job.titleEn.toLowerCase().includes(q);
-        const orgMatch = job.organization.toLowerCase().includes(q) || job.organizationEn.toLowerCase().includes(q);
+        const titleMatch = (job.title || '').toLowerCase().includes(q) || (job.titleEn || '').toLowerCase().includes(q);
+        const orgMatch = (job.organization || '').toLowerCase().includes(q) || (job.organizationEn || '').toLowerCase().includes(q);
         if (!titleMatch && !orgMatch) return false;
       }
 
@@ -81,12 +81,46 @@ export default function SearchFilter() {
       if (activeTab !== 'all' && jobCategory !== activeTab) return false;
 
       // Filter panel options
-      if (filters.location && job.location !== filters.location) return false;
-      if (filters.jobType && job.type !== filters.jobType) return false;
+      // 1. Qualification filter
+      if (filters.qualification) {
+        const reqStr = Array.isArray(job.requirements) ? job.requirements.join(' ') : (job.requirements || '');
+        const matchQual = (job.qualification && job.qualification.includes(filters.qualification)) ||
+                          (job.education && job.education.includes(filters.qualification)) ||
+                          reqStr.includes(filters.qualification);
+        if (!matchQual) return false;
+      }
+
+      // 2. Location filter
+      if (filters.location) {
+        const matchLoc = (job.location && job.location.includes(filters.location)) ||
+                         (job.description && job.description.includes(filters.location));
+        if (!matchLoc) return false;
+      }
+
+      // 3. Job Type filter
+      if (filters.jobType) {
+        const matchType = job.type === filters.jobType ||
+                          job.jobType === filters.jobType ||
+                          job.category === filters.jobType;
+        if (!matchType) return false;
+      }
+
+      // 4. Deadline filter
+      if (filters.deadline && job.deadline) {
+        const deadlineDate = new Date(job.deadline);
+        if (!isNaN(deadlineDate.getTime())) {
+          const now = new Date();
+          const diffDays = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
+          if (filters.deadline === 'today' && diffDays > 1) return false;
+          if (filters.deadline === '3days' && diffDays > 3) return false;
+          if (filters.deadline === 'week' && diffDays > 7) return false;
+          if (filters.deadline === 'month' && diffDays > 30) return false;
+        }
+      }
 
       return true;
     });
-  }, [query, activeTab, filters]);
+  }, [query, activeTab, filters, localJobs]);
 
   return (
     <div className="page">
@@ -122,6 +156,7 @@ export default function SearchFilter() {
             resultCount={filteredJobs.length}
             onShowResults={() => setShowFilter(false)}
             onClose={() => setShowFilter(false)}
+            jobs={localJobs}
           />
         )}
 
