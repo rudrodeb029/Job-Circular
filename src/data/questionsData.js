@@ -24,11 +24,23 @@ export const getQuestionsByCategory = (category) => {
 
 export const getQuestionById = (id) => {
   const all = getQuestionsData();
-  return all.find(q => q.id === id);
+  return all.find(q => String(q.id) === String(id));
 };
 
 export const getQuestionsData = () => {
-  return cachedQuestionsData;
+  if (cachedQuestionsData && cachedQuestionsData.length > 0) {
+    return cachedQuestionsData;
+  }
+  try {
+    const saved = localStorage.getItem('cache_data_questions') || localStorage.getItem('questions_data');
+    if (saved) {
+      cachedQuestionsData = JSON.parse(saved);
+      return cachedQuestionsData;
+    }
+  } catch (e) {
+    console.error('Error reading questions cache:', e);
+  }
+  return [];
 };
 
 export const saveQuestionsData = async (data) => {

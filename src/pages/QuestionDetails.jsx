@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 import { getQuestionById } from '../data/questionsData';
 import BottomNav from '../components/BottomNav';
 
@@ -9,11 +10,17 @@ export default function QuestionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useAppContext();
+  const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
 
   const paper = useMemo(() => {
+    // 1. Check adminState.questions
+    const fromContext = (adminState?.questions || []).find(q => String(q.id) === String(id));
+    if (fromContext) return fromContext;
+
+    // 2. Fallback to questionsData lookup
     return getQuestionById(id);
-  }, [id]);
+  }, [id, adminState?.questions]);
 
   // 'practice' or 'read'
   const [mode, setMode] = useState('practice');
