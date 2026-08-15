@@ -242,22 +242,36 @@ export const deleteDocument = async (collectionName, docId) => {
  * @param {Function} callback - Triggered with updated table data array on changes
  */
 export const onCollectionSnapshot = (collectionName, callback) => {
-  const channel = supabase
-    .channel(`admin_realtime_${collectionName}_${Date.now()}`)
-    .on(
-      'postgres_changes',
-      { event: '*', schema: 'public', table: collectionName },
-      async () => {
-        // Fetch fresh data from Supabase and invoke callback
-        const freshData = await getCollection(collectionName, true);
-        callback(freshData);
-      }
-    )
-    .subscribe();
+  try {
+    const channel = supabase
+      .channel(`admin_realtime_${collectionName}_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: collectionName },
+        async () => {
+          try {
+            const freshData = await getCollection(collectionName, true);
+            callback(freshData);
+          } catch (e) {
+            console.warn(`Realtime fetch error for ${collectionName}:`, e);
+          }
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          console.warn(`Realtime channel error for ${collectionName}`);
+        }
+      });
 
-  return () => {
-    supabase.removeChannel(channel);
-  };
+    return () => {
+      try {
+        supabase.removeChannel(channel);
+      } catch (e) {}
+    };
+  } catch (err) {
+    console.warn(`Failed to create realtime subscription for ${collectionName}:`, err);
+    return () => {};
+  }
 };
 
 /**

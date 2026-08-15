@@ -443,69 +443,11 @@ export const AdminProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    // 1. Initial fetch from server to guarantee fresh data
-    loadAllData(true);
+    let isMounted = true;
 
-    // 2. Real-time snapshot listener for JOBS collection
-    const unsubscribeJobs = onCollectionSnapshot(COLLECTIONS.JOBS, (jobsData) => {
-      if (Array.isArray(jobsData)) {
-        const sortedJobs = mapWithTimestamps(jobsData).sort(sortByCreatedAt);
-        dispatch({ type: 'SET_JOBS', payload: sortedJobs });
-        saveLocalCache(COLLECTIONS.JOBS, sortedJobs);
-      }
-    });
-
-    // 3. Real-time snapshot listener for LIVE_EXAMS collection
-    const unsubscribeLiveExams = onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (liveExamsData) => {
-      if (Array.isArray(liveExamsData)) {
-        const sortedExams = mapWithTimestamps(liveExamsData).sort(sortByCreatedAt);
-        dispatch({ type: 'SET_LIVE_EXAMS', payload: sortedExams });
-        saveLocalCache(COLLECTIONS.LIVE_EXAMS, sortedExams);
-      }
-    });
-
-    // 4. Real-time snapshot listener for ADMITS collection
-    const unsubscribeAdmits = onCollectionSnapshot(COLLECTIONS.ADMITS, (admitsData) => {
-      if (Array.isArray(admitsData)) {
-        const sortedAdmits = mapWithTimestamps(admitsData).sort(sortByCreatedAt);
-        dispatch({ type: 'SET_ADMITS', payload: sortedAdmits });
-        saveLocalCache(COLLECTIONS.ADMITS, sortedAdmits);
-      }
-    });
-
-    // 5. Real-time snapshot listener for QUESTIONS collection
-    const unsubscribeQuestions = onCollectionSnapshot(COLLECTIONS.QUESTIONS, (questionsData) => {
-      if (Array.isArray(questionsData)) {
-        const sortedQuestions = mapWithTimestamps(questionsData).sort(sortByCreatedAt);
-        dispatch({ type: 'SET_QUESTIONS', payload: sortedQuestions });
-        saveLocalCache(COLLECTIONS.QUESTIONS, sortedQuestions);
-      }
-    });
-
-    // 6. Real-time snapshot listener for NOTIFICATIONS collection
-    const unsubscribeNotifs = onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (notifsData) => {
-      if (Array.isArray(notifsData)) {
-        const sortedNotifs = mapWithTimestamps(notifsData).sort(sortByCreatedAt);
-        dispatch({ type: 'SET_NOTIFICATIONS', payload: sortedNotifs });
-        saveLocalCache(COLLECTIONS.NOTIFICATIONS, sortedNotifs);
-      }
-    });
-
-    // 7. Real-time snapshot listener for ACTIVITIES collection
-    const unsubscribeActivities = onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (activitiesData) => {
-      if (Array.isArray(activitiesData)) {
-        const sortedActivities = mapWithTimestamps(activitiesData).sort((a, b) => {
-          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return dateB - dateA;
-        });
-        dispatch({ type: 'SET_ACTIVITIES', payload: sortedActivities });
-        saveLocalCache(COLLECTIONS.ACTIVITIES, sortedActivities);
-      }
-    });
-
-    // 8. Real-time Firebase Auth state change listener
+    // 1. Real-time Firebase Auth state change listener (First Priority)
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (!isMounted) return;
       if (user && user.email === 'rudrodeb029@gmail.com') {
         const adminPayload = {
           name: user.displayName || 'Super Admin',
@@ -520,7 +462,101 @@ export const AdminProvider = ({ children }) => {
       setAuthChecked(true);
     });
 
+    // Fallback safety timeout so session verification never blocks rendering
+    const authTimeout = setTimeout(() => {
+      if (isMounted) setAuthChecked(true);
+    }, 1200);
+
+    // 2. Initial fetch from server
+    loadAllData(true).catch(console.error);
+
+    // 3. Real-time snapshot listeners with safe error boundaries
+    let unsubscribeJobs = () => {};
+    let unsubscribeLiveExams = () => {};
+    let unsubscribeAdmits = () => {};
+    let unsubscribeQuestions = () => {};
+    let unsubscribeNotifs = () => {};
+    let unsubscribeActivities = () => {};
+
+    try {
+      unsubscribeJobs = onCollectionSnapshot(COLLECTIONS.JOBS, (jobsData) => {
+        if (Array.isArray(jobsData) && isMounted) {
+          const sortedJobs = mapWithTimestamps(jobsData).sort(sortByCreatedAt);
+          dispatch({ type: 'SET_JOBS', payload: sortedJobs });
+          saveLocalCache(COLLECTIONS.JOBS, sortedJobs);
+        }
+      });
+    } catch (e) {
+      console.warn('Jobs realtime error:', e);
+    }
+
+    try {
+      unsubscribeLiveExams = onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (liveExamsData) => {
+        if (Array.isArray(liveExamsData) && isMounted) {
+          const sortedExams = mapWithTimestamps(liveExamsData).sort(sortByCreatedAt);
+          dispatch({ type: 'SET_LIVE_EXAMS', payload: sortedExams });
+          saveLocalCache(COLLECTIONS.LIVE_EXAMS, sortedExams);
+        }
+      });
+    } catch (e) {
+      console.warn('LiveExams realtime error:', e);
+    }
+
+    try {
+      unsubscribeAdmits = onCollectionSnapshot(COLLECTIONS.ADMITS, (admitsData) => {
+        if (Array.isArray(admitsData) && isMounted) {
+          const sortedAdmits = mapWithTimestamps(admitsData).sort(sortByCreatedAt);
+          dispatch({ type: 'SET_ADMITS', payload: sortedAdmits });
+          saveLocalCache(COLLECTIONS.ADMITS, sortedAdmits);
+        }
+      });
+    } catch (e) {
+      console.warn('Admits realtime error:', e);
+    }
+
+    try {
+      unsubscribeQuestions = onCollectionSnapshot(COLLECTIONS.QUESTIONS, (questionsData) => {
+        if (Array.isArray(questionsData) && isMounted) {
+          const sortedQuestions = mapWithTimestamps(questionsData).sort(sortByCreatedAt);
+          dispatch({ type: 'SET_QUESTIONS', payload: sortedQuestions });
+          saveLocalCache(COLLECTIONS.QUESTIONS, sortedQuestions);
+        }
+      });
+    } catch (e) {
+      console.warn('Questions realtime error:', e);
+    }
+
+    try {
+      unsubscribeNotifs = onCollectionSnapshot(COLLECTIONS.NOTIFICATIONS, (notifsData) => {
+        if (Array.isArray(notifsData) && isMounted) {
+          const sortedNotifs = mapWithTimestamps(notifsData).sort(sortByCreatedAt);
+          dispatch({ type: 'SET_NOTIFICATIONS', payload: sortedNotifs });
+          saveLocalCache(COLLECTIONS.NOTIFICATIONS, sortedNotifs);
+        }
+      });
+    } catch (e) {
+      console.warn('Notifications realtime error:', e);
+    }
+
+    try {
+      unsubscribeActivities = onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (activitiesData) => {
+        if (Array.isArray(activitiesData) && isMounted) {
+          const sortedActivities = mapWithTimestamps(activitiesData).sort((a, b) => {
+            const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return dateB - dateA;
+          });
+          dispatch({ type: 'SET_ACTIVITIES', payload: sortedActivities });
+          saveLocalCache(COLLECTIONS.ACTIVITIES, sortedActivities);
+        }
+      });
+    } catch (e) {
+      console.warn('Activities realtime error:', e);
+    }
+
     return () => {
+      isMounted = false;
+      clearTimeout(authTimeout);
       unsubscribeJobs();
       unsubscribeLiveExams();
       unsubscribeAdmits();
