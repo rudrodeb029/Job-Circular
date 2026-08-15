@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { setDocument, COLLECTIONS } from '../services/firestoreService';
+import { setDocument, COLLECTIONS } from '../services/supabaseService';
 
 const AppContext = createContext();
 

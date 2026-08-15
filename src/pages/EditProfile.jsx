@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Edit, FileText, MapPin, X } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { CLOUDINARY_CONFIG } from '../cloudinary';
+import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import BottomNav from '../components/BottomNav';
 
 const PhoneIcon = ({ size = 16, color = 'currentColor' }) => (
@@ -166,7 +167,8 @@ export default function EditProfile() {
       });
       const fileData = await res.json();
       if (fileData.secure_url) {
-        setFormData(prev => ({ ...prev, avatar: fileData.secure_url }));
+        const optimizedUrl = optimizeCloudinaryUrl(fileData.secure_url);
+        setFormData(prev => ({ ...prev, avatar: optimizedUrl }));
       }
     } catch (err) {
       console.error(err);

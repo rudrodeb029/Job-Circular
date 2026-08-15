@@ -1,4 +1,4 @@
-import { getDocument, setDocument, COLLECTIONS } from '../services/firestoreService';
+import { getDocument, setDocument, COLLECTIONS } from '../services/supabaseService';
 
 export const DEFAULT_APP_INFO = {
   contactEmail: 'support@jobcircularbd.app',

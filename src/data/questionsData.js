@@ -1,4 +1,4 @@
-import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/firestoreService';
+import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/supabaseService';
 
 export const questionsData = [];
 

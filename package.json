@@ -13,6 +13,7 @@
     "@capacitor/local-notifications": "^8.2.1",
     "@capacitor/status-bar": "^8.0.3",
     "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.112.3",
     "firebase": "^12.17.1",
     "onesignal-cordova-plugin": "^5.5.2",
     "react": "^18.3.1",

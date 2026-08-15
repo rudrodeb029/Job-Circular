@@ -9,7 +9,7 @@ import {
   setDocument,
   deleteDocument,
   COLLECTIONS
-} from '../services/firestoreService';
+} from '../services/supabaseService';
 
 import { getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import { auth } from '../firebase';
@@ -426,7 +426,7 @@ export const AdminProvider = ({ children }) => {
         getCollectionCached(COLLECTIONS.NOTIFICATIONS, forceServer),
         getCollectionCached(COLLECTIONS.ADMITS, forceServer),
         getCollectionCached(COLLECTIONS.QUESTIONS, forceServer),
-        getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer, 2)
+        getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer)
       ]);
 
       dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(jobsData) });

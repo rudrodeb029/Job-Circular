@@ -2,7 +2,7 @@ import {
   getCollection,
   updateDocument,
   COLLECTIONS
-} from '../services/firestoreService';
+} from '../services/supabaseService';
 
 /**
  * Migration script to ensure all existing Firestore documents have a createdAt timestamp.

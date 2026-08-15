@@ -173,7 +173,7 @@ export const defaultLiveExams = [
   }
 ];
 
-import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/firestoreService';
+import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/supabaseService';
 import { sortByCreatedAt } from '../utils/timeUtils';
 
 // Initialize cache with local storage or static fallback

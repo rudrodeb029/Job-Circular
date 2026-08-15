@@ -15,24 +15,11 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Firestore with offline persistence
+// Initialize Firestore instance for OneSignal push notification integration
 export const db = getFirestore(app);
 
 // Initialize Firebase Auth
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
-
-try {
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Firestore persistence failed: Multiple tabs open');
-    } else if (err.code === 'unimplemented') {
-      console.warn('Firestore persistence unsupported by browser');
-    }
-  });
-} catch (e) {
-  console.warn('Firestore persistence setup warning:', e);
-}
 
 export default app;

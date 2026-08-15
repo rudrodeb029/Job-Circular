@@ -3,6 +3,7 @@ import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
 import { triggerLocalNotification } from '../../utils/notifications';
 import { CLOUDINARY_CONFIG } from '../../cloudinary';
+import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -80,7 +81,8 @@ export default function ManageJobs() {
         });
         const fileData = await res.json();
         if (fileData.secure_url) {
-          uploadedUrls.push(fileData.secure_url);
+          const optimizedUrl = optimizeCloudinaryUrl(fileData.secure_url);
+          uploadedUrls.push(optimizedUrl);
           successCount++;
         }
       } catch (err) {

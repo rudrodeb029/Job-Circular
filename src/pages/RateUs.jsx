@@ -4,7 +4,7 @@ import { ArrowLeft, Star, CheckCircle, Award, ExternalLink } from '../components
 import BottomNav from '../components/BottomNav';
 import { useAppContext } from '../context/AppContext';
 import { getAppInfoConfig, DEFAULT_APP_INFO } from '../utils/appInfoService';
-import { addDocument, COLLECTIONS } from '../services/firestoreService';
+import { addDocument, COLLECTIONS } from '../services/supabaseService';
 
 export default function RateUs() {
   const navigate = useNavigate();

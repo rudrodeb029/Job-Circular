@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { useNavigate } from 'react-router-dom';
-import { getDocument, COLLECTIONS } from '../../services/firestoreService';
+import { getDocument, COLLECTIONS } from '../../services/supabaseService';
 import { saveOneSignalConfig, broadcastPush } from '../../utils/oneSignalWrapper';
 import { getAppInfoConfig, saveAppInfoConfig, DEFAULT_APP_INFO } from '../../utils/appInfoService';
 
