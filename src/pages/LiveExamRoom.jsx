@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
@@ -13,6 +13,7 @@ export default function LiveExamRoom() {
   const { state } = useAppContext();
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
+  const roomEntryTime = useRef(Date.now());
 
   const [exam, setExam] = useState(null);
   const [loadingExam, setLoadingExam] = useState(true);
@@ -343,8 +344,15 @@ export default function LiveExamRoom() {
 
     const totalQuestions = exam.questions?.length || 100;
     const scaledScore = Math.round((correct / totalQuestions) * 100);
-    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
-    const elapsedSec = Math.max(1, Math.floor((Date.now() - startMs) / 1000));
+    const durationMins = typeof exam?.duration === 'number' ? exam.duration : (parseInt(exam?.duration) || 10);
+    const totalDurationSec = durationMins * 60;
+    
+    let elapsedSec = 0;
+    if (typeof remainingSeconds === 'number' && remainingSeconds > 0 && remainingSeconds <= totalDurationSec) {
+      elapsedSec = Math.max(1, totalDurationSec - remainingSeconds);
+    } else {
+      elapsedSec = Math.max(1, Math.floor((Date.now() - (roomEntryTime.current || Date.now())) / 1000));
+    }
     const mins = Math.floor(elapsedSec / 60);
     const secs = elapsedSec % 60;
     const timeStr = `${mins}m ${String(secs).padStart(2, '0')}s`;
@@ -829,7 +837,7 @@ export default function LiveExamRoom() {
                               <circle cx="12" cy="12" r="10"></circle>
                               <polyline points="12 6 12 12 16 14"></polyline>
                             </svg>
-                            {isEn ? displayTime : toBengaliNumber(displayTime)}
+                            {formatTimeTaken(displayTime, isEn)}
                           </span>
                         </div>
                       </div>
@@ -915,4 +923,20 @@ const toBengaliNumber = (num) => {
   const engNum = toSafeString(num);
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
+
+const formatTimeTaken = (timeVal, isEn) => {
+  if (!timeVal || timeVal === '0m 00s') return isEn ? '0m 00s' : '০মি: ০০সে:';
+  const str = String(timeVal).trim();
+  const match = str.match(/(\d+)\s*m\s*(\d+)\s*s/i);
+  if (match) {
+    const m = parseInt(match[1]);
+    const s = parseInt(match[2]);
+    if (isEn) {
+      return `${m}m ${String(s).padStart(2, '0')}s`;
+    } else {
+      return `${toBengaliNumber(m)}মি: ${toBengaliNumber(s)}সে:`;
+    }
+  }
+  return isEn ? str : toBengaliNumber(str);
 };
