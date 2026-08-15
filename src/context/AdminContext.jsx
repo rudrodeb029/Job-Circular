@@ -296,11 +296,13 @@ const adminReducer = (state, action) => {
     }
 
     case 'ADD_LIVE_EXAM':
-    case 'UPDATE_LIVE_EXAM': {
+    case 'ADD_EXAM':
+    case 'UPDATE_LIVE_EXAM':
+    case 'UPDATE_EXAM': {
       const examItem = action.payload;
       setDocument(COLLECTIONS.LIVE_EXAMS, examItem.id, examItem).catch(console.error);
 
-      if (action.type === 'ADD_LIVE_EXAM') {
+      if (action.type === 'ADD_LIVE_EXAM' || action.type === 'ADD_EXAM') {
         logActivity('add', `Scheduled new live exam: ${examItem.title}`);
         sendExamCountdownPush(examItem)
           .then(res => {

@@ -146,17 +146,46 @@ export default function ManageLiveExams() {
 
   const handleSaveExam = (e) => {
     e.preventDefault();
+    if (!title.trim()) {
+      triggerToast('Please enter an exam title', 'error');
+      return;
+    }
+
+    const scheduledDateIso = startTime ? new Date(startTime).toISOString() : new Date().toISOString();
     const newExam = {
       id: `live-exam-${Date.now()}`,
-      title, titleEn,
-      startTime: new Date(startTime).toISOString(),
-      duration: parseInt(duration, 10),
-      subjectTopics, questions,
+      title: title.trim(),
+      titleEn: titleEn.trim() || title.trim(),
+      startTime: scheduledDateIso,
+      scheduledAt: scheduledDateIso,
+      duration: parseInt(duration, 10) || 10,
+      totalQuestions: questions.length,
+      subjectTopics,
+      subjects: subjectTopics,
+      questions,
+      status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    dispatch({ type: 'ADD_EXAM', payload: newExam });
+
+    dispatch({ type: 'ADD_LIVE_EXAM', payload: newExam });
     triggerToast('Live exam scheduled successfully!');
+
+    setTitle('');
+    setTitleEn('');
+    setStartTime('');
+    setDuration('10');
+    setSubjectTopics([{ subject: '', subjectEn: '', topics: '', topicsEn: '' }]);
+    setQuestions([
+      {
+        question: '', questionEn: '',
+        options: ['', '', '', ''],
+        optionsEn: ['', '', '', ''],
+        correctIndex: 0,
+        explanation: '', explanationEn: ''
+      }
+    ]);
+    setBulkInput('');
     setShowAddForm(false);
   };
 
@@ -258,24 +287,24 @@ export default function ManageLiveExams() {
                                <input className="modern-input" value={qn.question} onChange={e => handleQuestionFieldChange(qIndex, 'question', e.target.value)} />
                             </div>
                          </div>
-                         <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px', marginBottom: '16px' }}>
-                            <div>
-                               <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (Bengali)</label>
-                               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                                 {qn.options.map((opt, oIdx) => (
-                                    <input key={oIdx} className="modern-input" value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} placeholder={`বিকল্প ${oIdx + 1}`} />
-                                 ))}
-                               </div>
-                            </div>
-                         </div>
+
                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
-                            <div>
-                               <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Option Index (0-3)</label>
+                            {qn.options.map((opt, oIdx) => (
+                               <div key={oIdx} className="input-group">
+                                  <label>Option {oIdx + 1} ({['ক', 'খ', 'গ', 'ঘ'][oIdx]})</label>
+                                  <input className="modern-input" value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} />
+                               </div>
+                            ))}
+                         </div>
+
+                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                            <div className="input-group">
+                               <label>Correct Option Index (0-3)</label>
                                <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
-                                  <option value="0">Option 1 / ক</option>
-                                  <option value="1">Option 2 / খ</option>
-                                  <option value="2">Option 3 / গ</option>
-                                  <option value="3">Option 4 / ঘ</option>
+                                  <option value={0}>Option 1 / ক</option>
+                                  <option value={1}>Option 2 / খ</option>
+                                  <option value={2}>Option 3 / গ</option>
+                                  <option value={3}>Option 4 / ঘ</option>
                                </select>
                             </div>
                             <div className="input-group">
@@ -331,25 +360,30 @@ export default function ManageLiveExams() {
               </tr>
             </thead>
             <tbody>
-              {exams.map(exam => (
-                <tr key={exam.id}>
-                  <td>
-                    <div style={{ fontWeight: 700, color: '#1e293b' }}>{exam.titleEn}</div>
-                    <div style={{ fontSize: '12px', color: '#64748b' }}>{exam.title}</div>
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 600, color: '#475569' }}>{new Date(exam.startTime).toLocaleDateString()}</div>
-                    <div style={{ fontSize: '12px', color: '#94a3b8' }}>{new Date(exam.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
-                  </td>
-                  <td style={{ fontWeight: 700, color: '#2563eb' }}>{exam.duration} Min</td>
-                  <td>
-                    <span style={{ padding: '4px 10px', background: '#f1f5f9', borderRadius: '6px', fontSize: '12px', fontWeight: 700, color: '#475569' }}>{exam.questions?.length || 0} MCQ</span>
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    <button onClick={() => handleDeleteExam(exam.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#fee2e2', color: '#dc2626', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Delete</button>
-                  </td>
-                </tr>
-              ))}
+              {exams.map(exam => {
+                const dateVal = exam.startTime || exam.scheduledAt || exam.createdAt;
+                const formattedDate = dateVal ? new Date(dateVal).toLocaleDateString() : 'N/A';
+                const formattedTime = dateVal ? new Date(dateVal).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
+                return (
+                  <tr key={exam.id}>
+                    <td>
+                      <div style={{ fontWeight: 700, color: '#1e293b' }}>{exam.title || exam.titleEn}</div>
+                      <div style={{ fontSize: '12px', color: '#64748b' }}>{exam.titleEn}</div>
+                    </td>
+                    <td>
+                      <div style={{ fontWeight: 600, color: '#475569' }}>{formattedDate}</div>
+                      <div style={{ fontSize: '12px', color: '#94a3b8' }}>{formattedTime}</div>
+                    </td>
+                    <td style={{ fontWeight: 700, color: '#2563eb' }}>{exam.duration} Min</td>
+                    <td>
+                      <span style={{ padding: '4px 10px', background: '#f1f5f9', borderRadius: '6px', fontSize: '12px', fontWeight: 700, color: '#475569' }}>{exam.questions?.length || 0} MCQ</span>
+                    </td>
+                    <td style={{ textAlign: 'center' }}>
+                      <button onClick={() => handleDeleteExam(exam.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#fee2e2', color: '#dc2626', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Delete</button>
+                    </td>
+                  </tr>
+                );
+              })}
               {exams.length === 0 && (
                 <tr><td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8' }}>No scheduled live exams found.</td></tr>
               )}
