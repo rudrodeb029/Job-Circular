@@ -242,6 +242,36 @@ export default function LiveExamRoom() {
     });
   }, [realSubmissions, savedResult, submitted, isEn, state.user, id]);
 
+  const isCompleted = useMemo(() => {
+    if (!exam) return false;
+    if (savedResult || submitted) return true;
+    if (exam.status === 'active' || exam.status === 'running') return false;
+    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+    if (!startMs) return false;
+    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
+    const endMs = startMs + durationMins * 60 * 1000;
+    return Date.now() >= endMs;
+  }, [exam, savedResult, submitted]);
+
+  function getExamResultLocal() {
+    try {
+      const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
+      return results[id];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  const currentResult = useMemo(() => {
+    if (savedResult) return savedResult;
+    if (submitted) return getExamResultLocal();
+    if (isCompleted && exam) {
+      const qTotal = Array.isArray(exam.questions) ? exam.questions.length : 100;
+      return { score: 0, total: qTotal, answers: {}, didNotAttend: true };
+    }
+    return null;
+  }, [savedResult, submitted, isCompleted, exam, id]);
+
   if (loadingExam) {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
@@ -369,27 +399,6 @@ export default function LiveExamRoom() {
     const pad = (num) => String(num).padStart(2, '0');
     return `${pad(mins)}:${pad(secs)}`;
   };
-
-  const isCompleted = useMemo(() => {
-    if (!exam) return false;
-    if (savedResult || submitted) return true;
-    if (exam.status === 'active' || exam.status === 'running') return false;
-    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
-    if (!startMs) return false;
-    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
-    const endMs = startMs + durationMins * 60 * 1000;
-    return Date.now() >= endMs;
-  }, [exam, savedResult, submitted]);
-
-  const currentResult = useMemo(() => {
-    if (savedResult) return savedResult;
-    if (submitted) return getExamResultLocal();
-    if (isCompleted && exam) {
-      const qTotal = Array.isArray(exam.questions) ? exam.questions.length : 100;
-      return { score: 0, total: qTotal, answers: {}, didNotAttend: true };
-    }
-    return null;
-  }, [savedResult, submitted, isCompleted, exam, id]);
 
   function getExamResultLocal() {
     try {

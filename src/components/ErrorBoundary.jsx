@@ -3,7 +3,7 @@ import React from 'react';
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error) {
@@ -12,6 +12,7 @@ export default class ErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error("ErrorBoundary caught an error:", error, errorInfo);
+    this.setState({ errorInfo });
   }
 
   render() {
@@ -40,8 +41,13 @@ export default class ErrorBoundary extends React.Component {
             পৃষ্ঠাটি লোড করার সময় একটি ত্রুটি ঘটেছে। পুনরায় চেষ্টা করুন বা হোম পেজে ফিরে যান।
           </p>
           {this.state.error && (
-            <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: '8px', fontSize: '11px', fontFamily: 'monospace', maxWidth: '340px', wordBreak: 'break-all', marginBottom: '20px' }}>
-              {String(this.state.error?.message || this.state.error)}
+            <div style={{ background: '#fee2e2', color: '#dc2626', padding: '10px 14px', borderRadius: '8px', fontSize: '11px', fontFamily: 'monospace', maxWidth: '340px', wordBreak: 'break-all', textAlign: 'left', marginBottom: '20px' }}>
+              <strong>Error:</strong> {String(this.state.error?.message || this.state.error)}
+              {this.state.errorInfo?.componentStack && (
+                <pre style={{ marginTop: '8px', fontSize: '9px', whiteSpace: 'pre-wrap', maxHeight: '120px', overflowY: 'auto' }}>
+                  {this.state.errorInfo.componentStack}
+                </pre>
+              )}
             </div>
           )}
           <div style={{ display: 'flex', gap: '12px' }}>
