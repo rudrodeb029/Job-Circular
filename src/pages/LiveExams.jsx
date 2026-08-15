@@ -366,7 +366,7 @@ export default function LiveExams() {
                     </span>
                   </div>
 
-                  {/* Card Header row 2: Start Date & Countdown (Upcoming Only) */}
+                  {/* Card Header row 2: Start Date & Countdown (Upcoming) */}
                   {status === 'upcoming' && (
                     <div style={{
                       display: 'flex',
@@ -384,20 +384,42 @@ export default function LiveExams() {
                           <line x1="8" y1="2" x2="8" y2="6"></line>
                           <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
-                        {new Date(exam.startTime).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
+                        {startMs ? new Date(startMs).toLocaleString(isEn ? 'en-US' : 'bn-BD', {
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit'
-                        })}
+                        }) : ''}
                       </span>
                       <span style={{ fontSize: '10px', fontWeight: 700, color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                         <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
-                          {isEn ? 'Left:' : 'বাকি:'}
+                          {isEn ? 'Starts in:' : 'বাকি:'}
                         </span>
                         <span style={{ fontFamily: 'monospace' }}>
                           {getCountdownString(startMs)}
                         </span>
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Card Header row 2: Live Remaining Countdown (Running) */}
+                  {status === 'running' && startMs && (
+                    <div style={{
+                      display: 'flex',
+                      justify: 'space-between',
+                      alignItems: 'center',
+                      background: 'rgba(239, 68, 68, 0.06)',
+                      border: '1px solid rgba(239, 68, 68, 0.2)',
+                      borderRadius: '10px',
+                      padding: '6px 10px',
+                      marginBottom: '10px'
+                    }}>
+                      <span style={{ fontSize: '10px', color: '#dc2626', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 1.5s infinite', display: 'inline-block' }}></span>
+                        {isEn ? 'Live Remaining:' : 'পরীক্ষা শেষ হতে বাকি:'}
+                      </span>
+                      <span style={{ fontSize: '10.5px', fontWeight: 800, color: '#dc2626', fontFamily: 'monospace' }}>
+                        {getCountdownString(startMs + (typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60)) * 60 * 1000)}
                       </span>
                     </div>
                   )}
