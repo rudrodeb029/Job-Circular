@@ -142,82 +142,37 @@ export const generate100Questions = (examIndex) => {
   return questions;
 };
 
-export const defaultLiveExams = [
-  {
-    id: 'live-exam-1',
-    title: 'বিসিএস লাইভ পরীক্ষা (১০০ প্রশ্নপত্র)',
-    titleEn: 'BCS Live Exam (100 MCQ Paper)',
-    startTime: new Date(Date.now() + 2 * 60 * 1000).toISOString(), // Starts in 2 mins
-    duration: 60, // 60 minutes
-    subjectTopics: [
-      { subject: 'বাংলা', subjectEn: 'Bengali', topics: 'চর্যাপদ, ব্যাকরণ', topicsEn: 'Charyapada, Grammar' },
-      { subject: 'গণিত', subjectEn: 'Mathematics', topics: 'লাভ-ক্ষতি', topicsEn: 'Profit & Loss' },
-      { subject: 'সাধারণ জ্ঞান', subjectEn: 'General Knowledge', topics: 'মুক্তিযুদ্ধ, ইতিহাস', topicsEn: 'Liberation War, History' },
-      { subject: 'আইসিটি', subjectEn: 'ICT', topics: 'ইনপুট ডিভাইস', topicsEn: 'Input Devices' }
-    ],
-    questions: generate100Questions(1)
-  },
-  {
-    id: 'live-exam-2',
-    title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা',
-    titleEn: 'Primary Assistant Teacher Live Exam',
-    startTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(), // Starts in 1 hour
-    duration: 80,
-    subjectTopics: [
-      { subject: 'গণিত', subjectEn: 'Mathematics', topics: 'মৌলিক সংখ্যা, লাভ-ক্ষতি', topicsEn: 'Prime Numbers, Profit-Loss' },
-      { subject: 'বিজ্ঞান', subjectEn: 'Science', topics: 'রক্তকণিকা, রক্তচাপ', topicsEn: 'Blood Cells, Blood Pressure' },
-      { subject: 'বাংলা', subjectEn: 'Bengali', topics: 'বিপরীত শব্দ, এককথায় প্রকাশ', topicsEn: 'Antonyms, Conversions' },
-      { subject: 'ইংরেজি', subjectEn: 'English', topics: 'Grammar, Synonyms', topicsEn: 'Grammar, Synonyms' }
-    ],
-    questions: generate100Questions(2)
-  }
-];
+export const defaultLiveExams = [];
 
 import { onCollectionSnapshot, setDocument, deleteDocument, getCollection, COLLECTIONS } from '../services/supabaseService';
 import { sortByCreatedAt } from '../utils/timeUtils';
 
-// Initialize cache with local storage or static fallback
+// Initialize cache with local storage or empty array
 let cachedLiveExams = (() => {
   try {
-    const saved = localStorage.getItem('admin_live_exams');
-    return saved ? JSON.parse(saved) : defaultLiveExams;
+    const saved = localStorage.getItem('cache_data_live_exams') || localStorage.getItem('admin_live_exams');
+    return saved ? JSON.parse(saved) : [];
   } catch (e) {
-    return defaultLiveExams;
+    return [];
   }
 })();
 
-// Real-time Firestore sync
+// Real-time Supabase sync
 try {
   onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => {
-    if (data && data.length > 0) {
-      // Sort LIFO (newest first)
+    if (Array.isArray(data)) {
       cachedLiveExams = [...data].sort(sortByCreatedAt);
       localStorage.setItem('admin_live_exams', JSON.stringify(cachedLiveExams));
+      localStorage.setItem('cache_data_live_exams', JSON.stringify(cachedLiveExams));
+      window.dispatchEvent(new CustomEvent('live_exams_updated'));
     }
   });
 } catch (err) {
-  console.error('Failed to subscribe to live exams Firestore:', err);
+  console.error('Failed to subscribe to live exams Supabase:', err);
 }
 
 export const getLiveExams = () => {
-  const exams = cachedLiveExams;
-  return exams.map(exam => {
-    if (exam.id === 'live-exam-1') {
-      return {
-        ...exam,
-        title: 'বিসিএস লাইভ পরীক্ষা (১০০ প্রশ্নপত্র)',
-        titleEn: 'BCS Live Exam (100 MCQ Paper)'
-      };
-    }
-    if (exam.id === 'live-exam-2') {
-      return {
-        ...exam,
-        title: 'প্রাইমারি শিক্ষক নিয়োগ লাইভ পরীক্ষা',
-        titleEn: 'Primary Assistant Teacher Live Exam'
-      };
-    }
-    return exam;
-  });
+  return cachedLiveExams || [];
 };
 
 export const saveLiveExams = async (exams) => {
