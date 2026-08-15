@@ -356,7 +356,15 @@ export default function LiveExamRoom() {
     return Date.now() >= endMs;
   }, [exam]);
 
-  const currentResult = savedResult || (submitted ? getExamResultLocal() : null) || (isCompleted ? { score: 0, total: exam.questions.length, answers: {}, didNotAttend: true } : null);
+  const currentResult = useMemo(() => {
+    if (savedResult) return savedResult;
+    if (submitted) return getExamResultLocal();
+    if (isCompleted && exam) {
+      const qTotal = Array.isArray(exam.questions) ? exam.questions.length : 100;
+      return { score: 0, total: qTotal, answers: {}, didNotAttend: true };
+    }
+    return null;
+  }, [savedResult, submitted, isCompleted, exam, id]);
 
   function getExamResultLocal() {
     try {
