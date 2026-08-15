@@ -202,7 +202,7 @@ export default function LiveExamRoom() {
 
     const list = (realSubmissions || []).map(sub => {
       const uName = toSafeString(sub?.userName || sub?.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
-      const uPhoto = toSafeString(sub?.userPhoto || sub?.avatar, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150');
+      const uPhoto = toSafeString(sub?.userPhoto || sub?.avatar, '');
       const uTime = toSafeString(sub?.timeTaken || sub?.time, '0m 00s');
       const isSelf = Boolean((state.user?.name && uName === state.user.name) || 
                              (state.user?.email && sub?.userEmail === state.user.email));
@@ -248,7 +248,7 @@ export default function LiveExamRoom() {
           total: rawTotal,
           time: toSafeString(currentRes.timeTaken, '0m 00s'),
           timeSec: typeof currentRes.timeTakenSec === 'number' ? currentRes.timeTakenSec : 9999,
-          avatar: toSafeString(state.user?.photoURL, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'),
+          avatar: toSafeString(state.user?.avatar || state.user?.photoURL, ''),
           isCurrentUser: true
         });
       }
@@ -397,7 +397,7 @@ export default function LiveExamRoom() {
     const timeStr = `${mins}m ${String(secs).padStart(2, '0')}s`;
 
     const userName = state.user?.name || 'Suvo Roy';
-    const userPhoto = state.user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+    const userPhoto = state.user?.avatar || state.user?.photoURL || '';
 
     const resultData = {
       score: correct,
@@ -643,7 +643,7 @@ export default function LiveExamRoom() {
                       let bg = 'var(--bg-secondary)';
                       let color = 'var(--text-primary)';
                       let border = '1px solid var(--border-light)';
-                      let trailingIcon = '';
+                      let trailingIcon = null;
 
                       // Styling based on state
                       if (currentResult) {
@@ -786,16 +786,22 @@ export default function LiveExamRoom() {
                   const displayTime = toSafeString(user.time, '0m 00s');
                   const displayScore = toSafeString(user.score, '0');
                   const displayTotal = toSafeString(user.total, (exam && Array.isArray(exam.questions) && exam.questions.length > 0 ? exam.questions.length : 100));
-                  const avatarUrl = toSafeString(user.avatar, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150');
+                  
+                  const rawAvatar = toSafeString(user.avatar || user.userPhoto, '');
+                  const hasCustomPhoto = Boolean(
+                    rawAvatar && 
+                    !rawAvatar.includes('unsplash.com/photo-1535713875002') && 
+                    (rawAvatar.startsWith('http://') || rawAvatar.startsWith('https://') || rawAvatar.startsWith('data:') || rawAvatar.startsWith('/'))
+                  );
 
                   const getAvatarBg = (nameStr) => {
                     const colors = [
-                      'rgba(26, 86, 219, 0.06)',
-                      'rgba(16, 185, 129, 0.06)',
-                      'rgba(245, 158, 11, 0.06)',
-                      'rgba(139, 92, 246, 0.06)',
-                      'rgba(236, 72, 153, 0.06)',
-                      'rgba(6, 182, 212, 0.06)'
+                      'rgba(26, 86, 219, 0.08)',
+                      'rgba(16, 185, 129, 0.08)',
+                      'rgba(245, 158, 11, 0.08)',
+                      'rgba(139, 92, 246, 0.08)',
+                      'rgba(236, 72, 153, 0.08)',
+                      'rgba(6, 182, 212, 0.08)'
                     ];
                     const textColors = [
                       'var(--primary)',
@@ -860,18 +866,47 @@ export default function LiveExamRoom() {
                           {isEn ? rank : toBengaliNumber(rank)}
                         </span>
 
-                        {/* Profile Picture */}
-                        <img 
-                          src={avatarUrl} 
-                          alt={displayName}
+                        {/* Profile Picture: Shows uploaded photo, or initial letter if no photo */}
+                        {hasCustomPhoto ? (
+                          <img 
+                            src={rawAvatar} 
+                            alt={displayName}
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              if (e.target.nextSibling) {
+                                e.target.nextSibling.style.display = 'flex';
+                              }
+                            }}
+                            style={{
+                              width: '36px',
+                              height: '36px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: `1.5px solid ${avatarStyle.text}`,
+                              flexShrink: 0
+                            }} 
+                          />
+                        ) : null}
+
+                        <div 
                           style={{
+                            display: hasCustomPhoto ? 'none' : 'flex',
                             width: '36px',
                             height: '36px',
                             borderRadius: '50%',
-                            objectFit: 'cover',
-                            border: `1.5px solid ${avatarStyle.text}`
-                          }} 
-                        />
+                            background: avatarStyle.bg,
+                            color: avatarStyle.text,
+                            border: `1.5px solid ${avatarStyle.text}`,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '14px',
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            flexShrink: 0
+                          }}
+                        >
+                          {displayName.trim().charAt(0) || '👤'}
+                        </div>
                         
                         <div>
                           <strong style={{ fontSize: '13px', color: 'var(--text-primary)', display: 'block' }}>
