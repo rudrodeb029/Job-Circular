@@ -523,7 +523,7 @@ export default function LiveExamRoom() {
             </span>
             <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>
               {isDidNotAttend 
-                ? (isEn ? 'You Did Not Participate' : 'আপনি অংশ নেননি')
+                ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
             <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: 1.5 }}>
@@ -556,9 +556,9 @@ export default function LiveExamRoom() {
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
                   {isDidNotAttend ? (isEn ? 'Status' : 'অবস্থা') : (isEn ? 'Your Score' : 'প্রাপ্ত নম্বর')}
                 </span>
-                <strong style={{ fontSize: isDidNotAttend ? '14px' : '18px', color: isDidNotAttend ? '#64748b' : 'var(--success)', fontWeight: 800 }}>
+                <strong style={{ fontSize: isDidNotAttend ? '13px' : '18px', color: isDidNotAttend ? '#ef4444' : 'var(--success)', fontWeight: 800 }}>
                   {isDidNotAttend 
-                    ? (isEn ? 'Did Not Attend' : 'অংশ নেননি')
+                    ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                     : (isEn ? toSafeString(currentResult.score, '0') : toBengaliNumber(currentResult.score))}
                 </strong>
               </div>

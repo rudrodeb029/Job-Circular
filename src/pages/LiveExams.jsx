@@ -53,33 +53,26 @@ export default function LiveExams() {
     if (!exam) return 'completed';
 
     const userResult = getExamResult(exam.id);
+    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
 
-    // If exam is explicitly marked as active/running by Admin
-    if (exam.status === 'active' || exam.status === 'running') {
-      if (userResult) return 'completed';
-      const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
-      if (!startMs) return 'running';
-      const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
+    if (startMs) {
       const endMs = startMs + durationMins * 60 * 1000;
-      if (now < startMs) return 'upcoming';
+      if (now >= endMs) {
+        return 'completed';
+      }
+      if (now < startMs) {
+        return 'upcoming';
+      }
+      if (userResult) return 'completed';
       return 'running';
     }
 
-    if (userResult) return 'completed';
-
-    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
-    if (!startMs) return 'running';
-
-    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
-    const endMs = startMs + durationMins * 60 * 1000;
-
-    if (now >= startMs && now < endMs) {
-      return 'running';
-    } else if (now < startMs) {
-      return 'upcoming';
-    } else {
+    if (exam.status === 'completed' || exam.status === 'ended') {
       return 'completed';
     }
+    if (userResult) return 'completed';
+    return 'running';
   };
 
   const getCountdownString = (startTimeMs) => {
@@ -563,8 +556,8 @@ export default function LiveExams() {
                             : `স্কোর: ${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)}`}
                         </div>
                       ) : (
-                        <span style={{ fontSize: '10.5px', color: '#64748b', fontWeight: 500 }}>
-                          {isEn ? 'You did not attend' : 'আপনি অংশ নেননি'}
+                        <span style={{ fontSize: '10px', color: '#dc2626', fontWeight: 700, background: '#fee2e2', padding: '3px 8px', borderRadius: '12px' }}>
+                          {isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি'}
                         </span>
                       )}
                       
