@@ -114,7 +114,13 @@ export default function LiveExams() {
   const getExamResult = (examId) => {
     try {
       const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
-      return results[examId];
+      const res = results[examId];
+      if (!res || res.didNotAttend) return null;
+      const answersObj = res.answers || {};
+      if (Object.keys(answersObj).length === 0 && !res.submittedAt && !res.score) {
+        return null;
+      }
+      return res;
     } catch (e) {
       return null;
     }
@@ -596,7 +602,9 @@ export default function LiveExams() {
                           cursor: 'pointer'
                         }}
                       >
-                        {isEn ? 'Solutions & Leaderboard' : 'ফলাফল ও লিডারবোর্ড'}
+                        {result
+                          ? (isEn ? 'Results & Leaderboard' : 'ফলাফল ও লিডারবোর্ড')
+                          : (isEn ? 'Solutions & Leaderboard' : 'সমাধান ও লিডারবোর্ড')}
                       </button>
                     </div>
                   )}

@@ -136,7 +136,14 @@ export default function LiveExamRoom() {
   const savedResult = useMemo(() => {
     try {
       const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
-      return results[id];
+      const res = results[id];
+      if (!res) return null;
+      if (res.didNotAttend) return null;
+      const answersObj = res.answers || {};
+      if (Object.keys(answersObj).length === 0 && !res.submittedAt && !res.score) {
+        return null;
+      }
+      return res;
     } catch (e) {
       return null;
     }
@@ -152,13 +159,20 @@ export default function LiveExamRoom() {
   const isRunning = useMemo(() => {
     if (!exam) return false;
     if (savedResult || submitted) return false;
-    if (exam.status === 'active' || exam.status === 'running') return true;
+
     const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
-    if (!startMs) return true;
     const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
-    const endMs = startMs + durationMins * 60 * 1000;
-    const nowMs = Date.now();
-    return nowMs >= startMs && nowMs < endMs;
+
+    if (startMs) {
+      const endMs = startMs + durationMins * 60 * 1000;
+      const nowMs = Date.now();
+      if (nowMs >= endMs) return false;
+      if (nowMs < startMs) return false;
+      return true;
+    }
+
+    if (exam.status === 'active' || exam.status === 'running') return true;
+    return false;
   }, [exam, savedResult, submitted]);
 
   // Timer Tick
@@ -209,9 +223,11 @@ export default function LiveExamRoom() {
       };
     });
 
-    // Also include current user's score if present in localStorage but not yet synced
-    const currentResult = savedResult || (submitted ? getExamResultLocal() : null);
-    if (currentResult) {
+    // Only include current user in leaderboard IF they actually participated!
+    const currentRes = savedResult || (submitted ? getExamResultLocal() : null);
+    const userActuallyParticipated = currentRes && !currentRes.didNotAttend && (Object.keys(currentRes.answers || {}).length > 0 || currentRes.score > 0);
+
+    if (userActuallyParticipated) {
       const currentUserName = toSafeString(state.user?.name, 'Suvo Roy');
       const existsInList = list.some(item => 
         item.isCurrentUser || 
@@ -221,8 +237,8 @@ export default function LiveExamRoom() {
       );
       
       if (!existsInList) {
-        const rawScore = typeof currentResult.score === 'number' ? currentResult.score : (parseInt(currentResult.score) || 0);
-        const rawTotal = typeof currentResult.total === 'number' ? currentResult.total : (parseInt(currentResult.total) || qTotal);
+        const rawScore = typeof currentRes.score === 'number' ? currentRes.score : (parseInt(currentRes.score) || 0);
+        const rawTotal = typeof currentRes.total === 'number' ? currentRes.total : (parseInt(currentRes.total) || qTotal);
         
         list.push({
           id: `local-sub-${id}`,
@@ -230,8 +246,8 @@ export default function LiveExamRoom() {
           nameEn: `${currentUserName} (You)`,
           score: rawScore,
           total: rawTotal,
-          time: toSafeString(currentResult.timeTaken, '0m 00s'),
-          timeSec: typeof currentResult.timeTakenSec === 'number' ? currentResult.timeTakenSec : 9999,
+          time: toSafeString(currentRes.timeTaken, '0m 00s'),
+          timeSec: typeof currentRes.timeTakenSec === 'number' ? currentRes.timeTakenSec : 9999,
           avatar: toSafeString(state.user?.photoURL, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'),
           isCurrentUser: true
         });
@@ -247,21 +263,29 @@ export default function LiveExamRoom() {
     });
   }, [realSubmissions, savedResult, submitted, isEn, state.user, id, exam]);
 
+  // Is exam completed/ended?
   const isCompleted = useMemo(() => {
     if (!exam) return false;
     if (savedResult || submitted) return true;
-    if (exam.status === 'active' || exam.status === 'running') return false;
+    if (exam.status === 'completed' || exam.status === 'ended') return true;
+
     const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
-    if (!startMs) return false;
     const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
-    const endMs = startMs + durationMins * 60 * 1000;
-    return Date.now() >= endMs;
+
+    if (startMs) {
+      const endMs = startMs + durationMins * 60 * 1000;
+      return Date.now() >= endMs;
+    }
+
+    return false;
   }, [exam, savedResult, submitted]);
 
   function getExamResultLocal() {
     try {
       const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
-      return results[id];
+      const res = results[id];
+      if (!res || res.didNotAttend) return null;
+      return res;
     } catch (e) {
       return null;
     }
@@ -279,7 +303,15 @@ export default function LiveExamRoom() {
 
   const isDidNotAttend = useMemo(() => {
     if (!currentResult) return false;
-    if (currentResult.didNotAttend) return true;
+    if (currentResult.didNotAttend === true) return true;
+    
+    // Check if user answered at least 1 question
+    const answersObj = currentResult.answers || {};
+    const answeredCount = Object.keys(answersObj).length;
+    if (answeredCount === 0 && !currentResult.submittedAt && !currentResult.score) {
+      return true;
+    }
+    
     if (!savedResult && !submitted) return true;
     return false;
   }, [currentResult, savedResult, submitted]);
