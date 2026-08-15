@@ -2,17 +2,16 @@ import React, { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAdminContext } from '../context/AdminContext';
 import SearchBar from '../components/SearchBar';
-import FilterPanel from '../components/FilterPanel';
 import JobCard from '../components/JobCard';
 import BottomNav from '../components/BottomNav';
 import EmptyState from '../components/EmptyState';
 import { Search } from '../components/Icons';
-import { jobs } from '../data/jobs';
 import { categories } from '../data/categories';
 import { useAppContext } from '../context/AppContext';
 
 export default function SearchFilter() {
   const { state } = useAppContext();
+  const isEn = state.language === 'en';
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || '';
 
@@ -20,7 +19,6 @@ export default function SearchFilter() {
   const [activeTab, setActiveTab] = useState(initialCategory || 'all');
 
   const typeTabs = useMemo(() => {
-    const isEn = state.language === 'en';
     const list = [
       { id: 'all', label: isEn ? 'All' : 'সব' }
     ];
@@ -32,29 +30,9 @@ export default function SearchFilter() {
       list.push({ id: cat.id, label });
     });
     return list;
-  }, [state.language]);
-  const [showFilter, setShowFilter] = useState(false);
-
-  const [filters, setFilters] = useState({
-    qualification: '',
-    location: '',
-    deadline: '',
-    jobType: '',
-    category: initialCategory
-  });
-
-  const handleFilterChange = (newFilters) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-  };
+  }, [isEn]);
 
   const handleReset = () => {
-    setFilters({
-      qualification: '',
-      location: '',
-      deadline: '',
-      jobType: '',
-      category: ''
-    });
     setQuery('');
     setActiveTab('all');
   };
@@ -64,7 +42,7 @@ export default function SearchFilter() {
 
   const filteredJobs = useMemo(() => {
     return localJobs.filter(job => {
-      // Query filter
+      // Search Query filter
       if (query) {
         const q = query.toLowerCase();
         const titleMatch = (job.title || '').toLowerCase().includes(q) || (job.titleEn || '').toLowerCase().includes(q);
@@ -72,55 +50,13 @@ export default function SearchFilter() {
         if (!titleMatch && !orgMatch) return false;
       }
 
-      // Category filter from URL & Tabs
+      // Category Tabs filter
       const jobCategory = job.categoryId || job.category;
-
-      if (filters.category && jobCategory !== filters.category) return false;
-
-      // Type tabs filter
       if (activeTab !== 'all' && jobCategory !== activeTab) return false;
-
-      // Filter panel options
-      // 1. Qualification filter
-      if (filters.qualification) {
-        const reqStr = Array.isArray(job.requirements) ? job.requirements.join(' ') : (job.requirements || '');
-        const matchQual = (job.qualification && job.qualification.includes(filters.qualification)) ||
-                          (job.education && job.education.includes(filters.qualification)) ||
-                          reqStr.includes(filters.qualification);
-        if (!matchQual) return false;
-      }
-
-      // 2. Location filter
-      if (filters.location) {
-        const matchLoc = (job.location && job.location.includes(filters.location)) ||
-                         (job.description && job.description.includes(filters.location));
-        if (!matchLoc) return false;
-      }
-
-      // 3. Job Type filter
-      if (filters.jobType) {
-        const matchType = job.type === filters.jobType ||
-                          job.jobType === filters.jobType ||
-                          job.category === filters.jobType;
-        if (!matchType) return false;
-      }
-
-      // 4. Deadline filter
-      if (filters.deadline && job.deadline) {
-        const deadlineDate = new Date(job.deadline);
-        if (!isNaN(deadlineDate.getTime())) {
-          const now = new Date();
-          const diffDays = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
-          if (filters.deadline === 'today' && diffDays > 1) return false;
-          if (filters.deadline === '3days' && diffDays > 3) return false;
-          if (filters.deadline === 'week' && diffDays > 7) return false;
-          if (filters.deadline === 'month' && diffDays > 30) return false;
-        }
-      }
 
       return true;
     });
-  }, [query, activeTab, filters, localJobs]);
+  }, [query, activeTab, localJobs]);
 
   return (
     <div className="page">
@@ -128,12 +64,11 @@ export default function SearchFilter() {
         <SearchBar
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search jobs..."
-          showFilter={true}
-          onFilterClick={() => setShowFilter(!showFilter)}
+          placeholder={isEn ? "Search jobs..." : "চাকরি খুঁজুন..."}
+          showFilter={false}
         />
 
-        {/* Horizontal Type Filter Tabs */}
+        {/* Horizontal Category Tabs */}
         <div className="filter-tabs" style={{ width: '100%' }}>
           {typeTabs.map(tab => (
             <button
@@ -148,20 +83,8 @@ export default function SearchFilter() {
       </div>
 
       <div className="page-content animate-fade-in">
-        {showFilter && (
-          <FilterPanel
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onReset={handleReset}
-            resultCount={filteredJobs.length}
-            onShowResults={() => setShowFilter(false)}
-            onClose={() => setShowFilter(false)}
-            jobs={localJobs}
-          />
-        )}
-
         <div style={{ marginBottom: 'var(--space-md)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-          Showing {filteredJobs.length} results
+          {isEn ? `Showing ${filteredJobs.length} results` : `${filteredJobs.length}টি ফলাফল দেখানো হচ্ছে`}
         </div>
 
         {filteredJobs.length > 0 ? (
@@ -173,9 +96,9 @@ export default function SearchFilter() {
         ) : (
           <EmptyState
             icon={Search}
-            title="No Jobs Found"
-            description="Try adjusting your search query or filter options."
-            actionText="Reset Filters"
+            title={isEn ? "No Jobs Found" : "কোনো চাকরি পাওয়া যায়নি"}
+            description={isEn ? "Try adjusting your search query." : "আপনার সার্চ পরিবর্তন করে চেষ্টা করুন।"}
+            actionText={isEn ? "Clear Search" : "সার্চ ক্লিয়ার করুন"}
             onAction={handleReset}
           />
         )}
