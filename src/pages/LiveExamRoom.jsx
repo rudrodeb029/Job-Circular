@@ -2,18 +2,128 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
-import { getLiveExams } from '../data/liveExams';
+import { useAdminContext } from '../context/AdminContext';
+import { getLiveExams, generate100Questions } from '../data/liveExams';
+import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, COLLECTIONS } from '../services/supabaseService';
 import BottomNav from '../components/BottomNav';
 
 export default function LiveExamRoom() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useAppContext();
+  const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
 
-  const exam = useMemo(() => {
-    const all = getLiveExams();
-    return all.find(e => e.id === id);
+  const [exam, setExam] = useState(null);
+  const [loadingExam, setLoadingExam] = useState(true);
+  const [realSubmissions, setRealSubmissions] = useState([]);
+
+  // Multi-tier resolution for exam details (Handles high concurrency, direct links, and notifications)
+  useEffect(() => {
+    let isMounted = true;
+
+    const findExam = async () => {
+      if (!id) {
+        if (isMounted) setLoadingExam(false);
+        return;
+      }
+
+      const targetId = String(id).trim();
+
+      // Tier 1: Check adminState.liveExams from AdminContext
+      const adminExams = adminState.liveExams || [];
+      let match = adminExams.find(e => e && String(e.id).trim() === targetId);
+
+      // Tier 2: Check getLiveExams() module cache
+      if (!match) {
+        const cachedExams = getLiveExams();
+        match = cachedExams.find(e => e && String(e.id).trim() === targetId);
+      }
+
+      // Tier 3: Check LocalStorage cache directly
+      if (!match) {
+        try {
+          const raw = localStorage.getItem('cache_data_live_exams') || localStorage.getItem('admin_live_exams');
+          if (raw) {
+            const list = JSON.parse(raw);
+            if (Array.isArray(list)) {
+              match = list.find(e => e && String(e.id).trim() === targetId);
+            }
+          }
+        } catch (e) {}
+      }
+
+      // Tier 4: Direct Supabase database query by ID
+      if (!match) {
+        try {
+          const doc = await getDocument(COLLECTIONS.LIVE_EXAMS, targetId, true);
+          if (doc) match = doc;
+        } catch (e) {
+          console.error('Error fetching live exam document directly:', e);
+        }
+      }
+
+      if (isMounted) {
+        if (match) {
+          const finalQuestions = (Array.isArray(match.questions) && match.questions.length > 0)
+            ? match.questions
+            : generate100Questions(1);
+
+          setExam({
+            ...match,
+            questions: finalQuestions
+          });
+        } else {
+          setExam(null);
+        }
+        setLoadingExam(false);
+      }
+    };
+
+    findExam();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id, adminState.liveExams]);
+
+  // Load REAL participant submissions from Supabase Activities
+  useEffect(() => {
+    let isMounted = true;
+    const targetId = String(id).trim();
+
+    const loadRealSubmissions = async () => {
+      try {
+        const allActivities = await getCollectionCached(COLLECTIONS.ACTIVITIES, false, 5);
+        if (Array.isArray(allActivities) && isMounted) {
+          const examSubs = allActivities.filter(act => 
+            act.type === 'live_exam_submission' && String(act.examId).trim() === targetId
+          );
+          setRealSubmissions(examSubs);
+        }
+      } catch (err) {
+        console.warn('Error fetching leaderboard submissions:', err);
+      }
+    };
+
+    loadRealSubmissions();
+
+    let unsubscribe = () => {};
+    try {
+      unsubscribe = onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (activitiesData) => {
+        if (Array.isArray(activitiesData) && isMounted) {
+          const examSubs = activitiesData.filter(act => 
+            act.type === 'live_exam_submission' && String(act.examId).trim() === targetId
+          );
+          setRealSubmissions(examSubs);
+        }
+      });
+    } catch (e) {}
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, [id]);
 
   const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -34,8 +144,8 @@ export default function LiveExamRoom() {
   // Is exam currently running?
   const isRunning = useMemo(() => {
     if (!exam) return false;
-    const startMs = new Date(exam.startTime).getTime();
-    const endMs = startMs + exam.duration * 60 * 1000;
+    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
+    const endMs = startMs + (exam.duration || 10) * 60 * 1000;
     const now = Date.now();
     return now >= startMs && now < endMs;
   }, [exam]);
@@ -44,8 +154,8 @@ export default function LiveExamRoom() {
   useEffect(() => {
     if (!exam || !isRunning || savedResult || submitted) return;
 
-    const startMs = new Date(exam.startTime).getTime();
-    const endMs = startMs + exam.duration * 60 * 1000;
+    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
+    const endMs = startMs + (exam.duration || 10) * 60 * 1000;
 
     const updateTimer = () => {
       const secondsLeft = Math.max(0, Math.floor((endMs - Date.now()) / 1000));
@@ -61,41 +171,80 @@ export default function LiveExamRoom() {
     return () => clearInterval(interval);
   }, [exam, isRunning, savedResult, submitted]);
 
-  // Generate dynamic Daily Leaderboard list ranking mock and user scores out of 100
+  // Generate 100% REAL dynamic Leaderboard list (ZERO dummy users)
   const leaderboardData = useMemo(() => {
-    const mockUsers = [
-      { name: 'সাদিয়া তাসনিম', nameEn: 'Sadia Tasnim', score: 94, time: '38m 12s', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150' },
-      { name: 'মেহেদী হাসান', nameEn: 'Mehedi Hasan', score: 91, time: '41m 05s', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150' },
-      { name: 'তন্ময় রায়', nameEn: 'Tonmoy Roy', score: 88, time: '44m 30s', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150' },
-      { name: 'নুসরাত জাহান', nameEn: 'Nusrat Jahan', score: 85, time: '36m 50s', avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150' },
-      { name: 'আরিফুর রহমান', nameEn: 'Arifur Rahman', score: 81, time: '49m 12s', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150' },
-      { name: 'ফারজানা আক্তার', nameEn: 'Farjana Akter', score: 79, time: '42m 18s', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150' },
-      { name: 'জাকির হোসেন', nameEn: 'Zakir Hossain', score: 75, time: '51m 40s', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150' },
-      { name: 'শামীমা ইয়াসমিন', nameEn: 'Shamima Yasmin', score: 72, time: '46m 10s', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150' }
-    ];
+    const list = realSubmissions.map(sub => {
+      const isSelf = (state.user?.name && sub.userName === state.user.name) || 
+                     (state.user?.email && sub.userEmail === state.user.email);
+      return {
+        id: sub.id,
+        name: sub.userName || (isEn ? 'Candidate' : 'পরীক্ষার্থী'),
+        nameEn: sub.userName || 'Candidate',
+        score: sub.scaledScore ?? Math.round(((sub.score || 0) / (sub.total || 1)) * 100),
+        time: sub.timeTaken || '0m 00s',
+        timeSec: sub.timeTakenSec || 9999,
+        avatar: sub.userPhoto || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+        isCurrentUser: isSelf
+      };
+    });
 
+    // Also include current user's score if present in localStorage but not yet synced
     const currentResult = savedResult || (submitted ? getExamResultLocal() : null);
-
-    const list = [...mockUsers];
     if (currentResult) {
-      // Calculate scaled score out of 100 if questions are different than 100
-      const scaledScore = Math.round((currentResult.score / currentResult.total) * 100);
-      list.push({
-        name: `${state.user.name || (isEn ? 'Candidate' : 'পরীক্ষার্থী')} (আপনি)`,
-        nameEn: `${state.user.name || 'Candidate'} (You)`,
-        score: scaledScore,
-        time: isEn ? '45m 00s' : '৪৫মি: ০০সে:',
-        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-        isCurrentUser: true
-      });
+      const currentUserName = state.user?.name || 'Suvo Roy';
+      const existsInList = list.some(item => item.isCurrentUser || item.name === currentUserName || item.name.includes('(আপনি)'));
+      
+      if (!existsInList) {
+        const scaledScore = currentResult.scaledScore ?? Math.round(((currentResult.score || 0) / (currentResult.total || 1)) * 100);
+        list.push({
+          id: `local-sub-${id}`,
+          name: `${currentUserName} (আপনি)`,
+          nameEn: `${currentUserName} (You)`,
+          score: scaledScore,
+          time: currentResult.timeTaken || '0m 00s',
+          timeSec: currentResult.timeTakenSec || 9999,
+          avatar: state.user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+          isCurrentUser: true
+        });
+      }
     }
 
-    // Sort by score desc, then by time asc
+    // Sort by score DESCENDING, then by completion time ASCENDING
     return list.sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
-      return a.time.localeCompare(b.time);
+      return (a.timeSec || 0) - (b.timeSec || 0);
     });
-  }, [savedResult, submitted, isEn]);
+  }, [realSubmissions, savedResult, submitted, isEn, state.user, id]);
+
+  if (loadingExam) {
+    return (
+      <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
+        <div className="page-header">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={22} />
+          </button>
+          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
+            {isEn ? 'Live Exam' : 'লাইভ পরীক্ষা'}
+          </h1>
+        </div>
+        <div style={{ textAlign: 'center', padding: '100px 20px', color: 'var(--text-secondary)' }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid rgba(26, 86, 219, 0.2)',
+            borderTop: '3px solid var(--primary)',
+            borderRadius: '50%',
+            margin: '0 auto 16px auto',
+            animation: 'spin 0.8s linear infinite'
+          }}></div>
+          <p style={{ fontSize: '14px', fontWeight: 700 }}>
+            {isEn ? 'Loading live exam room...' : 'লাইভ পরীক্ষা রুম লোড হচ্ছে...'}
+          </p>
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
 
   if (!exam) {
     return (
@@ -122,20 +271,37 @@ export default function LiveExamRoom() {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (savedResult || submitted) return;
 
     let correct = 0;
-    exam.questions.forEach((q, index) => {
+    (exam.questions || []).forEach((q, index) => {
       if (selectedAnswers[index] === q.correctIndex) {
         correct += 1;
       }
     });
 
+    const totalQuestions = exam.questions?.length || 100;
+    const scaledScore = Math.round((correct / totalQuestions) * 100);
+    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
+    const elapsedSec = Math.max(1, Math.floor((Date.now() - startMs) / 1000));
+    const mins = Math.floor(elapsedSec / 60);
+    const secs = elapsedSec % 60;
+    const timeStr = `${mins}m ${String(secs).padStart(2, '0')}s`;
+
+    const userName = state.user?.name || 'Suvo Roy';
+    const userPhoto = state.user?.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+
     const resultData = {
       score: correct,
-      total: exam.questions.length,
-      answers: selectedAnswers
+      total: totalQuestions,
+      scaledScore: scaledScore,
+      answers: selectedAnswers,
+      timeTaken: timeStr,
+      timeTakenSec: elapsedSec,
+      userName: userName,
+      userPhoto: userPhoto,
+      submittedAt: new Date().toISOString()
     };
 
     try {
@@ -144,6 +310,28 @@ export default function LiveExamRoom() {
       localStorage.setItem('live_exam_results', JSON.stringify(results));
     } catch (e) {
       console.error(e);
+    }
+
+    // Persist real participant submission to Supabase
+    const submissionId = `exam-sub-${id}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+    const submissionDoc = {
+      id: submissionId,
+      type: 'live_exam_submission',
+      examId: String(id).trim(),
+      userName: userName,
+      userPhoto: userPhoto,
+      score: correct,
+      total: totalQuestions,
+      scaledScore: scaledScore,
+      timeTaken: timeStr,
+      timeTakenSec: elapsedSec,
+      createdAt: new Date().toISOString()
+    };
+
+    try {
+      await setDocument(COLLECTIONS.ACTIVITIES, submissionId, submissionDoc);
+    } catch (err) {
+      console.warn('Failed to sync live exam submission to Supabase:', err);
     }
 
     setSubmitted(true);
@@ -158,8 +346,8 @@ export default function LiveExamRoom() {
 
   const isCompleted = useMemo(() => {
     if (!exam) return false;
-    const startMs = new Date(exam.startTime).getTime();
-    const endMs = startMs + exam.duration * 60 * 1000;
+    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
+    const endMs = startMs + (exam.duration || 10) * 60 * 1000;
     return Date.now() >= endMs;
   }, [exam]);
 
@@ -488,7 +676,6 @@ export default function LiveExamRoom() {
                   const isSilver = rank === 2;
                   const isBronze = rank === 3;
                   const displayName = isEn ? user.nameEn : user.name;
-                  const initial = displayName[0];
 
                   const getAvatarBg = (name) => {
                     const colors = [
@@ -508,7 +695,7 @@ export default function LiveExamRoom() {
                       '#0891b2'
                     ];
                     let hash = 0;
-                    for (let i = 0; i < name.length; i++) {
+                    for (let i = 0; i < (name || '').length; i++) {
                       hash = name.charCodeAt(i) + ((hash << 5) - hash);
                     }
                     const index = Math.abs(hash) % colors.length;
@@ -518,7 +705,7 @@ export default function LiveExamRoom() {
 
                   return (
                     <div
-                      key={idx}
+                      key={user.id || idx}
                       style={{
                         display: 'flex',
                         alignItems: 'center',
@@ -608,6 +795,15 @@ export default function LiveExamRoom() {
                     </div>
                   );
                 })}
+
+                {leaderboardData.length === 0 && (
+                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                    <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>🏆</span>
+                    <p style={{ fontSize: '13px', fontWeight: 600 }}>
+                      {isEn ? 'No real participants yet. Be the first to take this exam!' : 'এখনও কোনো প্রকৃত অংশগ্রহণকারী নেই। প্রথম হয়ে পরীক্ষায় অংশ নিন!'}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
