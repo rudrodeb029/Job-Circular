@@ -277,6 +277,13 @@ export default function LiveExamRoom() {
     return null;
   }, [savedResult, submitted, isCompleted, exam, id]);
 
+  const isDidNotAttend = useMemo(() => {
+    if (!currentResult) return false;
+    if (currentResult.didNotAttend) return true;
+    if (!savedResult && !submitted) return true;
+    return false;
+  }, [currentResult, savedResult, submitted]);
+
   if (loadingExam) {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
@@ -504,28 +511,34 @@ export default function LiveExamRoom() {
         {currentResult && activeRoomTab === 'solutions' && (
           <div style={{
             background: 'var(--white)',
-            border: '1.5px solid var(--primary)',
+            border: isDidNotAttend ? '1.5px solid #cbd5e1' : '1.5px solid var(--primary)',
             borderRadius: '20px',
             padding: '20px',
             marginBottom: '20px',
             boxShadow: '0 4px 18px rgba(0,0,0,0.03)',
             textAlign: 'center'
           }}>
-            <span style={{ fontSize: '40px', display: 'block', marginBottom: '8px' }}>{currentResult.didNotAttend ? '⏳' : '🏆'}</span>
+            <span style={{ fontSize: '40px', display: 'block', marginBottom: '8px' }}>
+              {isDidNotAttend ? '📝' : '🏆'}
+            </span>
             <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>
-              {currentResult.didNotAttend 
-                ? (isEn ? 'Exam Closed' : 'পরীক্ষা শেষ হয়েছে')
+              {isDidNotAttend 
+                ? (isEn ? 'You Did Not Participate' : 'আপনি অংশ নেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-              {currentResult.didNotAttend
-                ? (isEn ? 'This exam has ended. You can view the correct answers and leaderboard.' : 'এই পরীক্ষাটি শেষ হয়ে গেছে। আপনি এখন সঠিক উত্তর ও লিডারবোর্ড দেখতে পারেন।')
-                : (isEn ? 'Congratulations! You have completed the live test.' : 'অভিনন্দন! আপনি লাইভ পরীক্ষা সম্পন্ন করেছেন।')}
+            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: 1.5 }}>
+              {isDidNotAttend
+                ? (isEn 
+                    ? 'You did not participate in this live exam. However, you can review all correct answers and detailed solutions below.' 
+                    : 'আপনি এই লাইভ পরীক্ষায় অংশগ্রহণ করেননি। তবে নিচে প্রশ্নের সঠিক উত্তর ও ব্যাখ্যা দেখে অনুশীলন করতে পারেন।')
+                : (isEn 
+                    ? 'Congratulations! You have completed the live test.' 
+                    : 'অভিনন্দন! আপনি লাইভ পরীক্ষা সম্পন্ন করেছেন।')}
             </p>
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: currentResult.didNotAttend ? '1fr' : '1fr 1fr',
+              gridTemplateColumns: '1fr 1fr',
               gap: '12px',
               background: 'var(--bg-secondary)',
               padding: '14px',
@@ -539,16 +552,16 @@ export default function LiveExamRoom() {
                   {isEn ? toSafeString(currentResult.total, '100') : toBengaliNumber(currentResult.total)}
                 </strong>
               </div>
-              {!currentResult.didNotAttend && (
-                <div>
-                  <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
-                    {isEn ? 'Your Score' : 'প্রাপ্ত নম্বর'}
-                  </span>
-                  <strong style={{ fontSize: '18px', color: 'var(--success)', fontWeight: 800 }}>
-                    {isEn ? toSafeString(currentResult.score, '0') : toBengaliNumber(currentResult.score)}
-                  </strong>
-                </div>
-              )}
+              <div>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
+                  {isDidNotAttend ? (isEn ? 'Status' : 'অবস্থা') : (isEn ? 'Your Score' : 'প্রাপ্ত নম্বর')}
+                </span>
+                <strong style={{ fontSize: isDidNotAttend ? '14px' : '18px', color: isDidNotAttend ? '#64748b' : 'var(--success)', fontWeight: 800 }}>
+                  {isDidNotAttend 
+                    ? (isEn ? 'Did Not Attend' : 'অংশ নেননি')
+                    : (isEn ? toSafeString(currentResult.score, '0') : toBengaliNumber(currentResult.score))}
+                </strong>
+              </div>
             </div>
           </div>
         )}
