@@ -53,18 +53,20 @@ const Statistics = () => {
     };
   }, [jobs]);
 
-  if (!stats) return <div className="admin-page animate-fade-in" style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No data available to generate statistics.</div>;
+  if (!stats) return <div className="admin-page animate-fade-in" style={{ padding: '30px', textAlign: 'center', color: '#64748b', fontSize: '13px' }}>No data available to generate statistics.</div>;
 
   return (
-    <div className="admin-statistics-page animate-fade-in" style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div className="admin-statistics-page animate-fade-in" style={{ padding: '16px 20px', maxWidth: '1400px', margin: '0 auto' }}>
       <style>{`
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 2.5rem; }
-        .stat-card { background: #fff; padding: 24px; border-radius: 20px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: transform 0.3s ease; }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); }
-        .chart-card { background: #fff; padding: 32px; border-radius: 24px; border: 1px solid #f1f5f9; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+        .stat-card { background: #fff; padding: 14px 16px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: transform 0.2s ease; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .chart-card { background: #fff; padding: 16px 18px; border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
       `}</style>
 
-      <div style={{ marginBottom: '2.5rem' }}><h1 style={{ fontSize: '32px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Statistics & Analytics</h1></div>
+      <div style={{ marginBottom: '16px' }}>
+        <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Statistics & Analytics</h1>
+      </div>
 
       <div className="stat-grid">
         {[
@@ -76,27 +78,27 @@ const Statistics = () => {
           <div key={i} className="stat-card">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <p style={{ margin: 0, fontSize: '13px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>{s.label}</p>
-                <h2 style={{ margin: '8px 0 0 0', fontSize: '28px', fontWeight: 800, color: '#1e293b' }}>{s.val}</h2>
+                <p style={{ margin: 0, fontSize: '10.5px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{s.label}</p>
+                <h2 style={{ margin: '4px 0 0 0', fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>{s.val}</h2>
               </div>
-              <div style={{ fontSize: '24px' }}>{s.icon}</div>
+              <div style={{ fontSize: '18px' }}>{s.icon}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '24px', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '14px', marginBottom: '16px' }}>
         <div className="chart-card">
-          <h3 style={{ margin: '0 0 24px 0', fontSize: '18px', fontWeight: 800 }}>Jobs by Category</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ margin: '0 0 14px 0', fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>Jobs by Category</h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {stats.categoryStats.filter(c => c.count > 0).map(cat => (
               <div key={cat.id}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px', fontWeight: 600 }}>
-                  <span style={{ color: '#475569' }}>{cat.nameEn}</span>
-                  <span style={{ color: '#1e293b' }}>{cat.count} ({cat.percentage}%)</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px', fontSize: '11.5px', fontWeight: 600 }}>
+                  <span style={{ color: '#475569' }}>{cat.nameEn || cat.name}</span>
+                  <span style={{ color: '#0f172a', fontWeight: 700 }}>{cat.count} ({cat.percentage}%)</span>
                 </div>
-                <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                  <div style={{ width: `${cat.percentage}%`, height: '100%', background: cat.color || '#3b82f6', borderRadius: '4px' }}></div>
+                <div style={{ height: '6px', background: '#f1f5f9', borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: `${cat.percentage}%`, height: '100%', background: cat.color || '#3b82f6', borderRadius: '3px' }}></div>
                 </div>
               </div>
             ))}
@@ -104,12 +106,12 @@ const Statistics = () => {
         </div>
 
         <div className="chart-card">
-          <h3 style={{ margin: '0 0 24px 0', fontSize: '18px', fontWeight: 800 }}>Job Types Distribution</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <h3 style={{ margin: '0 0 14px 0', fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>Job Types Distribution</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
              {Object.entries(stats.typeCounts).map(([type, count], idx) => (
-                <div key={idx} style={{ background: '#f8fafc', padding: '20px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                   <p style={{ margin: '0 0 8px 0', fontSize: '13px', fontWeight: 700, color: '#64748b' }}>{type}</p>
-                   <p style={{ margin: 0, fontSize: '24px', fontWeight: 800, color: '#1e293b' }}>{count}</p>
+                <div key={idx} style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                   <p style={{ margin: '0 0 4px 0', fontSize: '10.5px', fontWeight: 700, color: '#64748b' }}>{type}</p>
+                   <p style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>{count}</p>
                 </div>
              ))}
           </div>

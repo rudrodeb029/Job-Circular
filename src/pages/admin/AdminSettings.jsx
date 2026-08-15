@@ -133,85 +133,81 @@ const AdminSettings = () => {
       <style>{`
         .settings-card {
           background: #ffffff;
-          border-radius: 24px;
-          padding: 32px;
-          border: 1px solid #f1f5f9;
-          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-          transition: all 0.3s ease;
-        }
-        .settings-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+          border-radius: 14px;
+          padding: 18px 20px;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+          transition: all 0.2s ease;
         }
         .section-header {
           display: flex;
           align-items: center;
-          gap: 12px;
-          margin-bottom: 24px;
+          gap: 10px;
+          margin-bottom: 16px;
           color: #0f172a;
         }
         .section-header h3 {
           margin: 0;
-          font-size: 18px;
-          fontWeight: 800;
+          font-size: 14px;
+          font-weight: 800;
         }
         .toggle-switch {
-          width: 52px; height: 28px; border-radius: 14px; position: relative; cursor: pointer; transition: all 0.3s;
+          width: 44px; height: 24px; border-radius: 12px; position: relative; cursor: pointer; transition: all 0.3s;
         }
         .toggle-knob {
-          width: 22px; height: 22px; border-radius: 50%; background: white; position: absolute; top: 3px; transition: all 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 3px; transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .modern-input {
-          width: 100%; padding: 14px; border: 1.5px solid #e2e8f0; border-radius: 12px; outline: none; transition: border-color 0.2s; background: #f8fafc;
+          width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s; background: #ffffff; font-size: 12px; color: #0f172a;
         }
         .modern-input:focus { border-color: #2563eb; background: #fff; }
         .settings-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-          gap: 24px;
-          margin-bottom: 24px;
+          grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+          gap: 16px;
+          margin-bottom: 16px;
         }
         @media (max-width: 768px) {
           .settings-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
-      <div style={{ marginBottom: '2.5rem' }}>
-        <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Admin Settings</h1>
+      <div style={{ marginBottom: '16px' }}>
+        <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Admin Settings</h1>
       </div>
 
       <div className="settings-grid">
         {/* Profile Card */}
         <div className="settings-card">
           <div className="section-header">
-            <div style={{ width: '36px', height: '36px', background: '#eff6ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <div style={{ width: '30px', height: '30px', background: '#eff6ff', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
             <h3>Admin Profile</h3>
           </div>
 
           {!isEditingProfile ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Full Name</p>
-                <p style={{ margin: 0, fontSize: '15px', color: '#1e293b', fontWeight: 700 }}>{profileName}</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                <p style={{ margin: '0 0 2px 0', fontSize: '10.5px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Full Name</p>
+                <p style={{ margin: 0, fontSize: '13px', color: '#1e293b', fontWeight: 700 }}>{profileName}</p>
               </div>
-              <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '16px', border: '1px solid #f1f5f9' }}>
-                <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Email Address</p>
-                <p style={{ margin: 0, fontSize: '15px', color: '#1e293b', fontWeight: 700 }}>{profileEmail}</p>
+              <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '10px', border: '1px solid #f1f5f9' }}>
+                <p style={{ margin: '0 0 2px 0', fontSize: '10.5px', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Email Address</p>
+                <p style={{ margin: 0, fontSize: '13px', color: '#1e293b', fontWeight: 700 }}>{profileEmail}</p>
               </div>
-              <button onClick={() => setIsEditingProfile(true)} style={{ marginTop: '8px', padding: '14px', background: '#eff6ff', color: '#2563eb', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              <button onClick={() => setIsEditingProfile(true)} style={{ marginTop: '4px', padding: '9px', background: '#eff6ff', color: '#2563eb', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 Edit Profile Info
               </button>
             </div>
           ) : (
-            <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <input className="modern-input" value={profileName} onChange={e => setProfileName(e.target.value)} placeholder="Full Name" />
               <input className="modern-input" type="email" value={profileEmail} onChange={e => setProfileEmail(e.target.value)} placeholder="Email Address" />
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button type="submit" style={{ flex: 1, padding: '14px', background: '#10b981', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}>Save</button>
-                <button type="button" onClick={() => setIsEditingProfile(false)} style={{ flex: 1, padding: '14px', background: '#f1f5f9', color: '#64748b', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button type="submit" style={{ flex: 1, padding: '9px', background: '#10b981', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Save</button>
+                <button type="button" onClick={() => setIsEditingProfile(false)} style={{ flex: 1, padding: '9px', background: '#f1f5f9', color: '#64748b', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Cancel</button>
               </div>
             </form>
           )}

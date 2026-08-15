@@ -187,27 +187,27 @@ const AdminLayout = () => {
         />
       )}
 
-      <aside className={`admin-sidebar ${drawerOpen ? 'open' : ''}`} style={{ width: '280px', backgroundColor: '#ffffff', borderRight: '1px solid #f1f5f9', display: 'flex', flexDirection: 'column', height: '100vh', sticky: 'top' }}>
-        <div className="sidebar-logo" style={{ padding: '32px 24px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <aside className={`admin-sidebar ${drawerOpen ? 'open' : ''}`} style={{ width: '230px', backgroundColor: '#ffffff', borderRight: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', height: '100vh', sticky: 'top' }}>
+        <div className="sidebar-logo" style={{ padding: '16px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', boxShadow: '0 4px 10px rgba(37, 99, 235, 0.2)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
             </svg>
           </div>
           <div>
-            <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>Job Circular</h2>
-            <p style={{ margin: 0, fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Admin Control</p>
+            <h2 style={{ margin: 0, fontSize: '14.5px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>Job Circular</h2>
+            <p style={{ margin: 0, fontSize: '9.5px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Admin Control</p>
           </div>
         </div>
 
-        <nav className="sidebar-nav" style={{ padding: '0 16px 32px 16px', flex: 1, overflowY: 'auto' }}>
+        <nav className="sidebar-nav" style={{ padding: '0 10px 20px 10px', flex: 1, overflowY: 'auto' }}>
           {navItems.map((group, idx) => (
-            <div key={idx} style={{ marginBottom: '32px' }}>
-              <h3 style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', marginBottom: '12px', letterSpacing: '0.1em', paddingLeft: '12px' }}>
+            <div key={idx} style={{ marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '9.5px', fontWeight: 700, color: '#94a3b8', marginBottom: '6px', letterSpacing: '0.08em', paddingLeft: '8px' }}>
                 {group.section}
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                 {group.items.map((item, itemIdx) => {
                   const isActive = item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path);
                   return (
@@ -221,17 +221,19 @@ const AdminLayout = () => {
                       style={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px 14px',
-                        borderRadius: '12px',
+                        gap: '9px',
+                        padding: '7px 10px',
+                        borderRadius: '8px',
                         cursor: 'pointer',
                         color: isActive ? '#1a56db' : '#64748b',
                         backgroundColor: isActive ? '#eff6ff' : 'transparent',
                         fontWeight: isActive ? '700' : '500',
                       }}
                     >
-                      <span style={{ color: isActive ? '#2563eb' : '#94a3b8' }}>{item.icon}</span>
-                      <span style={{ fontSize: '14.5px' }}>{item.name}</span>
+                      <span style={{ color: isActive ? '#2563eb' : '#94a3b8', display: 'flex', alignItems: 'center' }}>
+                        {React.cloneElement(item.icon, { width: 16, height: 16 })}
+                      </span>
+                      <span style={{ fontSize: '12px' }}>{item.name}</span>
                     </div>
                   );
                 })}
@@ -241,41 +243,41 @@ const AdminLayout = () => {
         </nav>
       </aside>
 
-      <main className="admin-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <header className="admin-topbar" style={{ minHeight: '80px', backgroundColor: 'rgba(255, 255, 255, 0.8)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'calc(var(--safe-area-top) + 8px) 32px 12px 32px', position: 'sticky', top: 0, zIndex: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      <main className="admin-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', marginLeft: '230px' }}>
+        <header className="admin-topbar" style={{ minHeight: '52px', backgroundColor: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(8px)', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'calc(var(--safe-area-top) + 4px) 20px 6px 20px', position: 'sticky', top: 0, zIndex: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
                onClick={() => setDrawerOpen(true)}
-               style={{ display: 'none', background: '#f1f5f9', border: 'none', padding: '8px', borderRadius: '8px', color: '#64748b' }}
+               style={{ display: 'none', background: '#f1f5f9', border: 'none', padding: '6px', borderRadius: '6px', color: '#64748b' }}
                className="mobile-toggle"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div className="breadcrumb" style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.02em' }}>
+            <div className="breadcrumb" style={{ fontSize: '15px', fontWeight: '800', color: '#0f172a', letterSpacing: '-0.01em' }}>
               {getPageTitle()}
             </div>
           </div>
           
-          <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <div className="admin-profile" style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', padding: '6px 12px', background: '#f8fafc', borderRadius: '14px', border: '1px solid #f1f5f9' }}>
+          <div className="topbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div className="admin-profile" style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px 8px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
               {adminState.adminUser?.photoURL ? (
                 <img 
                   src={adminState.adminUser.photoURL} 
                   alt="Avatar" 
-                  style={{ width: '36px', height: '36px', borderRadius: '10px', objectFit: 'cover', boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)' }} 
+                  style={{ width: '28px', height: '28px', borderRadius: '6px', objectFit: 'cover' }} 
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '16px', boxShadow: '0 4px 10px rgba(99, 102, 241, 0.15)' }}>
+                <div style={{ width: '28px', height: '28px', borderRadius: '6px', background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '800', fontSize: '13px' }}>
                   {(adminState.adminUser?.name || 'A')[0].toUpperCase()}
                 </div>
               )}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', lineHeight: 1.2 }}>{adminState.adminUser?.name || 'Admin'}</span>
-                  <span style={{ fontSize: '10px', fontWeight: '600', color: '#94a3b8' }}>{adminState.adminUser?.role || 'Super User'}</span>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#0f172a', lineHeight: 1.1 }}>{adminState.adminUser?.name || 'Admin'}</span>
+                  <span style={{ fontSize: '9px', fontWeight: '600', color: '#94a3b8' }}>{adminState.adminUser?.role || 'Super User'}</span>
                 </div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '4px' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '2px' }}>
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </div>
@@ -283,7 +285,7 @@ const AdminLayout = () => {
           </div>
         </header>
 
-        <div className="admin-content" style={{ flex: 1, padding: '40px', overflowY: 'auto' }}>
+        <div className="admin-content" style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
           <Outlet />
         </div>
       </main>

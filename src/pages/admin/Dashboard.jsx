@@ -76,26 +76,26 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="admin-dashboard-page animate-fade-in" style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
+    <div className="admin-dashboard-page animate-fade-in" style={{ padding: '16px 20px', maxWidth: '1400px', margin: '0 auto' }}>
       <style>{`
         @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
+          from { opacity: 0; transform: translateY(15px); }
           to { opacity: 1; transform: translateY(0); }
         }
         .animate-card {
-          animation: fadeInUp 0.5s ease forwards;
+          animation: fadeInUp 0.4s ease forwards;
         }
         .stat-card-hover:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 24px rgba(0,0,0,0.1) !important;
+          transform: translateY(-3px);
+          box-shadow: 0 8px 18px rgba(0,0,0,0.06) !important;
         }
         .btn-modern:hover {
           background: #1e40af !important;
           transform: scale(1.02);
         }
         .custom-scroll::-webkit-scrollbar {
-          width: 5px;
-          height: 5px;
+          width: 4px;
+          height: 4px;
         }
         .custom-scroll::-webkit-scrollbar-track {
           background: transparent;
@@ -109,10 +109,8 @@ const Dashboard = () => {
         }
       `}</style>
 
-
-
       {/* STATS GRID */}
-      <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
+      <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '16px' }}>
         {[
           { label: 'Total Circulars', val: totalCirculars },
           { label: 'Active Jobs', val: activeJobs },
@@ -124,53 +122,52 @@ const Dashboard = () => {
             key={i}
             className="stat-card animate-card stat-card-hover"
             style={{
-              padding: '1.25rem 1.5rem',
+              padding: '12px 14px',
               background: '#ffffff',
-              borderRadius: '20px',
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.03), 0 2px 4px -1px rgba(0,0,0,0.01)',
-              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-              animationDelay: `${i * 80}ms`,
+              borderRadius: '12px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
+              transition: 'all 0.2s ease',
+              animationDelay: `${i * 60}ms`,
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              minHeight: '100px',
-              border: '1px solid rgba(241, 245, 249, 0.8)'
+              border: '1px solid #e2e8f0'
             }}
           >
             <div>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '0.825rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{stat.label}</p>
-              <h3 style={{ margin: '0.25rem 0 0 0', fontSize: '1.75rem', color: '#1e293b', fontWeight: 800 }}>{formatNumber(stat.val)}</h3>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{stat.label}</p>
+              <h3 style={{ margin: '2px 0 0 0', fontSize: '20px', color: '#0f172a', fontWeight: 800 }}>{formatNumber(stat.val)}</h3>
             </div>
           </div>
         ))}
       </div>
 
       {/* CHARTS GRID */}
-      <div className="admin-charts-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div className="admin-charts-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '14px', marginBottom: '16px' }}>
         {/* BAR CHART */}
-        <div className="admin-chart-card animate-card" style={{ display: 'flex', flexDirection: 'column', background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '400ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Jobs by Category</h3>
-            <div style={{ fontSize: '12px', padding: '4px 12px', background: '#f8fafc', borderRadius: '20px', color: '#64748b', border: '1px solid #e2e8f0' }}>Last updated: Just now</div>
+        <div className="admin-chart-card animate-card" style={{ display: 'flex', flexDirection: 'column', background: '#ffffff', borderRadius: '14px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', animationDelay: '300ms', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+            <h3 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>Jobs by Category</h3>
+            <div style={{ fontSize: '10.5px', padding: '3px 8px', background: '#f8fafc', borderRadius: '12px', color: '#64748b', border: '1px solid #e2e8f0' }}>Last updated: Just now</div>
           </div>
-          <div className="bar-chart" style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', minHeight: '220px', gap: '12px' }}>
+          <div className="bar-chart" style={{ flex: 1, display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', minHeight: '160px', gap: '8px' }}>
             {categoryCounts.map((cat, idx) => (
               <div key={idx} className="bar-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1 }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>{cat.count}</span>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>{cat.count}</span>
                 <div 
                   className="bar" 
                   style={{ 
                     width: '100%', 
-                    maxWidth: '32px',
-                    height: `${(cat.count / maxCount) * 160}px`,
+                    maxWidth: '24px',
+                    height: `${(cat.count / maxCount) * 110}px`,
                     background: `linear-gradient(to top, ${cat.textColor}, ${cat.textColor}dd)`,
-                    borderRadius: '8px 8px 4px 4px',
-                    minHeight: cat.count > 0 ? '6px' : '2px',
-                    boxShadow: cat.count > 0 ? `0 4px 12px ${cat.textColor}40` : 'none',
-                    transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+                    borderRadius: '5px 5px 2px 2px',
+                    minHeight: cat.count > 0 ? '4px' : '2px',
+                    boxShadow: cat.count > 0 ? `0 2px 8px ${cat.textColor}30` : 'none',
+                    transition: 'all 0.5s ease'
                   }}
                 ></div>
-                <span style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '12px', fontWeight: 700, textAlign: 'center', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '9px', color: '#94a3b8', marginTop: '8px', fontWeight: 700, textAlign: 'center', textTransform: 'uppercase' }}>
                   {cat.id.substring(0,3)}
                 </span>
               </div>
@@ -179,10 +176,10 @@ const Dashboard = () => {
         </div>
 
         {/* DONUT CHART */}
-        <div className="admin-chart-card animate-card" style={{ background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '500ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
-          <h3 style={{ margin: '0 0 2rem 0', fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Status Distribution</h3>
+        <div className="admin-chart-card animate-card" style={{ background: '#ffffff', borderRadius: '14px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', animationDelay: '400ms', border: '1px solid #e2e8f0' }}>
+          <h3 style={{ margin: '0 0 14px 0', fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>Status Distribution</h3>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div className="donut-container" style={{ position: 'relative', width: '180px', height: '180px' }}>
+            <div className="donut-container" style={{ position: 'relative', width: '130px', height: '130px' }}>
               <div 
                 className="donut-chart" 
                 style={{
@@ -191,7 +188,7 @@ const Dashboard = () => {
                   borderRadius: '50%',
                   background: conicString,
                   position: 'relative',
-                  boxShadow: 'inset 0 0 20px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.05)',
+                  boxShadow: 'inset 0 0 10px rgba(0,0,0,0.04)',
                   transition: 'all 0.5s ease'
                 }}
               >
@@ -202,31 +199,31 @@ const Dashboard = () => {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: '120px',
-                    height: '120px',
+                    width: '82px',
+                    height: '82px',
                     background: '#ffffff',
                     borderRadius: '50%',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     flexDirection: 'column',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
                   }}
                 >
-                  <span style={{ fontSize: '2rem', fontWeight: 800, color: '#1e293b', lineHeight: 1 }}>{formatNumber(totalCirculars)}</span>
-                  <span style={{ fontSize: '0.875rem', color: '#94a3b8', fontWeight: 600, marginTop: '4px' }}>Total</span>
+                  <span style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{formatNumber(totalCirculars)}</span>
+                  <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 600, marginTop: '2px' }}>Total</span>
                 </div>
               </div>
             </div>
             
-            <div className="donut-legend" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '2rem', width: '100%' }}>
+            <div className="donut-legend" style={{ display: 'flex', justifyContent: 'center', gap: '14px', marginTop: '14px', width: '100%' }}>
               {[
                 { color: '#10b981', label: 'Active' },
                 { color: '#f59e0b', label: 'Draft' },
                 { color: '#ef4444', label: 'Expired' }
               ].map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 600, color: '#475569' }}>
-                  <span style={{ width: '12px', height: '12px', borderRadius: '4px', background: item.color, boxShadow: `0 2px 6px ${item.color}40` }}></span> {item.label}
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: 600, color: '#475569' }}>
+                  <span style={{ width: '9px', height: '9px', borderRadius: '3px', background: item.color }}></span> {item.label}
                 </div>
               ))}
             </div>
@@ -235,26 +232,26 @@ const Dashboard = () => {
       </div>
 
       {/* RECENT DATA ROW */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '14px', marginBottom: '16px' }}>
         {/* TABLE CARD */}
-        <div className="admin-table-wrapper animate-card" style={{ display: 'flex', flexDirection: 'column', height: '450px', background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '600ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexShrink: 0 }}>
-            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Recent Circulars</h3>
-            <Link to="/admin/jobs" style={{ color: '#1a56db', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 700, background: 'rgba(26, 86, 219, 0.05)', padding: '6px 16px', borderRadius: '10px', transition: 'all 0.2s' }}>View All</Link>
+        <div className="admin-table-wrapper animate-card" style={{ display: 'flex', flexDirection: 'column', height: '360px', background: '#ffffff', borderRadius: '14px', padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', animationDelay: '500ms', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', flexShrink: 0 }}>
+            <h3 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700, color: '#0f172a' }}>Recent Circulars</h3>
+            <Link to="/admin/jobs" style={{ color: '#1a56db', textDecoration: 'none', fontSize: '11px', fontWeight: 700, background: '#eff6ff', padding: '4px 10px', borderRadius: '6px' }}>View All</Link>
           </div>
           
-          <div className="custom-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', paddingRight: '4px' }}>
-            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 8px', textAlign: 'left' }}>
+          <div className="custom-scroll" style={{ flex: 1, overflowY: 'auto', overflowX: 'auto', paddingRight: '2px' }}>
+            <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 4px', textAlign: 'left' }}>
               <thead style={{ position: 'sticky', top: 0, background: '#ffffff', zIndex: 1 }}>
-                <tr style={{ color: '#94a3b8', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Information</th>
-                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Category</th>
-                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Status</th>
-                  <th style={{ padding: '0.5rem 1rem', fontWeight: 700, background: '#ffffff' }}>Deadline</th>
+                <tr style={{ color: '#64748b', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <th style={{ padding: '4px 8px', fontWeight: 700, background: '#ffffff' }}>Information</th>
+                  <th style={{ padding: '4px 8px', fontWeight: 700, background: '#ffffff' }}>Category</th>
+                  <th style={{ padding: '4px 8px', fontWeight: 700, background: '#ffffff' }}>Status</th>
+                  <th style={{ padding: '4px 8px', fontWeight: 700, background: '#ffffff' }}>Deadline</th>
                 </tr>
               </thead>
               <tbody>
-                {recentJobs.map((job, i) => {
+                {recentJobs.map((job) => {
                   const catData = categories.find(c => c.id === (job.categoryId || job.category));
                   let statusBg = '#f1f5f9', statusColor = '#475569';
                   if (job.status === 'active') { statusBg = '#d1fae5'; statusColor = '#065f46'; }
@@ -262,22 +259,22 @@ const Dashboard = () => {
                   if (job.status === 'expired') { statusBg = '#fee2e2'; statusColor = '#991b1b'; }
 
                   return (
-                    <tr key={job.id} style={{ transition: 'transform 0.2s', cursor: 'pointer' }}>
-                      <td style={{ padding: '1rem', background: '#f8fafc', borderRadius: '12px 0 0 12px' }}>
-                        <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: '2px' }}>{job.title}</div>
-                        <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{job.organization}</div>
+                    <tr key={job.id} style={{ cursor: 'pointer' }}>
+                      <td style={{ padding: '8px 10px', background: '#f8fafc', borderRadius: '8px 0 0 8px' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a', marginBottom: '1px', fontSize: '12px' }}>{job.title}</div>
+                        <div style={{ fontSize: '10.5px', color: '#64748b' }}>{job.organization}</div>
                       </td>
-                      <td style={{ padding: '1rem', background: '#f8fafc' }}>
-                        <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 700, background: `${catData?.textColor}15`, color: catData?.textColor }}>
+                      <td style={{ padding: '8px 10px', background: '#f8fafc' }}>
+                        <span style={{ display: 'inline-block', padding: '2px 7px', borderRadius: '5px', fontSize: '10px', fontWeight: 700, background: `${catData?.textColor || '#64748b'}15`, color: catData?.textColor || '#64748b' }}>
                           {catData?.name || job.categoryId || job.category}
                         </span>
                       </td>
-                      <td style={{ padding: '1rem', background: '#f8fafc' }}>
-                        <span style={{ display: 'inline-block', padding: '4px 10px', borderRadius: '8px', fontSize: '0.7rem', fontWeight: 800, background: statusBg, color: statusColor, textTransform: 'uppercase' }}>
+                      <td style={{ padding: '8px 10px', background: '#f8fafc' }}>
+                        <span style={{ display: 'inline-block', padding: '2px 7px', borderRadius: '5px', fontSize: '9.5px', fontWeight: 800, background: statusBg, color: statusColor, textTransform: 'uppercase' }}>
                           {job.status}
                         </span>
                       </td>
-                      <td style={{ padding: '1rem', background: '#f8fafc', borderRadius: '0 12px 12px 0', color: '#475569', fontWeight: 600, fontSize: '0.85rem' }}>
+                      <td style={{ padding: '8px 10px', background: '#f8fafc', borderRadius: '0 8px 8px 0', color: '#475569', fontWeight: 600, fontSize: '11px' }}>
                         {job.deadline}
                       </td>
                     </tr>
@@ -289,24 +286,24 @@ const Dashboard = () => {
         </div>
 
         {/* ACTIVITY CARD */}
-        <div className="admin-chart-card animate-card" style={{ display: 'flex', flexDirection: 'column', height: '450px', background: '#ffffff', borderRadius: '24px', padding: '2rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', animationDelay: '700ms', border: '1px solid rgba(241, 245, 249, 0.8)' }}>
-          <h3 style={{ margin: '0 0 1.5rem 0', fontSize: '1.25rem', fontWeight: 700, color: '#1e293b', flexShrink: 0 }}>Recent Activity</h3>
-          <div className="activity-feed custom-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingRight: '6px' }}>
+        <div className="admin-chart-card animate-card" style={{ display: 'flex', flexDirection: 'column', height: '360px', background: '#ffffff', borderRadius: '14px', padding: '14px 16px', boxShadow: '0 1px 3px rgba(0,0,0,0.02)', animationDelay: '600ms', border: '1px solid #e2e8f0' }}>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '13.5px', fontWeight: 700, color: '#0f172a', flexShrink: 0 }}>Recent Activity</h3>
+          <div className="activity-feed custom-scroll" style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px', paddingRight: '4px' }}>
             {recentActivities.length > 0 ? (
               recentActivities.map((act, idx) => (
-                <div key={idx} className="activity-item" style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexShrink: 0 }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: `${getActivityColor(act.type)}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>
+                <div key={idx} className="activity-item" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexShrink: 0, padding: '6px 0' }}>
+                  <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: `${getActivityColor(act.type)}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px', flexShrink: 0 }}>
                     {act.type === 'add' ? '✨' : act.type === 'update' ? '🔄' : '🗑️'}
                   </div>
                   <div style={{ flex: 1 }}>
-                    <p style={{ margin: '0', fontSize: '0.9rem', color: '#1e293b', fontWeight: 600 }}>{act.text}</p>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 500 }}>{formatTimeAgo(act.createdAt || act.time, true)}</span>
+                    <p style={{ margin: '0', fontSize: '11.5px', color: '#1e293b', fontWeight: 600 }}>{act.text}</p>
+                    <span style={{ fontSize: '10px', color: '#94a3b8', fontWeight: 500 }}>{formatTimeAgo(act.createdAt || act.time, true)}</span>
                   </div>
                 </div>
               ))
             ) : (
-              <div style={{ textAlign: 'center', padding: '2rem 0', flexShrink: 0 }}>
-                <p style={{ color: '#94a3b8', fontSize: '0.9rem', fontWeight: 500 }}>No recent activity to show.</p>
+              <div style={{ textAlign: 'center', padding: '1.5rem 0', flexShrink: 0 }}>
+                <p style={{ color: '#94a3b8', fontSize: '11.5px', fontWeight: 500 }}>No recent activity to show.</p>
               </div>
             )}
           </div>
