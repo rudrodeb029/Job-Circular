@@ -86,14 +86,34 @@ CREATE TABLE IF NOT EXISTS public.admits (
     raw_data JSONB DEFAULT '{}'::jsonb
 );
 
--- ACTIVITIES TABLE (Admin Activity Log)
+-- ACTIVITIES TABLE (Admin Activity Log & Exam Submissions)
 CREATE TABLE IF NOT EXISTS public.activities (
     id TEXT PRIMARY KEY,
     action TEXT,
     description TEXT,
+    type TEXT,
+    "examId" TEXT,
+    "userName" TEXT,
+    "userPhoto" TEXT,
+    score INTEGER,
+    total INTEGER,
+    "scaledScore" INTEGER,
+    "timeTaken" TEXT,
+    "timeTakenSec" INTEGER,
     "createdAt" TEXT,
     raw_data JSONB DEFAULT '{}'::jsonb
 );
+
+-- Migrations for existing database instances:
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS type TEXT;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "examId" TEXT;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "userName" TEXT;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "userPhoto" TEXT;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS score INTEGER;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS total INTEGER;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "scaledScore" INTEGER;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "timeTaken" TEXT;
+ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "timeTakenSec" INTEGER;
 
 -- USERS TABLE (User Profiles & Saved Jobs)
 CREATE TABLE IF NOT EXISTS public.users (
@@ -160,7 +180,12 @@ CREATE POLICY "Public insert/update/delete on users" ON public.users FOR ALL USI
 CREATE POLICY "Public read access on app_config" ON public.app_config FOR SELECT USING (true);
 CREATE POLICY "Public insert/update/delete on app_config" ON public.app_config FOR ALL USING (true) WITH CHECK (true);
 
--- 4. Enable Supabase Realtime for Admin Dashboard
+-- 4. Create Indexes for High Performance Queries
+CREATE INDEX IF NOT EXISTS idx_activities_type_examid ON public.activities (type, "examId");
+CREATE INDEX IF NOT EXISTS idx_live_exams_status ON public.live_exams (status);
+CREATE INDEX IF NOT EXISTS idx_jobs_category ON public.jobs ("categoryId");
+
+-- 5. Enable Supabase Realtime for Admin Dashboard and Live Leaderboard
 ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.questions;
