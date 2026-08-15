@@ -73,7 +73,10 @@ export default function ManageLiveExams() {
 
     const lines = bulkInput.trim().split('\n');
     const newQuestions = lines.map((line, index) => {
-      const parts = line.split(',').map(p => p.trim());
+      let parts = line.split(',,').map(p => p.trim());
+      if (parts.length < 6) {
+        parts = line.split(',').map(p => p.trim());
+      }
       if (parts.length < 6) return null;
 
       const question = parts[0];
@@ -84,23 +87,30 @@ export default function ManageLiveExams() {
       const correctVal = parts[5];
       const explanation = parts.slice(6).join(', ').replace(/\|/g, '').trim();
 
+      const cleanOpt = (opt) => (opt || '').replace(/^[\(\[]?\s*([a-d]|[ক-ঘ]|[1-4])\s*[\)\.\:]?\s*/i, '').trim();
+      const cleanedOptions = [cleanOpt(opt1), cleanOpt(opt2), cleanOpt(opt3), cleanOpt(opt4)];
+
       let finalIndex = 0;
-      const cleanVal = String(correctVal).toLowerCase();
-      if (cleanVal.includes('ক') || cleanVal === '0') finalIndex = 0;
-      else if (cleanVal.includes('খ') || cleanVal === '1') finalIndex = 1;
-      else if (cleanVal.includes('গ') || cleanVal === '2') finalIndex = 2;
-      else if (cleanVal.includes('ঘ') || cleanVal === '3') finalIndex = 3;
+      const cleanVal = String(correctVal || '').toLowerCase().trim();
+      if (cleanVal.includes('ক') || cleanVal === 'a' || cleanVal === '0') finalIndex = 0;
+      else if (cleanVal.includes('খ') || cleanVal === 'b' || cleanVal === '1') finalIndex = 1;
+      else if (cleanVal.includes('গ') || cleanVal === 'c' || cleanVal === '2') finalIndex = 2;
+      else if (cleanVal.includes('ঘ') || cleanVal === 'd' || cleanVal === '3') finalIndex = 3;
       else {
-        const parsed = parseInt(cleanVal, 10);
-        finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
+        const matchedIdx = cleanedOptions.findIndex(o => o && o.toLowerCase() === cleanVal);
+        if (matchedIdx !== -1) {
+          finalIndex = matchedIdx;
+        } else {
+          const parsed = parseInt(cleanVal, 10);
+          finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
+        }
       }
 
-      const cleanOpt = (opt) => opt.replace(/^[\(\[]?[কখগঘ][\)\]]?\s*/, '').trim();
-
       return {
+        id: `q-live-${Date.now()}-${index}`,
         question: question || '',
         questionEn: '',
-        options: [cleanOpt(opt1), cleanOpt(opt2), cleanOpt(opt3), cleanOpt(opt4)],
+        options: cleanedOptions,
         optionsEn: ['', '', '', ''],
         correctIndex: finalIndex,
         explanation: explanation || '',
@@ -116,9 +126,9 @@ export default function ManageLiveExams() {
         return [...prev, ...newQuestions];
       });
       setBulkInput('');
-      triggerToast(`${newQuestions.length} questions imported to exam!`);
+      triggerToast(`${newQuestions.length} questions imported to live exam!`);
     } else {
-      triggerToast('Invalid format. Use: Question, Opt1, Opt2, Opt3, Opt4, CorrectIndex, Explanation', 'error');
+      triggerToast('Invalid format. Please use double comma (,,) pattern: Question,, Opt1,, Opt2,, Opt3,, Opt4,, CorrectChoice(ক-ঘ),, Explanation', 'error');
     }
   };
 
@@ -281,14 +291,15 @@ export default function ManageLiveExams() {
 
              <div className="form-section" style={{ background: '#f1f5f9' }}>
                 <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>🚀 Bulk MCQ Import</h3>
-                <p style={{ color: '#64748b', fontSize: '12px', marginBottom: '16px' }}>
-                   Format: <strong>Question, Opt1, Opt2, Opt3, Opt4, Correct(0-3/ক-ঘ), Explanation</strong><br/>
-                   One question per line.
+                <p style={{ color: '#475569', fontSize: '12px', marginBottom: '16px', lineHeight: 1.5 }}>
+                   Format (Double Comma <code>,,</code> Separated):<br/>
+                   <strong>Question,, (ক) Option1,, (খ) Option2,, (গ) Option3,, (ঘ) Option4,, CorrectChoice(ক-ঘ),, Explanation</strong><br/>
+                   <span style={{ fontSize: '11px', color: '#64748b' }}>One question per line.</span>
                 </p>
                 <textarea
                    className="modern-input"
-                   style={{ height: '120px', resize: 'vertical', background: 'white', marginBottom: '16px' }}
-                   placeholder="মৌলিক অধিকার কয়টি?, ১২টি, ১৪টি, ৮টি, ১০টি, ক, সংবিধানের ৩য় ভাগে আছে"
+                   style={{ height: '140px', resize: 'vertical', background: 'white', marginBottom: '16px', fontSize: '13px', lineHeight: 1.5 }}
+                   placeholder="কোন বিষয়টি মুদ্রাপাচারের অন্তর্ভুক্ত নয়?,,(ক) রপ্তানী পণ্যের অবমূল্যায়ন ,,(খ) আমদানী পণ্যের অধিক মূল্য নির্ধারণ ,,(গ) আয়কর ফাঁকি দেয়া ,,(ঘ) অবৈধ চ্যানেলে বিদেশে টাকা পাঠানো,,গ,,ব্যাখ্যা: প্রচলিত আন্তর্জাতিক বাণিজ্য ও মানিলন্ডারিং প্রতিরোধ আইন অনুযায়ী কেবল 'আয়কর ফাঁকি দেওয়া' (Tax Evasion)..."
                    value={bulkInput}
                    onChange={e => setBulkInput(e.target.value)}
                 />
