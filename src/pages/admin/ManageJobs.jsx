@@ -440,16 +440,34 @@ export default function ManageJobs() {
 
               {formData.images && (
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
-                  {formData.images.split(',').map(i => i.trim()).filter(i => i).map((fileUrl, index) => (
-                    <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #cbd5e1', overflow: 'hidden' }}>
-                      <img src={fileUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      <button type="button" onClick={() => {
-                        const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
-                        current.splice(index, 1);
-                        setFormData(prev => ({ ...prev, images: current.join(', ') }));
-                      }} style={{ position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px' }}>✕</button>
-                    </div>
-                  ))}
+                  {formData.images.split(',').map(i => i.trim()).filter(i => i).map((fileUrl, index) => {
+                    const isPdf = fileUrl.toLowerCase().includes('.pdf');
+                    return (
+                      <div key={index} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '10px', border: '1px solid #cbd5e1', overflow: 'hidden', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {isPdf ? (
+                          <div style={{ textAlign: 'center', padding: '4px', color: '#ef4444', fontSize: '10px', fontWeight: 'bold' }}>
+                            📄 PDF Doc
+                          </div>
+                        ) : (
+                          <img
+                            src={fileUrl}
+                            alt="Preview"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.style.display = 'none';
+                              e.target.parentNode.innerHTML = '<div style="font-size:10px;font-weight:bold;color:#475569;text-align:center;padding:4px">🖼️ Image</div>';
+                            }}
+                          />
+                        )}
+                        <button type="button" onClick={() => {
+                          const current = formData.images.split(',').map(i => i.trim()).filter(i => i);
+                          current.splice(index, 1);
+                          setFormData(prev => ({ ...prev, images: current.join(', ') }));
+                        }} style={{ position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontSize: '10px', zIndex: 10 }}>✕</button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

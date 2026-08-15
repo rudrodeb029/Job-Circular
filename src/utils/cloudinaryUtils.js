@@ -11,7 +11,7 @@
  * @param {string} [transformation='f_webp,q_auto'] - Cloudinary transformation parameters
  * @returns {string} Optimized URL
  */
-export const optimizeCloudinaryUrl = (url, transformation = 'f_webp,q_auto') => {
+export const optimizeCloudinaryUrl = (url, transformation = 'f_auto,q_auto') => {
   if (!url || typeof url !== 'string') return url;
 
   // Check if it's a valid Cloudinary URL
@@ -20,7 +20,7 @@ export const optimizeCloudinaryUrl = (url, transformation = 'f_webp,q_auto') => 
   }
 
   // Already has format/quality transformation applied
-  if (url.includes('/f_webp') || url.includes('/f_auto') || url.includes('/q_auto')) {
+  if (url.includes('/f_auto') || url.includes('/f_webp') || url.includes('/q_auto')) {
     return url;
   }
 
