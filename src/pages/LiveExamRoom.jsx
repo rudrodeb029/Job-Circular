@@ -502,9 +502,12 @@ export default function LiveExamRoom() {
         {/* 1. Questions View Tab (Solutions or Live Taking) */}
         {(!currentResult || activeRoomTab === 'solutions') && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
-            {exam.questions.map((qn, qIndex) => {
-              const userSelections = currentResult ? currentResult.answers : selectedAnswers;
+            {(exam.questions || []).map((qn, qIndex) => {
+              if (!qn) return null;
+              const userSelections = (currentResult && currentResult.answers) ? currentResult.answers : (selectedAnswers || {});
               const chosenIndex = userSelections[qIndex];
+              const qOptions = Array.isArray(qn.options) ? qn.options : ['', '', '', ''];
+              const qOptionsEn = Array.isArray(qn.optionsEn) ? qn.optionsEn : ['', '', '', ''];
 
               return (
                 <div
@@ -528,13 +531,13 @@ export default function LiveExamRoom() {
                     gap: '8px'
                   }}>
                     <span>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                    <span>{isEn ? qn.questionEn : qn.question}</span>
+                    <span>{isEn ? (qn.questionEn || qn.question) : qn.question}</span>
                   </h4>
 
                   {/* Option Choices */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {qn.options.map((option, oIndex) => {
-                      const optText = isEn ? qn.optionsEn[oIndex] : option;
+                    {qOptions.map((option, oIndex) => {
+                      const optText = isEn ? (qOptionsEn[oIndex] || option) : option;
                       const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
                       const prefix = optionPrefixes[oIndex];
 
@@ -587,15 +590,15 @@ export default function LiveExamRoom() {
                             alignItems: 'center',
                             padding: '12px 14px',
                             borderRadius: '12px',
-                          background: bg,
-                          color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
-                          border: border,
-                          cursor: !currentResult ? 'pointer' : 'default',
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          transition: 'all 0.2s ease',
-                          gap: '10px'
-                        }}
+                            background: bg,
+                            color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
+                            border: border,
+                            cursor: !currentResult ? 'pointer' : 'default',
+                            fontSize: '13px',
+                            fontWeight: 500,
+                            transition: 'all 0.2s ease',
+                            gap: '10px'
+                          }}
                         >
                           <span style={{
                             width: '24px',
@@ -619,7 +622,7 @@ export default function LiveExamRoom() {
                   </div>
 
                   {/* Explanations */}
-                  {currentResult && (
+                  {currentResult && (qn.explanation || qn.explanationEn) && (
                     <div style={{
                       marginTop: '16px',
                       padding: '14px',
@@ -631,7 +634,7 @@ export default function LiveExamRoom() {
                         💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
                       </h5>
                       <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
-                        {isEn ? qn.explanationEn : qn.explanation}
+                        {isEn ? (qn.explanationEn || qn.explanation) : qn.explanation}
                       </p>
                     </div>
                   )}
