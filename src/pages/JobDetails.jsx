@@ -88,15 +88,19 @@ export default function JobDetails() {
 
   const isSaved = state.savedJobs.includes(job.id);
   const isApplied = state.appliedJobs.includes(job.id);
+  const isEn = state.language === 'en';
+  const orgName = isEn ? (job.organizationEn || job.organization) : (job.organization || job.title);
+  const titleName = isEn ? (job.titleEn || job.title) : (job.title || job.organization);
 
   const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
-  const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
+  const displayIcon = job.icon || (typeof job.organization === 'string' ? orgIconsMap[job.organization] : null) || styleConfig.defaultIcon;
 
   const handleApplyClick = () => {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
 
-  const handleOfficialApply = () => {
+  const handleOfficialApply = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     const link = job.applyLink || 'https://alljobs.teletalk.com.bd';
     navigate('/apply-webview', {
       state: {
@@ -429,9 +433,9 @@ export default function JobDetails() {
             )}
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
-              <a
-                href={circularImages[activeImageIndex]}
-                download={`${job.title || 'Job'}_Circular_Notice_Page_${activeImageIndex + 1}.png`}
+              <button
+                type="button"
+                onClick={() => setShowFullImage(prev => !prev)}
                 style={{
                   flex: 1,
                   display: 'flex',
@@ -445,14 +449,14 @@ export default function JobDetails() {
                   fontWeight: 700,
                   fontSize: '12px',
                   border: '1.5px solid #dbeafe',
-                  textDecoration: 'none',
                   boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.15s ease',
+                  cursor: 'pointer',
                   textAlign: 'center'
                 }}
               >
-                <Download size={14} /> Notice {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
-              </a>
+                <Eye size={14} /> {showFullImage ? 'Collapse Notice' : 'Notice'} {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
+              </button>
 
               <button
                 onClick={handleOfficialApply}
