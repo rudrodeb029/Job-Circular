@@ -63,7 +63,7 @@ const notifTypeConfig = {
   }
 };
 
-export default function NotificationItem({ notification }) {
+function NotificationItem({ notification }) {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const isEn = state.language === 'en';
@@ -133,6 +133,8 @@ export default function NotificationItem({ notification }) {
             <img 
               src={notification.imageUrl} 
               alt="" 
+              loading="lazy"
+              decoding="async"
               style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
             />
           ) : (
@@ -209,3 +211,5 @@ export default function NotificationItem({ notification }) {
     </div>
   );
 }
+
+export default React.memo(NotificationItem);

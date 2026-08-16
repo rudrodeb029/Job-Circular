@@ -101,11 +101,23 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-export default function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = false }) {
+const isExpired = (deadline) => {
+  if (!deadline) return false;
+  const deadlineDate = new Date(deadline);
+  if (isNaN(deadlineDate.getTime())) return false;
+  const endOfDay = new Date(deadlineDate);
+  endOfDay.setHours(23, 59, 59, 999);
+  return endOfDay < new Date();
+};
+
+function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = false }) {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
 
+  if (!job) return null;
+
   const isSaved = state.savedJobs.includes(job.id);
+  const isApplied = state.appliedJobs.includes(job.id);
   const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
   const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
 
@@ -164,15 +176,29 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
             flexShrink: 0
           }}
         >
-          {displayIcon}
+          {job.imageUrl ? (
+            <img
+              src={job.imageUrl}
+              alt={orgName}
+              loading="lazy"
+              decoding="async"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
+          ) : (
+            displayIcon
+          )}
         </div>
       )}
 
       <div className="job-card-content">
         <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+          <span style={{ fontSize: '15px', flexShrink: 0 }}>{displayIcon}</span>
           <span>{orgName}</span>
         </h4>
+
         <p className="job-card-org" style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -187,7 +213,7 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
           {displayDesc}
         </p>
         
-        {/* Ultra-compact single-line metadata badge */}
+        {/* Metadata Badges */}
         <div style={{ marginTop: '3px', overflow: 'hidden', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
           {job.showInResult ? (
             <span style={{
@@ -238,7 +264,13 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
             </span>
           )}
 
-          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+          {job.vacancy && (
+            <span className="job-card-tag font-bold" style={{ color: '#1a56db', background: '#eff6ff', fontSize: '9px' }}>
+              {isEn ? `${job.vacancy} Positions` : `${toBengaliNumber(job.vacancy)} টি পদ`}
+            </span>
+          )}
+
+          <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
             <span style={{ opacity: 0.4 }}>•</span>
             <Clock size={9} style={{ color: '#475569' }} /> 
             <span style={{ color: '#475569', fontWeight: 500 }}>
@@ -281,3 +313,5 @@ export default function JobCard({ job, showBookmark = true, showIcon = false, is
     </div>
   );
 }
+
+export default React.memo(JobCard);

@@ -23,7 +23,7 @@ const categoryGradientMap = {
   parttime: { bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)', shadow: 'rgba(2, 132, 199, 0.3)', badgeBg: '#f0f9ff', badgeColor: '#0369a1' }
 };
 
-export default function CategoryCard({ category }) {
+function CategoryCard({ category }) {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const isEn = state.language === 'en';
@@ -94,3 +94,5 @@ export default function CategoryCard({ category }) {
     </div>
   );
 }
+
+export default React.memo(CategoryCard);
