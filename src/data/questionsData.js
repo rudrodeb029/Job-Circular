@@ -4,18 +4,7 @@ export const questionsData = [];
 
 let cachedQuestionsData = [];
 
-// Real-time Firestore sync
-try {
-  onCollectionSnapshot(COLLECTIONS.QUESTIONS, (data) => {
-    if (data) {
-      cachedQuestionsData = [...data].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-      localStorage.setItem('questions_data', JSON.stringify(cachedQuestionsData));
-      window.dispatchEvent(new CustomEvent('questions_updated'));
-    }
-  });
-} catch (err) {
-  console.error('Failed to subscribe to questions Firestore:', err);
-}
+// Multi-tier cache accessor for Questions Data
 
 export const getQuestionsByCategory = (category) => {
   const all = getQuestionsData();

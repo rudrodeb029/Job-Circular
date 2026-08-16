@@ -157,22 +157,19 @@ let cachedLiveExams = (() => {
   }
 })();
 
-// Real-time Supabase sync
-try {
-  onCollectionSnapshot(COLLECTIONS.LIVE_EXAMS, (data) => {
-    if (Array.isArray(data)) {
-      cachedLiveExams = [...data].sort(sortByCreatedAt);
-      localStorage.setItem('admin_live_exams', JSON.stringify(cachedLiveExams));
-      localStorage.setItem('cache_data_live_exams', JSON.stringify(cachedLiveExams));
-      window.dispatchEvent(new CustomEvent('live_exams_updated'));
-    }
-  });
-} catch (err) {
-  console.error('Failed to subscribe to live exams Supabase:', err);
-}
-
+// Cache accessor for Live Exams (reads from multi-tier cache)
 export const getLiveExams = () => {
-  return cachedLiveExams || [];
+  if (cachedLiveExams && cachedLiveExams.length > 0) {
+    return cachedLiveExams;
+  }
+  try {
+    const saved = localStorage.getItem('cache_data_live_exams') || localStorage.getItem('admin_live_exams');
+    if (saved) {
+      cachedLiveExams = JSON.parse(saved);
+      return cachedLiveExams;
+    }
+  } catch (e) {}
+  return [];
 };
 
 export const saveLiveExams = async (exams) => {

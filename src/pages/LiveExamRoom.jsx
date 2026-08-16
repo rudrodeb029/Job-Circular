@@ -88,14 +88,14 @@ export default function LiveExamRoom() {
     };
   }, [id, adminState.liveExams]);
 
-  // Load REAL participant submissions from Supabase Activities
+  // Load REAL participant submissions from Supabase Activities via Polling / Fetch
   useEffect(() => {
     let isMounted = true;
     const targetId = String(id).trim();
 
-    const loadRealSubmissions = async () => {
+    const loadRealSubmissions = async (force = false) => {
       try {
-        const allActivities = await getCollectionCached(COLLECTIONS.ACTIVITIES, false, 5);
+        const allActivities = await getCollectionCached(COLLECTIONS.ACTIVITIES, force, 2);
         if (Array.isArray(allActivities) && isMounted) {
           const examSubs = allActivities.filter(act => 
             act.type === 'live_exam_submission' && String(act.examId).trim() === targetId
@@ -107,23 +107,19 @@ export default function LiveExamRoom() {
       }
     };
 
-    loadRealSubmissions();
+    // 1. Initial immediate fetch
+    loadRealSubmissions(false);
 
-    let unsubscribe = () => {};
-    try {
-      unsubscribe = onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (activitiesData) => {
-        if (Array.isArray(activitiesData) && isMounted) {
-          const examSubs = activitiesData.filter(act => 
-            act.type === 'live_exam_submission' && String(act.examId).trim() === targetId
-          );
-          setRealSubmissions(examSubs);
-        }
-      });
-    } catch (e) {}
+    // 2. Poll periodically every 20 seconds (0 Realtime socket usage, 100% scalable)
+    const pollInterval = setInterval(() => {
+      if (isMounted) {
+        loadRealSubmissions(true);
+      }
+    }, 20000);
 
     return () => {
       isMounted = false;
-      unsubscribe();
+      clearInterval(pollInterval);
     };
   }, [id]);
 
