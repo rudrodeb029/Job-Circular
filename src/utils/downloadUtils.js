@@ -1,6 +1,8 @@
+import { getGoogleDriveFileId, isGoogleDriveUrl, normalizeMediaUrl } from './mediaUtils';
+
 /**
  * High-speed secure file downloader for notice images and PDFs.
- * Masks raw Cloudinary URLs from the browser address bar and forces direct native download.
+ * Supports Cloudinary URLs, Google Drive links, and standard CDN media.
  * 
  * @param {string} fileUrl - The source URL of the image or PDF
  * @param {string} baseFileName - Desired file name without extension
@@ -12,6 +14,9 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
   const sanitizedFileName = (baseFileName || 'Job_Circular_Notice')
     .replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_')
     .replace(/_+/g, '_');
+
+  const normalizedUrl = normalizeMediaUrl(fileUrl);
+  const driveId = getGoogleDriveFileId(fileUrl);
 
   // Strategy 1: If Cloudinary URL, use Cloudinary fl_attachment header for 100% native instant download
   if (fileUrl.includes('cloudinary.com') && fileUrl.includes('/upload/')) {
@@ -33,9 +38,56 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
     }
   }
 
-  // Strategy 2: In-Memory Blob Fetch (Masks raw URL from address bar)
+  // Strategy 2: If Google Drive link, fetch image from high-speed CDN or use download endpoint
+  if (driveId) {
+    try {
+      const gDriveFetchUrl = `https://lh3.googleusercontent.com/d/${driveId}`;
+      const response = await fetch(gDriveFetchUrl, { method: 'GET', mode: 'cors', cache: 'force-cache' });
+      if (response.ok) {
+        const blob = await response.blob();
+        let extension = 'png';
+        const mimeType = (blob.type || '').toLowerCase();
+        if (mimeType.includes('pdf')) extension = 'pdf';
+        else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) extension = 'jpg';
+        else if (mimeType.includes('webp')) extension = 'webp';
+
+        const blobUrl = URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.href = blobUrl;
+        downloadAnchor.download = `${sanitizedFileName}.${extension}`;
+        downloadAnchor.style.display = 'none';
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        document.body.removeChild(downloadAnchor);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 4000);
+        return true;
+      }
+    } catch (gErr) {
+      console.warn('Google Drive direct blob fetch error, falling back to direct download link:', gErr);
+    }
+
+    // Direct Google Drive download endpoint fallback
+    try {
+      const driveDownloadUrl = `https://drive.usercontent.google.com/download?id=${driveId}&export=download`;
+      const anchor = document.createElement('a');
+      anchor.href = driveDownloadUrl;
+      anchor.download = `${sanitizedFileName}.png`;
+      anchor.target = '_self';
+      anchor.style.display = 'none';
+      document.body.appendChild(anchor);
+      anchor.click();
+      setTimeout(() => {
+        if (anchor.parentNode) document.body.removeChild(anchor);
+      }, 1000);
+      return true;
+    } catch (dErr) {
+      console.warn('Drive download endpoint error:', dErr);
+    }
+  }
+
+  // Strategy 3: In-Memory Blob Fetch for Standard URLs
   try {
-    const response = await fetch(fileUrl, {
+    const response = await fetch(normalizedUrl, {
       method: 'GET',
       mode: 'cors',
       cache: 'force-cache'
@@ -45,7 +97,7 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
       const blob = await response.blob();
       let extension = 'png';
       const mimeType = (blob.type || '').toLowerCase();
-      const urlLower = fileUrl.toLowerCase();
+      const urlLower = normalizedUrl.toLowerCase();
 
       if (mimeType.includes('pdf') || urlLower.includes('.pdf')) {
         extension = 'pdf';
@@ -75,7 +127,7 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
     console.warn('Fetch blob download error, attempting Canvas/Direct fallback:', err);
   }
 
-  // Strategy 3: Canvas to Data URL for images (100% CORS-safe in-memory download)
+  // Strategy 4: Canvas to Data URL for images (100% CORS-safe in-memory download)
   try {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -101,7 +153,7 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
         }
       };
       img.onerror = reject;
-      img.src = fileUrl;
+      img.src = normalizedUrl;
     });
 
     const success = await canvasPromise;
@@ -110,10 +162,10 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
     console.warn('Canvas download error, falling back to direct anchor:', canvasErr);
   }
 
-  // Strategy 4: Direct Download Trigger
+  // Strategy 5: Direct Download Trigger
   try {
     const finalAnchor = document.createElement('a');
-    finalAnchor.href = fileUrl;
+    finalAnchor.href = normalizedUrl;
     finalAnchor.download = `${sanitizedFileName}.png`;
     finalAnchor.target = '_self';
     finalAnchor.style.display = 'none';
@@ -125,7 +177,7 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
     return true;
   } catch (finalErr) {
     console.error('Final download error:', finalErr);
-    window.open(fileUrl, '_blank');
+    window.open(normalizedUrl, '_blank');
     return false;
   }
 }

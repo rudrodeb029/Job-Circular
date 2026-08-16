@@ -4,6 +4,7 @@ import { categories } from '../../data/categories';
 import { triggerLocalNotification } from '../../utils/notifications';
 import { CLOUDINARY_CONFIG } from '../../cloudinary';
 import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
+import { normalizeMediaUrl, getGoogleDriveFileId } from '../../utils/mediaUtils';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -440,20 +441,28 @@ export default function ManageJobs() {
 
               {formData.images && (
                 <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
-                  {Array.from(new Set(formData.images.split(',').map(i => i.trim()).filter(i => i))).map((fileUrl, index) => {
-                    const isPdf = fileUrl.toLowerCase().includes('.pdf');
+                  {Array.from(new Set(formData.images.split(',').map(i => i.trim()).filter(i => i))).map((rawFileUrl, index) => {
+                    const displayUrl = normalizeMediaUrl(rawFileUrl);
+                    const driveId = getGoogleDriveFileId(rawFileUrl);
+                    const isPdf = rawFileUrl.toLowerCase().includes('.pdf');
                     return (
                       <div key={index} style={{ position: 'relative', width: '90px', height: '90px', borderRadius: '12px', border: '1.5px solid #cbd5e1', overflow: 'hidden', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.06)' }}>
                         {isPdf ? (
-                          <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ textAlign: 'center', padding: '6px', color: '#ef4444', textDecoration: 'none', fontSize: '11px', fontWeight: 800 }}>
+                          <a href={displayUrl} target="_blank" rel="noopener noreferrer" style={{ textAlign: 'center', padding: '6px', color: '#ef4444', textDecoration: 'none', fontSize: '11px', fontWeight: 800 }}>
                             📄 PDF Doc
                           </a>
                         ) : (
-                          <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ width: '100%', height: '100%', display: 'block' }}>
+                          <a href={displayUrl} target="_blank" rel="noopener noreferrer" style={{ width: '100%', height: '100%', display: 'block' }}>
                             <img
-                              src={fileUrl}
+                              src={displayUrl}
                               alt="Circular Preview"
                               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              onError={(e) => {
+                                if (driveId && !e.target.dataset.triedFallback) {
+                                  e.target.dataset.triedFallback = 'true';
+                                  e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`;
+                                }
+                              }}
                             />
                           </a>
                         )}

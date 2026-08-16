@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
+import { normalizeMediaUrls, getGoogleDriveFileId } from '../utils/mediaUtils';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
@@ -88,6 +89,8 @@ export default function ResultDetails() {
   if (circularImages.length === 0 && job.circularImage && job.circularImage.trim()) {
     circularImages = [job.circularImage];
   }
+
+  circularImages = normalizeMediaUrls(circularImages);
 
   const isSaved = state.savedJobs.includes(job.id);
   const isApplied = state.appliedJobs.includes(job.id);
@@ -265,6 +268,13 @@ export default function ResultDetails() {
               alt="Result Sheet Preview"
               onClick={() => setShowFullImage(!showFullImage)}
               onError={(e) => {
+                const rawSrc = circularImages[activeImageIndex] || '';
+                const driveId = getGoogleDriveFileId(rawSrc);
+                if (driveId && !e.target.dataset.triedFallback) {
+                  e.target.dataset.triedFallback = 'true';
+                  e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+                  return;
+                }
                 e.target.onerror = null;
                 e.target.src = defaultNoticeImg;
               }}

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bookmark, BookmarkCheck, Calendar, Clock } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { formatTimeAgo } from '../utils/timeUtils';
+import { normalizeMediaUrl, getGoogleDriveFileId } from '../utils/mediaUtils';
 
 const categoryStyles = {
   gov: {
@@ -183,13 +184,19 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
         >
           {job.imageUrl ? (
             <img
-              src={job.imageUrl}
+              src={normalizeMediaUrl(job.imageUrl)}
               alt={orgName}
               loading="lazy"
               decoding="async"
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               onError={(e) => {
-                e.target.style.display = 'none';
+                const driveId = getGoogleDriveFileId(job.imageUrl);
+                if (driveId && !e.target.dataset.triedFallback) {
+                  e.target.dataset.triedFallback = 'true';
+                  e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w400`;
+                } else {
+                  e.target.style.display = 'none';
+                }
               }}
             />
           ) : (
