@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 
-const SOURCE_ICON = 'C:\\Users\\Suvro\\Downloads\\AppIcon.png';
+const SOURCE_ICON = 'C:\\Users\\Suvro\\Downloads\\finalappicon.png';
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const RES_DIR = path.join(PROJECT_ROOT, 'android', 'app', 'src', 'main', 'res');
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
@@ -62,7 +62,7 @@ async function generateIcons() {
     console.log(`✔ Generated ${cfg.folder} (launcher: ${cfg.launcherSize}x${cfg.launcherSize}, fg: ${cfg.foregroundSize}x${cfg.foregroundSize})`);
   }
 
-  // 3. Generate Android drawable foreground if exists
+  // 3. Generate Android drawable foreground
   const drawableDir = path.join(RES_DIR, 'drawable');
   if (fs.existsSync(drawableDir)) {
     await sharp(SOURCE_ICON)
@@ -72,7 +72,7 @@ async function generateIcons() {
     console.log('✔ Generated drawable/ic_launcher_foreground.png');
   }
 
-  console.log('🎉 All Android and Web app icons generated successfully!');
+  console.log('🎉 All Android and Web app icons generated successfully from finalappicon.png!');
 }
 
 generateIcons().catch(err => {
