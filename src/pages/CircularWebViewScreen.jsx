@@ -155,35 +155,35 @@ export default function CircularWebViewScreen() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '32px 24px',
+          padding: '24px 20px',
           textAlign: 'center',
-          gap: '20px',
+          gap: '14px',
           backgroundColor: 'var(--bg-secondary, #f8fafc)'
         }}
       >
         <div
           style={{
-            width: '72px',
-            height: '72px',
-            borderRadius: '20px',
+            width: '46px',
+            height: '46px',
+            borderRadius: '14px',
             background: 'linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '32px',
-            boxShadow: '0 8px 24px rgba(29, 78, 216, 0.12)'
+            fontSize: '22px',
+            boxShadow: '0 4px 14px rgba(29, 78, 216, 0.1)'
           }}
         >
           🏛️
         </div>
 
-        <div style={{ maxWidth: '360px' }}>
+        <div style={{ maxWidth: '320px' }}>
           <h2
             style={{
-              fontSize: '18px',
+              fontSize: '15px',
               fontWeight: 800,
               color: 'var(--text-primary, #0f172a)',
-              margin: '0 0 8px 0',
+              margin: '0 0 6px 0',
               lineHeight: 1.3
             }}
           >
@@ -191,10 +191,10 @@ export default function CircularWebViewScreen() {
           </h2>
           <p
             style={{
-              fontSize: '13.5px',
+              fontSize: '12px',
               color: 'var(--text-secondary, #64748b)',
               margin: 0,
-              lineHeight: 1.6
+              lineHeight: 1.5
             }}
           >
             অফিসিয়াল আবেদন ফরম পূরণ ও ছবি/স্বাক্ষর আপলোড করতে নিচের বাটনে চাপ দিন।
@@ -207,28 +207,25 @@ export default function CircularWebViewScreen() {
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '10px',
-            width: '100%',
-            maxWidth: '280px',
-            padding: '14px 20px',
-            borderRadius: '16px',
+            gap: '8px',
+            width: 'auto',
+            minWidth: '180px',
+            maxWidth: '220px',
+            padding: '10px 18px',
+            borderRadius: '12px',
             background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
             color: '#ffffff',
-            fontSize: '15px',
+            fontSize: '13px',
             fontWeight: 700,
             border: 'none',
             cursor: 'pointer',
-            boxShadow: '0 6px 20px rgba(29, 78, 216, 0.35)',
+            boxShadow: '0 4px 14px rgba(29, 78, 216, 0.25)',
             transition: 'all 0.2s ease'
           }}
         >
           <span>{loading ? 'লোড হচ্ছে...' : 'আবেদন পোর্টালে যান'}</span>
-          <ExternalLink size={18} />
+          <ExternalLink size={15} />
         </button>
-
-        <span style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
-          🔒 অফিসিয়াল ও সুরক্ষিত সরকারি সার্ভার ({displayDomain})
-        </span>
       </div>
     </div>
   );

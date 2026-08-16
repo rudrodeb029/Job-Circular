@@ -44,7 +44,7 @@ export function isGoogleDriveUrl(url) {
 
 /**
  * Normalizes any image/PDF URL for direct rendering in <img>, <iframe>, or preview containers.
- * Converts Google Drive sharing links to high-res direct image CDN stream (lh3.googleusercontent.com/d/ID).
+ * Uses Google Drive's official high-resolution thumbnail generator for images and PDF documents.
  * 
  * @param {string} url - Raw URL entered by admin or stored in database
  * @returns {string} - Direct renderable URL
@@ -56,8 +56,8 @@ export function normalizeMediaUrl(url) {
 
   const driveId = getGoogleDriveFileId(trimmed);
   if (driveId) {
-    // High-resolution direct streaming endpoint for Google Drive files
-    return `https://lh3.googleusercontent.com/d/${driveId}`;
+    // Official Google Drive thumbnail stream (works for PDFs, JPEGs, PNGs, and scans)
+    return `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
   }
 
   return trimmed;
@@ -83,4 +83,54 @@ export function normalizeMediaUrls(mediaInput) {
     .map(u => (typeof u === 'string' ? u.trim() : ''))
     .filter(u => u.length > 0)
     .map(u => normalizeMediaUrl(u));
+}
+
+/**
+ * Extracts and cleans all raw circular media URLs from a job/exam/result object.
+ * Checks all possible properties (images, circularImages, circularImage, imageUrl, noticeUrl, noticeImage, pdfUrl, pdf).
+ * 
+ * @param {object} item - Job, Exam, or Result item
+ * @returns {string[]} - Array of raw URLs
+ */
+export function extractJobMediaList(item) {
+  if (!item || typeof item !== 'object') return [];
+  let rawList = [];
+
+  if (item.images && item.images.length > 0) {
+    if (Array.isArray(item.images)) {
+      rawList = item.images.filter(img => img && typeof img === 'string' && img.trim());
+    } else if (typeof item.images === 'string') {
+      rawList = item.images.split(',').map(img => img.trim()).filter(Boolean);
+    }
+  }
+
+  if (rawList.length === 0 && item.circularImages && item.circularImages.length > 0) {
+    rawList = Array.isArray(item.circularImages) ? item.circularImages : [item.circularImages];
+  }
+
+  if (rawList.length === 0 && item.circularImage && typeof item.circularImage === 'string' && item.circularImage.trim()) {
+    rawList = [item.circularImage];
+  }
+
+  if (rawList.length === 0 && item.imageUrl && typeof item.imageUrl === 'string' && item.imageUrl.trim()) {
+    rawList = [item.imageUrl];
+  }
+
+  if (rawList.length === 0 && item.noticeUrl && typeof item.noticeUrl === 'string' && item.noticeUrl.trim()) {
+    rawList = [item.noticeUrl];
+  }
+
+  if (rawList.length === 0 && item.noticeImage && typeof item.noticeImage === 'string' && item.noticeImage.trim()) {
+    rawList = [item.noticeImage];
+  }
+
+  if (rawList.length === 0 && item.pdfUrl && typeof item.pdfUrl === 'string' && item.pdfUrl.trim()) {
+    rawList = [item.pdfUrl];
+  }
+
+  if (rawList.length === 0 && item.pdf && typeof item.pdf === 'string' && item.pdf.trim()) {
+    rawList = [item.pdf];
+  }
+
+  return rawList.map(u => (typeof u === 'string' ? u.trim() : '')).filter(Boolean);
 }

@@ -6,7 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
-import { normalizeMediaUrls, getGoogleDriveFileId } from '../utils/mediaUtils';
+import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
@@ -73,24 +73,8 @@ export default function ResultDetails() {
 
   if (!job) return <NotFoundPage />;
 
-  let circularImages = [];
-  if (job.images && job.images.length > 0) {
-    if (Array.isArray(job.images)) {
-      circularImages = job.images.filter(img => img && img.trim());
-    } else if (typeof job.images === 'string') {
-      circularImages = job.images.split(',').map(img => img.trim()).filter(img => img);
-    }
-  }
-
-  if (circularImages.length === 0 && job.circularImages && job.circularImages.length > 0) {
-    circularImages = job.circularImages;
-  }
-
-  if (circularImages.length === 0 && job.circularImage && job.circularImage.trim()) {
-    circularImages = [job.circularImage];
-  }
-
-  circularImages = normalizeMediaUrls(circularImages);
+  const rawImagesList = extractJobMediaList(job);
+  const circularImages = normalizeMediaUrls(rawImagesList);
 
   const isSaved = state.savedJobs.includes(job.id);
   const isApplied = state.appliedJobs.includes(job.id);
@@ -268,15 +252,45 @@ export default function ResultDetails() {
               alt="Result Sheet Preview"
               onClick={() => setShowFullImage(!showFullImage)}
               onError={(e) => {
-                const rawSrc = circularImages[activeImageIndex] || '';
+                const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
                 const driveId = getGoogleDriveFileId(rawSrc);
-                if (driveId && !e.target.dataset.triedFallback) {
-                  e.target.dataset.triedFallback = 'true';
-                  e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+                const step = parseInt(e.target.dataset.fallbackStep || '0', 10);
+
+                if (driveId) {
+                  if (step === 0) {
+                    e.target.dataset.fallbackStep = '1';
+                    e.target.src = `https://lh3.googleusercontent.com/d/${driveId}`;
+                    return;
+                  }
+                  if (step === 1) {
+                    e.target.dataset.fallbackStep = '2';
+                    e.target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
+                    return;
+                  }
+                }
+
+                const isPdf = rawSrc.toLowerCase().includes('.pdf') || (driveId && step >= 2);
+                if (isPdf) {
+                  e.target.style.display = 'none';
+                  if (e.target.parentNode) {
+                    e.target.parentNode.innerHTML = `
+                      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;text-align:center;gap:10px;background:var(--bg-secondary)">
+                        <div style="width:50px;height:50px;border-radius:14px;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(220,38,38,0.15)">
+                          📄
+                        </div>
+                        <div style="font-size:14px;font-weight:800;color:var(--text-primary)">অফিসিয়াল ফলাফল নোটিশ পিডিএফ</div>
+                        <div style="font-size:11.5px;color:var(--text-secondary)">মূল ফাইলটি দেখতে বা ডাউনলোড করতে নিচে Download বাটনে চাপ দিন</div>
+                      </div>
+                    `;
+                  }
                   return;
                 }
+
                 e.target.onerror = null;
-                e.target.src = defaultNoticeImg;
+                e.target.style.display = 'none';
+                if (e.target.parentNode) {
+                  e.target.parentNode.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;background:var(--bg-secondary)"><div style="width:48px;height:48px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px">📷</div><span style="font-size:14px;font-weight:800;color:var(--text-secondary)">No Photo</span></div>';
+                }
               }}
               style={{
                 width: '100%',
