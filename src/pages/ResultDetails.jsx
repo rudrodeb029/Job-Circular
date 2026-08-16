@@ -96,10 +96,14 @@ export default function ResultDetails() {
   const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
 
   const handleViewResult = () => {
-    const link = job.examResult || job.applyLink;
-    if (link) {
-      window.open(link, '_blank');
-    }
+    const link = job.examResult || job.applyLink || 'https://alljobs.teletalk.com.bd';
+    navigate('/apply-webview', {
+      state: {
+        url: link,
+        title: orgName || titleName || (isEn ? 'Exam Result Portal' : 'পরীক্ষার ফলাফল পোর্টাল'),
+        jobId: job.id
+      }
+    });
   };
 
   const handleApplyClick = () => {

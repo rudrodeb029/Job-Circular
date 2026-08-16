@@ -98,10 +98,14 @@ export default function ExamDetails() {
   };
 
   const handleDownloadAdmitCard = () => {
-    const link = job.examLink || job.applyLink;
-    if (link) {
-      window.open(link, '_blank');
-    }
+    const link = job.examLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
+    navigate('/apply-webview', {
+      state: {
+        url: link,
+        title: orgName || titleName || (isEn ? 'Admit Card Download' : 'অ্যাডমিট কার্ড ডাউনলোড'),
+        jobId: job.id
+      }
+    });
   };
 
   return (

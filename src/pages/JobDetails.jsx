@@ -97,9 +97,14 @@ export default function JobDetails() {
   };
 
   const handleOfficialApply = () => {
-    if (job.applyLink) {
-      window.open(job.applyLink, '_blank');
-    }
+    const link = job.applyLink || 'https://alljobs.teletalk.com.bd';
+    navigate('/apply-webview', {
+      state: {
+        url: link,
+        title: orgName || titleName || (isEn ? 'Official Application' : 'সরকারি চাকরির আবেদন'),
+        jobId: job.id
+      }
+    });
   };
 
   return (
