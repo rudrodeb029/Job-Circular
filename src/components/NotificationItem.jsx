@@ -125,10 +125,10 @@ export default function NotificationItem({ notification }) {
         borderRadius: '4px 0 0 4px'
       }}></div>
 
-      {/* Header Row: Inline Icon + Title + Category Badge */}
+      {/* Header Row: Inline Icon + Title */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', gap: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
-          {/* Inline Icon directly before Title (Matching Image 1) */}
+          {/* Inline Icon directly before Title */}
           {notification.imageUrl ? (
             <img 
               src={notification.imageUrl} 
@@ -153,20 +153,6 @@ export default function NotificationItem({ notification }) {
             {orgName}
           </h4>
         </div>
-
-        {/* Type / Category Badge */}
-        <span style={{
-          fontSize: '10px',
-          fontWeight: 800,
-          padding: '3px 8px',
-          borderRadius: '8px',
-          background: config.chipBg,
-          color: config.chipColor,
-          whiteSpace: 'nowrap',
-          flexShrink: 0
-        }}>
-          {isEn ? config.labelEn : config.label}
-        </span>
       </div>
 
       {/* Notification Message */}
