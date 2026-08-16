@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
+import { downloadSecurely } from '../utils/downloadUtils';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
@@ -95,6 +96,19 @@ export default function ExamDetails() {
 
   const handleApplyClick = () => {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
+  };
+
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadNotice = async (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const currentUrl = circularImages[activeImageIndex] || job.imageUrl || job.circularImage;
+    if (!currentUrl) return;
+
+    setDownloading(true);
+    const fileName = `${orgName || titleName || 'Exam'}_Notice_Page_${activeImageIndex + 1}`;
+    await downloadSecurely(currentUrl, fileName);
+    setDownloading(false);
   };
 
   const handleDownloadAdmitCard = () => {
@@ -434,9 +448,10 @@ export default function ExamDetails() {
           )}
 
           <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
-            <a
-              href={circularImages[activeImageIndex]}
-              download={`${job.title || 'Job'}_Circular_Notice_Page_${activeImageIndex + 1}.png`}
+            <button
+              type="button"
+              disabled={downloading}
+              onClick={handleDownloadNotice}
               style={{
                 flex: 1,
                 display: 'flex',
@@ -450,15 +465,16 @@ export default function ExamDetails() {
                 fontWeight: 700,
                 fontSize: '12px',
                 border: '1.5px solid #dbeafe',
-                textDecoration: 'none',
                 boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
                 transition: 'all 0.2s ease',
                 textAlign: 'center',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                cursor: downloading ? 'wait' : 'pointer',
+                opacity: downloading ? 0.75 : 1
               }}
             >
-              <Download size={14} /> {state.language === 'en' ? 'Notice' : 'নোটিশ'} {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
-            </a>
+              <Download size={14} /> <span>{downloading ? (state.language === 'en' ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') : `${state.language === 'en' ? 'Notice' : 'নোটিশ'} ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}</span>
+            </button>
 
             <button
               onClick={handleDownloadAdmitCard}

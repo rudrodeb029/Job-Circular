@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
+import { downloadSecurely } from '../utils/downloadUtils';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
@@ -97,6 +98,19 @@ export default function JobDetails() {
 
   const handleApplyClick = () => {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
+  };
+
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadNotice = async (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const currentUrl = circularImages[activeImageIndex] || job.imageUrl || job.circularImage;
+    if (!currentUrl) return;
+
+    setDownloading(true);
+    const fileName = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
+    await downloadSecurely(currentUrl, fileName);
+    setDownloading(false);
   };
 
   const handleOfficialApply = (e) => {
@@ -435,7 +449,8 @@ export default function JobDetails() {
             <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
               <button
                 type="button"
-                onClick={() => setShowFullImage(prev => !prev)}
+                disabled={downloading}
+                onClick={handleDownloadNotice}
                 style={{
                   flex: 1,
                   display: 'flex',
@@ -451,11 +466,12 @@ export default function JobDetails() {
                   border: '1.5px solid #dbeafe',
                   boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
                   transition: 'all 0.15s ease',
-                  cursor: 'pointer',
-                  textAlign: 'center'
+                  cursor: downloading ? 'wait' : 'pointer',
+                  textAlign: 'center',
+                  opacity: downloading ? 0.75 : 1
                 }}
               >
-                <Eye size={14} /> {showFullImage ? 'Collapse Notice' : 'Notice'} {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
+                <Download size={14} /> <span>{downloading ? 'Downloading...' : `Notice ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}</span>
               </button>
 
               <button
