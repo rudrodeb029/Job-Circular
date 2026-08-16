@@ -1,19 +1,17 @@
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
+import { sanitizePortalUrl } from '../pages/CircularWebViewScreen';
 
 /**
  * Opens a URL in the native Android In-App Browser (Chrome Custom Tabs).
- * This completely bypasses X-Frame-Options/CORS blocks on government portals (Teletalk etc.)
- * and gives full file upload capabilities.
+ * Automatically sanitizes Teletalk and BD government domains to prevent NET::ERR_CERT_AUTHORITY_INVALID.
  * 
  * @param {string} url - Target URL
  * @param {Function} [onWebFallback] - Optional callback for web platform
  */
 export async function openInAppBrowser(url, onWebFallback) {
   if (!url) return;
-  const targetUrl = url.startsWith('http://') || url.startsWith('https://')
-    ? url
-    : `https://${url}`;
+  const targetUrl = sanitizePortalUrl(url);
 
   if (Capacitor.isNativePlatform()) {
     try {

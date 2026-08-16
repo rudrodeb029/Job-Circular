@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Base Config: Disable cleartext HTTP globally -->
-    <base-config cleartextTrafficPermitted="false">
+    <!-- Base Config: Allow cleartext HTTP for BD Govt & Teletalk job application portals -->
+    <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
             <certificates src="system" />
+            <certificates src="user" />
         </trust-anchors>
     </base-config>
 
@@ -13,8 +14,20 @@
         <domain includeSubdomains="true">googleapis.com</domain>
         <domain includeSubdomains="true">google.com</domain>
         <domain includeSubdomains="true">onesignal.com</domain>
+        <domain includeSubdomains="true">supabase.co</domain>
         <trust-anchors>
             <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+
+    <!-- Cleartext & Government Domain Config -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">teletalk.com.bd</domain>
+        <domain includeSubdomains="true">gov.bd</domain>
+        <domain includeSubdomains="true">alljobs.com.bd</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
         </trust-anchors>
     </domain-config>
 </network-security-config>

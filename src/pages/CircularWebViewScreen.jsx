@@ -4,6 +4,28 @@ import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 
+// Smart URL Formatter: BD Govt / Teletalk subdomains fail on HTTPS with ERR_CERT_AUTHORITY_INVALID, but work on HTTP
+export function sanitizePortalUrl(inputUrl) {
+  if (!inputUrl || typeof inputUrl !== 'string') return 'http://alljobs.teletalk.com.bd';
+  let clean = inputUrl.trim();
+
+  if (clean.includes('teletalk.com.bd')) {
+    if (clean.startsWith('https://')) {
+      return clean.replace('https://', 'http://');
+    }
+    if (!clean.startsWith('http://')) {
+      return `http://${clean}`;
+    }
+    return clean;
+  }
+
+  if (clean.startsWith('http://') || clean.startsWith('https://')) {
+    return clean;
+  }
+
+  return `https://${clean}`;
+}
+
 export default function CircularWebViewScreen() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -11,12 +33,9 @@ export default function CircularWebViewScreen() {
 
   // Extract dynamic apply URL & Title from router state or query parameters
   const queryParams = new URLSearchParams(location.search);
-  const rawUrl = location.state?.url || queryParams.get('url') || 'https://alljobs.teletalk.com.bd';
+  const rawUrl = location.state?.url || queryParams.get('url') || 'http://alljobs.teletalk.com.bd';
 
-  // Ensure URL has http/https protocol
-  const targetUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
-    ? rawUrl
-    : `https://${rawUrl}`;
+  const targetUrl = sanitizePortalUrl(rawUrl);
 
   // Extract clean domain for the Chrome-style URL bar
   let displayDomain = 'alljobs.teletalk.com.bd';
