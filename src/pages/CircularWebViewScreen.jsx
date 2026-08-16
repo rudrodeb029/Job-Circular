@@ -47,44 +47,14 @@ export default function CircularWebViewScreen() {
   }
 
   const [loading, setLoading] = useState(true);
-  const [iframeBlocked, setIframeBlocked] = useState(false);
 
-  // In native Android app, open native Chrome Custom Tab directly (Bypasses X-Frame-Options)
   useEffect(() => {
-    let isMounted = true;
-
-    async function launchNativeBrowser() {
-      if (Capacitor.isNativePlatform()) {
-        try {
-          await Browser.open({
-            url: targetUrl,
-            toolbarColor: '#ffffff',
-            presentationStyle: 'popover'
-          });
-
-          // When the user closes the native in-app browser tab, return to previous app screen
-          const listener = await Browser.addListener('browserFinished', () => {
-            if (isMounted) navigate(-1);
-          });
-
-          return () => {
-            if (listener) listener.remove();
-          };
-        } catch (err) {
-          console.warn('Native Browser.open failed:', err);
-        }
-      }
-    }
-
-    launchNativeBrowser();
-
-    // Web iframe load timeout check
+    // Safety loading timeout for in-app frame
     const timer = setTimeout(() => {
-      if (isMounted) setLoading(false);
-    }, 2500);
+      setLoading(false);
+    }, 2000);
 
     return () => {
-      isMounted = false;
       clearTimeout(timer);
       if (iframeRef.current) {
         try {
@@ -92,30 +62,27 @@ export default function CircularWebViewScreen() {
         } catch (err) {}
       }
     };
-  }, [targetUrl, navigate]);
+  }, [targetUrl]);
 
   const handleRefresh = () => {
     setLoading(true);
-    setIframeBlocked(false);
-    if (Capacitor.isNativePlatform()) {
-      Browser.open({
-        url: targetUrl,
-        toolbarColor: '#ffffff',
-        presentationStyle: 'popover'
-      });
-    } else if (iframeRef.current) {
+    if (iframeRef.current) {
       iframeRef.current.src = targetUrl;
     }
     setTimeout(() => setLoading(false), 1500);
   };
 
-  const handleOpenExternal = () => {
+  const handleOpenExternal = async () => {
     if (Capacitor.isNativePlatform()) {
-      Browser.open({
-        url: targetUrl,
-        toolbarColor: '#ffffff',
-        presentationStyle: 'popover'
-      });
+      try {
+        await Browser.open({
+          url: targetUrl,
+          toolbarColor: '#ffffff',
+          presentationStyle: 'popover'
+        });
+      } catch (e) {
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
+      }
     } else {
       window.open(targetUrl, '_blank', 'noopener,noreferrer');
     }
@@ -210,7 +177,7 @@ export default function CircularWebViewScreen() {
         </div>
       )}
 
-      {/* 2. In-App WebView & Government Security Fallback Container */}
+      {/* 2. In-App Direct WebView Screen Container */}
       <div
         style={{
           flex: 1,
@@ -261,10 +228,7 @@ export default function CircularWebViewScreen() {
           src={targetUrl}
           title="Application Portal"
           onLoad={() => setLoading(false)}
-          onError={() => {
-            setLoading(false);
-            setIframeBlocked(true);
-          }}
+          onError={() => setLoading(false)}
           allow="camera; microphone; geolocation; storage-access; fullscreen; clipboard-read; clipboard-write"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
           style={{
@@ -274,43 +238,6 @@ export default function CircularWebViewScreen() {
             display: 'block'
           }}
         />
-
-        {/* Fast Fallback Overlay for X-Frame-Options Protected Government Sites on Web */}
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '24px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            zIndex: 40,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}
-        >
-          <button
-            onClick={handleOpenExternal}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 24px',
-              borderRadius: '28px',
-              background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
-              color: '#ffffff',
-              fontSize: '13.5px',
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-              boxShadow: '0 6px 20px rgba(29, 78, 216, 0.4)',
-              transition: 'all 0.2s ease',
-              whiteSpace: 'nowrap'
-            }}
-          >
-            <span>পোর্টালে যান</span>
-            <ExternalLink size={16} />
-          </button>
-        </div>
       </div>
 
       <style>{`
