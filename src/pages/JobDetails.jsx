@@ -71,24 +71,24 @@ export default function JobDetails() {
 
   if (!job) return <NotFoundPage />;
 
-  let circularImages = [];
+  let rawImagesList = [];
   if (job.images && job.images.length > 0) {
     if (Array.isArray(job.images)) {
-      circularImages = job.images.filter(img => img && img.trim());
+      rawImagesList = job.images.filter(img => img && img.trim());
     } else if (typeof job.images === 'string') {
-      circularImages = job.images.split(',').map(img => img.trim()).filter(img => img);
+      rawImagesList = job.images.split(',').map(img => img.trim()).filter(img => img);
     }
   }
 
-  if (circularImages.length === 0 && job.circularImages && job.circularImages.length > 0) {
-    circularImages = job.circularImages;
+  if (rawImagesList.length === 0 && job.circularImages && job.circularImages.length > 0) {
+    rawImagesList = Array.isArray(job.circularImages) ? job.circularImages : [job.circularImages];
   }
 
-  if (circularImages.length === 0 && job.circularImage && job.circularImage.trim()) {
-    circularImages = [job.circularImage];
+  if (rawImagesList.length === 0 && job.circularImage && job.circularImage.trim()) {
+    rawImagesList = [job.circularImage];
   }
 
-  circularImages = normalizeMediaUrls(circularImages);
+  const circularImages = normalizeMediaUrls(rawImagesList);
 
   const isSaved = state.savedJobs.includes(job.id);
   const isApplied = state.appliedJobs.includes(job.id);
@@ -107,12 +107,12 @@ export default function JobDetails() {
 
   const handleDownloadNotice = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
-    const currentUrl = circularImages[activeImageIndex] || job.imageUrl || job.circularImage;
-    if (!currentUrl) return;
+    const rawFileUrl = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || job.imageUrl || job.circularImage;
+    if (!rawFileUrl) return;
 
     setDownloading(true);
     const fileName = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
-    await downloadSecurely(currentUrl, fileName);
+    await downloadSecurely(rawFileUrl, fileName);
     setDownloading(false);
   };
 
