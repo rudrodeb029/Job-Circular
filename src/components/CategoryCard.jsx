@@ -61,7 +61,7 @@ export default function CategoryCard({ category }) {
           alignItems: 'center',
           gap: '8px'
         }}>
-          <span style={{ fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>{category.icon}</span>
+          <span style={{ fontSize: '15px', lineHeight: 1, flexShrink: 0 }}>{category.icon}</span>
           <span>{category.name}</span>
         </h4>
         <span style={{

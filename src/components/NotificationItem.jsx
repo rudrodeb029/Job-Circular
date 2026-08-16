@@ -133,10 +133,10 @@ export default function NotificationItem({ notification }) {
             <img 
               src={notification.imageUrl} 
               alt="" 
-              style={{ width: '22px', height: '22px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
+              style={{ width: '18px', height: '18px', borderRadius: '4px', objectFit: 'cover', flexShrink: 0 }}
             />
           ) : (
-            <span style={{ fontSize: '18px', lineHeight: 1, flexShrink: 0 }}>
+            <span style={{ fontSize: '15px', lineHeight: 1, flexShrink: 0 }}>
               {getNotifIcon()}
             </span>
           )}
