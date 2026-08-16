@@ -102,7 +102,7 @@ export default function JobDetails() {
 
   const handleOfficialApply = (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    const link = job.applyLink || 'https://alljobs.teletalk.com.bd';
+    const link = job.applyLink || job.applicationLink || job.link || job.circularLink || job.url || 'http://alljobs.teletalk.com.bd';
     navigate('/apply-webview', {
       state: {
         url: link,

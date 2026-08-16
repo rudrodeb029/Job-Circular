@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
 import { Browser } from '@capacitor/browser';
@@ -48,13 +48,14 @@ export default function CircularWebViewScreen() {
 
   const [loading, setLoading] = useState(false);
 
+  // Opens the circular application link in Chrome Tab / Native In-App Browser
   const openPortal = async () => {
     setLoading(true);
     if (Capacitor.isNativePlatform()) {
       try {
         await Browser.open({
           url: targetUrl,
-          toolbarColor: '#ffffff',
+          toolbarColor: '#1d4ed8',
           presentationStyle: 'popover'
         });
       } catch (err) {
@@ -64,13 +65,8 @@ export default function CircularWebViewScreen() {
     } else {
       window.open(targetUrl, '_blank', 'noopener,noreferrer');
     }
-    setTimeout(() => setLoading(false), 800);
+    setTimeout(() => setLoading(false), 600);
   };
-
-  useEffect(() => {
-    // Auto-launch the clean in-app portal once on mount
-    openPortal();
-  }, [targetUrl]);
 
   return (
     <div
@@ -101,7 +97,7 @@ export default function CircularWebViewScreen() {
           <ArrowLeft size={22} />
         </button>
 
-        {/* Chrome-Style Rounded URL Address Bar */}
+        {/* Chrome-Style Rounded URL Address Bar (Clickable) */}
         <div
           onClick={openPortal}
           style={{
