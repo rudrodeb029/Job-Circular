@@ -118,18 +118,22 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
 
   const isSaved = state.savedJobs.includes(job.id);
   const isApplied = state.appliedJobs.includes(job.id);
-  const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
-  const displayIcon = job.icon || orgIconsMap[job.organization] || styleConfig.defaultIcon;
+  const rawIcon = job.icon || (typeof job.organization === 'string' ? orgIconsMap[job.organization] : null) || styleConfig.defaultIcon;
+  const displayIcon = (typeof rawIcon === 'string' || typeof rawIcon === 'number') ? String(rawIcon) : (styleConfig.defaultIcon || '🏛️');
 
   const isEn = state.language === 'en';
-  const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
-  const titleName = isEn ? (job.titleEn || job.title) : job.title;
+  const rawOrg = isEn ? (job.organizationEn || job.organization) : job.organization;
+  const orgName = typeof rawOrg === 'string' ? rawOrg : (rawOrg && typeof rawOrg === 'object' ? (rawOrg.bn || rawOrg.en || rawOrg.name || '') : String(rawOrg || ''));
+
+  const rawTitle = isEn ? (job.titleEn || job.title) : job.title;
+  const titleName = typeof rawTitle === 'string' ? rawTitle : (rawTitle && typeof rawTitle === 'object' ? (rawTitle.bn || rawTitle.en || rawTitle.title || '') : String(rawTitle || ''));
   
   const descriptionSentence = isEn
     ? `Recruitment notice published for the post of ${titleName}${job.vacancy ? ` (${job.vacancy} vacancies)` : ''}. Apply today!`
     : `${titleName} পদে ${job.vacancy ? `${toBengaliNumber(job.vacancy)} জনের ` : ''}নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে। আজই আবেদন করুন।`;
 
-  const displayDesc = job.description || descriptionSentence;
+  const rawDesc = job.description || descriptionSentence;
+  const displayDesc = typeof rawDesc === 'string' ? rawDesc : (rawDesc && typeof rawDesc === 'object' ? (rawDesc.bn || rawDesc.en || '') : String(rawDesc || ''));
 
   const handleBookmark = (e) => {
     e.stopPropagation();

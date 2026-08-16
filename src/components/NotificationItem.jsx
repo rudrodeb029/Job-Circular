@@ -84,16 +84,21 @@ function NotificationItem({ notification }) {
 
   const config = notifTypeConfig[notification.type] || notifTypeConfig.new_job;
 
-  const orgName = isEn 
+  const rawOrg = isEn 
     ? (notification.organizationEn || notification.organization || notification.titleEn || notification.title) 
     : (notification.organization || notification.title || notification.organizationEn || notification.titleEn);
 
-  const notifMessage = isEn ? (notification.messageEn || notification.message) : notification.message;
+  const orgName = typeof rawOrg === 'string' ? rawOrg : (rawOrg && typeof rawOrg === 'object' ? (rawOrg.bn || rawOrg.en || rawOrg.name || '') : String(rawOrg || ''));
+
+  const rawMsg = isEn ? (notification.messageEn || notification.message) : notification.message;
+  const notifMessage = typeof rawMsg === 'string' ? rawMsg : (rawMsg && typeof rawMsg === 'object' ? (rawMsg.bn || rawMsg.en || '') : String(rawMsg || ''));
 
   const getNotifIcon = () => {
     if (orgName && orgIconsMap[orgName]) return orgIconsMap[orgName];
-    if (notification.organization && orgIconsMap[notification.organization]) return orgIconsMap[notification.organization];
-    return config.icon || '🏛️';
+    if (notification.organization && typeof notification.organization === 'string' && orgIconsMap[notification.organization]) {
+      return orgIconsMap[notification.organization];
+    }
+    return (config && typeof config.icon === 'string') ? config.icon : '🏛️';
   };
 
   return (
