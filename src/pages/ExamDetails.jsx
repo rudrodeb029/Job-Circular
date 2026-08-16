@@ -275,47 +275,36 @@ export default function ExamDetails() {
               src={circularImages[activeImageIndex]}
               alt={`Circular Notice Page ${activeImageIndex + 1}`}
               onClick={() => setShowFullImage(!showFullImage)}
-              onError={(e) => {
-                const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
-                const driveId = getGoogleDriveFileId(rawSrc);
-                const step = parseInt(e.target.dataset.fallbackStep || '0', 10);
+                onError={(e) => {
+                  const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
+                  const driveId = getGoogleDriveFileId(rawSrc);
+                  const step = parseInt(e.target.dataset.fallbackStep || '0', 10);
 
-                if (driveId) {
-                  if (step === 0) {
+                  if (driveId) {
+                    if (step === 0) {
+                      e.target.dataset.fallbackStep = '1';
+                      e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+                      return;
+                    }
+                    if (step === 1) {
+                      e.target.dataset.fallbackStep = '2';
+                      e.target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
+                      return;
+                    }
+                  }
+
+                  if (rawSrc.includes('cloudinary.com') && step === 0) {
                     e.target.dataset.fallbackStep = '1';
-                    e.target.src = `https://lh3.googleusercontent.com/d/${driveId}`;
+                    e.target.src = rawSrc.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg');
                     return;
                   }
-                  if (step === 1) {
-                    e.target.dataset.fallbackStep = '2';
-                    e.target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
-                    return;
-                  }
-                }
 
-                const isPdf = rawSrc.toLowerCase().includes('.pdf') || (driveId && step >= 2);
-                if (isPdf) {
+                  e.target.onerror = null;
                   e.target.style.display = 'none';
                   if (e.target.parentNode) {
-                    e.target.parentNode.innerHTML = `
-                      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;text-align:center;gap:10px;background:var(--bg-secondary)">
-                        <div style="width:50px;height:50px;border-radius:14px;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(220,38,38,0.15)">
-                          📄
-                        </div>
-                        <div style="font-size:14px;font-weight:800;color:var(--text-primary)">অফিসিয়াল পরীক্ষার নোটিশ পিডিএফ</div>
-                        <div style="font-size:11.5px;color:var(--text-secondary)">মূল ফাইলটি দেখতে বা ডাউনলোড করতে নিচে Notice বাটনে চাপ দিন</div>
-                      </div>
-                    `;
+                    e.target.parentNode.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;background:var(--bg-secondary)"><div style="width:48px;height:48px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px">📷</div><span style="font-size:14px;font-weight:800;color:var(--text-secondary)">No Photo</span></div>';
                   }
-                  return;
-                }
-
-                e.target.onerror = null;
-                e.target.style.display = 'none';
-                if (e.target.parentNode) {
-                  e.target.parentNode.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;background:var(--bg-secondary)"><div style="width:48px;height:48px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px">📷</div><span style="font-size:14px;font-weight:800;color:var(--text-secondary)">No Photo</span></div>';
-                }
-              }}
+                }}
               style={{
                 width: '100%',
                 maxHeight: showFullImage ? 'none' : '380px',

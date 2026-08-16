@@ -259,7 +259,7 @@ export default function ResultDetails() {
                 if (driveId) {
                   if (step === 0) {
                     e.target.dataset.fallbackStep = '1';
-                    e.target.src = `https://lh3.googleusercontent.com/d/${driveId}`;
+                    e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
                     return;
                   }
                   if (step === 1) {
@@ -269,20 +269,9 @@ export default function ResultDetails() {
                   }
                 }
 
-                const isPdf = rawSrc.toLowerCase().includes('.pdf') || (driveId && step >= 2);
-                if (isPdf) {
-                  e.target.style.display = 'none';
-                  if (e.target.parentNode) {
-                    e.target.parentNode.innerHTML = `
-                      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;text-align:center;gap:10px;background:var(--bg-secondary)">
-                        <div style="width:50px;height:50px;border-radius:14px;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(220,38,38,0.15)">
-                          📄
-                        </div>
-                        <div style="font-size:14px;font-weight:800;color:var(--text-primary)">অফিসিয়াল ফলাফল নোটিশ পিডিএফ</div>
-                        <div style="font-size:11.5px;color:var(--text-secondary)">মূল ফাইলটি দেখতে বা ডাউনলোড করতে নিচে Download বাটনে চাপ দিন</div>
-                      </div>
-                    `;
-                  }
+                if (rawSrc.includes('cloudinary.com') && step === 0) {
+                  e.target.dataset.fallbackStep = '1';
+                  e.target.src = rawSrc.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg');
                   return;
                 }
 

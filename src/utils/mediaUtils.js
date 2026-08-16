@@ -43,31 +43,37 @@ export function isGoogleDriveUrl(url) {
 }
 
 /**
- * Normalizes any image/PDF URL for direct rendering in <img>, <iframe>, or preview containers.
- * Uses Google Drive's official high-resolution thumbnail generator for images and PDF documents.
+ * Normalizes any image/PDF URL for direct snapshot rendering in <img> tags.
+ * - Google Drive: Returns direct CDN image stream (lh3.googleusercontent.com/d/ID)
+ * - Cloudinary PDF: Automatically transforms .pdf to .jpg snapshot of page 1
  * 
  * @param {string} url - Raw URL entered by admin or stored in database
- * @returns {string} - Direct renderable URL
+ * @returns {string} - Direct image snapshot URL
  */
 export function normalizeMediaUrl(url) {
   if (!url || typeof url !== 'string') return '';
   const trimmed = url.trim();
   if (!trimmed) return '';
 
+  // 1. Google Drive: High-res direct CDN snapshot
   const driveId = getGoogleDriveFileId(trimmed);
   if (driveId) {
-    // Official Google Drive thumbnail stream (works for PDFs, JPEGs, PNGs, and scans)
-    return `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+    return `https://lh3.googleusercontent.com/d/${driveId}`;
+  }
+
+  // 2. Cloudinary PDF: Convert to high-quality JPG snapshot of page 1
+  if (trimmed.includes('cloudinary.com') && (trimmed.toLowerCase().endsWith('.pdf') || trimmed.toLowerCase().includes('.pdf?'))) {
+    return trimmed.replace(/\.pdf(\?.*)?$/i, '.jpg$1');
   }
 
   return trimmed;
 }
 
 /**
- * Normalizes an array or comma-separated string of media URLs.
+ * Normalizes an array or comma-separated string of media URLs into snapshot URLs.
  * 
  * @param {string|string[]} mediaInput - Comma-separated string or array of URLs
- * @returns {string[]} - Array of cleaned, normalized direct URLs
+ * @returns {string[]} - Array of direct image snapshot URLs
  */
 export function normalizeMediaUrls(mediaInput) {
   if (!mediaInput) return [];
