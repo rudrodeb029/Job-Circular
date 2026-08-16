@@ -3,7 +3,6 @@ import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { App as CapacitorApp } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
-import SplashScreen from './pages/SplashScreen'
 import VersionUpdateModal from './components/VersionUpdateModal'
 import ErrorBoundary from './components/ErrorBoundary'
 import { initializePushNotifications } from './utils/notifications'
@@ -163,7 +162,7 @@ function App() {
     <ErrorBoundary>
       <div className="container" data-theme={state.theme}>
         <Routes location={location}>
-          <Route path="/" element={<SplashScreen />} />
+          <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/home" element={<Home />} />
           <Route path="/job/:id" element={<JobDetails />} />
