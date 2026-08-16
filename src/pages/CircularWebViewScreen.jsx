@@ -11,7 +11,7 @@ export default function CircularWebViewScreen() {
   // Extract dynamic apply URL & Title from router state or query parameters
   const queryParams = new URLSearchParams(location.search);
   const rawUrl = location.state?.url || queryParams.get('url') || 'https://alljobs.teletalk.com.bd';
-  const title = location.state?.title || queryParams.get('title') || 'সরকারি চাকরির আবেদন পোর্টাল';
+  const title = location.state?.title || queryParams.get('title') || 'অনলাইন আবেদন পোর্টাল';
 
   // Ensure URL has http/https protocol
   const targetUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
@@ -19,16 +19,8 @@ export default function CircularWebViewScreen() {
     : `https://${rawUrl}`;
 
   const [loading, setLoading] = useState(true);
-  const [domainName, setDomainName] = useState('');
 
   useEffect(() => {
-    try {
-      const parsed = new URL(targetUrl);
-      setDomainName(parsed.hostname.replace(/^www\./, ''));
-    } catch (e) {
-      setDomainName('teletalk.com.bd');
-    }
-
     // Safety loading timeout
     const timer = setTimeout(() => {
       setLoading(false);
@@ -64,123 +56,45 @@ export default function CircularWebViewScreen() {
         flexDirection: 'column',
         height: '100dvh',
         minHeight: '100vh',
-        backgroundColor: '#ffffff',
+        backgroundColor: 'var(--bg-primary, #ffffff)',
         overflow: 'hidden',
         position: 'relative'
       }}
     >
-      {/* 1. In-App Browser Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: 'calc(var(--safe-area-top) + 6px) 12px 8px 12px',
-          background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-          color: '#ffffff',
-          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.15)',
-          zIndex: 50,
-          flexShrink: 0
-        }}
-      >
-        {/* Back Button */}
-        <button
-          onClick={() => navigate(-1)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.12)',
-            color: '#ffffff',
-            border: 'none',
-            cursor: 'pointer',
-            flexShrink: 0
-          }}
-          title="Back"
-        >
-          <ArrowLeft size={20} />
+      {/* 1. Native App Header (Matching JobDetails & App Theme) */}
+      <div className="page-header" style={{ position: 'relative', flexShrink: 0 }}>
+        <button className="back-btn" onClick={() => navigate(-1)} title="Back">
+          <ArrowLeft size={22} />
         </button>
 
-        {/* Website Title & SSL Indicator */}
-        <div style={{ flex: 1, minWidth: 0, padding: '0 10px', textAlign: 'center' }}>
-          <div
-            style={{
-              fontSize: '13.5px',
-              fontWeight: 700,
-              color: '#ffffff',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
-            }}
-          >
-            {title}
-          </div>
-          <div
-            style={{
-              fontSize: '10px',
-              color: '#94a3b8',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '4px',
-              marginTop: '1px'
-            }}
-          >
-            <span style={{ color: '#10b981', fontSize: '11px' }}>🔒</span>
-            <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '180px' }}>
-              {domainName}
-            </span>
-          </div>
-        </div>
+        <h1
+          style={{
+            flex: 1,
+            minWidth: 0,
+            fontSize: '15px',
+            fontWeight: 800,
+            color: 'var(--text-primary)',
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }}
+        >
+          {title}
+        </h1>
 
-        {/* Action Buttons: Refresh & External Direct Open */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
-          <button
-            onClick={handleRefresh}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '34px',
-              height: '34px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.12)',
-              color: '#ffffff',
-              border: 'none',
-              cursor: 'pointer'
-            }}
-            title="Refresh"
-          >
-            <RefreshCw size={15} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+          <button className="back-btn" onClick={handleRefresh} title="Refresh">
+            <RefreshCw size={19} />
           </button>
-
-          <button
-            onClick={handleOpenExternal}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '34px',
-              height: '34px',
-              borderRadius: '50%',
-              background: 'rgba(37, 99, 235, 0.3)',
-              color: '#60a5fa',
-              border: '1px solid rgba(96, 165, 250, 0.4)',
-              cursor: 'pointer'
-            }}
-            title="Open in External Browser"
-          >
-            <ExternalLink size={15} />
+          <button className="back-btn" onClick={handleOpenExternal} title="Open in Browser">
+            <ExternalLink size={19} />
           </button>
         </div>
       </div>
 
       {/* Progress Bar while loading */}
       {loading && (
-        <div style={{ width: '100%', height: '3px', background: '#e2e8f0', overflow: 'hidden', zIndex: 60 }}>
+        <div style={{ width: '100%', height: '2.5px', background: 'var(--border-light, #e2e8f0)', overflow: 'hidden', zIndex: 60 }}>
           <div
             style={{
               width: '100%',
@@ -192,7 +106,7 @@ export default function CircularWebViewScreen() {
         </div>
       )}
 
-      {/* 2. Main WebView Container */}
+      {/* 2. Seamless In-App WebView Container */}
       <div
         style={{
           flex: 1,
@@ -200,7 +114,7 @@ export default function CircularWebViewScreen() {
           width: '100%',
           height: '100%',
           overflow: 'hidden',
-          backgroundColor: '#ffffff'
+          backgroundColor: 'var(--bg-primary, #ffffff)'
         }}
       >
         {/* Loading Spinner */}
@@ -216,22 +130,22 @@ export default function CircularWebViewScreen() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'rgba(255, 255, 255, 0.96)',
+              background: 'rgba(255, 255, 255, 0.95)',
               zIndex: 30,
               gap: '12px'
             }}
           >
             <div
               style={{
-                width: '38px',
-                height: '38px',
-                border: '3.5px solid #e2e8f0',
-                borderTopColor: '#2563eb',
+                width: '36px',
+                height: '36px',
+                border: '3px solid #e2e8f0',
+                borderTopColor: 'var(--primary, #2563eb)',
                 borderRadius: '50%',
                 animation: 'spin 0.8s linear infinite'
               }}
             />
-            <span style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>
+            <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary, #64748b)' }}>
               আবেদন পেজটি লোড হচ্ছে...
             </span>
           </div>
@@ -241,7 +155,7 @@ export default function CircularWebViewScreen() {
         <iframe
           ref={iframeRef}
           src={targetUrl}
-          title="Official Application Portal"
+          title="Application Portal"
           onLoad={() => setLoading(false)}
           onError={() => setLoading(false)}
           allow="camera; microphone; geolocation; storage-access; fullscreen; clipboard-read; clipboard-write"
