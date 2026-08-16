@@ -50,34 +50,19 @@ export default function CategoryCard({ category }) {
         cursor: 'pointer'
       }}
     >
-      {/* Glossy 3D Gradient Icon Badge Tile */}
-      <div
-        style={{
-          width: '42px',
-          height: '42px',
-          borderRadius: '12px',
-          background: theme.bg,
-          boxShadow: `0 6px 16px ${theme.shadow}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '20px',
-          color: 'white',
-          flexShrink: 0
-        }}
-      >
-        {category.icon}
-      </div>
-
-      {/* Category Info */}
+      {/* Category Info with Inline Icon */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <h4 style={{
           fontSize: '15px',
           fontWeight: 700,
           color: 'var(--text-primary)',
-          marginBottom: '4px'
+          marginBottom: '4px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
         }}>
-          {category.name}
+          <span style={{ fontSize: '20px', lineHeight: 1, flexShrink: 0 }}>{category.icon}</span>
+          <span>{category.name}</span>
         </h4>
         <span style={{
           display: 'inline-block',
