@@ -118,6 +118,7 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
 
   const isSaved = state.savedJobs.includes(job.id);
   const isApplied = state.appliedJobs.includes(job.id);
+  const styleConfig = categoryStyles[job.category] || categoryStyles[job.categoryId] || categoryStyles.gov;
   const rawIcon = job.icon || (typeof job.organization === 'string' ? orgIconsMap[job.organization] : null) || styleConfig.defaultIcon;
   const displayIcon = (typeof rawIcon === 'string' || typeof rawIcon === 'number') ? String(rawIcon) : (styleConfig.defaultIcon || '🏛️');
 
