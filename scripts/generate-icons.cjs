@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 
-const SOURCE_ICON = 'C:\\Users\\Suvro\\Downloads\\finalappicon.png';
+const SOURCE_ICON = 'C:\\Users\\Suvro\\Downloads\\Untitled design (9).png';
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const RES_DIR = path.join(PROJECT_ROOT, 'android', 'app', 'src', 'main', 'res');
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
@@ -72,7 +72,7 @@ async function generateIcons() {
     console.log('✔ Generated drawable/ic_launcher_foreground.png');
   }
 
-  console.log('🎉 All Android and Web app icons generated successfully from finalappicon.png!');
+  console.log('🎉 All Android and Web app icons generated successfully from Untitled design (9).png!');
 }
 
 generateIcons().catch(err => {
