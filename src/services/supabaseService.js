@@ -232,6 +232,64 @@ const sanitizePayload = (collectionName, docId, data) => {
   return sanitized;
 };
 
+// ─── Instant Real-time Broadcast System (0 DB Egress) ───────────
+let globalBroadcastChannel = null;
+
+const getBroadcastChannel = () => {
+  if (!globalBroadcastChannel) {
+    globalBroadcastChannel = supabase.channel('global_app_updates', {
+      config: { broadcast: { self: true } }
+    });
+    globalBroadcastChannel.subscribe();
+  }
+  return globalBroadcastChannel;
+};
+
+/**
+ * Broadcasts an instant update signal to all candidate app devices (< 100ms, 0 DB egress)
+ */
+export const broadcastAppUpdate = (collectionName) => {
+  try {
+    const channel = getBroadcastChannel();
+    channel.send({
+      type: 'broadcast',
+      event: 'CONTENT_PUBLISHED',
+      payload: { collection: collectionName, timestamp: Date.now() }
+    });
+  } catch (e) {
+    console.warn('Failed to broadcast app update signal:', e);
+  }
+};
+
+/**
+ * Subscribes candidate app devices to real-time instant update signals (0 DB egress)
+ */
+export const subscribeToAppUpdates = (callback) => {
+  try {
+    const channel = supabase.channel(`client_broadcast_${Math.random().toString(36).substr(2, 5)}`, {
+      config: { broadcast: { ack: false } }
+    });
+
+    channel
+      .on('broadcast', { event: 'CONTENT_PUBLISHED' }, (payload) => {
+        if (payload?.payload?.collection) {
+          clearCollectionCache(payload.payload.collection);
+          callback(payload.payload.collection);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      try {
+        supabase.removeChannel(channel);
+      } catch (e) {}
+    };
+  } catch (err) {
+    console.warn('Failed to subscribe to app update broadcast:', err);
+    return () => {};
+  }
+};
+
 /**
  * Insert a new document
  */
@@ -248,6 +306,7 @@ export const addDocument = async (collectionName, data) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    broadcastAppUpdate(collectionName);
     return normalizeDoc(inserted || payload);
   } catch (error) {
     console.error(`Error adding to ${collectionName}:`, error);
@@ -269,6 +328,7 @@ export const setDocument = async (collectionName, docId, data) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    broadcastAppUpdate(collectionName);
     return normalizeDoc(upserted || payload);
   } catch (error) {
     console.error(`Error setting ${collectionName}/${docId}:`, error);
@@ -290,6 +350,7 @@ export const updateDocument = async (collectionName, docId, updates) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    broadcastAppUpdate(collectionName);
     return normalizeDoc(updated || payload);
   } catch (error) {
     console.error(`Error updating ${collectionName}/${docId}:`, error);
@@ -309,6 +370,7 @@ export const deleteDocument = async (collectionName, docId) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    broadcastAppUpdate(collectionName);
     return true;
   } catch (error) {
     console.error(`Error deleting ${collectionName}/${docId}:`, error);
@@ -367,6 +429,7 @@ export const batchSetDocuments = async (collectionName, items) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    broadcastAppUpdate(collectionName);
     return true;
   } catch (error) {
     console.error(`Batch write error on ${collectionName}:`, error);

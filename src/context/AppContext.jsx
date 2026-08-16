@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { setDocument, COLLECTIONS } from '../services/supabaseService';
+import { setDocument, subscribeToAppUpdates, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
 
 const AppContext = createContext();
 
@@ -130,6 +130,18 @@ export function AppProvider({ children }) {
       localStorage.setItem('installTime', state.installTime);
     }
     document.documentElement.setAttribute('data-theme', state.theme);
+
+    // Instant Realtime Broadcast Sync (0 DB Egress)
+    // Instantly invalidates local cache and notifies candidate components when Admin publishes anything
+    const unsubscribe = subscribeToAppUpdates((collectionName) => {
+      clearCollectionCache(collectionName);
+      window.dispatchEvent(new CustomEvent(`${collectionName}_updated`));
+      window.dispatchEvent(new CustomEvent('app_content_updated', { detail: { collectionName } }));
+    });
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, [state.theme, state.installTime]);
 
   return (
