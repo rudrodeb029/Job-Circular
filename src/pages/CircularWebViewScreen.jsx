@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 
 export default function CircularWebViewScreen() {
   const location = useLocation();
@@ -17,24 +19,53 @@ export default function CircularWebViewScreen() {
     : `https://${rawUrl}`;
 
   // Extract clean domain for the Chrome-style URL bar
-  let displayDomain = 'bdgovt.info';
+  let displayDomain = 'alljobs.teletalk.com.bd';
   try {
     const parsed = new URL(targetUrl);
     displayDomain = parsed.hostname.replace(/^www\./, '');
   } catch (e) {
-    displayDomain = targetUrl.replace(/^https?:\/\//, '').split('/')[0] || 'bdgovt.info';
+    displayDomain = targetUrl.replace(/^https?:\/\//, '').split('/')[0] || 'alljobs.teletalk.com.bd';
   }
 
   const [loading, setLoading] = useState(true);
+  const [iframeBlocked, setIframeBlocked] = useState(false);
 
+  // In native Android app, open native Chrome Custom Tab directly (Bypasses X-Frame-Options)
   useEffect(() => {
-    // Safety loading timeout
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    let isMounted = true;
 
-    // Memory Disposing: Cleanup iframe references when component unmounts
+    async function launchNativeBrowser() {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          await Browser.open({
+            url: targetUrl,
+            toolbarColor: '#ffffff',
+            presentationStyle: 'popover'
+          });
+
+          // When the user closes the native in-app browser tab, return to previous app screen
+          const listener = await Browser.addListener('browserFinished', () => {
+            if (isMounted) navigate(-1);
+          });
+
+          return () => {
+            if (listener) listener.remove();
+          };
+        } catch (err) {
+          console.warn('Native Browser.open failed:', err);
+        }
+      }
+    }
+
+    launchNativeBrowser();
+
+    // Web iframe load timeout check
+    const timer = setTimeout(() => {
+      if (isMounted) setLoading(false);
+    }, 2500);
+
     return () => {
+      isMounted = false;
       clearTimeout(timer);
       if (iframeRef.current) {
         try {
@@ -42,18 +73,33 @@ export default function CircularWebViewScreen() {
         } catch (err) {}
       }
     };
-  }, [targetUrl]);
+  }, [targetUrl, navigate]);
 
   const handleRefresh = () => {
     setLoading(true);
-    if (iframeRef.current) {
+    setIframeBlocked(false);
+    if (Capacitor.isNativePlatform()) {
+      Browser.open({
+        url: targetUrl,
+        toolbarColor: '#ffffff',
+        presentationStyle: 'popover'
+      });
+    } else if (iframeRef.current) {
       iframeRef.current.src = targetUrl;
     }
     setTimeout(() => setLoading(false), 1500);
   };
 
   const handleOpenExternal = () => {
-    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    if (Capacitor.isNativePlatform()) {
+      Browser.open({
+        url: targetUrl,
+        toolbarColor: '#ffffff',
+        presentationStyle: 'popover'
+      });
+    } else {
+      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -87,6 +133,7 @@ export default function CircularWebViewScreen() {
 
         {/* Chrome-Style Rounded URL Address Bar */}
         <div
+          onClick={handleOpenExternal}
           style={{
             flex: 1,
             display: 'flex',
@@ -98,7 +145,8 @@ export default function CircularWebViewScreen() {
             padding: '6px 14px',
             minWidth: 0,
             height: '36px',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            cursor: 'pointer'
           }}
         >
           <span style={{ fontSize: '12px', lineHeight: 1, color: '#10b981', flexShrink: 0 }}>
@@ -143,7 +191,7 @@ export default function CircularWebViewScreen() {
         </div>
       )}
 
-      {/* 2. Full Height In-App WebView Container */}
+      {/* 2. In-App WebView & Government Security Fallback Container */}
       <div
         style={{
           flex: 1,
@@ -183,7 +231,7 @@ export default function CircularWebViewScreen() {
               }}
             />
             <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary, #64748b)' }}>
-              পেজটি লোড হচ্ছে...
+              আবেদন পেজটি লোড হচ্ছে...
             </span>
           </div>
         )}
@@ -194,7 +242,10 @@ export default function CircularWebViewScreen() {
           src={targetUrl}
           title="Application Portal"
           onLoad={() => setLoading(false)}
-          onError={() => setLoading(false)}
+          onError={() => {
+            setLoading(false);
+            setIframeBlocked(true);
+          }}
           allow="camera; microphone; geolocation; storage-access; fullscreen; clipboard-read; clipboard-write"
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
           style={{
@@ -204,6 +255,43 @@ export default function CircularWebViewScreen() {
             display: 'block'
           }}
         />
+
+        {/* Fast Fallback Overlay for X-Frame-Options Protected Government Sites on Web */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 40,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}
+        >
+          <button
+            onClick={handleOpenExternal}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              borderRadius: '28px',
+              background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+              color: '#ffffff',
+              fontSize: '13.5px',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 6px 20px rgba(29, 78, 216, 0.4)',
+              transition: 'all 0.2s ease',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <span>পোর্টালে যান</span>
+            <ExternalLink size={16} />
+          </button>
+        </div>
       </div>
 
       <style>{`
