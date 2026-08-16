@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
-import AdMobBanner from '../components/AdMobBanner';
 
 export default function CircularWebViewScreen() {
   const location = useLocation();
@@ -11,12 +10,20 @@ export default function CircularWebViewScreen() {
   // Extract dynamic apply URL & Title from router state or query parameters
   const queryParams = new URLSearchParams(location.search);
   const rawUrl = location.state?.url || queryParams.get('url') || 'https://alljobs.teletalk.com.bd';
-  const title = location.state?.title || queryParams.get('title') || 'অনলাইন আবেদন পোর্টাল';
 
   // Ensure URL has http/https protocol
   const targetUrl = rawUrl.startsWith('http://') || rawUrl.startsWith('https://')
     ? rawUrl
     : `https://${rawUrl}`;
+
+  // Extract clean domain for the Chrome-style URL bar
+  let displayDomain = 'bdgovt.info';
+  try {
+    const parsed = new URL(targetUrl);
+    displayDomain = parsed.hostname.replace(/^www\./, '');
+  } catch (e) {
+    displayDomain = targetUrl.replace(/^https?:\/\//, '').split('/')[0] || 'bdgovt.info';
+  }
 
   const [loading, setLoading] = useState(true);
 
@@ -61,28 +68,58 @@ export default function CircularWebViewScreen() {
         position: 'relative'
       }}
     >
-      {/* 1. Native App Header (Matching JobDetails & App Theme) */}
-      <div className="page-header" style={{ position: 'relative', flexShrink: 0 }}>
-        <button className="back-btn" onClick={() => navigate(-1)} title="Back">
+      {/* 1. Chrome-Style URL Header */}
+      <div
+        className="page-header"
+        style={{
+          position: 'relative',
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: 'calc(var(--safe-area-top) + 4px) 10px 6px 10px'
+        }}
+      >
+        {/* Back Button */}
+        <button className="back-btn" onClick={() => navigate(-1)} title="Back" style={{ flexShrink: 0 }}>
           <ArrowLeft size={22} />
         </button>
 
-        <h1
+        {/* Chrome-Style Rounded URL Address Bar */}
+        <div
           style={{
             flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'var(--bg-secondary, #f1f5f9)',
+            border: '1px solid var(--border-light, #e2e8f0)',
+            borderRadius: '24px',
+            padding: '6px 14px',
             minWidth: 0,
-            fontSize: '15px',
-            fontWeight: 800,
-            color: 'var(--text-primary)',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
+            height: '36px',
+            boxSizing: 'border-box'
           }}
         >
-          {title}
-        </h1>
+          <span style={{ fontSize: '12px', lineHeight: 1, color: '#10b981', flexShrink: 0 }}>
+            🔒
+          </span>
+          <span
+            style={{
+              fontSize: '13px',
+              fontWeight: 600,
+              color: 'var(--text-primary, #0f172a)',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
+          >
+            {displayDomain}
+          </span>
+        </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+        {/* Action Buttons: Refresh & External Browser */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
           <button className="back-btn" onClick={handleRefresh} title="Refresh">
             <RefreshCw size={19} />
           </button>
@@ -106,7 +143,7 @@ export default function CircularWebViewScreen() {
         </div>
       )}
 
-      {/* 2. Seamless In-App WebView Container */}
+      {/* 2. Full Height In-App WebView Container */}
       <div
         style={{
           flex: 1,
@@ -146,7 +183,7 @@ export default function CircularWebViewScreen() {
               }}
             />
             <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary, #64748b)' }}>
-              আবেদন পেজটি লোড হচ্ছে...
+              পেজটি লোড হচ্ছে...
             </span>
           </div>
         )}
@@ -168,9 +205,6 @@ export default function CircularWebViewScreen() {
           }}
         />
       </div>
-
-      {/* 3. Bottom AdMob Banner Container (Safely Separated, 100% AdMob Compliant) */}
-      <AdMobBanner />
 
       <style>{`
         @keyframes spin {
