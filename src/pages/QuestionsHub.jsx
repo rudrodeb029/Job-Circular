@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import PullToRefresh from '../components/PullToRefresh';
+import ModernLoader from '../components/ModernLoader';
 
 const categoryConfig = {
   bcs: { name: 'বিসিএস', nameEn: 'BCS', color: 'rgba(26, 86, 219, 0.05)', icon: '🎓' },
@@ -23,7 +24,17 @@ export default function QuestionsHub() {
   const isEn = state.language === 'en';
 
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
+  const [isFiltering, setIsFiltering] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleCategorySelect = (key) => {
+    if (activeCategory === key) return;
+    setIsFiltering(true);
+    setActiveCategory(key);
+    setTimeout(() => {
+      setIsFiltering(false);
+    }, 180);
+  };
 
   const papers = adminState.questions || [];
   
@@ -117,7 +128,7 @@ export default function QuestionsHub() {
                 border: activeCategory === 'all' ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
                 borderRadius: '14px'
               }}
-              onClick={() => setActiveCategory('all')}
+              onClick={() => handleCategorySelect('all')}
             >
               <div className="category-grid-icon"><LayoutGrid size={18} /></div>
               <span className="category-grid-label">{isEn ? 'All' : 'সব প্রশ্ন'}</span>
@@ -135,7 +146,7 @@ export default function QuestionsHub() {
                     border: isActive ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
                     borderRadius: '14px'
                   }}
-                  onClick={() => setActiveCategory(key)}
+                  onClick={() => handleCategorySelect(key)}
                 >
                   <div className="category-grid-icon" style={{ background: cat.color }}>{cat.icon}</div>
                   <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
@@ -151,27 +162,37 @@ export default function QuestionsHub() {
             <SearchBar value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={isEn ? "Search questions..." : "প্রশ্নব্যাংকে খুঁজুন..."} />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {filteredPapers.map(paper => (
-              <div
-                key={paper.id}
-                className="job-card animate-fade-in"
-                onClick={() => navigate(`/question-details/${paper.id}`)}
-                style={{ padding: '14px', border: '1px solid rgba(37, 99, 235, 0.12)' }}
-              >
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  {categoryConfig[paper.category]?.icon || '📚'}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h3 style={{ fontSize: '13.5px', fontWeight: 700, marginBottom: '4px' }}>{isEn ? paper.titleEn : paper.title}</h3>
-                  <div style={{ display: 'flex', gap: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
-                    <span>📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}</span>
-                    <span>📝 {isEn ? `${paper.questions.length} Items` : `${paper.questions.length}টি প্রশ্ন`}</span>
-                  </div>
-                </div>
-                <ChevronRight size={18} color="var(--border)" style={{ flexShrink: 0, marginLeft: 'auto' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '180px' }}>
+            {isFiltering ? (
+              <div style={{ padding: '60px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <ModernLoader size="md" icon={categoryConfig[activeCategory]?.icon || '📚'} />
               </div>
-            ))}
+            ) : filteredPapers.length > 0 ? (
+              filteredPapers.map(paper => (
+                <div
+                  key={paper.id}
+                  className="job-card animate-fade-in"
+                  onClick={() => navigate(`/question-details/${paper.id}`)}
+                  style={{ padding: '14px', border: '1px solid rgba(37, 99, 235, 0.12)' }}
+                >
+                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    {categoryConfig[paper.category]?.icon || '📚'}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{ fontSize: '13.5px', fontWeight: 700, marginBottom: '4px' }}>{isEn ? paper.titleEn : paper.title}</h3>
+                    <div style={{ display: 'flex', gap: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
+                      <span>📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}</span>
+                      <span>📝 {isEn ? `${paper.questions.length} Items` : `${paper.questions.length}টি প্রশ্ন`}</span>
+                    </div>
+                  </div>
+                  <ChevronRight size={18} color="var(--border)" style={{ flexShrink: 0, marginLeft: 'auto' }} />
+                </div>
+              ))
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                <p>{isEn ? 'No questions found' : 'কোন প্রশ্নপত্র পাওয়া যায়নি'}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

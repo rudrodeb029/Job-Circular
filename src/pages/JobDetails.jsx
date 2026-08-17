@@ -52,6 +52,12 @@ export default function JobDetails() {
   const [showMore, setShowMore] = useState(false);
   const [showFullImage, setShowFullImage] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  React.useEffect(() => {
+    const t = setTimeout(() => setPageLoading(false), 180);
+    return () => clearTimeout(t);
+  }, []);
 
   const { state: adminState } = useAdminContext();
   const localJobs = adminState.jobs || [];
@@ -70,6 +76,23 @@ export default function JobDetails() {
     }
   }, [job, adminState.notifications, state.readNotifications, dispatch]);
 
+  if (pageLoading) {
+    return (
+      <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
+        <div className="page-header">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={22} />
+          </button>
+          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>Job Circulars BD</h1>
+        </div>
+        <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
+          <ModernLoader size="lg" icon="📄" />
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
+
   if (!job) {
     if (adminState?.loading || localJobs.length === 0) {
       return (
@@ -80,7 +103,7 @@ export default function JobDetails() {
             </button>
             <h1 style={{ flex: 1 }}>Job Details</h1>
           </div>
-          <ModernPageSkeleton type="details" title={state.language === 'en' ? "Loading circular details..." : "সার্কুলার বিস্তারিত লোড হচ্ছে..."} />
+          <ModernPageSkeleton type="details" icon="📄" />
           <BottomNav />
         </div>
       );

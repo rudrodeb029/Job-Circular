@@ -2,25 +2,21 @@ import React from 'react';
 
 /**
  * Modern High-Performance Animated Loader Component
- * Provides premium micro-animations for page transitions, data fetching, questions, exams & button states.
+ * Clean, modern, text-free visual animated orb with glowing dual rotating gradient rings.
  */
 export default function ModernLoader({
-  text = 'লোড হচ্ছে...',
-  textEn = 'Loading...',
-  subtext,
   size = 'md', // 'sm' | 'md' | 'lg' | 'fullscreen'
   variant = 'brand', // 'brand' | 'glass' | 'minimal' | 'fullscreen'
   icon = '📄',
-  isEn = false
+  text = null,
+  showText = false
 }) {
-  const displayText = isEn ? textEn : text;
-
   // Size mapping
   const sizeMap = {
-    sm: { containerSize: 44, orbSize: 26, fontSize: 12, iconSize: 13, gap: 8 },
-    md: { containerSize: 64, orbSize: 40, fontSize: 13.5, iconSize: 18, gap: 12 },
-    lg: { containerSize: 84, orbSize: 52, fontSize: 15, iconSize: 24, gap: 16 },
-    fullscreen: { containerSize: 76, orbSize: 48, fontSize: 14.5, iconSize: 22, gap: 14 }
+    sm: { containerSize: 42, orbSize: 26, iconSize: 13, gap: 0 },
+    md: { containerSize: 58, orbSize: 36, iconSize: 18, gap: 0 },
+    lg: { containerSize: 76, orbSize: 48, iconSize: 24, gap: 0 },
+    fullscreen: { containerSize: 72, orbSize: 46, iconSize: 22, gap: 0 }
   };
 
   const currentSize = sizeMap[size] || sizeMap.md;
@@ -29,14 +25,13 @@ export default function ModernLoader({
   const loaderCore = (
     <div
       style={{
-        display: 'flex',
+        display: 'inline-flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: `${currentSize.gap}px`,
         textAlign: 'center',
-        padding: isFullscreen ? '30px' : '20px',
-        animation: 'modernFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+        padding: isFullscreen ? '24px' : '12px',
+        animation: 'modernFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards'
       }}
     >
       {/* Dynamic Animated Orb with Dual Gradient Spinners */}
@@ -54,10 +49,10 @@ export default function ModernLoader({
         <div
           style={{
             position: 'absolute',
-            inset: '4px',
+            inset: '3px',
             borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(37, 99, 235, 0) 70%)',
-            animation: 'modernPulseGlow 2s ease-in-out infinite'
+            background: 'radial-gradient(circle, rgba(37, 99, 235, 0.3) 0%, rgba(37, 99, 235, 0) 70%)',
+            animation: 'modernPulseGlow 1.8s ease-in-out infinite'
           }}
         />
 
@@ -70,8 +65,8 @@ export default function ModernLoader({
             border: '2.5px solid rgba(37, 99, 235, 0.12)',
             borderTopColor: '#2563eb',
             borderRightColor: '#60a5fa',
-            animation: 'modernSpin 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite',
-            boxShadow: '0 0 14px rgba(37, 99, 235, 0.15)'
+            animation: 'modernSpin 0.85s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite',
+            boxShadow: '0 0 14px rgba(37, 99, 235, 0.18)'
           }}
         />
 
@@ -84,7 +79,7 @@ export default function ModernLoader({
             border: '2px solid transparent',
             borderBottomColor: '#059669',
             borderLeftColor: '#34d399',
-            animation: 'modernSpinReverse 1.4s linear infinite',
+            animation: 'modernSpinReverse 1.3s linear infinite',
             opacity: 0.85
           }}
         />
@@ -95,54 +90,23 @@ export default function ModernLoader({
             width: `${currentSize.orbSize}px`,
             height: `${currentSize.orbSize}px`,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)',
-            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.1), inset 0 1px 1px rgba(255, 255, 255, 0.8)',
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+            boxShadow: '0 4px 12px rgba(15, 23, 42, 0.12), inset 0 1px 1px rgba(255, 255, 255, 0.9)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: `${currentSize.iconSize}px`,
             zIndex: 2,
-            animation: 'modernFloat 2.4s ease-in-out infinite'
+            animation: 'modernFloat 2.2s ease-in-out infinite'
           }}
         >
           {icon}
         </div>
       </div>
 
-      {/* Modern Shimmer Text & Bouncing Wave Dots */}
-      {displayText && (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
-          <div
-            style={{
-              fontSize: `${currentSize.fontSize}px`,
-              fontWeight: 700,
-              color: 'var(--text-primary, #0f172a)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              letterSpacing: '0.2px'
-            }}
-          >
-            <span>{displayText}</span>
-            {/* Wave Dots */}
-            <span style={{ display: 'inline-flex', gap: '2px', alignItems: 'center' }}>
-              <span className="modern-dot modern-dot-1" />
-              <span className="modern-dot modern-dot-2" />
-              <span className="modern-dot modern-dot-3" />
-            </span>
-          </div>
-
-          {subtext && (
-            <span
-              style={{
-                fontSize: '11.5px',
-                color: 'var(--text-secondary, #64748b)',
-                fontWeight: 500
-              }}
-            >
-              {subtext}
-            </span>
-          )}
+      {showText && text && (
+        <div style={{ marginTop: '10px', fontSize: '13px', fontWeight: 700, color: 'var(--text-primary, #0f172a)' }}>
+          {text}
         </div>
       )}
     </div>
@@ -168,9 +132,10 @@ export default function ModernLoader({
             background: 'var(--bg-primary, #ffffff)',
             borderRadius: '24px',
             boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.15), 0 0 0 1px rgba(226, 232, 240, 0.8)',
-            padding: '10px 18px',
-            maxWidth: '280px',
-            width: '90%'
+            padding: '12px 20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
           {loaderCore}
@@ -218,36 +183,36 @@ export function ButtonSpinner({ size = 16, color = '#ffffff' }) {
 }
 
 /**
- * Modern Card & Details Skeleton for ultra-fast layout stability
+ * Modern Card & Details Skeleton with Clean Animated Center Loader
  */
-export function ModernPageSkeleton({ type = 'details', title = 'লোড হচ্ছে...' }) {
+export function ModernPageSkeleton({ type = 'details', icon = '📄' }) {
   return (
     <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
       {/* Header bar placeholder */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div className="modern-skeleton-shimmer" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-        <div className="modern-skeleton-shimmer" style={{ height: '20px', width: '60%', borderRadius: '6px' }} />
+        <div className="modern-skeleton-shimmer" style={{ height: '20px', width: '55%', borderRadius: '6px' }} />
       </div>
 
-      {/* Main notice/content hero card placeholder */}
+      {/* Main notice/content hero card with embedded ModernLoader */}
       <div
         className="modern-skeleton-shimmer"
         style={{
           width: '100%',
-          height: type === 'details' ? '280px' : '180px',
+          height: type === 'details' ? '260px' : '160px',
           borderRadius: '20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center'
         }}
       >
-        <ModernLoader text={title} size="sm" />
+        <ModernLoader size="md" icon={icon} />
       </div>
 
       {/* List item placeholders */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        <div className="modern-skeleton-shimmer" style={{ height: '54px', width: '100%', borderRadius: '14px' }} />
-        <div className="modern-skeleton-shimmer" style={{ height: '54px', width: '100%', borderRadius: '14px' }} />
+        <div className="modern-skeleton-shimmer" style={{ height: '52px', width: '100%', borderRadius: '14px' }} />
+        <div className="modern-skeleton-shimmer" style={{ height: '52px', width: '100%', borderRadius: '14px' }} />
       </div>
     </div>
   );

@@ -7,6 +7,8 @@ import { categories } from '../data/categories';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 
+import ModernLoader from '../components/ModernLoader';
+
 export default function Categories() {
   const navigate = useNavigate();
   const { state } = useAppContext();
@@ -30,7 +32,10 @@ export default function Categories() {
     return (
       <div className="page">
         <div className="page-header">
-           <h1 style={{ fontSize: '16px' }}>{isEn ? 'Loading...' : 'লোড হচ্ছে...'}</h1>
+           <h1 style={{ fontSize: '16px' }}>{isEn ? 'Categories' : 'ক্যাটাগরি'}</h1>
+        </div>
+        <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <ModernLoader size="lg" icon="📑" />
         </div>
         <BottomNav />
       </div>

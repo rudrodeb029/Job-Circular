@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionById } from '../data/questionsData';
 import BottomNav from '../components/BottomNav';
-import { ModernPageSkeleton } from '../components/ModernLoader';
+import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
 
 export default function QuestionDetails() {
   const { id } = useParams();
@@ -13,6 +13,14 @@ export default function QuestionDetails() {
   const { state } = useAppContext();
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
+
+  const [pageLoading, setPageLoading] = useState(true);
+  const [isSwitchingMode, setIsSwitchingMode] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setPageLoading(false), 180);
+    return () => clearTimeout(t);
+  }, []);
 
   const paper = useMemo(() => {
     // 1. Check adminState.questions
@@ -28,6 +36,34 @@ export default function QuestionDetails() {
   // Tracks selected answers for each question: { [questionId]: optionIndex }
   const [selectedAnswers, setSelectedAnswers] = useState({});
 
+  const handleModeChange = (newMode) => {
+    if (newMode === mode) return;
+    setIsSwitchingMode(true);
+    setMode(newMode);
+    setTimeout(() => {
+      setIsSwitchingMode(false);
+    }, 180);
+  };
+
+  if (pageLoading) {
+    return (
+      <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
+        <div className="page-header">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={22} />
+          </button>
+          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
+            {isEn ? 'Questions & Solutions' : 'প্রশ্ন ও সমাধান'}
+          </h1>
+        </div>
+        <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
+          <ModernLoader size="lg" icon="📝" />
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
+
   if (!paper) {
     if (adminState?.loading || !adminState?.questions || adminState?.questions?.length === 0) {
       return (
@@ -38,7 +74,7 @@ export default function QuestionDetails() {
             </button>
             <h1 style={{ flex: 1 }}>{isEn ? 'Question Paper' : 'প্রশ্নপত্র'}</h1>
           </div>
-          <ModernPageSkeleton type="details" title={isEn ? "Loading question paper..." : "প্রশ্নপত্র লোড হচ্ছে..."} />
+          <ModernPageSkeleton type="details" icon="📝" />
           <BottomNav />
         </div>
       );
@@ -128,7 +164,7 @@ export default function QuestionDetails() {
             gap: '4px'
           }}>
             <button
-              onClick={() => setMode('practice')}
+              onClick={() => handleModeChange('practice')}
               style={{
                 flex: 1,
                 padding: '10px',
@@ -145,7 +181,7 @@ export default function QuestionDetails() {
               🎯 {isEn ? 'Practice Mode' : 'অনুশীলন মোড'}
             </button>
             <button
-              onClick={() => setMode('read')}
+              onClick={() => handleModeChange('read')}
               style={{
                 flex: 1,
                 padding: '10px',
@@ -164,7 +200,13 @@ export default function QuestionDetails() {
           </div>
         </div>
 
-        {/* Score & Progress Tracker Card (Only in Practice Mode) */}
+        {isSwitchingMode ? (
+          <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
+            <ModernLoader size="md" icon={mode === 'practice' ? '🎯' : '📖'} />
+          </div>
+        ) : (
+          <>
+            {/* Score & Progress Tracker Card (Only in Practice Mode) */}
         {mode === 'practice' && (
           <div style={{
             background: 'var(--white)',
@@ -374,6 +416,8 @@ export default function QuestionDetails() {
             );
           })}
         </div>
+          </>
+        )}
       </div>
 
       <BottomNav />

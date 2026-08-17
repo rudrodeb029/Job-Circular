@@ -54,6 +54,12 @@ export default function ResultDetails() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+
+  React.useEffect(() => {
+    const t = setTimeout(() => setPageLoading(false), 180);
+    return () => clearTimeout(t);
+  }, []);
 
   // Load jobs from AdminContext
   const { state: adminState } = useAdminContext();
@@ -72,6 +78,23 @@ export default function ResultDetails() {
     }
   }, [job, adminState.notifications, state.readNotifications, dispatch]);
 
+  if (pageLoading) {
+    return (
+      <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
+        <div className="page-header">
+          <button className="back-btn" onClick={() => navigate(-1)}>
+            <ArrowLeft size={22} />
+          </button>
+          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>{isEn ? 'Result Details' : 'ফলাফলের বিস্তারিত'}</h1>
+        </div>
+        <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
+          <ModernLoader size="lg" icon="📊" />
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
+
   if (!job) {
     if (adminState?.loading || (localJobs && localJobs.length === 0)) {
       return (
@@ -82,7 +105,7 @@ export default function ResultDetails() {
             </button>
             <h1 style={{ flex: 1 }}>{isEn ? 'Result Details' : 'ফলাফলের বিস্তারিত'}</h1>
           </div>
-          <ModernPageSkeleton type="details" title={isEn ? "Loading exam result..." : "পরীক্ষার ফলাফল লোড হচ্ছে..."} />
+          <ModernPageSkeleton type="details" icon="📊" />
           <BottomNav />
         </div>
       );
