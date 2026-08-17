@@ -184,19 +184,19 @@ export default function ResultDetails() {
           <div style={{
             background: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)',
             color: 'white',
-            margin: '0 auto var(--space-md)',
-            fontSize: '32px',
-            width: '64px',
-            height: '64px',
-            borderRadius: '18px',
+            margin: '0 auto 10px',
+            fontSize: '22px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '13px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 6px 18px rgba(124, 58, 237, 0.3)'
+            boxShadow: '0 4px 14px rgba(124, 58, 237, 0.25)'
           }}>
             {displayIcon}
           </div>
-           <h2 style={{ fontSize: '18px', fontWeight: 800, color: '#334155', marginBottom: '0' }}>
+           <h2 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0' }}>
             {orgName}
           </h2>
         </div>

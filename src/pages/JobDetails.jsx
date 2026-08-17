@@ -197,19 +197,19 @@ export default function JobDetails() {
           <div style={{
             background: styleConfig.bg,
             color: 'white',
-            margin: '0 auto var(--space-md)',
-            fontSize: '32px',
-            width: '64px',
-            height: '64px',
-            borderRadius: '18px',
+            margin: '0 auto 10px',
+            fontSize: '22px',
+            width: '44px',
+            height: '44px',
+            borderRadius: '13px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 6px 18px ${styleConfig.shadow}`
+            boxShadow: `0 4px 14px ${styleConfig.shadow}`
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '10px' }}>
             {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
           </h2>
 
