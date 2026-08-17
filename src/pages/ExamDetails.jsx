@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
+import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/ModernLoader';
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 
@@ -70,7 +71,23 @@ export default function ExamDetails() {
     }
   }, [job, adminState.notifications, state.readNotifications, dispatch]);
 
-  if (!job) return <NotFoundPage />;
+  if (!job) {
+    if (adminState?.loading || (localJobs && localJobs.length === 0)) {
+      return (
+        <div className="page" style={{ paddingBottom: '100px' }}>
+          <div className="page-header">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              <ArrowLeft size={22} />
+            </button>
+            <h1 style={{ flex: 1 }}>{state.language === 'en' ? 'Exam Details' : 'পরীক্ষার বিস্তারিত'}</h1>
+          </div>
+          <ModernPageSkeleton type="details" title={state.language === 'en' ? "Loading exam details..." : "পরীক্ষার তথ্য লোড হচ্ছে..."} />
+          <BottomNav />
+        </div>
+      );
+    }
+    return <NotFoundPage />;
+  }
 
   const rawImagesList = extractJobMediaList(job);
   const circularImages = normalizeMediaUrls(rawImagesList);
@@ -483,7 +500,7 @@ export default function ExamDetails() {
                 opacity: downloading ? 0.75 : 1
               }}
             >
-              <Download size={14} /> <span>{downloading ? (state.language === 'en' ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') : `${state.language === 'en' ? 'Notice' : 'নোটিশ'} ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}</span>
+              {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={14} />} <span>{downloading ? (state.language === 'en' ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') : `${state.language === 'en' ? 'Notice' : 'নোটিশ'} ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}</span>
             </button>
 
             <button

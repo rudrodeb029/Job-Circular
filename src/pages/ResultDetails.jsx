@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
+import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/ModernLoader';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 
 const categoryStyles = {
@@ -71,7 +72,23 @@ export default function ResultDetails() {
     }
   }, [job, adminState.notifications, state.readNotifications, dispatch]);
 
-  if (!job) return <NotFoundPage />;
+  if (!job) {
+    if (adminState?.loading || (localJobs && localJobs.length === 0)) {
+      return (
+        <div className="page" style={{ paddingBottom: '100px' }}>
+          <div className="page-header">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              <ArrowLeft size={22} />
+            </button>
+            <h1 style={{ flex: 1 }}>{isEn ? 'Result Details' : 'ফলাফলের বিস্তারিত'}</h1>
+          </div>
+          <ModernPageSkeleton type="details" title={isEn ? "Loading exam result..." : "পরীক্ষার ফলাফল লোড হচ্ছে..."} />
+          <BottomNav />
+        </div>
+      );
+    }
+    return <NotFoundPage />;
+  }
 
   const rawImagesList = extractJobMediaList(job);
   const circularImages = normalizeMediaUrls(rawImagesList);

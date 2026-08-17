@@ -1210,3 +1210,112 @@
   padding-left: 12px !important;
 }
 
+/* ==========================================================================
+   Modern Interactive Micro-Animation & Loader System
+   ========================================================================== */
+
+@keyframes modernSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes modernSpinReverse {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes modernPulseGlow {
+  0%, 100% {
+    transform: scale(0.92);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.9;
+  }
+}
+
+@keyframes modernFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
+
+@keyframes modernFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modernDotWave {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  30% {
+    transform: translateY(-3.5px);
+    opacity: 1;
+  }
+}
+
+.modern-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #2563eb;
+  display: inline-block;
+}
+
+.modern-dot-1 {
+  animation: modernDotWave 1.2s ease-in-out infinite 0s;
+}
+
+.modern-dot-2 {
+  animation: modernDotWave 1.2s ease-in-out infinite 0.2s;
+}
+
+.modern-dot-3 {
+  animation: modernDotWave 1.2s ease-in-out infinite 0.4s;
+}
+
+/* Glassmorphism Modern Skeleton Shimmer */
+.modern-skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(241, 245, 249, 0.9) 0%,
+    rgba(226, 232, 240, 0.4) 50%,
+    rgba(241, 245, 249, 0.9) 100%
+  );
+  background-size: 200% 100%;
+  animation: modernShimmerWave 1.6s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+[data-theme='dark'] .modern-skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.8) 0%,
+    rgba(51, 65, 85, 0.5) 50%,
+    rgba(30, 41, 59, 0.8) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes modernShimmerWave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+

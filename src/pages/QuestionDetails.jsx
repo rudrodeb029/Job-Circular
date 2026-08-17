@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionById } from '../data/questionsData';
 import BottomNav from '../components/BottomNav';
+import { ModernPageSkeleton } from '../components/ModernLoader';
 
 export default function QuestionDetails() {
   const { id } = useParams();
@@ -28,6 +29,20 @@ export default function QuestionDetails() {
   const [selectedAnswers, setSelectedAnswers] = useState({});
 
   if (!paper) {
+    if (adminState?.loading || !adminState?.questions || adminState?.questions?.length === 0) {
+      return (
+        <div className="page" style={{ paddingBottom: '100px' }}>
+          <div className="page-header">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              <ArrowLeft size={22} />
+            </button>
+            <h1 style={{ flex: 1 }}>{isEn ? 'Question Paper' : 'প্রশ্নপত্র'}</h1>
+          </div>
+          <ModernPageSkeleton type="details" title={isEn ? "Loading question paper..." : "প্রশ্নপত্র লোড হচ্ছে..."} />
+          <BottomNav />
+        </div>
+      );
+    }
     return (
       <div className="page" style={{ paddingBottom: '100px' }}>
         <div className="page-header">

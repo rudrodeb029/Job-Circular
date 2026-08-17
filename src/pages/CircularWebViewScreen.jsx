@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
+import { ButtonSpinner } from '../components/ModernLoader';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 
@@ -219,8 +220,9 @@ export default function CircularWebViewScreen() {
             transition: 'all 0.2s ease'
           }}
         >
+          {loading && <ButtonSpinner size={14} color="#ffffff" />}
           <span>{loading ? 'লোড হচ্ছে...' : 'আবেদন পোর্টালে যান'}</span>
-          <ExternalLink size={15} />
+          {!loading && <ExternalLink size={15} />}
         </button>
       </div>
     </div>

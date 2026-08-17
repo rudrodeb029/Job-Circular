@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { getLiveExams, generate100Questions } from '../data/liveExams';
 import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, COLLECTIONS } from '../services/supabaseService';
 import BottomNav from '../components/BottomNav';
+import ModernLoader from '../components/ModernLoader';
 
 export default function LiveExamRoom() {
   const { id } = useParams();
@@ -320,22 +321,17 @@ export default function LiveExamRoom() {
             <ArrowLeft size={22} />
           </button>
           <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
-            {isEn ? 'Live Exam' : 'লাইভ পরীক্ষা'}
+            {isEn ? 'Live Exam Room' : 'লাইভ পরীক্ষা রুম'}
           </h1>
         </div>
-        <div style={{ textAlign: 'center', padding: '100px 20px', color: 'var(--text-secondary)' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '3px solid rgba(26, 86, 219, 0.2)',
-            borderTop: '3px solid var(--primary)',
-            borderRadius: '50%',
-            margin: '0 auto 16px auto',
-            animation: 'spin 0.8s linear infinite'
-          }}></div>
-          <p style={{ fontSize: '14px', fontWeight: 700 }}>
-            {isEn ? 'Loading live exam room...' : 'লাইভ পরীক্ষা রুম লোড হচ্ছে...'}
-          </p>
+        <div style={{ textAlign: 'center', padding: '80px 20px' }}>
+          <ModernLoader
+            text={isEn ? "Preparing Live Exam..." : "লাইভ পরীক্ষা প্রস্তুত হচ্ছে..."}
+            subtext={isEn ? "Loading questions & timer settings" : "প্রশ্নপত্র ও টাইমার লোড করা হচ্ছে..."}
+            icon="🏆"
+            size="lg"
+            isEn={isEn}
+          />
         </div>
         <BottomNav />
       </div>

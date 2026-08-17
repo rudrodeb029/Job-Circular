@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
+import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/ModernLoader';
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 
@@ -69,7 +70,23 @@ export default function JobDetails() {
     }
   }, [job, adminState.notifications, state.readNotifications, dispatch]);
 
-  if (!job) return <NotFoundPage />;
+  if (!job) {
+    if (adminState?.loading || localJobs.length === 0) {
+      return (
+        <div className="page" style={{ paddingBottom: '100px' }}>
+          <div className="page-header">
+            <button className="back-btn" onClick={() => navigate(-1)}>
+              <ArrowLeft size={22} />
+            </button>
+            <h1 style={{ flex: 1 }}>Job Details</h1>
+          </div>
+          <ModernPageSkeleton type="details" title={state.language === 'en' ? "Loading circular details..." : "সার্কুলার বিস্তারিত লোড হচ্ছে..."} />
+          <BottomNav />
+        </div>
+      );
+    }
+    return <NotFoundPage />;
+  }
 
   const rawImagesList = extractJobMediaList(job);
   const circularImages = normalizeMediaUrls(rawImagesList);
@@ -481,7 +498,7 @@ export default function JobDetails() {
                   opacity: downloading ? 0.75 : 1
                 }}
               >
-                <Download size={14} /> <span>{downloading ? 'Downloading...' : `Notice ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}</span>
+                {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={14} />} <span>{downloading ? (isEn ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') : `${isEn ? 'Notice' : 'নোটিশ'} ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}</span>
               </button>
 
               <button
