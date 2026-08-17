@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
+import { Routes, Route, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { App as CapacitorApp } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
@@ -57,24 +57,30 @@ function App() {
   const { state } = useAppContext()
   const location = useLocation()
   const navigate = useNavigate()
+  const navType = useNavigationType()
 
   const [updateInfo, setUpdateInfo] = useState(null)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [isRouteLoading, setIsRouteLoading] = useState(false)
   const prevLocRef = useRef(location.pathname + location.search)
 
-  // Show modern loader on every new page open or back button navigation
+  // Show modern loader ONLY when opening new page (PUSH navigation).
+  // Clicking Back Button (POP navigation) will NOT show the loader.
   useEffect(() => {
     const currentLoc = location.pathname + location.search
     if (prevLocRef.current !== currentLoc) {
       prevLocRef.current = currentLoc
-      setIsRouteLoading(true)
-      const t = setTimeout(() => {
+      if (navType === 'PUSH' || navType === 'REPLACE') {
+        setIsRouteLoading(true)
+        const t = setTimeout(() => {
+          setIsRouteLoading(false)
+        }, 160)
+        return () => clearTimeout(t)
+      } else {
         setIsRouteLoading(false)
-      }, 160)
-      return () => clearTimeout(t)
+      }
     }
-  }, [location.pathname, location.search, location.key])
+  }, [location.pathname, location.search, location.key, navType])
 
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
