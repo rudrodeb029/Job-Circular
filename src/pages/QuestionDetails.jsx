@@ -278,11 +278,11 @@ export default function QuestionDetails() {
               >
                 {/* Question Label */}
                 <h4 style={{
-                  fontSize: '14.5px',
+                  fontSize: '13.5px',
                   fontWeight: 700,
                   color: 'var(--text-primary)',
-                  marginBottom: '16px',
-                  lineHeight: '1.5',
+                  marginBottom: '14px',
+                  lineHeight: '1.45',
                   display: 'flex',
                   gap: '8px'
                 }}>
@@ -291,7 +291,7 @@ export default function QuestionDetails() {
                 </h4>
 
                 {/* Option Choices */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {qn.options.map((option, oIndex) => {
                     let optText = isEn ? qn.optionsEn[oIndex] : option;
                     
@@ -349,7 +349,7 @@ export default function QuestionDetails() {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          padding: '10px 12px',
+                          padding: '9px 12px',
                           borderRadius: '10px',
                           background: bg,
                           color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
@@ -358,25 +358,25 @@ export default function QuestionDetails() {
                           fontSize: '12px',
                           fontWeight: 500,
                           transition: 'all 0.2s ease',
-                          gap: '10px'
+                          gap: '8px'
                         }}
                       >
                         <span style={{
-                          width: '22px',
-                          height: '22px',
+                          width: '21px',
+                          height: '21px',
                           borderRadius: '50%',
                           background: 'rgba(0,0,0,0.05)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '10.5px',
+                          fontSize: '10px',
                           fontWeight: 700,
                           flexShrink: 0
                         }}>
                           {prefix}
                         </span>
-                        <span style={{ flex: 1 }}>{optText}</span>
-                        {prefixIcon && <span style={{ fontSize: '13px' }}>{prefixIcon}</span>}
+                        <span style={{ flex: 1, lineHeight: '1.45' }}>{optText}</span>
+                        {prefixIcon && <span style={{ fontSize: '12px' }}>{prefixIcon}</span>}
                       </div>
                     );
                   })}

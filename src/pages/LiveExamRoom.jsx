@@ -613,11 +613,11 @@ export default function LiveExamRoom() {
                 >
                   {/* Question Text */}
                   <h4 style={{
-                    fontSize: '15px',
+                    fontSize: '13.5px',
                     fontWeight: 700,
                     color: 'var(--text-primary)',
-                    marginBottom: '16px',
-                    lineHeight: '1.5',
+                    marginBottom: '14px',
+                    lineHeight: '1.45',
                     display: 'flex',
                     gap: '8px'
                   }}>
@@ -626,7 +626,7 @@ export default function LiveExamRoom() {
                   </h4>
 
                   {/* Option Choices */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {qOptions.map((option, oIndex) => {
                       const optText = toSafeString(isEn ? (qOptionsEn[oIndex] || option) : option);
                       const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
@@ -644,7 +644,7 @@ export default function LiveExamRoom() {
                           color = '#065f46';
                           border = '1px solid #34d399';
                           trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
                           );
@@ -653,7 +653,7 @@ export default function LiveExamRoom() {
                           color = '#991b1b';
                           border = '1px solid #f87171';
                           trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <line x1="18" y1="6" x2="6" y2="18" />
                               <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
@@ -665,7 +665,7 @@ export default function LiveExamRoom() {
                           color = 'var(--primary)';
                           border = '1.5px solid var(--primary)';
                           trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
                           );
@@ -679,33 +679,33 @@ export default function LiveExamRoom() {
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            padding: '12px 14px',
-                            borderRadius: '12px',
+                            padding: '9px 12px',
+                            borderRadius: '10px',
                             background: bg,
                             color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
                             border: border,
                             cursor: !currentResult ? 'pointer' : 'default',
-                            fontSize: '13px',
+                            fontSize: '12px',
                             fontWeight: 500,
                             transition: 'all 0.2s ease',
-                            gap: '10px'
+                            gap: '8px'
                           }}
                         >
                           <span style={{
-                            width: '24px',
-                            height: '24px',
+                            width: '21px',
+                            height: '21px',
                             borderRadius: '50%',
                             background: 'rgba(0,0,0,0.04)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '11px',
+                            fontSize: '10px',
                             fontWeight: 700,
                             flexShrink: 0
                           }}>
                             {prefix}
                           </span>
-                          <span style={{ flex: 1 }}>{optText}</span>
+                          <span style={{ flex: 1, lineHeight: '1.45' }}>{optText}</span>
                           {trailingIcon && <span style={{ display: 'inline-flex', alignItems: 'center' }}>{trailingIcon}</span>}
                         </div>
                       );
