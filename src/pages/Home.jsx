@@ -381,8 +381,8 @@ export default function Home() {
                     key={`${cat.id}-${idx}`}
                     className="category-grid-item"
                     style={{
-                      border: '1px solid rgba(37, 99, 235, 0.12)',
-                      boxShadow: '0 4px 14px rgba(37, 99, 235, 0.04)',
+                      border: '1px solid rgba(226, 232, 240, 0.9)',
+                      boxShadow: 'none',
                       background: 'var(--white)',
                       borderRadius: '16px',
                       minWidth: '85px',
@@ -401,8 +401,8 @@ export default function Home() {
             <div
               className="category-grid-item animate-scale-in"
               style={{
-                border: '1.5px solid rgba(37, 99, 235, 0.15)',
-                boxShadow: '0 6px 20px rgba(37, 99, 235, 0.1)',
+                border: '1px solid rgba(226, 232, 240, 0.9)',
+                boxShadow: 'none',
                 background: 'var(--white)',
                 borderRadius: '16px',
                 minWidth: '85px',
