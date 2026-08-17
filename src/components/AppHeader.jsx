@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight } from './Icons';
+import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight, Briefcase, Calendar } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsData } from '../data/questionsData';
@@ -198,26 +198,36 @@ export default function AppHeader() {
           right: 0,
           bottom: 0,
           zIndex: 200,
-          background: 'rgba(15, 23, 42, 0.5)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex'
+          background: 'rgba(15, 23, 42, 0.55)',
+          backdropFilter: 'blur(5px)',
+          WebkitBackdropFilter: 'blur(5px)',
+          display: 'flex',
+          animation: 'drawerOverlayFade 0.35s ease'
         }} onClick={() => setDrawerOpen(false)}>
           <div
             style={{
               width: '280px',
-              background: 'var(--white)',
-              boxShadow: '4px 0 24px rgba(0,0,0,0.15)',
+              maxWidth: '85vw',
+              background: 'var(--card-bg, #ffffff)',
+              boxShadow: '10px 0 35px rgba(0,0,0,0.25)',
               display: 'flex',
               flexDirection: 'column',
               padding: 'calc(var(--safe-area-top) + 20px) 16px 20px 16px',
               height: '100dvh',
-              animation: 'slideInRight 0.3s ease'
+              animation: 'drawerSlideInLeft 0.38s cubic-bezier(0.16, 1, 0.3, 1)',
+              willChange: 'transform, opacity'
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Drawer Header */}
+            {/* Drawer Header (Clickable User Profile) */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div 
+                onClick={() => {
+                  setDrawerOpen(false);
+                  navigate('/profile');
+                }}
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+              >
                 {state.user.avatar ? (
                   <img
                     src={state.user.avatar}
@@ -250,9 +260,12 @@ export default function AppHeader() {
                   <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {state.user.name || (state.language === 'en' ? 'Set Your Name' : 'নাম সেট করুন')}
                   </h4>
+                  <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 600 }}>
+                    {state.language === 'en' ? 'View Profile' : 'প্রোফাইল দেখুন'} →
+                  </span>
                 </div>
               </div>
-              <button onClick={() => setDrawerOpen(false)} style={{ padding: '6px', color: 'var(--text-muted)', border: 'none', background: 'transparent' }}>
+              <button onClick={() => setDrawerOpen(false)} style={{ padding: '6px', color: 'var(--text-muted)', border: 'none', background: 'transparent', cursor: 'pointer' }}>
                 <X size={22} />
               </button>
             </div>
@@ -262,6 +275,21 @@ export default function AppHeader() {
               <Link to="/home" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Home size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Home' : 'হোম'}</span>
+              </Link>
+
+              <Link to="/all-circulars" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+                <div className="menu-item-icon"><Briefcase size={20} /></div>
+                <span className="menu-item-label">{state.language === 'en' ? 'All Circulars' : 'সকল সার্কুলার'}</span>
+              </Link>
+
+              <Link to="/categories" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+                <div className="menu-item-icon"><LayoutGrid size={20} /></div>
+                <span className="menu-item-label">{state.language === 'en' ? 'Categories' : 'ক্যাটাগরি'}</span>
+              </Link>
+
+              <Link to="/saved" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+                <div className="menu-item-icon"><Bookmark size={20} /></div>
+                <span className="menu-item-label">{state.language === 'en' ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
               </Link>
 
               {/* Collapsible Question Paper & Answer Section */}
@@ -446,6 +474,16 @@ export default function AppHeader() {
                   </div>
                 )}
               </div>
+
+              <Link to="/admit-card" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+                <div className="menu-item-icon"><Calendar size={20} /></div>
+                <span className="menu-item-label">{state.language === 'en' ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
+              </Link>
+
+              <Link to="/notifications" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+                <div className="menu-item-icon"><Bell size={20} /></div>
+                <span className="menu-item-label">{state.language === 'en' ? 'Notifications' : 'বিজ্ঞপ্তি'}</span>
+              </Link>
 
               <Link to="/settings" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Settings size={20} /></div>
