@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import { App as CapacitorApp } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import VersionUpdateModal from './components/VersionUpdateModal'
 import ErrorBoundary from './components/ErrorBoundary'
+import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
 import { initializeOneSignal } from './utils/oneSignalWrapper'
 
@@ -59,6 +60,21 @@ function App() {
 
   const [updateInfo, setUpdateInfo] = useState(null)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [isRouteLoading, setIsRouteLoading] = useState(false)
+  const prevLocRef = useRef(location.pathname + location.search)
+
+  // Show modern loader on every new page open or back button navigation
+  useEffect(() => {
+    const currentLoc = location.pathname + location.search
+    if (prevLocRef.current !== currentLoc) {
+      prevLocRef.current = currentLoc
+      setIsRouteLoading(true)
+      const t = setTimeout(() => {
+        setIsRouteLoading(false)
+      }, 160)
+      return () => clearTimeout(t)
+    }
+  }, [location.pathname, location.search, location.key])
 
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
@@ -160,7 +176,28 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div className="container" data-theme={state.theme}>
+      <div className="container" data-theme={state.theme} style={{ position: 'relative' }}>
+        {/* Universal Smooth Page Open & Back Button Micro-Loader */}
+        {isRouteLoading && (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 999999,
+              background: state.theme === 'dark' ? '#0f172a' : '#f8fafc',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              animation: 'modernFadeIn 0.12s ease'
+            }}
+          >
+            <ModernLoader size="lg" />
+          </div>
+        )}
+
         <Routes location={location}>
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />
