@@ -8,42 +8,7 @@ import BottomNav from '../components/BottomNav';
 import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/ModernLoader';
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
-
-const categoryStyles = {
-  gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.35)', defaultIcon: '🏛️' },
-  bank: { bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(5, 150, 105, 0.35)', defaultIcon: '🏦' },
-  ngo: { bg: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)', shadow: 'rgba(234, 88, 12, 0.35)', defaultIcon: '🤝' },
-  private: { bg: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)', shadow: 'rgba(124, 58, 237, 0.35)', defaultIcon: '🏢' },
-  teaching: { bg: 'linear-gradient(135deg, #db2777 0%, #ec4899 100%)', shadow: 'rgba(219, 39, 119, 0.35)', defaultIcon: '📚' },
-  defense: { bg: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)', shadow: 'rgba(220, 38, 38, 0.35)', defaultIcon: '🛡️' },
-  health: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', shadow: 'rgba(13, 148, 136, 0.35)', defaultIcon: '🏥' },
-  it: { bg: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', shadow: 'rgba(79, 70, 229, 0.35)', defaultIcon: '💻' },
-  engineering: { bg: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)', shadow: 'rgba(217, 119, 6, 0.35)', defaultIcon: '⚙️' },
-  parttime: { bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)', shadow: 'rgba(2, 132, 199, 0.35)', defaultIcon: '⏰' }
-};
-
-const orgIconsMap = {
-  'শিক্ষা মন্ত্রণালয়': '🏛️',
-  'সোনালী ব্যাংক লিমিটেড': '🏦',
-  'বাংলাদেশ পুলিশ': '👮',
-  'ব্র্যাক': '🤝',
-  'গ্রামীণফোন': '📱',
-  'বাংলাদেশ সেনাবাহিনী': '🛡️',
-  'ইসলামী ব্যাংক': '🕌',
-  'বাংলাদেশ রেলওয়ে': '🚂',
-  'ডাক ও টেলিযোগাযোগ মন্ত্রণালয়': '📡',
-  'স্বাস্থ্য অধিদপ্তর': '🏥',
-  'বাংলাদেশ ব্যাংক': '🏛️',
-  'ভিকারুননিসা নূন স্কুল এন্ড কলেজ': '🎓',
-  'এলজিইডি': '🏗️',
-  'বিকাশ লিমিটেড': '💸',
-  'আশা': '🌱',
-  'জনতা ব্যাংক': '🏦',
-  'স্কয়ার হাসপাতাল': '🩺',
-  'পাঠাও': '🚀',
-  'রাজউক উত্তরা মডেল কলেজ': '🏫',
-  'রূপালী ব্যাংক': '🏦'
-};
+import { getJobIconAndStyle } from '../utils/jobIconUtils';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -121,8 +86,7 @@ export default function JobDetails() {
   const orgName = isEn ? (job.organizationEn || job.organization) : (job.organization || job.title);
   const titleName = isEn ? (job.titleEn || job.title) : (job.title || job.organization);
 
-  const styleConfig = categoryStyles[job.category] || categoryStyles.gov;
-  const displayIcon = job.icon || (typeof job.organization === 'string' ? orgIconsMap[job.organization] : null) || styleConfig.defaultIcon;
+  const { icon: displayIcon, style: styleConfig } = getJobIconAndStyle(job);
 
   const handleApplyClick = () => {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
@@ -228,7 +192,7 @@ export default function JobDetails() {
                 <Calendar size={11} /> Deadline: {job.deadline}
               </span>
             )}
-            <span className="chip" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>{job.type}</span>
+            {job.type && <span className="chip" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>{job.type}</span>}
             {isApplied && <span className="chip chip-success" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>✓ Applied</span>}
           </div>
         </div>
