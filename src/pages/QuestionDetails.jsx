@@ -36,6 +36,18 @@ export default function QuestionDetails() {
   // Tracks selected answers for each question: { [questionId]: optionIndex }
   const [selectedAnswers, setSelectedAnswers] = useState({});
 
+  // Calculate score safely at top-level
+  const score = useMemo(() => {
+    if (!paper || !Array.isArray(paper.questions)) return 0;
+    let correct = 0;
+    paper.questions.forEach(q => {
+      if (selectedAnswers[q.id] === q.correctIndex) {
+        correct += 1;
+      }
+    });
+    return correct;
+  }, [paper, selectedAnswers]);
+
   const handleModeChange = (newMode) => {
     if (newMode === mode) return;
     setIsSwitchingMode(true);
@@ -109,17 +121,6 @@ export default function QuestionDetails() {
   const handleReset = () => {
     setSelectedAnswers({});
   };
-
-  // Calculate score
-  const score = useMemo(() => {
-    let correct = 0;
-    paper.questions.forEach(q => {
-      if (selectedAnswers[q.id] === q.correctIndex) {
-        correct += 1;
-      }
-    });
-    return correct;
-  }, [paper.questions, selectedAnswers]);
 
   const attemptedCount = Object.keys(selectedAnswers).length;
   const totalCount = paper.questions.length;

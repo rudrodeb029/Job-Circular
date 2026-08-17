@@ -52,6 +52,7 @@ export default function JobDetails() {
   const [showMore, setShowMore] = useState(false);
   const [showFullImage, setShowFullImage] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [downloading, setDownloading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
 
   React.useEffect(() => {
@@ -126,8 +127,6 @@ export default function JobDetails() {
   const handleApplyClick = () => {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
-
-  const [downloading, setDownloading] = useState(false);
 
   const handleDownloadNotice = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
