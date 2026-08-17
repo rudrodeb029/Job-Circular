@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { getLiveExams } from '../data/liveExams';
 import BottomNav from '../components/BottomNav';
 import PullToRefresh from '../components/PullToRefresh';
+import ModernLoader from '../components/ModernLoader';
 
 export default function LiveExams() {
   const navigate = useNavigate();
@@ -18,6 +19,16 @@ export default function LiveExams() {
   const [registrations, setRegistrations] = useState({});
   const [toastMessage, setToastMessage] = useState('');
   const [activeTab, setActiveTab] = useState('live'); // 'live' | 'history'
+  const [isSwitchingTab, setIsSwitchingTab] = useState(false);
+
+  const handleTabChange = (tab) => {
+    if (activeTab === tab) return;
+    setIsSwitchingTab(true);
+    setActiveTab(tab);
+    setTimeout(() => {
+      setIsSwitchingTab(false);
+    }, 180);
+  };
 
   // Ticks the clock every second and reads databases reactively
   useEffect(() => {
@@ -157,7 +168,7 @@ export default function LiveExams() {
         padding: '0 8px'
       }}>
         <button
-          onClick={() => setActiveTab('live')}
+          onClick={() => handleTabChange('live')}
           style={{
             flex: 1,
             padding: '14px 0',
@@ -174,7 +185,7 @@ export default function LiveExams() {
           {isEn ? 'Live & Upcoming' : 'লাইভ ও আসন্ন'}
         </button>
         <button
-          onClick={() => setActiveTab('history')}
+          onClick={() => handleTabChange('history')}
           style={{
             flex: 1,
             padding: '14px 0',
@@ -246,9 +257,16 @@ export default function LiveExams() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '16px'
+          gap: '16px',
+          minHeight: '220px'
         }}>
-          {filteredExams.map(exam => {
+          {isSwitchingTab ? (
+            <div style={{ padding: '60px 20px', gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '220px' }}>
+              <ModernLoader size="md" icon={activeTab === 'live' ? '🏆' : '📜'} />
+            </div>
+          ) : (
+            <>
+              {filteredExams.map(exam => {
             const status = getExamStatus(exam);
             const startMs = new Date(exam.startTime).getTime();
             const result = getExamResult(exam.id);
@@ -613,16 +631,18 @@ export default function LiveExams() {
             );
           })}
 
-          {filteredExams.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-              <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
-              <p style={{ fontSize: '14px', fontWeight: 600 }}>
-                {activeTab === 'live'
-                  ? (isEn ? 'No live or upcoming exams' : 'কোনো লাইভ বা আসন্ন পরীক্ষা নেই')
-                  : (isEn ? 'No exam history found' : 'কোনো পরীক্ষার ইতিহাস পাওয়া যায়নি')}
-              </p>
-            </div>
-          )}
+            {filteredExams.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
+                <p style={{ fontSize: '14px', fontWeight: 600 }}>
+                  {activeTab === 'live'
+                    ? (isEn ? 'No live or upcoming exams' : 'কোনো লাইভ বা আসন্ন পরীক্ষা নেই')
+                    : (isEn ? 'No exam history found' : 'কোনো পরীক্ষার ইতিহাস পাওয়া যায়নি')}
+                </p>
+              </div>
+            )}
+          </>
+        )}
         </div>
       </div>
       </PullToRefresh>
