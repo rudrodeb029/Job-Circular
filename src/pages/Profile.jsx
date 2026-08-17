@@ -241,7 +241,7 @@ export default function Profile() {
               style={{ borderBottom: '1px solid var(--border-light)' }}
             >
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', color: 'white' }}>
-                <Edit size={15} />
+                <Edit size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
@@ -250,7 +250,7 @@ export default function Profile() {
             {/* Saved Jobs */}
             <div className="menu-item" onClick={() => navigate('/saved')} style={{ borderBottom: '1px solid var(--border-light)' }}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: 'white' }}>
-                <Bookmark size={15} />
+                <Bookmark size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
@@ -259,7 +259,7 @@ export default function Profile() {
             {/* MCQ Exam & Question Bank */}
             <div className="menu-item" onClick={() => navigate('/questions-hub')} style={{ borderBottom: '1px solid var(--border-light)' }}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white' }}>
-                <FileText size={15} />
+                <FileText size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'MCQ Exam & Question Bank' : 'MCQ Exam ও প্রশ্নব্যাংক'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
@@ -268,7 +268,7 @@ export default function Profile() {
             {/* Admit Card & Result */}
             <div className="menu-item" onClick={() => navigate('/admit-card')}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', color: 'white' }}>
-                <FileText size={15} />
+                <FileText size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
@@ -295,7 +295,7 @@ export default function Profile() {
             {/* Notification Settings */}
             <div className="menu-item" onClick={() => navigate('/notifications')} style={{ borderBottom: '1px solid var(--border-light)' }}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)', color: 'white' }}>
-                <Bell size={15} />
+                <Bell size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Notification Settings' : 'নোটিফিকেশন সেটিংস'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
@@ -304,7 +304,7 @@ export default function Profile() {
             {/* Language Switcher */}
             <div className="menu-item" onClick={toggleLanguage} style={{ borderBottom: '1px solid var(--border-light)' }}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #db2777, #ec4899)', color: 'white' }}>
-                <Globe size={15} />
+                <Globe size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'App Language' : 'অ্যাপের ভাষা'}</span>
               <span style={{
@@ -324,7 +324,7 @@ export default function Profile() {
             {/* Dark Mode Toggle */}
             <div className="menu-item" onClick={() => dispatch({ type: 'TOGGLE_THEME' })}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white' }}>
-                {state.theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+                {state.theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
               </div>
               <span className="menu-item-label">{isEn ? 'Dark Mode' : 'ডার্ক মোড'}</span>
               <div className={`toggle ${state.theme === 'dark' ? 'active' : ''}`}></div>
