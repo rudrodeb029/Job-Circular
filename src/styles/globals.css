@@ -323,9 +323,26 @@ ul, ol {
   }
 }
 
+/* Sidebar Drawer Right-to-Left Exit Motion */
+@keyframes drawerSlideOutLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0.5;
+  }
+}
+
 @keyframes drawerOverlayFade {
   0% { opacity: 0; }
   100% { opacity: 1; }
+}
+
+@keyframes drawerOverlayFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 /* Page Content Opening Right-to-Left Slow & Polished Motion */

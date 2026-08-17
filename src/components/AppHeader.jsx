@@ -11,11 +11,29 @@ export default function AppHeader() {
   const { state, dispatch } = useAppContext();
   const { state: adminState } = useAdminContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const [questionsMenuOpen, setQuestionsMenuOpen] = useState(true); // Default open for better discoverability
   const [expandedCategory, setExpandedCategory] = useState(null);
 
   const notificationsList = getFilteredNotifications(adminState.notifications || [], state.installTime);
   const unreadCount = notificationsList.filter(n => !state.readNotifications.includes(n.id)).length;
+
+  const handleOpenDrawer = () => {
+    setIsClosing(false);
+    setDrawerOpen(true);
+  };
+
+  const handleCloseDrawer = (callback) => {
+    if (isClosing) return;
+    setIsClosing(true);
+    setTimeout(() => {
+      setDrawerOpen(false);
+      setIsClosing(false);
+      if (typeof callback === 'function') {
+        callback();
+      }
+    }, 300);
+  };
 
   return (
     <>
@@ -39,7 +57,7 @@ export default function AppHeader() {
         {/* Left: Hamburger Menu Icon Button */}
         <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
           <button
-            onClick={() => setDrawerOpen(true)}
+            onClick={handleOpenDrawer}
             aria-label="Open Menu"
             style={{
               width: '36px',
@@ -202,8 +220,8 @@ export default function AppHeader() {
           backdropFilter: 'blur(5px)',
           WebkitBackdropFilter: 'blur(5px)',
           display: 'flex',
-          animation: 'drawerOverlayFade 0.35s ease'
-        }} onClick={() => setDrawerOpen(false)}>
+          animation: isClosing ? 'drawerOverlayFadeOut 0.3s ease forwards' : 'drawerOverlayFade 0.35s ease forwards'
+        }} onClick={() => handleCloseDrawer()}>
           <div
             style={{
               width: '280px',
@@ -214,7 +232,7 @@ export default function AppHeader() {
               flexDirection: 'column',
               padding: 'calc(var(--safe-area-top) + 20px) 16px 20px 16px',
               height: '100dvh',
-              animation: 'drawerSlideInLeft 0.38s cubic-bezier(0.16, 1, 0.3, 1)',
+              animation: isClosing ? 'drawerSlideOutLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards' : 'drawerSlideInLeft 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards',
               willChange: 'transform, opacity'
             }}
             onClick={(e) => e.stopPropagation()}
@@ -223,8 +241,7 @@ export default function AppHeader() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <div 
                 onClick={() => {
-                  setDrawerOpen(false);
-                  navigate('/profile');
+                  handleCloseDrawer(() => navigate('/profile'));
                 }}
                 style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
               >
@@ -262,29 +279,29 @@ export default function AppHeader() {
                   </h4>
                 </div>
               </div>
-              <button onClick={() => setDrawerOpen(false)} style={{ padding: '6px', color: 'var(--text-muted)', border: 'none', background: 'transparent', cursor: 'pointer' }}>
+              <button onClick={() => handleCloseDrawer()} style={{ padding: '6px', color: 'var(--text-muted)', border: 'none', background: 'transparent', cursor: 'pointer' }}>
                 <X size={22} />
               </button>
             </div>
 
             {/* Drawer Menu Links */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, overflowY: 'auto' }}>
-              <Link to="/home" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+              <Link to="/home" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Home size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Home' : 'হোম'}</span>
               </Link>
 
-              <Link to="/all-circulars" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+              <Link to="/all-circulars" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Briefcase size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'All Circulars' : 'সকল সার্কুলার'}</span>
               </Link>
 
-              <Link to="/categories" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+              <Link to="/categories" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><LayoutGrid size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Categories' : 'ক্যাটাগরি'}</span>
               </Link>
 
-              <Link to="/saved" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+              <Link to="/saved" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Bookmark size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
               </Link>
@@ -337,8 +354,7 @@ export default function AppHeader() {
                             }}
                             className="menu-item-sub"
                             onClick={() => {
-                              setDrawerOpen(false);
-                              navigate(`/questions/${cat.id}`);
+                              handleCloseDrawer(() => navigate(`/questions/${cat.id}`));
                             }}
                           >
                             <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -402,7 +418,7 @@ export default function AppHeader() {
                                   <Link
                                     key={paper.id}
                                     to={`/question-details/${paper.id}`}
-                                    onClick={() => setDrawerOpen(false)}
+                                    onClick={() => handleCloseDrawer()}
                                     style={{
                                       fontSize: '12px',
                                       fontWeight: 500,
@@ -452,7 +468,7 @@ export default function AppHeader() {
                     {/* Live Exam link */}
                     <Link
                       to="/live-exams"
-                      onClick={() => setDrawerOpen(false)}
+                      onClick={() => handleCloseDrawer()}
                       style={{ 
                         display: 'flex', 
                         alignItems: 'center', 
@@ -472,17 +488,17 @@ export default function AppHeader() {
                 )}
               </div>
 
-              <Link to="/admit-card" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+              <Link to="/admit-card" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Calendar size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
               </Link>
 
-              <Link to="/notifications" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+              <Link to="/notifications" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Bell size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Notifications' : 'বিজ্ঞপ্তি'}</span>
               </Link>
 
-              <Link to="/settings" onClick={() => setDrawerOpen(false)} className="menu-item" style={{ borderRadius: '10px' }}>
+              <Link to="/settings" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Settings size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Settings' : 'সেটিংস'}</span>
               </Link>
