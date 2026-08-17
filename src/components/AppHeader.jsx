@@ -257,12 +257,9 @@ export default function AppHeader() {
                   </div>
                 )}
                 <div>
-                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
                     {state.user.name || (state.language === 'en' ? 'Set Your Name' : 'নাম সেট করুন')}
                   </h4>
-                  <span style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: 600 }}>
-                    {state.language === 'en' ? 'View Profile' : 'প্রোফাইল দেখুন'} →
-                  </span>
                 </div>
               </div>
               <button onClick={() => setDrawerOpen(false)} style={{ padding: '6px', color: 'var(--text-muted)', border: 'none', background: 'transparent', cursor: 'pointer' }}>
