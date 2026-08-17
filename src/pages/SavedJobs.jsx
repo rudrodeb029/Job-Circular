@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
-import { Bookmark, BookmarkCheck, Calendar, Clock, Download, FileText, Search } from '../components/Icons';
+import { Bookmark, BookmarkCheck, Briefcase, Calendar, Clock, Download, FileText, Search } from '../components/Icons';
 import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
 import SearchBar from '../components/SearchBar';
@@ -66,22 +66,34 @@ const toBengaliNumber = (num) => {
 
 export default function SavedJobs() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { state, dispatch } = useAppContext();
   const isEn = state.language === 'en';
-  const [activeTab, setActiveTab] = useState('all');
+
+  const initialTab = searchParams.get('tab') || location.state?.tab || 'all';
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [searchQuery, setSearchQuery] = useState('');
 
   const tabs = [
-    { id: 'all', label: state.language === 'en' ? 'All' : 'সব' },
+    { id: 'all', label: state.language === 'en' ? 'Saved' : 'সংরক্ষিত' },
     { id: 'applied', label: state.language === 'en' ? 'Applied' : 'আবেদনকৃত' }
   ];
 
   // Load jobs from AdminContext
   const { state: adminState } = useAdminContext();
-  const localJobs = adminState.jobs;
+  const localJobs = adminState.jobs || [];
 
-  const savedJobList = useMemo(() => {
-    const list = localJobs.filter(j => state.savedJobs.includes(j.id));
+  const currentJobList = useMemo(() => {
+    // If 'applied' tab: show all applied jobs whether saved or not!
+    // If 'all' (Saved) tab: show all saved jobs!
+    let list = [];
+    if (activeTab === 'applied') {
+      list = localJobs.filter(j => (state.appliedJobs || []).includes(j.id));
+    } else {
+      list = localJobs.filter(j => (state.savedJobs || []).includes(j.id));
+    }
+
     const getItemTimestamp = (item) => {
       if (item.createdAt) {
         const ms = new Date(item.createdAt).getTime();
@@ -98,28 +110,21 @@ export default function SavedJobs() {
       return 0;
     };
     return list.sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a));
-  }, [localJobs, state.savedJobs]);
+  }, [localJobs, state.savedJobs, state.appliedJobs, activeTab]);
 
-  const filteredJobs = savedJobList.filter(job => {
-    const isApplied = state.appliedJobs.includes(job.id);
-    const matchesTab = activeTab === 'applied' ? isApplied :
-                       activeTab === 'exam_date' ? !!job.examDate :
-                       activeTab === 'result' ? !!job.examResult : true;
-    
-    if (!matchesTab) return false;
-
-    if (!searchQuery.trim()) return true;
+  const filteredJobs = useMemo(() => {
+    if (!searchQuery.trim()) return currentJobList;
 
     const q = searchQuery.toLowerCase().trim();
-    return (
+    return currentJobList.filter(job => (
       (job.title && job.title.toLowerCase().includes(q)) ||
       (job.titleEn && job.titleEn.toLowerCase().includes(q)) ||
       (job.organization && job.organization.toLowerCase().includes(q)) ||
       (job.organizationEn && job.organizationEn.toLowerCase().includes(q)) ||
       (job.location && job.location.toLowerCase().includes(q)) ||
       (job.type && job.type.toLowerCase().includes(q))
-    );
-  });
+    ));
+  }, [currentJobList, searchQuery]);
 
   return (
     <div className="page">
@@ -330,10 +335,16 @@ export default function SavedJobs() {
           </div>
         ) : (
           <EmptyState
-            icon={searchQuery ? Search : Bookmark}
-            description={searchQuery ? `No saved jobs match "${searchQuery}"` : undefined}
-            actionText={searchQuery ? "Clear Search" : "Explore Jobs"}
-            onAction={searchQuery ? () => setSearchQuery('') : () => navigate('/search')}
+            icon={searchQuery ? Search : (activeTab === 'applied' ? Briefcase : Bookmark)}
+            description={
+              searchQuery 
+                ? (isEn ? `No ${activeTab === 'applied' ? 'applied' : 'saved'} circulars match "${searchQuery}"` : `"${searchQuery}" এর সাথে কোনো ${activeTab === 'applied' ? 'আবেদনকৃত' : 'সংরক্ষিত'} সার্কুলার মেলেনি`)
+                : (activeTab === 'applied' 
+                    ? (isEn ? 'You have not marked any jobs as applied yet.' : 'আপনি এখনও কোনো সার্কুলারে আবেদন করেননি।')
+                    : (isEn ? 'You have not saved any circulars yet.' : 'আপনি এখনও কোনো সার্কুলার সংরক্ষণ করেননি।'))
+            }
+            actionText={searchQuery ? (isEn ? 'Clear Search' : 'সার্চ মুছুন') : (isEn ? 'Explore Jobs' : 'সকল সার্কুলার দেখুন')}
+            onAction={searchQuery ? () => setSearchQuery('') : () => navigate('/all-circulars')}
           />
         )}
       </div>

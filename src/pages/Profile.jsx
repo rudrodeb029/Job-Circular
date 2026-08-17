@@ -192,7 +192,7 @@ export default function Profile() {
           </div>
           <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
           <div
-            onClick={() => navigate('/saved')}
+            onClick={() => navigate('/saved?tab=applied')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
             <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669' }}>
