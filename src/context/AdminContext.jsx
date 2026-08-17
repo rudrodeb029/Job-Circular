@@ -415,13 +415,6 @@ export const AdminProvider = ({ children }) => {
   const loadAllData = async (forceServer = true) => {
     try {
       setLoading(true);
-      if (forceServer) {
-        clearCollectionCache(COLLECTIONS.JOBS);
-        clearCollectionCache(COLLECTIONS.NOTIFICATIONS);
-        clearCollectionCache(COLLECTIONS.ADMITS);
-        clearCollectionCache(COLLECTIONS.QUESTIONS);
-        clearCollectionCache(COLLECTIONS.LIVE_EXAMS);
-      }
 
       const [jobsData, notifsData, admitsData, questionsData, liveExamsData] = await Promise.all([
         getCollectionCached(COLLECTIONS.JOBS, forceServer),
