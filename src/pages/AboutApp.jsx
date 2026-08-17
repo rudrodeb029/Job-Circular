@@ -172,7 +172,7 @@ export default function AboutApp() {
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Info size={18} color="var(--primary)" />
-          <span>{isEn ? 'About Job Circular' : 'অ্যাপ সম্পর্কিত ও বৈশিষ্ট্য'}</span>
+          <span>{isEn ? 'About Job Circulars BD' : 'অ্যাপ সম্পর্কিত ও বৈশিষ্ট্য'}</span>
         </h1>
       </div>
 
@@ -221,7 +221,7 @@ export default function AboutApp() {
           </div>
 
           <h2 style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.3px' }}>
-            Job Circular BD
+            Job Circulars BD
           </h2>
 
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--white)', border: '1px solid var(--border)', padding: '4px 12px', borderRadius: '30px', marginTop: '8px' }}>

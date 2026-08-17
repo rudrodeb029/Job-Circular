@@ -33,7 +33,7 @@ export default function TermsConditions() {
                 1. Disclaimer / সাধারণ নিয়মাবলি
               </h3>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                Job Circular aggregates job posts from government gazettes, corporate sites, and newspapers. Candidates are advised to verify details with official sources before submitting applications.
+                Job Circulars BD aggregates job posts from government gazettes, corporate sites, and newspapers. Candidates are advised to verify details with official sources before submitting applications.
               </p>
               <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '8px', fontStyle: 'italic' }}>
                 জব সার্কুলার অ্যাপের তথ্যসমূহ সরকারি গেজেট ও বিভিন্ন বিশ্বস্ত সূত্র থেকে নেওয়া হয়। আবেদনের পূর্বে মূল বিজ্ঞপ্তি ভালোভাবে যাচাই করে নেওয়ার অনুরোধ রইল।

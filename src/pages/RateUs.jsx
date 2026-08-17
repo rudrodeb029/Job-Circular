@@ -75,7 +75,7 @@ export default function RateUs() {
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Star size={18} color="#f59e0b" fill="#f59e0b" />
-          <span>{isEn ? 'Rate Job Circular App' : 'অ্যাপ রেটিং দিন'}</span>
+          <span>{isEn ? 'Rate Job Circulars BD' : 'অ্যাপ রেটিং দিন'}</span>
         </h1>
       </div>
 
@@ -107,7 +107,7 @@ export default function RateUs() {
           </div>
 
           <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 6px 0' }}>
-            {isEn ? 'Enjoying Job Circular BD?' : 'অ্যাপটি আপনার কেমন লাগছে?'}
+            {isEn ? 'Enjoying Job Circulars BD?' : 'অ্যাপটি আপনার কেমন লাগছে?'}
           </h2>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
             {isEn 

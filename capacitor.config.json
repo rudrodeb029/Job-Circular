@@ -1,6 +1,6 @@
 {
   "appId": "com.jobcircular.app",
-  "appName": "Job Circular",
+  "appName": "Job Circulars BD",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
