@@ -223,8 +223,6 @@ ul, ol {
   padding-bottom: calc(75px + var(--safe-area-bottom));
   min-height: 100vh;
   min-height: 100dvh;
-  animation: pageSlideInRight 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
 }
 
 /* Glassmorphic Modern Header */
