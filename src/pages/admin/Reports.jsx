@@ -74,6 +74,7 @@ const Reports = () => {
       let normType = item.type || 'system';
       if (item.type === 'live_exam_submission' || item.examId) normType = 'submission';
       else if (item.type === 'contact_message') normType = 'message';
+      else if (item.type === 'app_rating_review') normType = 'rating';
       else if ((item.action || '').toLowerCase().includes('job') || (item.target || '').toLowerCase().includes('job')) normType = 'job';
       else if ((item.action || '').toLowerCase().includes('exam') || (item.target || '').toLowerCase().includes('exam')) normType = 'exam';
       else if ((item.action || '').toLowerCase().includes('notif') || (item.target || '').toLowerCase().includes('notif')) normType = 'notification';
@@ -160,6 +161,8 @@ const Reports = () => {
         return { bg: '#ede9fe', color: '#7c3aed', label: 'Notification' };
       case 'message':
         return { bg: '#ffedd5', color: '#ea580c', label: 'Support Message' };
+      case 'rating':
+        return { bg: '#fef3c7', color: '#d97706', label: 'App Rating' };
       case 'question':
         return { bg: '#e0f2fe', color: '#0284c7', label: 'Question' };
       default:
@@ -270,6 +273,7 @@ const Reports = () => {
               <option value="exam">Live Exams</option>
               <option value="submission">Student Submissions</option>
               <option value="message">User Messages</option>
+              <option value="rating">App Ratings</option>
               <option value="notification">Notifications</option>
               <option value="question">Questions</option>
             </select>

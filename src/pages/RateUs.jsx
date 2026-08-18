@@ -39,8 +39,10 @@ export default function RateUs() {
       // Save rating review to Firestore 'activities' or 'feedback'
       await addDocument(COLLECTIONS.ACTIVITIES, {
         type: 'app_rating_review',
+        action: 'App Rating Received',
         rating: rating,
         feedback: feedback || '',
+        text: `Rated ${rating} stars. Review: ${feedback || 'No comments'}`,
         createdAt: new Date().toISOString()
       });
 
