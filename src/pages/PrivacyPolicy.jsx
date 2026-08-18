@@ -7,60 +7,83 @@ export default function PrivacyPolicy() {
   const navigate = useNavigate();
 
   return (
-    <div className="page">
+    <div className="page" style={{ background: 'var(--bg-secondary)' }}>
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1>Privacy Policy</h1>
+        <h1 style={{ fontSize: '15px', fontWeight: 800 }}>Privacy Policy</h1>
       </div>
 
-      <div className="page-content animate-fade-in">
-        <div className="card" style={{ marginBottom: '20px', borderTop: '4px solid var(--primary)' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+        <div className="card" style={{ marginBottom: '20px', borderRadius: '24px', borderTop: '4px solid var(--primary)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ padding: '10px', background: 'var(--primary-bg)', borderRadius: '12px', color: 'var(--primary)' }}>
               <Shield size={24} />
             </div>
             <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Privacy & Data</h2>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Last updated: July 2026</p>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>Privacy & Data Security</h2>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>Last updated: July 2026</p>
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <section>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                1. Data Collection / তথ্য সংগ্রহ
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                1. Information We Collect
               </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                We collect your profile details (name, email, educational qualification, and target job category) locally to personalize your job feed and matching alerts.
-              </p>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '8px', fontStyle: 'italic' }}>
-                আমরা আপনার প্রোফাইলের বিবরণ (নাম, ইমেল, শিক্ষাগত যোগ্যতা এবং লক্ষ্যযুক্ত চাকুরির ক্যাটাগরি) আপনার জন্য উপযুক্ত চাকুরির খবর দেখানোর জন্য সংরক্ষণ করি।
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                We collect information you provide directly to us when creating a profile, including your name, educational qualification, district location, and target job categories. We also collect activity data such as saved job circulars, applied jobs, and feedback messages you send to our support team.
               </p>
             </section>
 
             <section>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                2. Permissions / পারমিশন
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                2. Data Synchronization & Storage
               </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                The app requests storage permissions to allow downloading circular images, and notification permissions to alert you about new jobs and upcoming deadlines.
-              </p>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '8px', fontStyle: 'italic' }}>
-                চাকুরির বিজ্ঞপ্তির ছবি ডাউনলোড করার জন্য স্টোরেজ পারমিশন এবং নতুন চাকুরির অ্যালার্ট পাওয়ার জন্য নোটিফিকেশন পারমিশন প্রয়োজন।
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Your profile and activity data are synchronized with our secure backend (Supabase) to ensure your information is backed up and can be restored if you reinstall the app. We also use high-performance local caching to store job data on your device for instant offline access.
               </p>
             </section>
 
             <section>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                3. Security / নিরাপত্তা
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                3. Push Notifications
               </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                Your data is stored securely in local storage and is never shared with third parties. We value your privacy and ensure that all personal information remains on your device.
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                We use OneSignal to send real-time alerts about new job circulars, exam dates, and results. These services may collect unique device identifiers to deliver notifications effectively. You can opt-out of these notifications at any time through the app settings.
               </p>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '8px', fontStyle: 'italic' }}>
-                আপনার তথ্য সম্পূর্ণ সুরক্ষিত রাখা হয় এবং কোনো তৃতীয় পক্ষের সাথে শেয়ার করা হয় না।
+            </section>
+
+            <section>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                4. Third-Party Services
+              </h3>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Our application utilizes trusted third-party services to enhance performance:
+              </p>
+              <ul style={{ paddingLeft: '18px', marginTop: '6px', fontSize: '12.5px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <li><strong>Supabase:</strong> For secure database storage and real-time data sync.</li>
+                <li><strong>Cloudinary:</strong> For optimized delivery of job circular images.</li>
+                <li><strong>OneSignal:</strong> For reliable push notification delivery.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                5. Security Measures
+              </h3>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                We implement industry-standard security protocols to protect your personal information from unauthorized access, alteration, or disclosure. We do not sell or share your personal data with third-party advertisers or marketing agencies.
+              </p>
+            </section>
+
+            <section>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                6. Contact Information
+              </h3>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                If you have any questions or concerns regarding this Privacy Policy or our data practices, please contact us through the "Contact Support" section within the app or email our data protection officer.
               </p>
             </section>
           </div>

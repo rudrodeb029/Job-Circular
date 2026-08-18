@@ -7,60 +7,69 @@ export default function TermsConditions() {
   const navigate = useNavigate();
 
   return (
-    <div className="page">
+    <div className="page" style={{ background: 'var(--bg-secondary)' }}>
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1>Terms & Conditions</h1>
+        <h1 style={{ fontSize: '15px', fontWeight: 800 }}>Terms & Conditions</h1>
       </div>
 
-      <div className="page-content animate-fade-in">
-        <div className="card" style={{ marginBottom: '20px', borderTop: '4px solid var(--primary)' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+        <div className="card" style={{ marginBottom: '20px', borderRadius: '24px', borderTop: '4px solid var(--primary)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ padding: '10px', background: 'var(--primary-bg)', borderRadius: '12px', color: 'var(--primary)' }}>
               <FileText size={24} />
             </div>
             <div>
-              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>Usage Terms</h2>
-              <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Effective: July 2026</p>
+              <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)' }}>Terms of Service</h2>
+              <p style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }}>Effective: July 2026</p>
             </div>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <section>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                1. Disclaimer / সাধারণ নিয়মাবলি
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                1. Disclaimer of Affiliation
               </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                Job Circulars BD aggregates job posts from government gazettes, corporate sites, and newspapers. Candidates are advised to verify details with official sources before submitting applications.
-              </p>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '8px', fontStyle: 'italic' }}>
-                জব সার্কুলার অ্যাপের তথ্যসমূহ সরকারি গেজেট ও বিভিন্ন বিশ্বস্ত সূত্র থেকে নেওয়া হয়। আবেদনের পূর্বে মূল বিজ্ঞপ্তি ভালোভাবে যাচাই করে নেওয়ার অনুরোধ রইল।
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                Job Circulars BD is an independent, non-governmental platform. We are NOT affiliated with the Government of Bangladesh or any specific government agency. All information provided in the app is for educational and informational purposes only.
               </p>
             </section>
 
             <section>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                2. User Obligations / ব্যবহারকারীর দায়িত্ব
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                2. Information Accuracy
               </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                You must provide accurate profile details to get relevant notifications. Any misuse of links, templates, or automated query generation is strictly prohibited.
-              </p>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '8px', fontStyle: 'italic' }}>
-                সঠিক নোটিফিকেশন পেতে আপনার প্রোফাইলে সঠিক তথ্য প্রদান করুন। আমাদের চাকুরির লিঙ্ক বা ছবিগুলোর কোনো প্রকার বাণিজ্যিক অপব্যবহার নিষিদ্ধ।
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                We aggregate job circulars, exam dates, and results from public official gazettes, official portals, and national newspapers. While we strive for 100% accuracy, users are required to verify all details on official government websites or the original circular before submitting any job application.
               </p>
             </section>
 
             <section>
-              <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-                3. Limitation of Liability / দায়বদ্ধতার সীমাবদ্ধতা
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                3. User Obligations
               </h3>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                We are not responsible for any issues arising from delayed applications, technical errors on official apply sites, or changes in circular deadlines.
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                By using this app, you agree to provide accurate information in your user profile. Commercial misuse of images, links, or automated data extraction from this application is strictly prohibited.
               </p>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '8px', fontStyle: 'italic' }}>
-                অফিসিয়াল ওয়েবসাইটের কোনো সমস্যা বা চাকুরির ডেডলাইন পরিবর্তনের জন্য জব সার্কুলার অ্যাপ কর্তৃপক্ষ দায়ী থাকবে না।
+            </section>
+
+            <section>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                4. Limitation of Liability
+              </h3>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                We are not responsible for any issues arising from technical errors on official job application sites, changes in recruitment deadlines, or delays in push notification delivery.
+              </p>
+            </section>
+
+            <section>
+              <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '6px' }}>
+                5. Acceptance of Terms
+              </h3>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                By accessing or using the Job Circulars BD app, you acknowledge that you have read, understood, and agreed to be bound by these terms. We reserve the right to update these terms at any time without prior notice.
               </p>
             </section>
           </div>

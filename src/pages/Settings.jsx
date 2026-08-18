@@ -28,7 +28,7 @@ export default function Settings() {
 
   const handleDeleteAccount = () => {
     const isConfirm = window.confirm(
-      "Are you sure you want to delete your profile and all local data? This action cannot be undone.\n\nআপনি কি আপনার প্রোফাইল এবং সকল তথ্য মুছে ফেলতে চান?"
+      "Are you sure you want to delete your profile and all local data? This action cannot be undone."
     );
     if (isConfirm) {
       localStorage.clear();
