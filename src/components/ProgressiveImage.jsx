@@ -51,10 +51,14 @@ export default function ProgressiveImage({
       if (onLoad) onLoad();
     };
     img.onerror = (err) => {
-      // Final fallback to raw URL if optimization fails
-      if (currentSrc !== src) {
+      console.warn('ProgressiveImage load failed for:', highResUrl);
+      // Final fallback to the direct Drive view or raw URL if optimization fails
+      if (driveId) {
+        setCurrentSrc(`https://drive.google.com/uc?export=view&id=${driveId}`);
+      } else {
         setCurrentSrc(src);
       }
+      setIsLoaded(true); // Stop the "Optimizing" state even if fallback used
       if (onError) onError(err);
     };
   }, [src]);

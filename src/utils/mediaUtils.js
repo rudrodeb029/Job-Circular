@@ -55,9 +55,14 @@ export function normalizeMediaUrl(url) {
   const trimmed = url.trim();
   if (!trimmed) return '';
 
-  // 1. Google Drive: High-res direct CDN snapshot
+  // 1. Google Drive: Detect ID
   const driveId = getGoogleDriveFileId(trimmed);
   if (driveId) {
+    // If it's a PDF or we don't know, the thumbnail service is safest for previews
+    if (trimmed.toLowerCase().includes('.pdf') || trimmed.includes('/view')) {
+      return `https://drive.google.com/thumbnail?id=${driveId}&sz=w1200`;
+    }
+    // For direct image formats, lh3 is very fast
     return `https://lh3.googleusercontent.com/d/${driveId}`;
   }
 
