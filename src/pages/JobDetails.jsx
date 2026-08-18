@@ -9,6 +9,7 @@ import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/M
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
+import ProgressiveImage from '../components/ProgressiveImage';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -117,6 +118,51 @@ export default function JobDetails() {
 
   return (
     <div className="page" style={{ paddingBottom: '100px' }}>
+      {/* FULL SCREEN ZOOM VIEWER */}
+      {showFullImage && (
+        <div
+          onClick={() => setShowFullImage(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0,0,0,0.95)',
+            zIndex: 2000,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+        >
+          {/* Header for Zoom Viewer */}
+          <div style={{ position: 'absolute', top: '20px', left: '0', right: 0, display: 'flex', justifyContent: 'space-between', padding: '0 20px', alignItems: 'center' }}>
+            <span style={{ color: 'white', fontSize: '14px', fontWeight: 800 }}>Page {activeImageIndex + 1} / {circularImages.length}</span>
+            <button
+              onClick={() => setShowFullImage(false)}
+              style={{ color: 'white', background: 'rgba(255,255,255,0.2)', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 800 }}
+            >
+              CLOSE ✕
+            </button>
+          </div>
+
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'auto' }}>
+            <img
+              src={circularImages[activeImageIndex]}
+              alt="Zoomed Notice"
+              style={{ maxWidth: '300%', width: '100%', height: 'auto', display: 'block' }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+
+          <div style={{ position: 'absolute', bottom: '30px', color: 'rgba(255,255,255,0.6)', fontSize: '11px', fontWeight: 600 }}>
+            Pinch to zoom or scroll to see details
+          </div>
+        </div>
+      )}
+
       {/* Header with Applied & Saved Actions */}
       <div className="page-header">
         <button className="back-btn" onClick={() => navigate(-1)}>
@@ -273,48 +319,42 @@ export default function JobDetails() {
 
             {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
             <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
-              <img
+              <ProgressiveImage
                 src={circularImages[activeImageIndex]}
                 alt={`Circular Notice Page ${activeImageIndex + 1}`}
                 onClick={() => setShowFullImage(!showFullImage)}
+                style={{
+                  maxHeight: showFullImage ? 'none' : '380px',
+                  objectPosition: 'top'
+                }}
                 onError={(e) => {
+                  const target = e.target || e;
+                  if (!target) return;
                   const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
                   const driveId = getGoogleDriveFileId(rawSrc);
-                  const step = parseInt(e.target.dataset.fallbackStep || '0', 10);
+                  const step = parseInt(target.dataset?.fallbackStep || '0', 10);
 
                   if (driveId) {
                     if (step === 0) {
-                      e.target.dataset.fallbackStep = '1';
-                      e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+                      target.dataset.fallbackStep = '1';
+                      target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
                       return;
                     }
                     if (step === 1) {
-                      e.target.dataset.fallbackStep = '2';
-                      e.target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
+                      target.dataset.fallbackStep = '2';
+                      target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
                       return;
                     }
                   }
 
                   if (rawSrc.includes('cloudinary.com') && step === 0) {
-                    e.target.dataset.fallbackStep = '1';
-                    e.target.src = rawSrc.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg');
+                    target.dataset.fallbackStep = '1';
+                    target.src = rawSrc.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg');
                     return;
                   }
 
-                  e.target.onerror = null;
-                  e.target.style.display = 'none';
-                  if (e.target.parentNode) {
-                    e.target.parentNode.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;background:var(--bg-secondary)"><div style="width:48px;height:48px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px">📷</div><span style="font-size:14px;font-weight:800;color:var(--text-secondary)">No Photo</span></div>';
-                  }
-                }}
-                style={{
-                  width: '100%',
-                  maxHeight: showFullImage ? 'none' : '380px',
-                  objectFit: 'cover',
-                  objectPosition: 'top',
-                  display: 'block',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
+                  target.onerror = null;
+                  target.style.display = 'none';
                 }}
               />
 
