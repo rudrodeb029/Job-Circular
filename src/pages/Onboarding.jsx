@@ -142,16 +142,20 @@ export default function Onboarding() {
         {/* Bottom Button Action */}
         <div>
           <button
-            className="btn btn-block btn-lg animate-slide-up"
+            className="btn btn-block animate-slide-up"
             onClick={() => setHasAgreedDisclaimer(true)}
             style={{
               background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               color: 'white',
-              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)'
+              boxShadow: '0 8px 24px rgba(16, 185, 129, 0.3)',
+              height: '46px',
+              fontSize: '14px',
+              fontWeight: 800,
+              borderRadius: '12px'
             }}
           >
             <span>I Understand</span>
-            <ChevronRight size={20} />
+            <ChevronRight size={18} />
           </button>
         </div>
       </div>
@@ -224,14 +228,18 @@ export default function Onboarding() {
 
         {/* Action Button */}
         <button
-          className="btn btn-block btn-lg"
+          className="btn btn-block"
           onClick={handleNext}
           style={{
             background: currentSlide === slides.length - 1
               ? 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)'
               : 'var(--primary)',
             color: 'white',
-            boxShadow: '0 8px 24px rgba(26, 86, 219, 0.3)'
+            boxShadow: '0 8px 24px rgba(26, 86, 219, 0.3)',
+            height: '46px',
+            fontSize: '14px',
+            fontWeight: 800,
+            borderRadius: '12px'
           }}
         >
           <span>
@@ -239,7 +247,7 @@ export default function Onboarding() {
               ? (isEn ? 'Get Started' : 'শুরু করুন') 
               : (isEn ? 'Next' : 'পরবর্তী')}
           </span>
-          <ChevronRight size={20} />
+          <ChevronRight size={18} />
         </button>
       </div>
     </div>
