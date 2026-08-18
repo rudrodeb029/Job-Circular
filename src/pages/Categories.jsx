@@ -8,6 +8,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 
 import ModernLoader from '../components/ModernLoader';
+import { CategorySkeleton } from '../components/SkeletonLoader';
 
 export default function Categories() {
   const navigate = useNavigate();
@@ -34,8 +35,8 @@ export default function Categories() {
         <div className="page-header">
            <h1 style={{ fontSize: '16px' }}>{isEn ? 'Categories' : 'ক্যাটাগরি'}</h1>
         </div>
-        <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <ModernLoader size="lg" icon="📑" />
+        <div className="page-content" style={{ padding: '16px' }}>
+          {[1, 2, 3, 4, 5, 6].map(i => <CategorySkeleton key={i} />)}
         </div>
         <BottomNav />
       </div>
@@ -54,16 +55,10 @@ export default function Categories() {
         </h1>
       </div>
 
-      <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '16px 16px 80px 16px' }}>
         <div>
-          {categoriesWithCounts.map((cat, index) => (
-            <div
-              key={cat.id}
-              className="animate-slide-up"
-              style={{ animationDelay: `${index * 40}ms` }}
-            >
-              <CategoryCard category={cat} />
-            </div>
+          {categoriesWithCounts.map((cat) => (
+            <CategoryCard key={cat.id} category={cat} />
           ))}
         </div>
       </div>
