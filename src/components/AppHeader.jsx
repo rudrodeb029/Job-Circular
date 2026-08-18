@@ -285,7 +285,17 @@ export default function AppHeader() {
             </div>
 
             {/* Drawer Menu Links */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1, overflowY: 'auto' }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px',
+              flex: 1,
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              overscrollBehavior: 'contain'
+            }}>
               <Link to="/home" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Home size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Home' : 'হোম'}</span>
