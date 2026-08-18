@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
 import { initializeOneSignal } from './utils/oneSignalWrapper'
+import { syncCoreDataOnStartup } from './services/supabaseService'
 
 const CURRENT_VERSION = "1.0.9";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
@@ -66,6 +67,11 @@ function App() {
   const isAdminRoute = location.pathname.startsWith('/admin')
 
   useEffect(() => {
+    // 0. Strict Startup Sync - Fetch all core data exactly once
+    if (!isAdminRoute) {
+      syncCoreDataOnStartup();
+    }
+
     // 1. Initialize Push Notifications for non-admin users
     if (!isAdminRoute) {
       initializePushNotifications();

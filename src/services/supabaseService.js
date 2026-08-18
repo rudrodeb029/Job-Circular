@@ -83,6 +83,40 @@ export const getCollection = async (collectionName, forceServer = false) => {
 
 // Per-session revalidation tracker
 const _sessionRevalidatedCollections = new Set();
+let _appInitialized = false;
+
+/**
+ * Global app initialization sync.
+ * Strictly fetches core data once when the app opens.
+ */
+export const syncCoreDataOnStartup = async () => {
+  if (_appInitialized || !navigator.onLine) return;
+
+  const coreCollections = [
+    COLLECTIONS.JOBS,
+    COLLECTIONS.NOTIFICATIONS,
+    COLLECTIONS.ADMITS,
+    COLLECTIONS.LIVE_EXAMS,
+    COLLECTIONS.APP_CONFIG
+  ];
+
+  console.log('Strict Startup Sync: Fetching core data...');
+
+  try {
+    await Promise.all(coreCollections.map(async (col) => {
+      const data = await getCollection(col, false);
+      if (data && data.length > 0) {
+        localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
+        localStorage.setItem(`cache_time_${col}`, String(Date.now()));
+        _sessionRevalidatedCollections.add(col);
+      }
+    }));
+    _appInitialized = true;
+    console.log('Strict Startup Sync: Complete.');
+  } catch (err) {
+    console.warn('Strict Startup Sync: Some collections failed to sync.', err.message);
+  }
+};
 
 /**
  * Multi-Tier Caching Collection Fetcher
@@ -90,7 +124,7 @@ const _sessionRevalidatedCollections = new Set();
  * - Tier 2: Cloudflare Global Edge CDN (bypassed on forceServer=true)
  * - Tier 3: Supabase PostgreSQL Database
  * 
- * Strategy: Stale-While-Revalidate (SWR) but only once per app session to minimize requests.
+ * Strategy: RETURNS CACHE ONLY after the initial startup sync is done.
  */
 export const getCollectionCached = async (collectionName, forceServer = false, customTtlMinutes = null) => {
   const cacheKey = `cache_data_${collectionName}`;
@@ -98,7 +132,7 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
   const now = Date.now();
   const cachedDataStr = localStorage.getItem(cacheKey);
 
-  // 1. Show Cache IMMEDIATELY (Instant Load)
+  // 1. Parse Cached Data
   let cachedData = null;
   if (cachedDataStr) {
     try {
@@ -108,31 +142,25 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
     }
   }
 
-  // If we are offline, or if we have cache and aren't forcing a refresh,
-  // return the cached data immediately.
-  if (cachedData && !forceServer && (!navigator.onLine || _sessionRevalidatedCollections.has(collectionName))) {
-    return cachedData;
-  }
+  // 2. Strict Revalidation Logic
+  // We ONLY fetch from network IF:
+  // - A manual Pull-to-Refresh is triggered (forceServer)
+  // - There is NO cached data at all (first time install)
+  // - It's a non-core collection that hasn't been synced this session yet (e.g. specific Questions category)
+  const isCore = [COLLECTIONS.JOBS, COLLECTIONS.NOTIFICATIONS, COLLECTIONS.ADMITS, COLLECTIONS.LIVE_EXAMS].includes(collectionName);
+  const needsInitialSync = !cachedData || !_sessionRevalidatedCollections.has(collectionName);
 
-  // 2. Controlled Background Revalidation
-  // We only sync from server IF:
-  // - It's a manual refresh (forceServer)
-  // - We haven't revalidated in THIS SESSION yet
-  // - We have NO cached data at all
-  const shouldRevalidate = forceServer || !cachedData || !_sessionRevalidatedCollections.has(collectionName);
-
-  if (shouldRevalidate && navigator.onLine) {
+  if ((forceServer || needsInitialSync) && navigator.onLine) {
     try {
       const data = await getCollection(collectionName, forceServer);
       if (data && data.length > 0) {
         localStorage.setItem(cacheKey, JSON.stringify(data));
         localStorage.setItem(timeKey, String(now));
-        // Mark as revalidated for this session
         _sessionRevalidatedCollections.add(collectionName);
         return data;
       }
     } catch (error) {
-      console.warn(`Background sync failed for ${collectionName}, using cache.`);
+      console.warn(`Fetch failed for ${collectionName}, using cache.`);
     }
   }
 
