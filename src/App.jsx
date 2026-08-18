@@ -159,9 +159,16 @@ function App() {
     )
   }
 
+  const navigationType = useNavigationType()
+  const isBackNavigation = navigationType === 'POP'
+
   return (
     <ErrorBoundary>
-      <div className="container" data-theme={state.theme}>
+      <div 
+        className={`container ${isBackNavigation ? 'nav-direction-back' : 'nav-direction-forward'}`} 
+        data-theme={state.theme}
+        data-nav-direction={isBackNavigation ? 'back' : 'forward'}
+      >
         <Routes location={location}>
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />

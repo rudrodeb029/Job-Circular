@@ -220,7 +220,7 @@ ul, ol {
 }
 
 .page {
-  padding-bottom: calc(75px + var(--safe-area-bottom));
+  padding-bottom: calc(56px + var(--safe-area-bottom));
   min-height: 100vh;
   min-height: 100dvh;
 }
@@ -345,10 +345,22 @@ ul, ol {
   100% { opacity: 0; }
 }
 
-/* Page Content Opening Right-to-Left Slow & Polished Motion */
+/* Page Content Opening Right-to-Left Slow & Polished Motion (Forward Navigation) */
 @keyframes pageContentSlideInRight {
   0% {
     transform: translateX(32px);
+    opacity: 0.82;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Page Content Opening Left-to-Right Slow & Polished Motion (Back Navigation) */
+@keyframes pageContentSlideInLeft {
+  0% {
+    transform: translateX(-32px);
     opacity: 0.82;
   }
   100% {
@@ -365,6 +377,16 @@ ul, ol {
 .animate-slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
 .animate-slide-in-right { animation: pageContentSlideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 .animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
+
+/* Left-to-Right Transitions when going Back */
+[data-nav-direction="back"] .page-content,
+[data-nav-direction="back"] .animate-fade-in,
+[data-nav-direction="back"] .animate-slide-in-right,
+.nav-direction-back .page-content,
+.nav-direction-back .animate-fade-in,
+.nav-direction-back .animate-slide-in-right {
+  animation: pageContentSlideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
 /* GPU Acceleration & Performance Tuning */
 .job-card, .category-card, .notification-item, .page-header, .bottom-nav {

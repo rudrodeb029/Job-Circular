@@ -288,18 +288,33 @@
   box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
   display: flex;
   justify-content: space-around;
-  padding: 8px 0 calc(8px + var(--safe-area-bottom));
+  padding: 4px 0 calc(4px + var(--safe-area-bottom));
   z-index: var(--z-bottom-nav);
   max-width: 430px;
   margin: 0 auto;
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  will-change: transform, opacity;
 }
+
+.bottom-nav.nav-visible {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bottom-nav.nav-hidden {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 .bottom-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 4px 14px;
-  font-size: 11px;
+  gap: 1px;
+  padding: 2px 8px;
+  font-size: 10px;
   font-weight: 600;
   color: var(--text-muted);
   transition: var(--transition-fast);
@@ -313,11 +328,11 @@
 .bottom-nav-item.active::before {
   content: '';
   position: absolute;
-  top: -8px;
-  width: 24px;
-  height: 3px;
+  top: -4px;
+  width: 18px;
+  height: 2.5px;
   background: var(--primary);
-  border-radius: 0 0 4px 4px;
+  border-radius: 0 0 3px 3px;
 }
 .bottom-nav-badge {
   position: absolute;
