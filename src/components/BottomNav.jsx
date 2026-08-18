@@ -60,20 +60,17 @@ const BottomNav = () => {
   return (
     <nav className={`bottom-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
       <NavLink to="/home" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <Home size={18} />
-        <span>Home</span>
+        <Home size={24} />
       </NavLink>
       <NavLink to="/categories" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <LayoutGrid size={18} />
-        <span>Categories</span>
+        <LayoutGrid size={24} />
       </NavLink>
       <NavLink to="/saved" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <Bookmark size={18} />
-        <span>Saved</span>
+        <Bookmark size={24} />
       </NavLink>
       <NavLink to="/notifications" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <div style={{ position: 'relative' }}>
-          <Bell size={18} />
+          <Bell size={24} />
           {unreadCount > 0 && (
             <span
               style={{
@@ -99,11 +96,9 @@ const BottomNav = () => {
             </span>
           )}
         </div>
-        <span>Notify</span>
       </NavLink>
       <NavLink to="/profile" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <User size={18} />
-        <span>Profile</span>
+        <User size={24} />
       </NavLink>
     </nav>
   );
