@@ -713,10 +713,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px 4px;
+  gap: 2px;
+  padding: 6px 4px;
   background: var(--white);
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: none;
   cursor: pointer;
@@ -729,13 +729,13 @@
   background: var(--primary-bg);
 }
 .category-grid-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 13px;
   box-shadow: none;
 }
 .category-grid-label {
