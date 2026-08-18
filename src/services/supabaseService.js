@@ -192,6 +192,8 @@ export const clearCollectionCache = (collectionName) => {
   try {
     localStorage.removeItem(`cache_data_${collectionName}`);
     localStorage.removeItem(`cache_time_${collectionName}`);
+    // Also remove from session tracker so it's allowed to re-sync once
+    _sessionRevalidatedCollections.delete(collectionName);
   } catch (e) {
     console.warn(`Failed to clear cache for ${collectionName}:`, e);
   }

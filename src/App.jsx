@@ -66,19 +66,18 @@ function App() {
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
 
+  // STRICT ONCE-PER-BOOT INITIALIZATION
   useEffect(() => {
-    // 0. Strict Startup Sync - Fetch all core data exactly once
     if (!isAdminRoute) {
-      syncCoreDataOnStartup();
-    }
-
-    // 1. Initialize Push Notifications for non-admin users
-    if (!isAdminRoute) {
+      console.log('App Boot: Initializing services...');
+      syncCoreDataOnStartup(); // Synchronize all categories exactly once
       initializePushNotifications();
       initializeOneSignal();
     }
+  }, []); // Empty dependency array ensures this ONLY runs when the app is first opened
 
-    // 2. Set StatusBar - prevent overlay and set proper colors
+  useEffect(() => {
+    // Set StatusBar - prevent overlay and set proper colors
     if (!isAdminRoute) {
       try {
         // CRITICAL: Prevent status bar from overlapping WebView content
