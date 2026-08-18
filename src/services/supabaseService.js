@@ -81,15 +81,16 @@ export const getCollection = async (collectionName, forceServer = false) => {
   }
 };
 
+// Per-session revalidation tracker
+const _sessionRevalidatedCollections = new Set();
+
 /**
  * Multi-Tier Caching Collection Fetcher
- * - Tier 1: Device localStorage (1hr for Jobs/Exams/Admits/Notifications, 24hr for rest)
+ * - Tier 1: Device localStorage (Indefinite Cache)
  * - Tier 2: Cloudflare Global Edge CDN (bypassed on forceServer=true)
  * - Tier 3: Supabase PostgreSQL Database
  * 
- * @param {string} collectionName - Table name
- * @param {boolean} forceServer - Force network fetch (e.g. Pull-to-refresh)
- * @param {number|null} customTtlMinutes - Optional custom cache duration
+ * Strategy: Stale-While-Revalidate (SWR) but only once per app session to minimize requests.
  */
 export const getCollectionCached = async (collectionName, forceServer = false, customTtlMinutes = null) => {
   const cacheKey = `cache_data_${collectionName}`;
@@ -97,8 +98,7 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
   const now = Date.now();
   const cachedDataStr = localStorage.getItem(cacheKey);
 
-  // 1. Show Cache IMMEDIATELY (Indefinite Cache)
-  // We return this first to make the UI instant.
+  // 1. Show Cache IMMEDIATELY (Instant Load)
   let cachedData = null;
   if (cachedDataStr) {
     try {
@@ -110,22 +110,25 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
 
   // If we are offline, or if we have cache and aren't forcing a refresh,
   // return the cached data immediately.
-  if (cachedData && !forceServer && !navigator.onLine) {
+  if (cachedData && !forceServer && (!navigator.onLine || _sessionRevalidatedCollections.has(collectionName))) {
     return cachedData;
   }
 
-  // 2. Background Sync (Revalidation)
-  // If online, we always try to get the latest data to keep the cache fresh
-  // but we only do it if the cache is older than 5 minutes (to avoid spamming)
-  const cachedTime = localStorage.getItem(timeKey);
-  const isStale = !cachedTime || (now - parseInt(cachedTime, 10) > 5 * 60 * 1000); // 5 minute "freshness" check
+  // 2. Controlled Background Revalidation
+  // We only sync from server IF:
+  // - It's a manual refresh (forceServer)
+  // - We haven't revalidated in THIS SESSION yet
+  // - We have NO cached data at all
+  const shouldRevalidate = forceServer || !cachedData || !_sessionRevalidatedCollections.has(collectionName);
 
-  if (forceServer || isStale || !cachedData) {
+  if (shouldRevalidate && navigator.onLine) {
     try {
       const data = await getCollection(collectionName, forceServer);
       if (data && data.length > 0) {
         localStorage.setItem(cacheKey, JSON.stringify(data));
         localStorage.setItem(timeKey, String(now));
+        // Mark as revalidated for this session
+        _sessionRevalidatedCollections.add(collectionName);
         return data;
       }
     } catch (error) {
