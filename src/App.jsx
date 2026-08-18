@@ -4,6 +4,7 @@ import { App as CapacitorApp } from '@capacitor/app'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import VersionUpdateModal from './components/VersionUpdateModal'
+import ConnectivityBanner from './components/ConnectivityBanner'
 import ErrorBoundary from './components/ErrorBoundary'
 import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
@@ -169,6 +170,7 @@ function App() {
         data-theme={state.theme}
         data-nav-direction={isBackNavigation ? 'back' : 'forward'}
       >
+        {!isAdminRoute && <ConnectivityBanner />}
         <Routes location={location}>
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />

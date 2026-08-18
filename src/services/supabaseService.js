@@ -104,12 +104,15 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
 
   const isCacheValid = cachedTime && cachedDataStr && (now - parseInt(cachedTime, 10) < ttl * 60 * 1000);
 
-  // 1. Return Tier 1 localStorage cache immediately if valid and not forcing refresh (0 network requests)
-  if (isCacheValid && !forceServer) {
-    try {
-      return JSON.parse(cachedDataStr);
-    } catch (e) {
-      console.warn(`Cache parse error for ${collectionName}:`, e);
+  // 1. Return Tier 1 localStorage cache immediately if valid AND not forcing refresh (0 network requests)
+  // OR if offline (regardless of TTL)
+  if (!forceServer && (isCacheValid || !navigator.onLine)) {
+    if (cachedDataStr) {
+      try {
+        return JSON.parse(cachedDataStr);
+      } catch (e) {
+        console.warn(`Cache parse error for ${collectionName}:`, e);
+      }
     }
   }
 
