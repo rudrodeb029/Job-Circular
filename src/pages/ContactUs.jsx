@@ -40,9 +40,9 @@ export default function ContactUs() {
       await addDocument(COLLECTIONS.ACTIVITIES, {
         type: 'contact_message',
         action: 'Support Message Received',
-        name: formData.name || 'Anonymous User',
+        userName: formData.name || 'Anonymous User',
+        description: `Subject: ${formData.subject}. Message: ${formData.message}`,
         email: formData.email || 'N/A',
-        text: `From: ${formData.name}. Subject: ${formData.subject}. Message: ${formData.message}`,
         subject: formData.subject,
         message: formData.message,
         createdAt: new Date().toISOString()

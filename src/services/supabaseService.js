@@ -198,7 +198,9 @@ const TABLE_COLUMNS = {
     'dateEn', 'link', 'createdAt'
   ],
   [COLLECTIONS.ACTIVITIES]: [
-    'id', 'action', 'description', 'createdAt'
+    'id', 'action', 'description', 'type', 'examId', 'userName',
+    'userPhoto', 'score', 'total', 'scaledScore', 'timeTaken',
+    'timeTakenSec', 'createdAt'
   ],
   [COLLECTIONS.USERS]: [
     'id', 'name', 'phone', 'qualification', 'category', 'location',

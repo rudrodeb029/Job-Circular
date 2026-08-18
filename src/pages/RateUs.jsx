@@ -40,9 +40,9 @@ export default function RateUs() {
       await addDocument(COLLECTIONS.ACTIVITIES, {
         type: 'app_rating_review',
         action: 'App Rating Received',
-        rating: rating,
-        feedback: feedback || '',
-        text: `Rated ${rating} stars. Review: ${feedback || 'No comments'}`,
+        score: rating,
+        total: 5,
+        description: feedback || 'No comments',
         createdAt: new Date().toISOString()
       });
 
