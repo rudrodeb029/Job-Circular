@@ -11,7 +11,7 @@ export default function SearchBar({ value, onChange, placeholder, onFilterClick,
       background: 'var(--white)'
     }}>
       <div className="search-bar-icon-box">
-        <Search size={16} />
+        <Search size={18} />
       </div>
       <input
         type="text"
@@ -28,7 +28,7 @@ export default function SearchBar({ value, onChange, placeholder, onFilterClick,
           aria-label="Filter"
           title="Filter Jobs"
         >
-          <SlidersHorizontal size={16} />
+          <SlidersHorizontal size={18} />
         </button>
       )}
     </div>
