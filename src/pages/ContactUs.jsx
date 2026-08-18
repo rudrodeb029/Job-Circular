@@ -39,8 +39,10 @@ export default function ContactUs() {
       // Write user feedback message to Firestore 'activities' or 'feedback' collection
       await addDocument(COLLECTIONS.ACTIVITIES, {
         type: 'contact_message',
+        action: 'Support Message Received',
         name: formData.name || 'Anonymous User',
         email: formData.email || 'N/A',
+        text: `From: ${formData.name}. Subject: ${formData.subject}. Message: ${formData.message}`,
         subject: formData.subject,
         message: formData.message,
         createdAt: new Date().toISOString()
@@ -110,30 +112,6 @@ export default function ContactUs() {
               <Mail size={14} color="var(--primary)" />
               <span>{info.contactEmail}</span>
             </a>
-
-            {info.whatsappNumber && (
-              <a 
-                href={`https://wa.me/${info.whatsappNumber.replace(/[^0-9]/g, '')}`}
-                target="_blank"
-                rel="noreferrer"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  border: '1px solid rgba(16, 185, 129, 0.25)',
-                  padding: '6px 12px',
-                  borderRadius: '10px',
-                  fontSize: '11.5px',
-                  fontWeight: 700,
-                  color: '#059669',
-                  textDecoration: 'none'
-                }}
-              >
-                <MessageSquare size={14} color="#059669" />
-                <span>WhatsApp: {info.whatsappNumber}</span>
-              </a>
-            )}
           </div>
         </div>
 
@@ -167,7 +145,7 @@ export default function ContactUs() {
 
             <div style={{ marginBottom: '14px' }}>
               <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
-                YOUR NAME (আপনার নাম)
+                আপনার নাম
               </label>
               <input
                 type="text"
@@ -189,7 +167,7 @@ export default function ContactUs() {
 
             <div style={{ marginBottom: '14px' }}>
               <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
-                EMAIL ADDRESS (ইমেইল এড্রেস)
+                ইমেইল এড্রেস
               </label>
               <input
                 type="email"
@@ -211,7 +189,7 @@ export default function ContactUs() {
 
             <div style={{ marginBottom: '14px' }}>
               <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
-                SUBJECT (বিষয়) *
+                বিষয় *
               </label>
               <input
                 type="text"
@@ -234,7 +212,7 @@ export default function ContactUs() {
 
             <div style={{ marginBottom: '20px' }}>
               <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px', display: 'block' }}>
-                MESSAGE (বার্তা) *
+                বার্তা *
               </label>
               <textarea
                 required

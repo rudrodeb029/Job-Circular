@@ -73,6 +73,7 @@ const Reports = () => {
       
       let normType = item.type || 'system';
       if (item.type === 'live_exam_submission' || item.examId) normType = 'submission';
+      else if (item.type === 'contact_message') normType = 'message';
       else if ((item.action || '').toLowerCase().includes('job') || (item.target || '').toLowerCase().includes('job')) normType = 'job';
       else if ((item.action || '').toLowerCase().includes('exam') || (item.target || '').toLowerCase().includes('exam')) normType = 'exam';
       else if ((item.action || '').toLowerCase().includes('notif') || (item.target || '').toLowerCase().includes('notif')) normType = 'notification';
@@ -157,6 +158,8 @@ const Reports = () => {
         return { bg: '#d1fae5', color: '#059669', label: 'Submission' };
       case 'notification':
         return { bg: '#ede9fe', color: '#7c3aed', label: 'Notification' };
+      case 'message':
+        return { bg: '#ffedd5', color: '#ea580c', label: 'Support Message' };
       case 'question':
         return { bg: '#e0f2fe', color: '#0284c7', label: 'Question' };
       default:
@@ -266,6 +269,7 @@ const Reports = () => {
               <option value="job">Circulars</option>
               <option value="exam">Live Exams</option>
               <option value="submission">Student Submissions</option>
+              <option value="message">User Messages</option>
               <option value="notification">Notifications</option>
               <option value="question">Questions</option>
             </select>
