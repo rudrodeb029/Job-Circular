@@ -42,7 +42,7 @@ export default function PrivacyPolicy() {
                 2. Data Synchronization & Storage
               </h3>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                Your profile and activity data are synchronized with our secure backend (Supabase) to ensure your information is backed up and can be restored if you reinstall the app. We also use high-performance local caching to store job data on your device for instant offline access.
+                Your profile and activity data are synchronized with our secure cloud database to ensure your information is backed up and can be restored if you reinstall the app. We also use high-performance local caching to store job data on your device for instant offline access.
               </p>
             </section>
 
@@ -51,7 +51,7 @@ export default function PrivacyPolicy() {
                 3. Push Notifications
               </h3>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                We use OneSignal to send real-time alerts about new job circulars, exam dates, and results. These services may collect unique device identifiers to deliver notifications effectively. You can opt-out of these notifications at any time through the app settings.
+                We use automated notification services to send real-time alerts about new job circulars, exam dates, and results. These services may collect unique device identifiers to deliver notifications effectively. You can opt-out of these notifications at any time through the app settings.
               </p>
             </section>
 
@@ -60,12 +60,12 @@ export default function PrivacyPolicy() {
                 4. Third-Party Services
               </h3>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                Our application utilizes trusted third-party services to enhance performance:
+                Our application utilizes trusted third-party services to enhance performance and security:
               </p>
               <ul style={{ paddingLeft: '18px', marginTop: '6px', fontSize: '12.5px', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <li><strong>Supabase:</strong> For secure database storage and real-time data sync.</li>
-                <li><strong>Cloudinary:</strong> For optimized delivery of job circular images.</li>
-                <li><strong>OneSignal:</strong> For reliable push notification delivery.</li>
+                <li><strong>Cloud Infrastructure:</strong> For secure data storage and real-time synchronization.</li>
+                <li><strong>Media Optimization:</strong> For fast and efficient delivery of job circular images.</li>
+                <li><strong>Communication Systems:</strong> For reliable delivery of important alerts and updates.</li>
               </ul>
             </section>
 
