@@ -3,7 +3,7 @@ const path = require('path');
 const sharp = require('sharp');
 
 const SOURCE_CANDIDATES = [
-  'C:\\Users\\Suvro\\Downloads\\finalicon (2).png',
+  'C:\\Users\\Suvro\\Downloads\\finallastone.png',
   'C:\\Users\\Suvro\\Downloads\\LastFinal.png',
   'C:\\Users\\Suvro\\Downloads\\Finalicon.png',
   'C:\\Users\\Suvro\\Downloads\\Untitled design (9).png',
@@ -30,7 +30,7 @@ const MIPMAP_CONFIGS = [
 ];
 
 async function generateIcons() {
-  console.log(`🚀 Starting comprehensive icon generation from: ${SOURCE_ICON}`);
+  console.log(`🚀 Starting icon & asset generation from: ${SOURCE_ICON}`);
 
   // 1. Generate Public / Web & PWA Assets
   console.log('📦 1. Generating Web & PWA assets in public/ & src/assets/...');
@@ -48,18 +48,18 @@ async function generateIcons() {
 
   await sharp(SOURCE_ICON).resize(512, 512).png().toFile(path.join(ASSETS_DIR, 'app-icon.png'));
   await sharp(SOURCE_ICON).resize(512, 512).png().toFile(path.join(ASSETS_DIR, 'app-logo.png'));
-  await sharp(SOURCE_ICON).resize(512, 512).png().toFile(path.join(ASSETS_DIR, 'finalicon.png'));
+  await sharp(SOURCE_ICON).resize(512, 512).png().toFile(path.join(ASSETS_DIR, 'finallastone.png'));
   console.log('✔ Web, PWA, and assets icons generated successfully.');
 
-  // 2. Generate Android Mipmap Icons
-  console.log('📱 2. Generating Android mipmap icons (Auto-adjusted background)...');
+  // 2. Generate Android Mipmap Icons with pure white backgrounds
+  console.log('📱 2. Generating Android mipmap icons (Auto-adjusted white background)...');
   for (const cfg of MIPMAP_CONFIGS) {
     const targetDir = path.join(RES_DIR, cfg.folder);
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
     }
 
-    // A. ic_launcher.png (Standard launcher icon)
+    // A. ic_launcher.png (Standard launcher icon with white background)
     await sharp(SOURCE_ICON)
       .resize(cfg.launcherSize, cfg.launcherSize)
       .png()
@@ -105,10 +105,10 @@ async function generateIcons() {
     .png()
     .toFile(path.join(targetDir, 'ic_launcher_foreground.png'));
 
-    console.log(`✔ Generated ${cfg.folder} (launcher: ${cfg.launcherSize}x${cfg.launcherSize}, fg: ${cfg.foregroundSize}x${cfg.foregroundSize})`);
+    console.log(`✔ Generated ${cfg.folder} (launcher: ${cfg.launcherSize}x${cfg.launcherSize}, fg: ${cfg.foregroundSize}x${cfg.foregroundSize}, bg: pure white)`);
   }
 
-  // 3. Generate Android drawable foreground & splash assets
+  // 3. Generate Android drawable foreground
   const drawableDir = path.join(RES_DIR, 'drawable');
   if (fs.existsSync(drawableDir)) {
     const iconScaledSize = Math.round(432 * 0.72);
@@ -131,7 +131,7 @@ async function generateIcons() {
     await sharp(SOURCE_ICON).resize(512, 512).png().toFile(path.join(drawableDir, 'splash_icon.png'));
   }
 
-  console.log('🎉 All Android and Web app icons generated successfully from finalicon (2).png!');
+  console.log('🎉 All Android and Web app icons generated from finallastone.png successfully!');
 }
 
 generateIcons().catch(err => {
