@@ -390,7 +390,7 @@ export default function Home() {
                     }}
                     onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
                   >
-                    <div className="category-grid-icon" style={{ background: cat.color, fontSize: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
+                    <div className="category-grid-icon" style={{ background: cat.color, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
                     <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
                   </div>
                 ))}
@@ -412,7 +412,7 @@ export default function Home() {
               onClick={() => navigate('/questions-hub')}
             >
               <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <LayoutGrid size={20} />
+                <LayoutGrid size={18} />
               </div>
               <span className="category-grid-label" style={{ fontWeight: 800 }}>{isEn ? 'More' : 'আরও'}</span>
             </div>
