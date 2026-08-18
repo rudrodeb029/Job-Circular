@@ -16,14 +16,25 @@ export const supabase = createClient(
   SUPABASE_CONFIG.anonKey,
   {
     global: {
-      fetch: (url, options = {}) => {
+      fetch: async (url, options = {}) => {
         if (
           SUPABASE_CONFIG.cloudflareProxyUrl &&
           typeof url === 'string' &&
           url.startsWith(SUPABASE_CONFIG.projectUrl + '/rest/v1/')
         ) {
           const proxiedUrl = url.replace(SUPABASE_CONFIG.projectUrl, SUPABASE_CONFIG.cloudflareProxyUrl);
-          return fetch(proxiedUrl, options);
+          try {
+            const response = await fetch(proxiedUrl, options);
+            // If the worker returns a server error (5xx), fallback to direct Supabase
+            if (response.status >= 500) {
+              console.warn('Cloudflare Worker error, falling back to direct Supabase');
+              return fetch(url, options);
+            }
+            return response;
+          } catch (e) {
+            console.error('Cloudflare Worker unreachable, falling back to direct Supabase:', e.message);
+            return fetch(url, options);
+          }
         }
         return fetch(url, options);
       }
