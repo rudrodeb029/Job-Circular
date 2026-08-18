@@ -360,10 +360,10 @@ export default function Home() {
             </Link>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Scrolling part - 5 Categories only */}
-            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '10px 0' }}>
-              <div className="scrolling-content" style={{ gap: '12px' }}>
+            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '6px 0' }}>
+              <div className="scrolling-content" style={{ gap: '10px' }}>
                 {[
                   { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
                   { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
@@ -384,13 +384,13 @@ export default function Home() {
                       border: '1px solid rgba(226, 232, 240, 0.9)',
                       boxShadow: 'none',
                       background: 'var(--white)',
-                      borderRadius: '16px',
-                      minWidth: '85px',
+                      borderRadius: '14px',
+                      minWidth: '78px',
                       flexShrink: 0
                     }}
                     onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
                   >
-                    <div className="category-grid-icon" style={{ background: cat.color, fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
+                    <div className="category-grid-icon" style={{ background: cat.color, fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
                     <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
                   </div>
                 ))}
@@ -404,15 +404,15 @@ export default function Home() {
                 border: '1px solid rgba(226, 232, 240, 0.9)',
                 boxShadow: 'none',
                 background: 'var(--white)',
-                borderRadius: '16px',
-                minWidth: '85px',
+                borderRadius: '14px',
+                minWidth: '78px',
                 flexShrink: 0,
                 zIndex: 5
               }}
               onClick={() => navigate('/questions-hub')}
             >
               <div className="category-grid-icon" style={{ background: 'var(--bg-secondary)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <LayoutGrid size={18} />
+                <LayoutGrid size={16} />
               </div>
               <span className="category-grid-label" style={{ fontWeight: 800 }}>{isEn ? 'More' : 'আরও'}</span>
             </div>
