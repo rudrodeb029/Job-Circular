@@ -88,8 +88,8 @@ export default function Profile() {
         {/* Avatar with Ring & Edit Camera Trigger Badge */}
         <div style={{
           position: 'relative',
-          width: '84px',
-          height: '84px',
+          width: '72px',
+          height: '72px',
           margin: '0 auto 14px auto'
         }}>
           {state.user.avatar ? (
@@ -115,7 +115,7 @@ export default function Profile() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '32px',
+              fontSize: '26px',
               fontWeight: 800,
               boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
               border: '3.5px solid rgba(255, 255, 255, 0.85)'

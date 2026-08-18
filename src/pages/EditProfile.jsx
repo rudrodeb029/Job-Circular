@@ -130,7 +130,7 @@ export default function EditProfile() {
 
   const [formData, setFormData] = useState({
     name: state.user.name || '',
-    phone: state.user.phone || '01712345678',
+    phone: state.user.phone || '',
     qualification: state.user.qualification || 'স্নাতক (Bachelor)',
     location: state.user.location || 'ঢাকা',
     avatar: state.user.avatar || null
@@ -257,8 +257,8 @@ export default function EditProfile() {
         <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
           <div style={{
             position: 'relative',
-            width: '96px',
-            height: '96px',
+            width: '80px',
+            height: '80px',
             margin: '0 auto'
           }}>
             {formData.avatar ? (
@@ -286,7 +286,7 @@ export default function EditProfile() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '36px',
+                fontSize: '30px',
                 fontWeight: 800,
                 border: '4px solid #ffffff',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
