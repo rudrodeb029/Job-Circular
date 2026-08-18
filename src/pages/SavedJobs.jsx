@@ -339,12 +339,10 @@ export default function SavedJobs() {
             description={
               searchQuery 
                 ? (isEn ? `No ${activeTab === 'applied' ? 'applied' : 'saved'} circulars match "${searchQuery}"` : `"${searchQuery}" এর সাথে কোনো ${activeTab === 'applied' ? 'আবেদনকৃত' : 'সংরক্ষিত'} সার্কুলার মেলেনি`)
-                : (activeTab === 'applied' 
-                    ? (isEn ? 'You have not marked any jobs as applied yet.' : 'আপনি এখনও কোনো সার্কুলারে আবেদন করেননি।')
-                    : (isEn ? 'You have not saved any circulars yet.' : 'আপনি এখনও কোনো সার্কুলার সংরক্ষণ করেননি।'))
+                : null
             }
-            actionText={searchQuery ? (isEn ? 'Clear Search' : 'সার্চ মুছুন') : (isEn ? 'Explore Jobs' : 'সকল সার্কুলার দেখুন')}
-            onAction={searchQuery ? () => setSearchQuery('') : () => navigate('/all-circulars')}
+            actionText={searchQuery ? (isEn ? 'Clear Search' : 'সার্চ মুছুন') : null}
+            onAction={searchQuery ? () => setSearchQuery('') : null}
           />
         )}
       </div>
