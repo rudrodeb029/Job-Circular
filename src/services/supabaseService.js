@@ -95,54 +95,45 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
   const cacheKey = `cache_data_${collectionName}`;
   const timeKey = `cache_time_${collectionName}`;
   const now = Date.now();
-  const cachedTime = localStorage.getItem(timeKey);
   const cachedDataStr = localStorage.getItem(cacheKey);
 
-  const ttl = customTtlMinutes ?? (
-    SHORT_CACHE_COLLECTIONS.includes(collectionName) ? SHORT_TTL_MINUTES : DEFAULT_TTL_MINUTES
-  );
-
-  const isCacheValid = cachedTime && cachedDataStr && (now - parseInt(cachedTime, 10) < ttl * 60 * 1000);
-
-  // 1. Return Tier 1 localStorage cache immediately if valid AND not forcing refresh (0 network requests)
-  // OR if offline (regardless of TTL)
-  if (!forceServer && (isCacheValid || !navigator.onLine)) {
-    if (cachedDataStr) {
-      try {
-        return JSON.parse(cachedDataStr);
-      } catch (e) {
-        console.warn(`Cache parse error for ${collectionName}:`, e);
-      }
+  // 1. Show Cache IMMEDIATELY (Indefinite Cache)
+  // We return this first to make the UI instant.
+  let cachedData = null;
+  if (cachedDataStr) {
+    try {
+      cachedData = JSON.parse(cachedDataStr);
+    } catch (e) {
+      console.warn(`Cache parse error for ${collectionName}:`, e);
     }
   }
 
-  // 2. Fetch fresh data over network (sends Cache-Control: no-cache on forceServer=true)
-  try {
-    const data = await getCollection(collectionName, forceServer);
-    
-    // Save to Tier 1 localStorage cache
-    if (data && data.length > 0) {
-      try {
+  // If we are offline, or if we have cache and aren't forcing a refresh,
+  // return the cached data immediately.
+  if (cachedData && !forceServer && !navigator.onLine) {
+    return cachedData;
+  }
+
+  // 2. Background Sync (Revalidation)
+  // If online, we always try to get the latest data to keep the cache fresh
+  // but we only do it if the cache is older than 5 minutes (to avoid spamming)
+  const cachedTime = localStorage.getItem(timeKey);
+  const isStale = !cachedTime || (now - parseInt(cachedTime, 10) > 5 * 60 * 1000); // 5 minute "freshness" check
+
+  if (forceServer || isStale || !cachedData) {
+    try {
+      const data = await getCollection(collectionName, forceServer);
+      if (data && data.length > 0) {
         localStorage.setItem(cacheKey, JSON.stringify(data));
         localStorage.setItem(timeKey, String(now));
-      } catch (e) {
-        console.warn(`Failed to write ${collectionName} to localStorage cache:`, e);
+        return data;
       }
+    } catch (error) {
+      console.warn(`Background sync failed for ${collectionName}, using cache.`);
     }
-    return data;
-  } catch (error) {
-    console.warn(`Server fetch for ${collectionName} failed, attempting offline cache fallback:`, error.message);
-    
-    // 3. Offline fallback to local cache
-    if (cachedDataStr) {
-      try {
-        return JSON.parse(cachedDataStr);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    return [];
   }
+
+  return cachedData || [];
 };
 
 /**
