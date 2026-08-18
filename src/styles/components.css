@@ -288,7 +288,7 @@
   box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
   display: flex;
   justify-content: space-around;
-  padding: 4px 0 calc(4px + var(--safe-area-bottom));
+  padding: 10px 0 calc(10px + var(--safe-area-bottom));
   z-index: var(--z-bottom-nav);
   max-width: 430px;
   margin: 0 auto;
