@@ -64,8 +64,6 @@ const BottomNav = () => {
           <path
             d="M 0,10 L 36,10 C 42,10 42,48 50,48 C 58,48 58,10 64,10 L 100,10 L 100,60 L 0,60 Z"
             fill="var(--white)"
-            stroke="var(--border-light)"
-            strokeWidth="0.5"
           />
         </svg>
       </div>
