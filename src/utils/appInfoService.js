@@ -1,7 +1,7 @@
 import { getDocument, setDocument, COLLECTIONS } from '../services/supabaseService';
 
 export const DEFAULT_APP_INFO = {
-  contactEmail: 'support@jobcircularbd.app',
+  contactEmail: 'support@livecircular.app',
   contactPhone: '+8801700000000',
   whatsappNumber: '+8801700000000',
   playStoreUrl: 'https://play.google.com/store/apps/details?id=com.jobcircular.app',

@@ -33,7 +33,7 @@ export default function TermsConditions() {
                 1. Disclaimer of Affiliation
               </h3>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                Job Circulars BD is an independent, non-governmental platform. We are NOT affiliated with the Government of Bangladesh or any specific government agency. All information provided in the app is for educational and informational purposes only.
+                Live Circular is an independent, non-governmental platform. We are NOT affiliated with the Government of Bangladesh or any specific government agency. All information provided in the app is for educational and informational purposes only.
               </p>
             </section>
 
@@ -69,7 +69,7 @@ export default function TermsConditions() {
                 5. Acceptance of Terms
               </h3>
               <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                By accessing or using the Job Circulars BD app, you acknowledge that you have read, understood, and agreed to be bound by these terms. We reserve the right to update these terms at any time without prior notice.
+                By accessing or using the Live Circular app, you acknowledge that you have read, understood, and agreed to be bound by these terms. We reserve the right to update these terms at any time without prior notice.
               </p>
             </section>
           </div>

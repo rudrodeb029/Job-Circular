@@ -1,6 +1,6 @@
-# Job Circular & Live Exam - Android App Rules
+# Live Circular & Live Exam - Android App Rules
 
-This document outlines the core logic, functionality, and operational rules for the **Job Circular & Live Exam** Android application.
+This document outlines the core logic, functionality, and operational rules for the **Live Circular & Live Exam** Android application.
 
 ## 📱 1. Architecture Overview
 The application is built using a modern web-to-mobile architecture:

@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Job Circulars BD</string>
-    <string name="title_activity_main">Job Circulars BD</string>
+    <string name="app_name">Live Circular</string>
+    <string name="title_activity_main">Live Circular</string>
     <string name="package_name">com.jobcircular.app</string>
     <string name="custom_url_scheme">com.jobcircular.app</string>
 </resources>

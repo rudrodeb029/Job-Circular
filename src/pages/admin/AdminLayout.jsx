@@ -196,7 +196,7 @@ const AdminLayout = () => {
             </svg>
           </div>
           <div>
-            <h2 style={{ margin: 0, fontSize: '14.5px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>Job Circulars BD</h2>
+            <h2 style={{ margin: 0, fontSize: '14.5px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>Live Circular</h2>
             <p style={{ margin: 0, fontSize: '9.5px', color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Admin Control</p>
           </div>
         </div>

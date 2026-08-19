@@ -50,7 +50,7 @@ export default function JobDetails() {
           <button className="back-btn" onClick={() => navigate(-1)}>
             <ArrowLeft size={22} />
           </button>
-          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>Job Circulars BD</h1>
+          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>Live Circular</h1>
         </div>
         <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
           <ModernLoader size="lg" icon="📄" />

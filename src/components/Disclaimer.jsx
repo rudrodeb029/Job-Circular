@@ -68,7 +68,7 @@ export default function Disclaimer() {
           }}
         >
           <p style={{ margin: 0 }}>
-            Job Circulars BD is an independent platform and has no affiliation with the government of Bangladesh or any government agency. All government job notices are aggregated from public official gazettes and portals.
+            Live Circular is an independent platform and has no affiliation with the government of Bangladesh or any government agency. All government job notices are aggregated from public official gazettes and portals.
           </p>
 
           <div style={{

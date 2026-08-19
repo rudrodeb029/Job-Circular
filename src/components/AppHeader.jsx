@@ -91,7 +91,7 @@ export default function AppHeader() {
             letterSpacing: '0.8px',
             boxShadow: '0 4px 10px rgba(26, 86, 219, 0.25)'
           }}>
-            JOB
+            LIVE
           </div>
           <span style={{
             fontWeight: 900,

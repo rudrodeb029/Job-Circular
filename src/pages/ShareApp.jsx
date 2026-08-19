@@ -37,10 +37,10 @@ export default function ShareApp() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Job Circulars BD',
+          title: 'Live Circular',
           text: isEn 
-            ? 'Download Job Circulars BD app for latest government, bank, and private job notices & live MCQ preparation!'
-            : 'বাংলাদেশের সকল চাকরির সার্কুলার, পরীক্ষার প্রবেশপত্র ও প্রস্তুতির জন্য Job Circulars BD অ্যাপটি ডাউনলোড করুন!',
+            ? 'Download Live Circular app for latest government, bank, and private job notices & live MCQ preparation!'
+            : 'বাংলাদেশের সকল চাকরির সার্কুলার, পরীক্ষার প্রবেশপত্র ও প্রস্তুতির জন্য Live Circular অ্যাপটি ডাউনলোড করুন!',
           url: shareUrl
         });
       } catch (err) {
@@ -56,7 +56,7 @@ export default function ShareApp() {
       name: 'WhatsApp', 
       color: '#25d366', 
       bg: 'rgba(37, 211, 102, 0.12)', 
-      url: `https://api.whatsapp.com/send?text=${encodeURIComponent((isEn ? 'Download Job Circulars BD App: ' : 'সকল চাকরির খবর একসাথে পেতে Job Circulars BD অ্যাপটি ডাউনলোড করুন: ') + shareUrl)}`
+      url: `https://api.whatsapp.com/send?text=${encodeURIComponent((isEn ? 'Download Live Circular App: ' : 'সকল চাকরির খবর একসাথে পেতে Live Circular অ্যাপটি ডাউনলোড করুন: ') + shareUrl)}`
     },
     { 
       name: 'Facebook', 
@@ -68,13 +68,13 @@ export default function ShareApp() {
       name: 'Telegram', 
       color: '#0088cc', 
       bg: 'rgba(0, 136, 204, 0.12)', 
-      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(isEn ? 'Job Circulars BD App' : 'Job Circulars BD অ্যাপ')}`
+      url: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(isEn ? 'Live Circular App' : 'Live Circular অ্যাপ')}`
     },
     { 
       name: 'Email', 
       color: '#ea4335', 
       bg: 'rgba(234, 67, 53, 0.12)', 
-      url: `mailto:?subject=${encodeURIComponent(isEn ? 'Download Job Circulars BD App' : 'Job Circulars BD অ্যাপ লিঙ্ক')}&body=${encodeURIComponent(shareUrl)}`
+      url: `mailto:?subject=${encodeURIComponent(isEn ? 'Download Live Circular App' : 'Live Circular অ্যাপ লিঙ্ক')}&body=${encodeURIComponent(shareUrl)}`
     }
   ];
 
@@ -124,7 +124,7 @@ export default function ShareApp() {
           </h2>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: 0 }}>
             {isEn 
-              ? 'Help your friends, family, and colleagues find their dream jobs by sharing Job Circulars BD.'
+              ? 'Help your friends, family, and colleagues find their dream jobs by sharing Live Circular.'
               : 'আপনার ১টি শেয়ার আপনার বন্ধুকে স্বপ্নের ক্যারিয়ার গঠনে সাহায্য করতে পারে।'}
           </p>
         </div>

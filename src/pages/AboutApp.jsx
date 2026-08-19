@@ -126,8 +126,8 @@ export default function AboutApp() {
         <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
-        <h1 style={{ flex: 1, fontSize: '13px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span>{isEn ? 'About Job Circulars BD' : 'অ্যাপ সম্পর্কিত ও বৈশিষ্ট্য'}</span>
+        <h1 style={{ flex: 1, fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <span>{isEn ? 'About Live Circular' : 'অ্যাপ সম্পর্কিত ও বৈশিষ্ট্য'}</span>
         </h1>
       </div>
 
@@ -158,8 +158,8 @@ export default function AboutApp() {
             pointerEvents: 'none'
           }} />
 
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, letterSpacing: '-0.3px' }}>
-            Job Circulars BD
+          <h2 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-secondary)', margin: 0, letterSpacing: '-0.3px' }}>
+            Live Circular
           </h2>
 
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--white)', border: '1px solid var(--border)', padding: '4px 12px', borderRadius: '30px', marginTop: '8px' }}>
@@ -196,7 +196,7 @@ export default function AboutApp() {
                 boxShadow: 'var(--shadow-sm)'
               }}>
                 <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, lineHeight: 1.2 }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', margin: 0, lineHeight: 1.2 }}>
                     {item.number}
                   </h3>
                   <p style={{ fontSize: '10px', fontWeight: 700, color: item.color, margin: '2px 0 0 0' }}>
@@ -213,8 +213,8 @@ export default function AboutApp() {
 
         {/* Section Heading: Key Features */}
         <div style={{ marginBottom: '14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '4px', height: '16px', background: 'var(--primary)', borderRadius: '2px' }}></div>
+          <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ width: '4px', height: '16px', background: 'var(--primary)', borderRadius: '2px', opacity: 0.7 }}></div>
             <span>{isEn ? 'All Features & Capabilities' : 'অ্যাপের সকল ফিচার ও সুবিধাসমূহ'}</span>
           </h3>
         </div>
@@ -231,7 +231,7 @@ export default function AboutApp() {
                 transition: 'all 0.2s ease'
               }}>
                 <div style={{ minWidth: 0, flex: 1 }}>
-                  <h4 style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 4px 0', lineHeight: 1.3 }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 4px 0', lineHeight: 1.3 }}>
                     {f.title}
                   </h4>
                   <p style={{ fontSize: '11px', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.55 }}>

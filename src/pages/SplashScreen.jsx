@@ -37,7 +37,7 @@ export default function SplashScreen() {
         }}>
           <img
             src="/app-logo.png"
-            alt="Job Circular BD"
+            alt="Live Circular"
             style={{
               width: '100%',
               height: '100%',

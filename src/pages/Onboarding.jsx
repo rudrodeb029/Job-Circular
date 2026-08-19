@@ -134,7 +134,7 @@ export default function Onboarding() {
                 fontWeight: '500'
               }}
             >
-              <span style={{ fontWeight: '800', color: '#1e293b' }}>Job Circulars BD</span> is an <span style={{ fontWeight: '700', color: '#dc2626' }}>independent platform</span> and has <span style={{ fontWeight: '700', color: '#dc2626' }}>no affiliation</span> with the government of Bangladesh or any government agency. All government job notices are <span style={{ fontWeight: '700', color: '#1e293b' }}>aggregated</span> from public official gazettes and portals.
+              <span style={{ fontWeight: '800', color: '#1e293b' }}>Live Circular</span> is an <span style={{ fontWeight: '700', color: '#dc2626' }}>independent platform</span> and has <span style={{ fontWeight: '700', color: '#dc2626' }}>no affiliation</span> with the government of Bangladesh or any government agency. All government job notices are <span style={{ fontWeight: '700', color: '#1e293b' }}>aggregated</span> from public official gazettes and portals.
             </p>
           </div>
         </div>

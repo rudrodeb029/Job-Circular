@@ -1,6 +1,6 @@
-# Job Circular Mobile Application 🚀
+# Live Circular Mobile Application 🚀
 
-Welcome to the **Job Circular Mobile App** repository. This is a premium, feature-rich React-based hybrid mobile application designed to deliver real-time government and private job notices in Bangladesh, along with a comprehensive **Live MCQ Exam** system, interactive **Question Banks**, and an administrative control panel.
+Welcome to the **Live Circular Mobile App** repository. This is a premium, feature-rich React-based hybrid mobile application designed to deliver real-time government and private job notices in Bangladesh, along with a comprehensive **Live MCQ Exam** system, interactive **Question Banks**, and an administrative control panel.
 
 ---
 
