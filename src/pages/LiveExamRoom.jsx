@@ -737,14 +737,14 @@ export default function LiveExamRoom() {
 
         {/* 2. Leaderboard Tab view */}
         {currentResult && activeRoomTab === 'leaderboard' && (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
             {/* NEW PREMIUM PODIUM DESIGN */}
             {leaderboardData.length > 0 && (
               <div style={{
                 background: 'linear-gradient(180deg, #1e3a8a 0%, #111827 100%)',
                 borderRadius: '28px',
-                padding: '30px 10px 20px 10px',
+                padding: '24px 10px 20px 10px',
                 position: 'relative',
                 overflow: 'hidden',
                 boxShadow: '0 15px 35px rgba(0,0,0,0.3)',
@@ -752,17 +752,6 @@ export default function LiveExamRoom() {
                 flexDirection: 'column',
                 alignItems: 'center'
               }}>
-                {/* Decorative background glow */}
-                <div style={{
-                  position: 'absolute',
-                  top: '-50px',
-                  width: '200px',
-                  height: '200px',
-                  background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
-                  filter: 'blur(30px)',
-                  zIndex: 0
-                }} />
-
                 <div style={{
                   fontSize: '11px',
                   fontWeight: 700,
@@ -794,18 +783,23 @@ export default function LiveExamRoom() {
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
-                        <img
-                          src={leaderboardData[1].avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(leaderboardData[1].name)}&background=random`}
-                          alt="Rank 2"
-                          style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', objectFit: 'cover' }}
-                        />
+                        {leaderboardData[1].avatar ? (
+                          <img
+                            src={leaderboardData[1].avatar}
+                            alt="Rank 2"
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid rgba(255,255,255,0.4)' }}>
+                            {leaderboardData[1].name[0].toUpperCase()}
+                          </div>
+                        )}
                       </div>
                       <div style={{ color: 'white', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[1].name.split(' ')[0]}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
-                        <span style={{ fontSize: '12px', color: '#fbbf24' }}>🟡</span>
-                        <span style={{ color: 'white', fontSize: '12px', fontWeight: 800 }}>{leaderboardData[1].score}</span>
+                      <div style={{ color: 'white', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
+                        {leaderboardData[1].score}
                       </div>
                     </div>
                   )}
@@ -819,18 +813,23 @@ export default function LiveExamRoom() {
                           position: 'absolute', top: '-4px', left: '-4px', right: '-4px', bottom: '-4px',
                           borderRadius: '50%', border: '3px solid #fbbf24', animation: 'pulse 2s infinite'
                         }} />
-                        <img
-                          src={leaderboardData[0].avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(leaderboardData[0].name)}&background=random`}
-                          alt="Rank 1"
-                          style={{ width: '100%', height: '100%', borderRadius: '50%', border: '3px solid #fbbf24', objectFit: 'cover' }}
-                        />
+                        {leaderboardData[0].avatar ? (
+                          <img
+                            src={leaderboardData[0].avatar}
+                            alt="Rank 1"
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '3px solid #fbbf24', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#fbbf24', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 900 }}>
+                            {leaderboardData[0].name[0].toUpperCase()}
+                          </div>
+                        )}
                       </div>
                       <div style={{ color: 'white', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
                         {leaderboardData[0].name.split(' ')[0]}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
-                        <span style={{ fontSize: '14px', color: '#fbbf24' }}>🟡</span>
-                        <span style={{ color: 'white', fontSize: '16px', fontWeight: 900 }}>{leaderboardData[0].score}</span>
+                      <div style={{ color: '#fbbf24', fontSize: '18px', fontWeight: 900, marginTop: '2px' }}>
+                        {leaderboardData[0].score}
                       </div>
                     </div>
                   )}
@@ -840,18 +839,23 @@ export default function LiveExamRoom() {
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
-                        <img
-                          src={leaderboardData[2].avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(leaderboardData[2].name)}&background=random`}
-                          alt="Rank 3"
-                          style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.3)', objectFit: 'cover' }}
-                        />
+                        {leaderboardData[2].avatar ? (
+                          <img
+                            src={leaderboardData[2].avatar}
+                            alt="Rank 3"
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.3)', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid rgba(255,255,255,0.3)' }}>
+                            {leaderboardData[2].name[0].toUpperCase()}
+                          </div>
+                        )}
                       </div>
                       <div style={{ color: 'white', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[2].name.split(' ')[0]}
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
-                        <span style={{ fontSize: '12px', color: '#fbbf24' }}>🟡</span>
-                        <span style={{ color: 'white', fontSize: '12px', fontWeight: 800 }}>{leaderboardData[2].score}</span>
+                      <div style={{ color: 'white', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
+                        {leaderboardData[2].score}
                       </div>
                     </div>
                   )}
@@ -861,14 +865,9 @@ export default function LiveExamRoom() {
 
             {/* FULL RANK LIST */}
             <div style={{
-              background: 'var(--white)',
-              borderRadius: '24px',
-              padding: '16px',
-              border: '1px solid var(--border-light)',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px'
+              gap: '12px'
             }}>
               {leaderboardData.map((user, idx) => {
                 const rank = idx + 1;
@@ -882,59 +881,67 @@ export default function LiveExamRoom() {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px 14px',
-                      borderRadius: '16px',
-                      background: user.isCurrentUser ? 'rgba(26, 86, 219, 0.05)' : 'var(--bg-secondary)',
-                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid transparent',
+                      gap: '14px',
+                      padding: '14px 16px',
+                      borderRadius: '20px',
+                      background: 'var(--white)',
+                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                       transition: 'all 0.2s'
                     }}
                   >
                     {/* Rank Circle */}
                     <div style={{
-                      width: '28px',
-                      height: '28px',
+                      width: '32px',
+                      height: '32px',
                       borderRadius: '50%',
-                      border: '1px solid var(--border)',
+                      border: '1.5px solid var(--border-light)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '11px',
+                      fontSize: '12px',
                       fontWeight: 800,
                       color: 'var(--text-secondary)',
                       flexShrink: 0,
-                      background: 'var(--white)'
+                      background: 'var(--bg-secondary)'
                     }}>
                       {rank}
                     </div>
 
                     {/* Avatar */}
-                    <div style={{ position: 'relative', width: '38px', height: '38px', flexShrink: 0 }}>
-                      <img
-                        src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`}
-                        alt={displayName}
-                        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--white)' }}
-                      />
+                    <div style={{ position: 'relative', width: '42px', height: '42px', flexShrink: 0 }}>
+                      {user.avatar ? (
+                        <img
+                          src={user.avatar}
+                          alt={displayName}
+                          style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                        />
+                      ) : (
+                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--primary-bg)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                          {displayName[0].toUpperCase()}
+                        </div>
+                      )}
                     </div>
 
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <h4 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {displayName}
                       </h4>
-                      <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color: '#059669' }}>✓ {user.score} Correct</span>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color: '#ef4444' }}>✗ {user.total - user.score} Wrong</span>
+                      <div style={{ display: 'flex', gap: '10px', marginTop: '3px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                           <span style={{ fontSize: '12px' }}>✓</span> {user.score} Correct
+                        </span>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                           <span style={{ fontSize: '12px' }}>✗</span> {user.total - user.score} Wrong
+                        </span>
                       </div>
                     </div>
 
                     {/* Score */}
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
-                        <span style={{ fontSize: '14px', fontWeight: 900, color: 'var(--text-primary)' }}>{displayScore}</span>
-                        <span style={{ fontSize: '11px', color: '#fbbf24' }}>🟡</span>
-                      </div>
-                      <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{displayScore}</div>
+                      <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginTop: '2px' }}>{isEn ? 'SCORE' : 'নম্বর'}</div>
                     </div>
                   </div>
                 );
