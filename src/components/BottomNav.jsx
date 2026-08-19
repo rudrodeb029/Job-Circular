@@ -60,34 +60,31 @@ const BottomNav = () => {
   return (
     <nav className={`bottom-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
       <NavLink to="/home" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <Home size={22} />
-        <span>{state.language === 'en' ? 'Home' : 'হোম'}</span>
+        <Home size={24} />
       </NavLink>
 
       <NavLink to="/categories" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <LayoutGrid size={22} />
-        <span>{state.language === 'en' ? 'Category' : 'ক্যাটাগরি'}</span>
+        <LayoutGrid size={24} />
       </NavLink>
 
       {/* Raised Middle Button (Saved Circulars) */}
       <div className="bottom-nav-middle-wrapper">
         <NavLink to="/saved" className={({ isActive }) => `bottom-nav-middle-item ${isActive ? 'active' : ''}`}>
           <div className="middle-icon-circle">
-            <Bookmark size={24} />
+            <Bookmark size={26} />
           </div>
-          <span className="middle-label">{state.language === 'en' ? 'Saved' : 'সংরক্ষিত'}</span>
         </NavLink>
       </div>
 
       <NavLink to="/notifications" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Bell size={22} />
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Bell size={24} />
           {unreadCount > 0 && (
             <span
               style={{
                 position: 'absolute',
-                top: '-3px',
-                right: '-5px',
+                top: '-2px',
+                right: '-4px',
                 background: 'var(--danger)',
                 color: 'white',
                 borderRadius: '50%',
@@ -107,12 +104,10 @@ const BottomNav = () => {
             </span>
           )}
         </div>
-        <span>{state.language === 'en' ? 'Alerts' : 'বিজ্ঞপ্তি'}</span>
       </NavLink>
 
       <NavLink to="/profile" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <User size={22} />
-        <span>{state.language === 'en' ? 'Profile' : 'প্রোফাইল'}</span>
+        <User size={24} />
       </NavLink>
     </nav>
   );
