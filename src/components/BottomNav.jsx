@@ -59,6 +59,17 @@ const BottomNav = () => {
 
   return (
     <nav className={`bottom-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
+      <div className="bottom-nav-background">
+        <svg width="100%" height="60" viewBox="0 0 100 60" preserveAspectRatio="none" style={{ display: 'block', overflow: 'visible' }}>
+          <path
+            d="M 0,10 L 36,10 C 42,10 42,48 50,48 C 58,48 58,10 64,10 L 100,10 L 100,60 L 0,60 Z"
+            fill="var(--white)"
+            stroke="var(--border-light)"
+            strokeWidth="0.5"
+          />
+        </svg>
+      </div>
+
       <NavLink to="/home" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <Home size={24} />
       </NavLink>
@@ -67,7 +78,7 @@ const BottomNav = () => {
         <LayoutGrid size={24} />
       </NavLink>
 
-      {/* Raised Middle Button (Saved Circulars) */}
+      {/* Raised Middle Button (Saved Circulars) sits exactly in the cutout */}
       <div className="bottom-nav-middle-wrapper">
         <NavLink to="/saved" className={({ isActive }) => `bottom-nav-middle-item ${isActive ? 'active' : ''}`}>
           <div className="middle-icon-circle">
