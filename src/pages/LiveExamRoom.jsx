@@ -884,8 +884,8 @@ export default function LiveExamRoom() {
                       gap: '14px',
                       padding: '14px 16px',
                       borderRadius: '20px',
-                      background: '#f0fdf4',
-                      border: user.isCurrentUser ? '1.5px solid #22c55e' : '1px solid #dcfce7',
+                      background: 'var(--white)',
+                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                       transition: 'all 0.2s'
                     }}
@@ -917,7 +917,7 @@ export default function LiveExamRoom() {
                           style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                         />
                       ) : (
-                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--primary-bg)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                           {displayName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                         </div>
                       )}
