@@ -803,7 +803,7 @@ export default function LiveExamRoom() {
                         {leaderboardData[1].name.split(' ')[0]}
                       </div>
                       <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
-                        {leaderboardData[1].score}
+                        {isEn ? leaderboardData[1].score : toBengaliNumber(leaderboardData[1].score)}
                       </div>
                     </div>
                   )}
@@ -837,7 +837,7 @@ export default function LiveExamRoom() {
                         {leaderboardData[0].name.split(' ')[0]}
                       </div>
                       <div style={{ color: '#fbbf24', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
-                        {leaderboardData[0].score}
+                        {isEn ? leaderboardData[0].score : toBengaliNumber(leaderboardData[0].score)}
                       </div>
                     </div>
                   )}
@@ -867,7 +867,7 @@ export default function LiveExamRoom() {
                         {leaderboardData[2].name.split(' ')[0]}
                       </div>
                       <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
-                        {leaderboardData[2].score}
+                        {isEn ? leaderboardData[2].score : toBengaliNumber(leaderboardData[2].score)}
                       </div>
                     </div>
                   )}
@@ -917,7 +917,7 @@ export default function LiveExamRoom() {
                       flexShrink: 0,
                       background: 'var(--bg-secondary)'
                     }}>
-                      {rank}
+                      {isEn ? rank : toBengaliNumber(rank)}
                     </div>
 
                     {/* Avatar */}
@@ -946,17 +946,19 @@ export default function LiveExamRoom() {
                       </h4>
                       <div style={{ display: 'flex', gap: '10px', marginTop: '3px' }}>
                         <span style={{ fontSize: '10px', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                           <span style={{ fontSize: '12px' }}>✓</span> {user.score} Correct
+                           <span style={{ fontSize: '12px' }}>✓</span> {isEn ? `${user.score} Correct` : `${toBengaliNumber(user.score)} সঠিক`}
                         </span>
                         <span style={{ fontSize: '10px', fontWeight: 700, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                           <span style={{ fontSize: '12px' }}>✗</span> {user.total - user.score} Wrong
+                           <span style={{ fontSize: '12px' }}>✗</span> {isEn ? `${user.total - user.score} Wrong` : `${toBengaliNumber(user.total - user.score)} ভুল`}
                         </span>
                       </div>
                     </div>
 
                     {/* Score */}
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '14px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{displayScore}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>
+                        {isEn ? displayScore : toBengaliNumber(displayScore)}
+                      </div>
                       <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginTop: '2px' }}>{isEn ? 'SCORE' : 'নম্বর'}</div>
                     </div>
                   </div>
