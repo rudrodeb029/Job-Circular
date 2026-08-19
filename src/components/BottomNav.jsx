@@ -60,17 +60,28 @@ const BottomNav = () => {
   return (
     <nav className={`bottom-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
       <NavLink to="/home" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <Home size={24} />
+        <Home size={22} />
+        <span>{state.language === 'en' ? 'Home' : 'হোম'}</span>
       </NavLink>
+
       <NavLink to="/categories" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <LayoutGrid size={24} />
+        <LayoutGrid size={22} />
+        <span>{state.language === 'en' ? 'Category' : 'ক্যাটাগরি'}</span>
       </NavLink>
-      <NavLink to="/saved" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <Bookmark size={24} />
-      </NavLink>
+
+      {/* Raised Middle Button */}
+      <div className="bottom-nav-middle-wrapper">
+        <NavLink to="/saved" className={({ isActive }) => `bottom-nav-middle-item ${isActive ? 'active' : ''}`}>
+          <div className="middle-icon-circle">
+            <Bookmark size={24} />
+          </div>
+          <span className="middle-label">{state.language === 'en' ? 'Saved' : 'সংরক্ষিত'}</span>
+        </NavLink>
+      </div>
+
       <NavLink to="/notifications" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <div style={{ position: 'relative' }}>
-          <Bell size={24} />
+        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Bell size={22} />
           {unreadCount > 0 && (
             <span
               style={{
@@ -96,9 +107,12 @@ const BottomNav = () => {
             </span>
           )}
         </div>
+        <span>{state.language === 'en' ? 'Alerts' : 'বিজ্ঞপ্তি'}</span>
       </NavLink>
+
       <NavLink to="/profile" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <User size={24} />
+        <User size={22} />
+        <span>{state.language === 'en' ? 'Profile' : 'প্রোফাইল'}</span>
       </NavLink>
     </nav>
   );
