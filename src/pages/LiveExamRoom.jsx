@@ -798,7 +798,7 @@ export default function LiveExamRoom() {
                       <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[1].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
                         {leaderboardData[1].score}
                       </div>
                     </div>
@@ -828,7 +828,7 @@ export default function LiveExamRoom() {
                       <div style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
                         {leaderboardData[0].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: '#fbbf24', fontSize: '18px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: '#fbbf24', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
                         {leaderboardData[0].score}
                       </div>
                     </div>
@@ -854,7 +854,7 @@ export default function LiveExamRoom() {
                       <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[2].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
                         {leaderboardData[2].score}
                       </div>
                     </div>
@@ -940,7 +940,7 @@ export default function LiveExamRoom() {
 
                     {/* Score */}
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{displayScore}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{displayScore}</div>
                       <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginTop: '2px' }}>{isEn ? 'SCORE' : 'নম্বর'}</div>
                     </div>
                   </div>
