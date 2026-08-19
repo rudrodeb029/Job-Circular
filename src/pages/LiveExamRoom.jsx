@@ -783,7 +783,7 @@ export default function LiveExamRoom() {
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
-                        {leaderboardData[1].avatar ? (
+                        {(leaderboardData[1].avatar && !leaderboardData[1].avatar.includes('dummy') && !leaderboardData[1].avatar.includes('placeholder')) ? (
                           <img
                             src={leaderboardData[1].avatar}
                             alt="Rank 2"
@@ -791,7 +791,7 @@ export default function LiveExamRoom() {
                           />
                         ) : (
                           <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid rgba(255,255,255,0.4)' }}>
-                            {leaderboardData[1].name[0].toUpperCase()}
+                            {leaderboardData[1].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                           </div>
                         )}
                       </div>
@@ -813,7 +813,7 @@ export default function LiveExamRoom() {
                           position: 'absolute', top: '-4px', left: '-4px', right: '-4px', bottom: '-4px',
                           borderRadius: '50%', border: '3px solid #fbbf24', animation: 'pulse 2s infinite'
                         }} />
-                        {leaderboardData[0].avatar ? (
+                        {(leaderboardData[0].avatar && !leaderboardData[0].avatar.includes('dummy') && !leaderboardData[0].avatar.includes('placeholder')) ? (
                           <img
                             src={leaderboardData[0].avatar}
                             alt="Rank 1"
@@ -821,7 +821,7 @@ export default function LiveExamRoom() {
                           />
                         ) : (
                           <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#fbbf24', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 900 }}>
-                            {leaderboardData[0].name[0].toUpperCase()}
+                            {leaderboardData[0].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                           </div>
                         )}
                       </div>
@@ -839,7 +839,7 @@ export default function LiveExamRoom() {
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
-                        {leaderboardData[2].avatar ? (
+                        {(leaderboardData[2].avatar && !leaderboardData[2].avatar.includes('dummy') && !leaderboardData[2].avatar.includes('placeholder')) ? (
                           <img
                             src={leaderboardData[2].avatar}
                             alt="Rank 3"
@@ -847,7 +847,7 @@ export default function LiveExamRoom() {
                           />
                         ) : (
                           <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid rgba(255,255,255,0.3)' }}>
-                            {leaderboardData[2].name[0].toUpperCase()}
+                            {leaderboardData[2].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                           </div>
                         )}
                       </div>
@@ -884,8 +884,8 @@ export default function LiveExamRoom() {
                       gap: '14px',
                       padding: '14px 16px',
                       borderRadius: '20px',
-                      background: 'var(--white)',
-                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
+                      background: '#f0fdf4',
+                      border: user.isCurrentUser ? '1.5px solid #22c55e' : '1px solid #dcfce7',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                       transition: 'all 0.2s'
                     }}
@@ -910,15 +910,15 @@ export default function LiveExamRoom() {
 
                     {/* Avatar */}
                     <div style={{ position: 'relative', width: '42px', height: '42px', flexShrink: 0 }}>
-                      {user.avatar ? (
+                      {(user.avatar && !user.avatar.includes('dummy') && !user.avatar.includes('placeholder')) ? (
                         <img
                           src={user.avatar}
                           alt={displayName}
                           style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                         />
                       ) : (
-                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--primary-bg)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                          {displayName[0].toUpperCase()}
+                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#dcfce7', color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                          {displayName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                         </div>
                       )}
                     </div>
