@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, LayoutGrid, Calendar, Bell, User } from './Icons';
+import { Home, LayoutGrid, Bookmark, Bell, User } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
@@ -69,13 +69,13 @@ const BottomNav = () => {
         <span>{state.language === 'en' ? 'Category' : 'ক্যাটাগরি'}</span>
       </NavLink>
 
-      {/* Raised Middle Button (Routine/Exams) */}
+      {/* Raised Middle Button (Saved Circulars) */}
       <div className="bottom-nav-middle-wrapper">
-        <NavLink to="/live-exams" className={({ isActive }) => `bottom-nav-middle-item ${isActive ? 'active' : ''}`}>
+        <NavLink to="/saved" className={({ isActive }) => `bottom-nav-middle-item ${isActive ? 'active' : ''}`}>
           <div className="middle-icon-circle">
-            <Calendar size={24} />
+            <Bookmark size={24} />
           </div>
-          <span className="middle-label">{state.language === 'en' ? 'Routine' : 'রুটিন'}</span>
+          <span className="middle-label">{state.language === 'en' ? 'Saved' : 'সংরক্ষিত'}</span>
         </NavLink>
       </div>
 
