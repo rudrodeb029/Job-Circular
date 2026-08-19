@@ -742,26 +742,26 @@ export default function LiveExamRoom() {
             {/* NEW PREMIUM PODIUM DESIGN */}
             {leaderboardData.length > 0 && (
               <div style={{
-                background: 'linear-gradient(180deg, #1e3a8a 0%, #111827 100%)',
+                background: 'var(--white)',
                 borderRadius: '28px',
                 padding: '24px 10px 20px 10px',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 15px 35px rgba(0,0,0,0.3)',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center'
+                alignItems: 'center',
+                border: '1px solid var(--border-light)'
               }}>
                 <div style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  color: 'rgba(255,255,255,0.7)',
-                  background: 'rgba(255,255,255,0.1)',
+                  color: 'var(--text-secondary)',
+                  background: 'var(--bg-secondary)',
                   padding: '4px 14px',
                   borderRadius: '20px',
                   marginBottom: '24px',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  backdropFilter: 'blur(4px)',
+                  border: '1px solid var(--border-light)',
                   zIndex: 1
                 }}>
                   {isEn ? 'Daily Top Performers' : 'আজকের সেরা অংশগ্রহণকারী'}
@@ -781,24 +781,24 @@ export default function LiveExamRoom() {
                   {/* RANK 2 */}
                   {leaderboardData[1] && (
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
                         {(leaderboardData[1].avatar && !leaderboardData[1].avatar.includes('dummy') && !leaderboardData[1].avatar.includes('placeholder')) ? (
                           <img
                             src={leaderboardData[1].avatar}
                             alt="Rank 2"
-                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid var(--border-light)', objectFit: 'cover' }}
                           />
                         ) : (
-                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid rgba(255,255,255,0.4)' }}>
+                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)' }}>
                             {leaderboardData[1].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                           </div>
                         )}
                       </div>
-                      <div style={{ color: 'white', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[1].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: 'white', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
                         {leaderboardData[1].score}
                       </div>
                     </div>
@@ -807,7 +807,7 @@ export default function LiveExamRoom() {
                   {/* RANK 1 */}
                   {leaderboardData[0] && (
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', transform: 'translateY(-15px)' }}>
-                      <div style={{ fontSize: '24px', marginBottom: '4px', filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.5))' }}>👑</div>
+                      <div style={{ fontSize: '24px', marginBottom: '4px', filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.3))' }}>👑</div>
                       <div style={{ position: 'relative', width: '74px', height: '74px', marginBottom: '8px' }}>
                         <div style={{
                           position: 'absolute', top: '-4px', left: '-4px', right: '-4px', bottom: '-4px',
@@ -825,7 +825,7 @@ export default function LiveExamRoom() {
                           </div>
                         )}
                       </div>
-                      <div style={{ color: 'white', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
                         {leaderboardData[0].name.split(' ')[0]}
                       </div>
                       <div style={{ color: '#fbbf24', fontSize: '18px', fontWeight: 900, marginTop: '2px' }}>
@@ -837,24 +837,24 @@ export default function LiveExamRoom() {
                   {/* RANK 3 */}
                   {leaderboardData[2] && (
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
+                      <div style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
                         {(leaderboardData[2].avatar && !leaderboardData[2].avatar.includes('dummy') && !leaderboardData[2].avatar.includes('placeholder')) ? (
                           <img
                             src={leaderboardData[2].avatar}
                             alt="Rank 3"
-                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.3)', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid var(--border-light)', objectFit: 'cover' }}
                           />
                         ) : (
-                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid rgba(255,255,255,0.3)' }}>
+                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)' }}>
                             {leaderboardData[2].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                           </div>
                         )}
                       </div>
-                      <div style={{ color: 'white', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[2].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: 'white', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
                         {leaderboardData[2].score}
                       </div>
                     </div>
