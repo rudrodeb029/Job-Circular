@@ -783,17 +783,21 @@ export default function LiveExamRoom() {
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
-                        {(leaderboardData[1].avatar && !leaderboardData[1].avatar.includes('dummy') && !leaderboardData[1].avatar.includes('placeholder')) ? (
+                        {isValidAvatar(leaderboardData[1].avatar) ? (
                           <img
                             src={leaderboardData[1].avatar}
                             alt="Rank 2"
+                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                             style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid var(--border-light)', objectFit: 'cover' }}
                           />
-                        ) : (
-                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)' }}>
-                            {leaderboardData[1].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
-                          </div>
-                        )}
+                        ) : null}
+                        <div style={{
+                          width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)',
+                          display: isValidAvatar(leaderboardData[1].avatar) ? 'none' : 'flex',
+                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)'
+                        }}>
+                          {getInitials(leaderboardData[1].name)}
+                        </div>
                       </div>
                       <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[1].name.split(' ')[0]}
@@ -813,17 +817,21 @@ export default function LiveExamRoom() {
                           position: 'absolute', top: '-4px', left: '-4px', right: '-4px', bottom: '-4px',
                           borderRadius: '50%', border: '3px solid #fbbf24', animation: 'pulse 2s infinite'
                         }} />
-                        {(leaderboardData[0].avatar && !leaderboardData[0].avatar.includes('dummy') && !leaderboardData[0].avatar.includes('placeholder')) ? (
+                        {isValidAvatar(leaderboardData[0].avatar) ? (
                           <img
                             src={leaderboardData[0].avatar}
                             alt="Rank 1"
+                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                             style={{ width: '100%', height: '100%', borderRadius: '50%', border: '3px solid #fbbf24', objectFit: 'cover' }}
                           />
-                        ) : (
-                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#fbbf24', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 900 }}>
-                            {leaderboardData[0].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
-                          </div>
-                        )}
+                        ) : null}
+                        <div style={{
+                          width: '100%', height: '100%', borderRadius: '50%', background: '#fbbf24', color: '#1e3a8a',
+                          display: isValidAvatar(leaderboardData[0].avatar) ? 'none' : 'flex',
+                          alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 900
+                        }}>
+                          {getInitials(leaderboardData[0].name)}
+                        </div>
                       </div>
                       <div style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
                         {leaderboardData[0].name.split(' ')[0]}
@@ -839,17 +847,21 @@ export default function LiveExamRoom() {
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       <div style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
-                        {(leaderboardData[2].avatar && !leaderboardData[2].avatar.includes('dummy') && !leaderboardData[2].avatar.includes('placeholder')) ? (
+                        {isValidAvatar(leaderboardData[2].avatar) ? (
                           <img
                             src={leaderboardData[2].avatar}
                             alt="Rank 3"
+                            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                             style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid var(--border-light)', objectFit: 'cover' }}
                           />
-                        ) : (
-                          <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)' }}>
-                            {leaderboardData[2].name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
-                          </div>
-                        )}
+                        ) : null}
+                        <div style={{
+                          width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)',
+                          display: isValidAvatar(leaderboardData[2].avatar) ? 'none' : 'flex',
+                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)'
+                        }}>
+                          {getInitials(leaderboardData[2].name)}
+                        </div>
                       </div>
                       <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[2].name.split(' ')[0]}
@@ -910,17 +922,21 @@ export default function LiveExamRoom() {
 
                     {/* Avatar */}
                     <div style={{ position: 'relative', width: '42px', height: '42px', flexShrink: 0 }}>
-                      {(user.avatar && !user.avatar.includes('dummy') && !user.avatar.includes('placeholder')) ? (
+                      {isValidAvatar(user.avatar) ? (
                         <img
                           src={user.avatar}
                           alt={displayName}
+                          onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
                           style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                         />
-                      ) : (
-                        <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'var(--primary-bg)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                          {displayName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
-                        </div>
-                      )}
+                      ) : null}
+                      <div style={{
+                        width: '100%', height: '100%', borderRadius: '50%', background: 'var(--primary-bg)', color: 'var(--primary)',
+                        display: isValidAvatar(user.avatar) ? 'none' : 'flex',
+                        alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                      }}>
+                        {getInitials(displayName)}
+                      </div>
                     </div>
 
                     {/* Info */}
@@ -998,6 +1014,31 @@ const toSafeString = (val, fallback = '') => {
     if (typeof val.value === 'string') return val.value;
     if (typeof val.bn === 'string') return val.bn;
     if (typeof val.en === 'string') return val.en;
+    return fallback;
+  }
+  return fallback;
+};
+
+const isValidAvatar = (url) => {
+  if (!url || typeof url !== 'string') return false;
+  const u = url.toLowerCase();
+  // Aggressive filtering of dummy/generic images
+  if (u.includes('dummy') || u.includes('placeholder') || u.includes('pravatar') || u.includes('randomuser') || u.includes('dicebear')) return false;
+  // Cloudinary URLs for real users are usually long and contain 'upload/'
+  if (!u.includes('cloudinary') && !u.includes('firebase') && !u.includes('googleusercontent') && !u.includes('facebook')) {
+    if (u.length < 30) return false;
+  }
+  if (u.includes('avatar.png') || u.includes('user.png') || u.includes('default.png')) return false;
+  return true;
+};
+
+const getInitials = (name) => {
+  if (!name || typeof name !== 'string') return 'U';
+  const parts = name.split(' ').filter(p => p.length > 0);
+  if (parts.length === 0) return 'U';
+  if (parts.length === 1) return parts[0].substring(0, 1).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+};
   }
   return fallback;
 };
