@@ -737,212 +737,217 @@ export default function LiveExamRoom() {
 
         {/* 2. Leaderboard Tab view */}
         {currentResult && activeRoomTab === 'leaderboard' && (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
-            <div style={{
-              background: 'var(--white)',
-              borderRadius: '20px',
-              padding: '24px 20px',
-              border: '1px solid var(--border-light)',
-              boxShadow: '0 4px 18px rgba(0,0,0,0.02)'
-            }}>
+            {/* NEW PREMIUM PODIUM DESIGN */}
+            {leaderboardData.length > 0 && (
               <div style={{
+                background: 'linear-gradient(180deg, #1e3a8a 0%, #111827 100%)',
+                borderRadius: '28px',
+                padding: '30px 10px 20px 10px',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: '0 15px 35px rgba(0,0,0,0.3)',
                 display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: 'rgba(26, 86, 219, 0.05)',
-                borderLeft: '4px solid var(--primary)',
-                borderRadius: '8px',
-                padding: '10px 14px',
-                marginBottom: '18px'
+                flexDirection: 'column',
+                alignItems: 'center'
               }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                  <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                  <path d="M4 22h16"></path>
-                  <path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path>
-                  <path d="M12 2a6 6 0 0 0-6 6v3.5a6 6 0 0 0 12 0V8a6 6 0 0 0-6-6z"></path>
-                </svg>
-                <h3 style={{ fontSize: '14.5px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                  {isEn ? 'Rank List' : 'র‍্যাংক তালিকা'}
-                </h3>
-              </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {leaderboardData.map((user, idx) => {
-                  const rank = idx + 1;
-                  const isGold = rank === 1;
-                  const isSilver = rank === 2;
-                  const isBronze = rank === 3;
-                  const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
-                  const displayTime = toSafeString(user.time, '0m 00s');
-                  const displayScore = toSafeString(user.score, '0');
-                  const displayTotal = toSafeString(user.total, (exam && Array.isArray(exam.questions) && exam.questions.length > 0 ? exam.questions.length : 100));
-                  
-                  const rawAvatar = toSafeString(user.avatar || user.userPhoto, '');
-                  const hasCustomPhoto = Boolean(
-                    rawAvatar && 
-                    !rawAvatar.includes('unsplash.com/photo-1535713875002') && 
-                    (rawAvatar.startsWith('http://') || rawAvatar.startsWith('https://') || rawAvatar.startsWith('data:') || rawAvatar.startsWith('/'))
-                  );
+                {/* Decorative background glow */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-50px',
+                  width: '200px',
+                  height: '200px',
+                  background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
+                  filter: 'blur(30px)',
+                  zIndex: 0
+                }} />
 
-                  const getAvatarBg = (nameStr) => {
-                    const colors = [
-                      'rgba(26, 86, 219, 0.08)',
-                      'rgba(16, 185, 129, 0.08)',
-                      'rgba(245, 158, 11, 0.08)',
-                      'rgba(139, 92, 246, 0.08)',
-                      'rgba(236, 72, 153, 0.08)',
-                      'rgba(6, 182, 212, 0.08)'
-                    ];
-                    const textColors = [
-                      'var(--primary)',
-                      '#059669',
-                      '#d97706',
-                      '#7c3aed',
-                      '#db2777',
-                      '#0891b2'
-                    ];
-                    let hash = 0;
-                    for (let i = 0; i < (nameStr || '').length; i++) {
-                      hash = nameStr.charCodeAt(i) + ((hash << 5) - hash);
-                    }
-                    const index = Math.abs(hash) % colors.length;
-                    return { bg: colors[index], text: textColors[index] };
-                  };
-                  const avatarStyle = getAvatarBg(displayName);
+                <div style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.7)',
+                  background: 'rgba(255,255,255,0.1)',
+                  padding: '4px 14px',
+                  borderRadius: '20px',
+                  marginBottom: '24px',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(4px)',
+                  zIndex: 1
+                }}>
+                  {isEn ? 'Daily Top Performers' : 'আজকের সেরা অংশগ্রহণকারী'}
+                </div>
 
-                  return (
-                    <div
-                      key={user.id || idx}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '12px 14px',
-                        borderRadius: '14px',
-                        background: user.isCurrentUser ? 'rgba(26, 86, 219, 0.04)' : 'var(--bg-secondary)',
-                        border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
-                        borderLeft: user.isCurrentUser ? '4px solid var(--primary)' : undefined,
-                        boxShadow: user.isCurrentUser ? '0 4px 12px rgba(26, 86, 219, 0.05)' : 'none'
-                      }}
-                    >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {/* Rank Badge */}
-                        <span style={{
-                          width: '26px',
-                          height: '26px',
-                          borderRadius: '50%',
-                          background: isGold 
-                            ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' 
-                            : isSilver 
-                              ? 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' 
-                              : isBronze 
-                                ? 'linear-gradient(135deg, #ca8a04 0%, #a16207 100%)' 
-                                : 'var(--white)',
-                          color: (isGold || isSilver || isBronze) ? 'white' : 'var(--text-secondary)',
-                          fontSize: '11px',
-                          fontWeight: 800,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          boxShadow: isGold 
-                            ? '0 2px 6px rgba(217, 119, 6, 0.25)' 
-                            : isSilver 
-                              ? '0 2px 6px rgba(100, 116, 139, 0.2)' 
-                              : isBronze 
-                                ? '0 2px 6px rgba(161, 98, 7, 0.2)' 
-                                : 'none',
-                          border: (isGold || isSilver || isBronze) ? 'none' : '1px solid var(--border-light)'
-                        }}>
-                          {isEn ? rank : toBengaliNumber(rank)}
-                        </span>
-
-                        {/* Profile Picture: Shows uploaded photo, or initial letter if no photo */}
-                        {hasCustomPhoto ? (
-                          <img 
-                            src={rawAvatar} 
-                            alt={displayName}
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              if (e.target.nextSibling) {
-                                e.target.nextSibling.style.display = 'flex';
-                              }
-                            }}
-                            style={{
-                              width: '36px',
-                              height: '36px',
-                              borderRadius: '50%',
-                              objectFit: 'cover',
-                              border: `1.5px solid ${avatarStyle.text}`,
-                              flexShrink: 0
-                            }} 
-                          />
-                        ) : null}
-
-                        <div 
-                          style={{
-                            display: hasCustomPhoto ? 'none' : 'flex',
-                            width: '36px',
-                            height: '36px',
-                            borderRadius: '50%',
-                            background: avatarStyle.bg,
-                            color: avatarStyle.text,
-                            border: `1.5px solid ${avatarStyle.text}`,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '14px',
-                            fontWeight: 800,
-                            textTransform: 'uppercase',
-                            flexShrink: 0
-                          }}
-                        >
-                          {displayName.trim().charAt(0) || '👤'}
-                        </div>
-                        
-                        <div>
-                          <strong style={{ fontSize: '13px', color: 'var(--text-primary)', display: 'block' }}>
-                            {displayName}
-                          </strong>
-                          <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ verticalAlign: 'middle' }}>
-                              <circle cx="12" cy="12" r="10"></circle>
-                              <polyline points="12 6 12 12 16 14"></polyline>
-                            </svg>
-                            {formatTimeTaken(displayTime, isEn)}
-                          </span>
-                        </div>
+                {/* Podium Grid */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1.2fr 1fr',
+                  width: '100%',
+                  alignItems: 'flex-end',
+                  gap: '5px',
+                  position: 'relative',
+                  zIndex: 2,
+                  marginBottom: '10px'
+                }}>
+                  {/* RANK 2 */}
+                  {leaderboardData[1] && (
+                    <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
+                      <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
+                        <img
+                          src={leaderboardData[1].avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(leaderboardData[1].name)}&background=random`}
+                          alt="Rank 2"
+                          style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.4)', objectFit: 'cover' }}
+                        />
                       </div>
-
-                      <div style={{ textAlign: 'right' }}>
-                        <span style={{ 
-                          fontSize: '12px', 
-                          fontWeight: 800, 
-                          color: user.isCurrentUser ? 'white' : 'var(--primary)', 
-                          display: 'inline-block',
-                          background: user.isCurrentUser ? 'var(--primary)' : 'rgba(26, 86, 219, 0.06)',
-                          padding: '4px 10px',
-                          borderRadius: '8px'
-                        }}>
-                          {isEn ? `${displayScore}/${displayTotal}` : `${toBengaliNumber(displayScore)}/${toBengaliNumber(displayTotal)}`}
-                        </span>
-                        <span style={{ fontSize: '10px', color: 'var(--text-muted)', display: 'block', marginTop: '2px', paddingRight: '4px' }}>
-                          {isEn ? 'Points' : 'পয়েন্ট'}
-                        </span>
+                      <div style={{ color: 'white', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                        {leaderboardData[1].name.split(' ')[0]}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '12px', color: '#fbbf24' }}>🟡</span>
+                        <span style={{ color: 'white', fontSize: '12px', fontWeight: 800 }}>{leaderboardData[1].score}</span>
                       </div>
                     </div>
-                  );
-                })}
+                  )}
 
-                {leaderboardData.length === 0 && (
-                  <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
-                    <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>🏆</span>
-                    <p style={{ fontSize: '13px', fontWeight: 600 }}>
-                      {isEn ? 'No real participants yet. Be the first to take this exam!' : 'এখনও কোনো প্রকৃত অংশগ্রহণকারী নেই। প্রথম হয়ে পরীক্ষায় অংশ নিন!'}
-                    </p>
-                  </div>
-                )}
+                  {/* RANK 1 */}
+                  {leaderboardData[0] && (
+                    <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', transform: 'translateY(-15px)' }}>
+                      <div style={{ fontSize: '24px', marginBottom: '4px', filter: 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.5))' }}>👑</div>
+                      <div style={{ position: 'relative', width: '74px', height: '74px', marginBottom: '8px' }}>
+                        <div style={{
+                          position: 'absolute', top: '-4px', left: '-4px', right: '-4px', bottom: '-4px',
+                          borderRadius: '50%', border: '3px solid #fbbf24', animation: 'pulse 2s infinite'
+                        }} />
+                        <img
+                          src={leaderboardData[0].avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(leaderboardData[0].name)}&background=random`}
+                          alt="Rank 1"
+                          style={{ width: '100%', height: '100%', borderRadius: '50%', border: '3px solid #fbbf24', objectFit: 'cover' }}
+                        />
+                      </div>
+                      <div style={{ color: 'white', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
+                        {leaderboardData[0].name.split(' ')[0]}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '14px', color: '#fbbf24' }}>🟡</span>
+                        <span style={{ color: 'white', fontSize: '16px', fontWeight: 900 }}>{leaderboardData[0].score}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* RANK 3 */}
+                  {leaderboardData[2] && (
+                    <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
+                      <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
+                        <img
+                          src={leaderboardData[2].avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(leaderboardData[2].name)}&background=random`}
+                          alt="Rank 3"
+                          style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid rgba(255,255,255,0.3)', objectFit: 'cover' }}
+                        />
+                      </div>
+                      <div style={{ color: 'white', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                        {leaderboardData[2].name.split(' ')[0]}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '12px', color: '#fbbf24' }}>🟡</span>
+                        <span style={{ color: 'white', fontSize: '12px', fontWeight: 800 }}>{leaderboardData[2].score}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
+            )}
+
+            {/* FULL RANK LIST */}
+            <div style={{
+              background: 'var(--white)',
+              borderRadius: '24px',
+              padding: '16px',
+              border: '1px solid var(--border-light)',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px'
+            }}>
+              {leaderboardData.map((user, idx) => {
+                const rank = idx + 1;
+                const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
+                const displayScore = toSafeString(user.score, '0');
+                const displayTotal = toSafeString(user.total, (exam && Array.isArray(exam.questions) ? exam.questions.length : 100));
+
+                return (
+                  <div
+                    key={user.id || idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px 14px',
+                      borderRadius: '16px',
+                      background: user.isCurrentUser ? 'rgba(26, 86, 219, 0.05)' : 'var(--bg-secondary)',
+                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid transparent',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    {/* Rank Circle */}
+                    <div style={{
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      border: '1px solid var(--border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '11px',
+                      fontWeight: 800,
+                      color: 'var(--text-secondary)',
+                      flexShrink: 0,
+                      background: 'var(--white)'
+                    }}>
+                      {rank}
+                    </div>
+
+                    {/* Avatar */}
+                    <div style={{ position: 'relative', width: '38px', height: '38px', flexShrink: 0 }}>
+                      <img
+                        src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random`}
+                        alt={displayName}
+                        style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid var(--white)' }}
+                      />
+                    </div>
+
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <h4 style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {displayName}
+                      </h4>
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
+                        <span style={{ fontSize: '9px', fontWeight: 700, color: '#059669' }}>✓ {user.score} Correct</span>
+                        <span style={{ fontSize: '9px', fontWeight: 700, color: '#ef4444' }}>✗ {user.total - user.score} Wrong</span>
+                      </div>
+                    </div>
+
+                    {/* Score */}
+                    <div style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
+                        <span style={{ fontSize: '14px', fontWeight: 900, color: 'var(--text-primary)' }}>{displayScore}</span>
+                        <span style={{ fontSize: '11px', color: '#fbbf24' }}>🟡</span>
+                      </div>
+                      <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Points</div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {leaderboardData.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+                  <span style={{ fontSize: '36px', display: 'block', marginBottom: '8px' }}>🏆</span>
+                  <p style={{ fontSize: '13px', fontWeight: 600 }}>
+                    {isEn ? 'No real participants yet.' : 'এখনও কোনো অংশগ্রহণকারী নেই।'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
