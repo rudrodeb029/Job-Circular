@@ -241,7 +241,9 @@ export default function ManageQuestions() {
       bank: 'Bank',
       ntrca: 'NTRCA',
       primary: 'Primary',
-      ministry: 'Ministries'
+      ministry: 'Ministries',
+      recent: 'Recent Questions',
+      subjectwise: 'Subjectwise Questions'
     };
     return labels[cat] || cat.toUpperCase();
   };
@@ -294,7 +296,7 @@ export default function ManageQuestions() {
               <div className="input-group">
                 <label>Category</label>
                 <select className="modern-input" value={category} onChange={e => setCategory(e.target.value)}>
-                  {['bcs', 'bank', 'ntrca', 'primary', 'ministry'].map(c => <option key={c} value={c}>{getCategoryLabel(c)}</option>)}
+                  {['bcs', 'bank', 'ntrca', 'primary', 'ministry', 'recent', 'subjectwise'].map(c => <option key={c} value={c}>{getCategoryLabel(c)}</option>)}
                 </select>
               </div>
               <div className="input-group">
@@ -395,7 +397,7 @@ export default function ManageQuestions() {
             </div>
             <select style={{ padding: '14px 24px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', outline: 'none', fontWeight: 600 }} value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                <option value="all">All Categories</option>
-               {['bcs', 'bank', 'ntrca', 'primary', 'ministry'].map(c => <option key={c} value={c}>{getCategoryLabel(c)}</option>)}
+               {['bcs', 'bank', 'ntrca', 'primary', 'ministry', 'recent', 'subjectwise'].map(c => <option key={c} value={c}>{getCategoryLabel(c)}</option>)}
             </select>
           </div>
 

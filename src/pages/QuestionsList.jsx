@@ -11,7 +11,9 @@ const categoryTitlesBn = {
   bank: 'ব্যাংক নিয়োগ পরীক্ষার প্রশ্নপত্র',
   ntrca: 'NTRCA শিক্ষক নিবন্ধন প্রশ্নপত্র',
   primary: 'প্রাইমারি শিক্ষক নিয়োগ প্রশ্নপত্র',
-  ministry: 'বিভিন্ন মন্ত্রনালয় নিয়োগ প্রশ্নপত্র'
+  ministry: 'বিভিন্ন মন্ত্রনালয় নিয়োগ প্রশ্নপত্র',
+  recent: 'রিসেন্ট প্রশ্নব্যাংক প্রশ্নপত্র',
+  subjectwise: 'বিষয়ভিত্তিক প্রশ্নব্যাংক প্রশ্নপত্র'
 };
 
 const categoryTitlesEn = {
@@ -19,7 +21,9 @@ const categoryTitlesEn = {
   bank: 'Bank Recruitment Questions',
   ntrca: 'NTRCA Registration Questions',
   primary: 'Primary Teacher Recruitment Questions',
-  ministry: 'Various Ministries Exam Questions'
+  ministry: 'Various Ministries Exam Questions',
+  recent: 'Recent Questions Papers',
+  subjectwise: 'Subjectwise Questions Papers'
 };
 
 const renderCategoryIcon = (category) => {
@@ -64,6 +68,19 @@ const renderCategoryIcon = (category) => {
           <path d="M20 22V7.5L12 3 4 7.5V22"></path>
           <path d="M12 22V12"></path>
           <path d="M8 12h8"></path>
+        </svg>
+      );
+    case 'recent':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={strokeColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+      );
+    case 'subjectwise':
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={strokeColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
         </svg>
       );
     default:
