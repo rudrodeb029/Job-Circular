@@ -177,7 +177,7 @@ export const initializeOneSignal = () => {
  * Broadcast a push notification via OneSignal REST API.
  * Reads credentials from Firestore (with hardcoded fallback).
  */
-export const broadcastPush = async (title, message, data = {}) => {
+export const broadcastPush = async (title, message, data = {}, sendAfter = null) => {
     let config;
     try {
         config = await getOneSignalConfig();
@@ -212,7 +212,11 @@ export const broadcastPush = async (title, message, data = {}) => {
             android_sound: 'notification'
         };
 
-        console.log('OneSignal: Sending push →', title);
+        if (sendAfter) {
+            payload.send_after = sendAfter;
+        }
+
+        console.log('OneSignal: Sending push →', title, sendAfter ? `(scheduled: ${sendAfter})` : '(immediate)');
 
         const response = await fetch('https://onesignal.com/api/v1/notifications', {
             method: 'POST',
@@ -246,6 +250,17 @@ export const broadcastPush = async (title, message, data = {}) => {
     }
 };
 
+const formatOneSignalDate = (dateObj) => {
+    const pad = (num) => String(num).padStart(2, '0');
+    const year = dateObj.getUTCFullYear();
+    const month = pad(dateObj.getUTCMonth() + 1);
+    const day = pad(dateObj.getUTCDate());
+    const hours = pad(dateObj.getUTCHours());
+    const minutes = pad(dateObj.getUTCMinutes());
+    const seconds = pad(dateObj.getUTCSeconds());
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds} GMT+0000`;
+};
+
 /**
  * Send a Live Exam countdown push notification.
  * Builds a human-readable countdown message in Bengali.
@@ -276,46 +291,29 @@ export const sendExamCountdownPush = async (exam) => {
         timeMessage = `${examDateStr}, ${startTimeStr} টায় শুরু হবে`;
     }
 
-    const title = '🔔 লাইভ পরীক্ষা শিডিউল';
-    const message = `${exam.title} — ${timeMessage} প্রস্তুত থাকুন!`;
+    const title = '📢 নতুন লাইভ পরীক্ষা প্রকাশিত!';
+    const message = `${exam.title} — পরীক্ষাটি ${timeMessage} শুরু হবে। অংশ নিতে প্রস্তুত হোন!`;
 
+    // 1. Send immediate push to all users
     const result = await broadcastPush(title, message, {
         examId: exam.id,
         type: 'live_exam',
         startTime: exam.startTime
     });
 
-    // Schedule a reminder push 5 minutes before exam starts
+    // 2. Schedule 5-minute reminder (if start is more than 5 minutes away)
     if (diffMinutes > 6) {
-        scheduleExamReminderPush(exam, diffMs);
+        const sendTime5 = new Date(examStartTime.getTime() - (5 * 60 * 1000));
+        await broadcastPush(
+            '⏰ পরীক্ষা ৫ মিনিটে শুরু!',
+            `${exam.title} — এখনই অ্যাপে ঢুকুন! পরীক্ষা শুরু হতে মাত্র ৫ মিনিট বাকি।`,
+            { examId: exam.id, type: 'exam_reminder', startTime: exam.startTime },
+            formatOneSignalDate(sendTime5)
+        );
+        console.log(`OneSignal: Scheduled native 5-min reminder for "${exam.title}" at ${sendTime5}`);
     }
 
     return result;
-};
-
-/**
- * Schedules a reminder push notification ~5 minutes before exam starts.
- * Uses setTimeout (works within the current browser/app session).
- */
-const scheduleExamReminderPush = (exam, diffMs) => {
-    const reminderDelay = diffMs - (5 * 60 * 1000); // 5 minutes before
-
-    if (reminderDelay > 0 && reminderDelay < 24 * 60 * 60 * 1000) { // Max 24 hours
-        console.log(`OneSignal: Exam reminder scheduled in ${Math.round(reminderDelay / 60000)} min for "${exam.title}"`);
-
-        setTimeout(async () => {
-            try {
-                await broadcastPush(
-                    '⏰ পরীক্ষা ৫ মিনিটে শুরু!',
-                    `${exam.title} — এখনই অ্যাপে ঢুকুন! পরীক্ষা শুরু হতে মাত্র ৫ মিনিট বাকি।`,
-                    { examId: exam.id, type: 'exam_reminder', startTime: exam.startTime }
-                );
-                console.log('OneSignal: ✅ Exam reminder push sent for', exam.title);
-            } catch (err) {
-                console.error('OneSignal: Exam reminder push failed:', err);
-            }
-        }, reminderDelay);
-    }
 };
 
 export const loginOneSignal = (externalId) => {
