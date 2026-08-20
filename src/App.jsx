@@ -8,7 +8,7 @@ import ConnectivityBanner from './components/ConnectivityBanner'
 import ErrorBoundary from './components/ErrorBoundary'
 import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
-import { initializeOneSignal } from './utils/oneSignalWrapper'
+import { initializeOneSignal, setupOneSignalClickHandler } from './utils/oneSignalWrapper'
 import { syncCoreDataOnStartup } from './services/supabaseService'
 
 const CURRENT_VERSION = "1.0.9";
@@ -73,6 +73,27 @@ function App() {
       syncCoreDataOnStartup(); // Synchronize all categories exactly once
       initializePushNotifications();
       initializeOneSignal();
+
+      // Handle OneSignal Notification Clicks (Redirection & Update)
+      setupOneSignalClickHandler((data) => {
+        console.log('App: Handling notification click with data:', data);
+
+        // Force refresh data
+        syncCoreDataOnStartup().catch(err => console.error('Data refresh failed:', err));
+
+        // Navigate to relevant post
+        if (data.jobId) {
+          navigate(`/job/${data.jobId}`);
+        } else if (data.examId) {
+          navigate(`/exam-details/${data.examId}`);
+        } else if (data.type === 'result' && data.jobId) {
+          navigate(`/result-details/${data.jobId}`);
+        } else if (data.type === 'exam_date' && data.jobId) {
+          navigate(`/exam-details/${data.jobId}`);
+        } else {
+          navigate('/notifications');
+        }
+      });
     }
   }, []); // Empty dependency array ensures this ONLY runs when the app is first opened
 

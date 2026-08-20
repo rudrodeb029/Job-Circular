@@ -64,6 +64,40 @@ export const getOneSignalAppId = () => {
 };
 
 /**
+ * Set up a callback for when a notification is clicked.
+ */
+export const setupOneSignalClickHandler = (callback) => {
+  const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+
+  if (OneSignal) {
+    if (Capacitor.isNativePlatform()) {
+      // Native OneSignal Click Handler
+      if (OneSignal.Notifications && typeof OneSignal.Notifications.addEventListener === 'function') {
+        OneSignal.Notifications.addEventListener('click', (event) => {
+          console.log('OneSignal: Notification clicked (Native):', event);
+          const data = event.notification.additionalData;
+          if (data && typeof callback === 'function') {
+            callback(data);
+          }
+        });
+      }
+    } else {
+      // Web OneSignal Click Handler
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push((OneSignal) => {
+        OneSignal.Notifications.addEventListener('click', (event) => {
+          console.log('OneSignal: Notification clicked (Web):', event);
+          const data = event.notification.data;
+          if (data && typeof callback === 'function') {
+            callback(data);
+          }
+        });
+      });
+    }
+  }
+};
+
+/**
  * OneSignal JavaScript Wrapper for Capacitor — SDK initialization on-device.
  */
 export const initializeOneSignal = () => {

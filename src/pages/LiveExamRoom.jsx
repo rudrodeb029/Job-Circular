@@ -739,30 +739,31 @@ export default function LiveExamRoom() {
         {currentResult && activeRoomTab === 'leaderboard' && (
           <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
-            {/* NEW PREMIUM PODIUM DESIGN */}
+            {/* NEW PREMIUM PODIUM DESIGN - SOFT GREEN STYLE */}
             {leaderboardData.length > 0 && (
               <div style={{
-                background: 'var(--white)',
+                background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
                 borderRadius: '28px',
                 padding: '24px 10px 20px 10px',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.05)',
+                boxShadow: '0 10px 30px rgba(22, 163, 74, 0.05)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                border: '1px solid var(--border-light)'
+                border: '1px solid #b9f6ca'
               }}>
                 <div style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  color: 'var(--text-secondary)',
-                  background: 'var(--bg-secondary)',
+                  color: '#166534',
+                  background: '#ffffff',
                   padding: '4px 14px',
                   borderRadius: '20px',
                   marginBottom: '24px',
-                  border: '1px solid var(--border-light)',
-                  zIndex: 1
+                  border: '1px solid #b9f6ca',
+                  zIndex: 1,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
                 }}>
                   {isEn ? 'Daily Top Performers' : 'আজকের সেরা অংশগ্রহণকারী'}
                 </div>
@@ -781,28 +782,28 @@ export default function LiveExamRoom() {
                   {/* RANK 2 */}
                   {leaderboardData[1] && (
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
+                      <div style={{ color: '#4b5563', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
                         {isValidAvatar(leaderboardData[1].avatar) ? (
                           <img
                             src={leaderboardData[1].avatar}
                             alt="Rank 2"
                             onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid var(--border-light)', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid #ffffff', objectFit: 'cover', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
                           />
                         ) : null}
                         <div style={{
-                          width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)',
+                          width: '100%', height: '100%', borderRadius: '50%', background: '#ffffff', color: '#16a34a',
                           display: isValidAvatar(leaderboardData[1].avatar) ? 'none' : 'flex',
-                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)'
+                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid #ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                         }}>
                           {getInitials(leaderboardData[1].name)}
                         </div>
                       </div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                      <div style={{ color: '#166534', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[1].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: '#15803d', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
                         {isEn ? leaderboardData[1].score : toBengaliNumber(leaderboardData[1].score)}
                       </div>
                     </div>
@@ -822,18 +823,18 @@ export default function LiveExamRoom() {
                             src={leaderboardData[0].avatar}
                             alt="Rank 1"
                             onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '3px solid #fbbf24', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '3px solid #fbbf24', objectFit: 'cover', boxShadow: '0 4px 15px rgba(0,0,0,0.1)' }}
                           />
                         ) : null}
                         <div style={{
-                          width: '100%', height: '100%', borderRadius: '50%', background: '#fbbf24', color: '#1e3a8a',
+                          width: '100%', height: '100%', borderRadius: '50%', background: '#fbbf24', color: '#ffffff',
                           display: isValidAvatar(leaderboardData[0].avatar) ? 'none' : 'flex',
                           alignItems: 'center', justifyContent: 'center', fontSize: '28px', fontWeight: 900
                         }}>
                           {getInitials(leaderboardData[0].name)}
                         </div>
                       </div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
+                      <div style={{ color: '#166534', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
                         {leaderboardData[0].name.split(' ')[0]}
                       </div>
                       <div style={{ color: '#fbbf24', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
@@ -845,33 +846,37 @@ export default function LiveExamRoom() {
                   {/* RANK 3 */}
                   {leaderboardData[2] && (
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ color: 'var(--text-muted)', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
+                      <div style={{ color: '#4b5563', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
                         {isValidAvatar(leaderboardData[2].avatar) ? (
                           <img
                             src={leaderboardData[2].avatar}
                             alt="Rank 3"
                             onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid var(--border-light)', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', borderRadius: '50%', border: '2.5px solid #ffffff', objectFit: 'cover', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
                           />
                         ) : null}
                         <div style={{
-                          width: '100%', height: '100%', borderRadius: '50%', background: 'var(--bg-secondary)', color: 'var(--text-secondary)',
+                          width: '100%', height: '100%', borderRadius: '50%', background: '#ffffff', color: '#16a34a',
                           display: isValidAvatar(leaderboardData[2].avatar) ? 'none' : 'flex',
-                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid var(--border-light)'
+                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid #ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                         }}>
                           {getInitials(leaderboardData[2].name)}
                         </div>
                       </div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                      <div style={{ color: '#166534', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[2].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: '#15803d', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
                         {isEn ? leaderboardData[2].score : toBengaliNumber(leaderboardData[2].score)}
                       </div>
                     </div>
                   )}
                 </div>
+
+                {/* Decorative background depth elements */}
+                <div style={{ position: 'absolute', top: '-20px', left: '-20px', width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(255,255,255,0.4)', zIndex: 0 }} />
+                <div style={{ position: 'absolute', bottom: '-10px', right: '-10px', width: '60px', height: '60px', borderRadius: '50%', background: 'rgba(34, 197, 94, 0.1)', zIndex: 0 }} />
               </div>
             )}
 
