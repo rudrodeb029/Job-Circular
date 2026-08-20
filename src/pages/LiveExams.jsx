@@ -475,8 +475,8 @@ export default function LiveExams() {
                   }}>
                     {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
                       exam.subjectTopics.map((st, idx) => {
-                        const subjText = safeStringify(isEn ? st.subjectEn : st.subject, 'General');
-                        const rawTopics = isEn ? st.topicsEn : st.topics;
+                        const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
+                        const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
                         const topicsList = Array.isArray(rawTopics) 
                           ? rawTopics.map(t => safeStringify(t)) 
                           : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
@@ -507,12 +507,12 @@ export default function LiveExams() {
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
-                          {safeStringify(isEn ? exam.subjectsEn || 'General' : exam.subjects || 'সাধারণ')}
+                          {safeStringify(isEn ? (exam.subjectsEn || exam.subjects || 'General') : (exam.subjects || 'সাধারণ'))}
                         </span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                          {(Array.isArray(isEn ? exam.topicsEn : exam.topics)
-                            ? (isEn ? exam.topicsEn : exam.topics)
-                            : safeStringify(isEn ? exam.topicsEn : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
+                          {(Array.isArray(isEn ? (exam.topicsEn || exam.topics) : exam.topics)
+                            ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics)
+                            : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
                           ).map((t, idx) => (
                             <span key={idx} style={{
                               fontSize: '9.5px',

@@ -56,9 +56,8 @@ export default function LiveExamsPage() {
                     LIVE
                   </div>
                 )}
-
                 <h3 style={{ fontSize: '14px', fontWeight: 800, marginBottom: '8px', color: 'var(--text-secondary)' }}>
-                  {isEn ? exam.titleEn : exam.title}
+                  {isEn ? (exam.titleEn || exam.title) : exam.title}
                 </h3>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '12px' }}>
