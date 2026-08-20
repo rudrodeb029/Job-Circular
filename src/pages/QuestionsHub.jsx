@@ -88,7 +88,7 @@ export default function QuestionsHub() {
         {/* Live MCQ Section */}
         <div style={{ marginBottom: '24px' }}>
           <div className="section-header" style={{ marginBottom: '16px' }}>
-            <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800 }}>
+            <h3 className="section-title" style={{ margin: 0 }}>
               {isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}
             </h3>
             <button onClick={() => navigate('/live-exams-list')} className="section-link">
@@ -110,7 +110,7 @@ export default function QuestionsHub() {
             }}
           >
             <div>
-              <h4 style={{ margin: 0, fontSize: '15px', fontWeight: 800 }}>{isEn ? 'Participate in Live Exams' : 'লাইভ পরীক্ষায় অংশ নিন'}</h4>
+              <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700 }}>{isEn ? 'Participate in Live Exams' : 'লাইভ পরীক্ষায় অংশ নিন'}</h4>
               <p style={{ margin: '4px 0 0 0', fontSize: '11px', opacity: 0.9 }}>{isEn ? 'Daily routine mock tests' : 'প্রতিদিনের রুটিন ভিত্তিক লাইভ পরীক্ষা'}</p>
             </div>
             <Clock size={20} color="white" />
@@ -119,7 +119,7 @@ export default function QuestionsHub() {
 
         {/* Categories Section */}
         <div style={{ marginBottom: '24px' }}>
-          <h3 className="section-title" style={{ marginBottom: '14px', fontSize: '14px', fontWeight: 800 }}>
+          <h3 className="section-title" style={{ marginBottom: '14px' }}>
             {isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}
           </h3>
           <div className="category-grid">

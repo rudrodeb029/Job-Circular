@@ -350,7 +350,7 @@ export default function Home() {
         <div className="mb-md">
           <div className="section-header" style={{ background: 'transparent', padding: '5px 0', marginBottom: '4px', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '6px 0', position: 'relative', overflow: 'hidden', border: 'none' }}>
-              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+              <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
               </h3>
             </div>
@@ -422,7 +422,7 @@ export default function Home() {
         <div>
           <div className="section-header" style={{ background: 'transparent', padding: '5px 0', marginBottom: '10px', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '6px 0', position: 'relative', overflow: 'hidden', border: 'none' }}>
-              <h3 className="section-title" style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+              <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
               </h3>
             </div>

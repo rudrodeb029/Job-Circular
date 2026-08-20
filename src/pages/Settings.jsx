@@ -131,9 +131,9 @@ export default function Settings() {
               </div>
               <span className="menu-item-label" style={{
                 flex: 1,
-                fontWeight: 600,
-                fontSize: 'var(--text-sm)',
-                color: item.key === 'delete' ? 'var(--danger)' : 'var(--text-primary)'
+                fontWeight: 500,
+                fontSize: '12.5px',
+                color: item.key === 'delete' ? 'var(--danger)' : 'var(--text-secondary)'
               }}>
                 {item.label}
               </span>
