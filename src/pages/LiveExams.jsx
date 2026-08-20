@@ -298,12 +298,8 @@ export default function LiveExams() {
                   };
 
             const isCompleted = status === 'completed';
-            const cardBgColor = isCompleted
-              ? (state.theme === 'dark' ? '#10271e' : '#f0fdf4')
-              : 'var(--white)';
-            const cardBorderColor = isCompleted
-              ? (state.theme === 'dark' ? 'rgba(16, 185, 129, 0.15)' : '#dcfce7')
-              : state.theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.8)';
+            const cardBgColor = 'var(--white)';
+            const cardBorderColor = state.theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.8)';
 
             return (
               <div
