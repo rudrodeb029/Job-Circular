@@ -14,8 +14,8 @@ const categoryConfig = {
   ntrca: { name: 'NTRCA', nameEn: 'NTRCA', color: 'rgba(139, 92, 246, 0.05)', icon: '📜' },
   primary: { name: 'প্রাইমারি', nameEn: 'Primary', color: 'rgba(236, 72, 153, 0.05)', icon: '🏫' },
   ministry: { name: 'বিভিন্ন মন্ত্রনালয়', nameEn: 'Ministries', color: 'rgba(6, 182, 212, 0.05)', icon: '🏛️' },
-  recent: { name: 'রিসেন্ট প্রশ্নব্যাংক', nameEn: 'Recent Questions', color: 'rgba(245, 158, 11, 0.05)', icon: '⏱️' },
-  subjectwise: { name: 'বিষয়ভিত্তিক প্রশ্নব্যাংক', nameEn: 'Subjectwise Questions', color: 'rgba(16, 185, 129, 0.05)', icon: '🗂️' }
+  recent: { name: 'রিসেন্ট প্রশ্ন', nameEn: 'Recent Questions', color: 'rgba(245, 158, 11, 0.05)', icon: '⏱️' },
+  subjectwise: { name: 'বিষয়ভিত্তিক', nameEn: 'Subjectwise Questions', color: 'rgba(16, 185, 129, 0.05)', icon: '🗂️' }
 };
 
 export default function QuestionsHub() {
