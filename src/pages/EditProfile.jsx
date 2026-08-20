@@ -12,7 +12,7 @@ const PhoneIcon = ({ size = 16, color = 'currentColor' }) => (
   </svg>
 );
 
-function FormInput({ label, icon, type = 'text', value, onChange, placeholder, required = false }) {
+function FormInput({ label, icon, type = 'text', value, onChange, placeholder, required = false, autoComplete = 'off' }) {
   const [isFocused, setIsFocused] = useState(false);
   return (
     <div style={{ marginBottom: '18px' }}>
@@ -39,6 +39,7 @@ function FormInput({ label, icon, type = 'text', value, onChange, placeholder, r
           onBlur={() => setIsFocused(false)}
           required={required}
           placeholder={placeholder}
+          autoComplete={autoComplete}
           style={{
             width: '100%',
             padding: '12px 14px 12px 42px',
@@ -131,8 +132,8 @@ export default function EditProfile() {
   const [formData, setFormData] = useState({
     name: state.user.name || '',
     phone: state.user.phone || '',
-    qualification: state.user.qualification || 'স্নাতক (Bachelor)',
-    location: state.user.location || 'ঢাকা',
+    qualification: state.user.qualification || '',
+    location: state.user.location || '',
     avatar: state.user.avatar || null
   });
 
@@ -374,6 +375,7 @@ export default function EditProfile() {
               value={formData.qualification}
               onChange={(e) => handleChange('qualification', e.target.value)}
             >
+              <option value="" disabled>{isEn ? 'Select Qualification' : 'শিক্ষাগত যোগ্যতা নির্বাচন করুন'}</option>
               <option value="স্নাতক (Bachelor)">{isEn ? 'Bachelor (স্নাতক)' : 'স্নাতক (Bachelor)'}</option>
               <option value="স্নাতকোত্তর (Master)">{isEn ? 'Master (স্নাতকোত্তর)' : 'স্নাতকোত্তর (Master)'}</option>
               <option value="এইচএসসি (HSC)">{isEn ? 'HSC (এইচএসসি)' : 'এইচএসসি (HSC)'}</option>
@@ -387,6 +389,7 @@ export default function EditProfile() {
               value={formData.location}
               onChange={(e) => handleChange('location', e.target.value)}
             >
+              <option value="" disabled>{isEn ? 'Select Location' : 'অবস্থান নির্বাচন করুন'}</option>
               <option value="ঢাকা">Dhaka (ঢাকা)</option>
               <option value="চট্টগ্রাম">Chattogram (চট্টগ্রাম)</option>
               <option value="রাজশাহী">Rajshahi (রাজশাহী)</option>

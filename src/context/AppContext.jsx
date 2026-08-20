@@ -7,9 +7,9 @@ const initialUser = {
   id: localStorage.getItem('user_id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
   name: '',
   phone: '',
-  qualification: 'স্নাতক (Bachelor)',
+  qualification: '',
   category: 'gov',
-  location: 'ঢাকা',
+  location: '',
   avatar: null
 };
 

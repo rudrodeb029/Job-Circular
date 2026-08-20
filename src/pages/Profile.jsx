@@ -148,11 +148,20 @@ export default function Profile() {
             <Edit size={12} />
           </div>
         </div>
-
         {/* User Info */}
         <h2 style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
           {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
         </h2>
+        {state.user.phone && (
+          <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.75)', fontWeight: 600, margin: '2px 0' }}>
+            {state.user.phone}
+          </p>
+        )}
+        {(state.user.qualification || state.user.location) && (
+          <p style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 500, margin: '2px 0 6px 0' }}>
+            {state.user.qualification} {state.user.qualification && state.user.location && '•'} {state.user.location}
+          </p>
+        )}
         {localStorage.getItem('onesignal_subscribed') === 'true' && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '10px', color: '#4ade80', fontWeight: 700 }}>
                 <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></div>
