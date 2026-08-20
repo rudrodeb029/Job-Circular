@@ -130,6 +130,7 @@ export function AppProvider({ children }) {
       localStorage.setItem('installTime', state.installTime);
     }
     document.documentElement.setAttribute('data-theme', state.theme);
+    document.documentElement.setAttribute('data-lang', state.language);
 
     // Instant Realtime Broadcast Sync (0 DB Egress)
     // Instantly invalidates local cache and notifies candidate components when Admin publishes anything
@@ -142,7 +143,7 @@ export function AppProvider({ children }) {
     return () => {
       if (typeof unsubscribe === 'function') unsubscribe();
     };
-  }, [state.theme, state.installTime]);
+  }, [state.theme, state.installTime, state.language]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

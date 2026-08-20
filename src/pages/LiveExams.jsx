@@ -459,7 +459,7 @@ export default function LiveExams() {
                     marginBottom: '10px',
                     lineHeight: '1.4'
                   }}>
-                    {isEn ? exam.titleEn : exam.title}
+                    {isEn ? (exam.titleEn || exam.title) : exam.title}
                   </h4>
 
                   {/* Subjects & Topics separately */}

@@ -399,3 +399,14 @@ ul, ol {
 img {
   content-visibility: auto;
 }
+
+/* English Mode Text Scaling to Prevent Layout Wrappings */
+html[data-lang="en"] {
+  --text-xs: 0.7rem;      /* 11.2px (was 12px) */
+  --text-sm: 0.8rem;      /* 12.8px (was 14px) */
+  --text-base: 0.9rem;    /* 14.4px (was 16px) */
+  --text-lg: 1.0rem;      /* 16px (was 18px) */
+  --text-xl: 1.15rem;     /* 18.4px (was 20px) */
+  --text-2xl: 1.35rem;    /* 21.6px (was 24px) */
+  --text-3xl: 1.7rem;     /* 27.2px (was 30px) */
+}

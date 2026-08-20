@@ -151,7 +151,7 @@ export default function QuestionsHub() {
                   onClick={() => handleCategorySelect(key)}
                 >
                   <div className="category-grid-icon" style={{ background: cat.color }}>{cat.icon}</div>
-                  <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
+                  <span className="category-grid-label">{isEn ? (cat.nameEn || cat.name) : cat.name}</span>
                 </div>
               );
             })}
@@ -181,7 +181,7 @@ export default function QuestionsHub() {
                     {categoryConfig[paper.category]?.icon || '📚'}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ fontSize: '13.5px', fontWeight: 700, marginBottom: '4px' }}>{isEn ? paper.titleEn : paper.title}</h3>
+                    <h3 style={{ fontSize: '13.5px', fontWeight: 700, marginBottom: '4px' }}>{isEn ? (paper.titleEn || paper.title) : paper.title}</h3>
                     <div style={{ display: 'flex', gap: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
                       <span>📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}</span>
                       <span>📝 {isEn ? `${paper.questions.length} Items` : `${paper.questions.length}টি প্রশ্ন`}</span>

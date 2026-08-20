@@ -115,9 +115,14 @@ export default function QuestionsList() {
     });
   }, [papers, searchQuery]);
 
+  const paperForTitle = papers.find(p => p.categoryName || p.categoryNameEn);
+  const fallbackTitle = paperForTitle 
+    ? (isEn ? (paperForTitle.categoryNameEn || paperForTitle.categoryName) : paperForTitle.categoryName)
+    : (isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর');
+
   const displayTitle = isEn 
-    ? (categoryTitlesEn[category] || 'Questions & Answers') 
-    : (categoryTitlesBn[category] || 'প্রশ্নপত্র এবং উত্তর');
+    ? (categoryTitlesEn[category] || fallbackTitle) 
+    : (categoryTitlesBn[category] || fallbackTitle);
 
   return (
     <div className="page" style={{ paddingBottom: '100px' }}>
@@ -177,7 +182,7 @@ export default function QuestionsList() {
                       marginBottom: '4px',
                       lineHeight: '1.4'
                     }}>
-                      {isEn ? paper.titleEn : paper.title}
+                      {isEn ? (paper.titleEn || paper.title) : paper.title}
                     </h3>
                     
                     {/* Meta information tags */}

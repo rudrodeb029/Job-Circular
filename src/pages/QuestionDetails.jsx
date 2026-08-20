@@ -148,12 +148,12 @@ export default function QuestionDetails() {
           boxShadow: '0 8px 24px rgba(26, 86, 219, 0.2)'
         }}>
           <h2 style={{ fontSize: '17px', fontWeight: 800, marginBottom: '8px', lineHeight: '1.4' }}>
-            {isEn ? paper.titleEn : paper.title}
+            {isEn ? (paper.titleEn || paper.title) : paper.title}
           </h2>
           <div style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.9, marginBottom: '16px' }}>
-            <span>📅 {isEn ? paper.dateEn : paper.date}</span>
+            <span>📅 {isEn ? (paper.dateEn || paper.date) : paper.date}</span>
             <span>📝 {isEn ? `${totalCount} Questions` : `${toBengaliNumber(totalCount)}টি প্রশ্ন`}</span>
-            <span>🕒 {isEn ? paper.timeLimitEn : paper.timeLimit}</span>
+            <span>🕒 {isEn ? (paper.timeLimitEn || paper.timeLimit) : paper.timeLimit}</span>
           </div>
 
           {/* Mode Switcher Buttons */}
