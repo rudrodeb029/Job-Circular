@@ -96,8 +96,6 @@ export default function SearchFilter() {
         ) : (
           <EmptyState
             icon={Search}
-            title={isEn ? "No Jobs Found" : "কোনো চাকরি পাওয়া যায়নি"}
-            description={isEn ? "Try adjusting your search query." : "আপনার সার্চ পরিবর্তন করে চেষ্টা করুন।"}
             actionText={isEn ? "Clear Search" : "সার্চ ক্লিয়ার করুন"}
             onAction={handleReset}
           />

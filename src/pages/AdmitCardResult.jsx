@@ -340,16 +340,6 @@ export default function AdmitCardResult() {
         ) : (
           <EmptyState
             icon={FileText}
-            title={
-              activeTab === 'admit_card'
-                ? (isEn ? 'No Exam Dates Found' : 'কোনো পরীক্ষার তারিখ পাওয়া যায়নি')
-                : (isEn ? 'No Results Found' : 'কোনো ফলাফল পাওয়া যায়নি')
-            }
-            description={
-              searchQuery
-                ? (isEn ? 'Try searching with a different term.' : 'অন্য বিবরণ দিয়ে সার্চ করে দেখুন।')
-                : (isEn ? 'Check back later for new exam notices and results.' : 'নতুন পরীক্ষার নোটিশ এবং ফলাফলের জন্য পরবর্তীতে চেক করুন।')
-            }
           />
         )}
       </div>
