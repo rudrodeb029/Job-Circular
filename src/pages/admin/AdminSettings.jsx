@@ -129,26 +129,30 @@ const AdminSettings = () => {
   };
 
   return (
-    <div className="admin-settings-page animate-fade-in" style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="admin-settings-page animate-fade-in" style={{ padding: '32px 24px', maxWidth: '1200px', margin: '0 auto' }}>
       <style>{`
         .settings-card {
           background: #ffffff;
-          border-radius: 14px;
-          padding: 18px 20px;
+          border-radius: 18px;
+          padding: 24px;
           border: 1px solid #e2e8f0;
-          box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-          transition: all 0.2s ease;
+          box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .settings-card:hover {
+          box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.06);
+          border-color: #cbd5e1;
         }
         .section-header {
           display: flex;
           align-items: center;
-          gap: 10px;
-          margin-bottom: 16px;
+          gap: 12px;
+          margin-bottom: 20px;
           color: #0f172a;
         }
         .section-header h3 {
           margin: 0;
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 800;
         }
         .toggle-switch {
@@ -158,22 +162,22 @@ const AdminSettings = () => {
           width: 18px; height: 18px; border-radius: 50%; background: white; position: absolute; top: 3px; transition: all 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .modern-input {
-          width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; transition: border-color 0.2s; background: #ffffff; font-size: 12px; color: #0f172a;
+          width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 10px; outline: none; transition: all 0.2s ease; background: #ffffff; font-size: 13px; color: #0f172a;
         }
-        .modern-input:focus { border-color: #2563eb; background: #fff; }
+        .modern-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
         .settings-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-          gap: 16px;
-          margin-bottom: 16px;
+          gap: 20px;
+          margin-bottom: 20px;
         }
         @media (max-width: 768px) {
           .settings-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
-      <div style={{ marginBottom: '16px' }}>
-        <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a', margin: 0 }}>Admin Settings</h1>
+      <div style={{ marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0, letterSpacing: '-0.5px' }}>Admin Settings</h1>
       </div>
 
       <div className="settings-grid">
