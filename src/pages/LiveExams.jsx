@@ -293,13 +293,17 @@ export default function LiveExams() {
                     borderLeft: '4px solid #64748b',
                     badgeColor: '#475569',
                     badgeBg: '#f1f5f9',
-                    accentColor: '#10b981',
+                    accentColor: '#2563eb',
                     boxBg: '#f8fafc'
                   };
 
             const isCompleted = status === 'completed';
-            const cardBgColor = 'var(--white)';
-            const cardBorderColor = state.theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.8)';
+            const cardBgColor = isCompleted
+              ? (state.theme === 'dark' ? '#10271e' : '#f0fdf4')
+              : 'var(--white)';
+            const cardBorderColor = isCompleted
+              ? (state.theme === 'dark' ? 'rgba(16, 185, 129, 0.15)' : '#dcfce7')
+              : state.theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.8)';
 
             return (
               <div
@@ -464,14 +468,14 @@ export default function LiveExams() {
 
                   {/* Subjects & Topics separately */}
                   <div style={{
-                    background: isCompleted ? (state.theme === 'dark' ? 'rgba(16, 185, 129, 0.06)' : '#f0fdf4') : 'var(--bg-secondary)',
+                    background: isCompleted ? (state.theme === 'dark' ? '#152238' : '#eff6ff') : 'var(--bg-secondary)',
                     borderRadius: '12px',
                     padding: '10px 12px',
                     marginBottom: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '8px',
-                    border: isCompleted ? (state.theme === 'dark' ? '1px solid rgba(16, 185, 129, 0.15)' : '1px solid #dcfce7') : '1px solid var(--border-light)'
+                    border: isCompleted ? (state.theme === 'dark' ? '1px solid rgba(59, 130, 246, 0.15)' : '1px solid #dbeafe') : '1px solid var(--border-light)'
                   }}>
                     {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
                       exam.subjectTopics.map((st, idx) => {
