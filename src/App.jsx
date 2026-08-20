@@ -79,13 +79,15 @@ function App() {
         console.log('App: Handling notification click with data:', data);
 
         // Force refresh data
-        syncCoreDataOnStartup().catch(err => console.error('Data refresh failed:', err));
+        syncCoreDataOnStartup(true).catch(err => console.error('Data refresh failed:', err));
 
         // Navigate to relevant post
         if (data.jobId) {
           navigate(`/job/${data.jobId}`);
         } else if (data.examId) {
-          navigate(`/exam-details/${data.examId}`);
+          navigate(`/live-exam-room/${data.examId}`);
+        } else if (data.paperId) {
+          navigate(`/question-details/${data.paperId}`);
         } else if (data.type === 'result' && data.jobId) {
           navigate(`/result-details/${data.jobId}`);
         } else if (data.type === 'exam_date' && data.jobId) {

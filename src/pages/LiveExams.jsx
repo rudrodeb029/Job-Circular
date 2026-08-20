@@ -293,16 +293,24 @@ export default function LiveExams() {
                     borderLeft: '4px solid #64748b',
                     badgeColor: '#475569',
                     badgeBg: '#f1f5f9',
-                    accentColor: '#64748b',
+                    accentColor: '#10b981',
                     boxBg: '#f8fafc'
                   };
+
+            const isCompleted = status === 'completed';
+            const cardBgColor = isCompleted
+              ? (state.theme === 'dark' ? '#2e2715' : '#fefce8')
+              : 'var(--white)';
+            const cardBorderColor = isCompleted
+              ? (state.theme === 'dark' ? 'rgba(234, 179, 8, 0.15)' : '#fef08a')
+              : 'rgba(226, 232, 240, 0.8)';
 
             return (
               <div
                 key={exam.id}
                 style={{
-                  background: 'var(--white)',
-                  border: '1px solid rgba(226, 232, 240, 0.8)',
+                  background: cardBgColor,
+                  border: `1px solid ${cardBorderColor}`,
                   borderLeft: theme.borderLeft,
                   borderRadius: '16px',
                   padding: '16px',
@@ -311,7 +319,7 @@ export default function LiveExams() {
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
-                  justify: 'space-between',
+                  justifyContent: 'space-between',
                   transition: 'all 0.3s'
                 }}
               >
@@ -460,14 +468,14 @@ export default function LiveExams() {
 
                   {/* Subjects & Topics separately */}
                   <div style={{
-                    background: 'var(--bg-secondary)',
+                    background: isCompleted ? (state.theme === 'dark' ? 'rgba(16, 185, 129, 0.06)' : '#f0fdf4') : 'var(--bg-secondary)',
                     borderRadius: '12px',
                     padding: '10px 12px',
                     marginBottom: '12px',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '8px',
-                    border: '1px solid var(--border-light)'
+                    border: isCompleted ? (state.theme === 'dark' ? '1px solid rgba(16, 185, 129, 0.15)' : '1px solid #dcfce7') : '1px solid var(--border-light)'
                   }}>
                     {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
                       exam.subjectTopics.map((st, idx) => {

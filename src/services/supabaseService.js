@@ -87,10 +87,11 @@ let _appInitialized = false;
 
 /**
  * Global app initialization sync.
- * Strictly fetches core data once when the app opens.
+ * Fetches core data when the app opens or when a forced refresh is needed.
+ * @param {boolean} force - If true, bypasses the "already initialized" check.
  */
-export const syncCoreDataOnStartup = async () => {
-  if (_appInitialized || !navigator.onLine) return;
+export const syncCoreDataOnStartup = async (force = false) => {
+  if ((_appInitialized && !force) || !navigator.onLine) return;
 
   const coreCollections = [
     COLLECTIONS.JOBS,
@@ -100,7 +101,7 @@ export const syncCoreDataOnStartup = async () => {
     COLLECTIONS.APP_CONFIG
   ];
 
-  console.log('Strict Startup Sync: Fetching core data...');
+  console.log(force ? 'Forced Refresh: Syncing core data...' : 'Strict Startup Sync: Fetching core data...');
 
   try {
     await Promise.all(coreCollections.map(async (col) => {
