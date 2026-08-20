@@ -279,9 +279,9 @@ export default function QuestionDetails() {
               >
                 {/* Question Label */}
                 <h4 style={{
-                  fontSize: '13.5px',
-                  fontWeight: 700,
-                  color: 'var(--text-primary)',
+                  fontSize: '12.5px',
+                  fontWeight: 600,
+                  color: 'var(--text-secondary)',
                   marginBottom: '14px',
                   lineHeight: '1.45',
                   display: 'flex',

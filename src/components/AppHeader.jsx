@@ -345,7 +345,9 @@ export default function AppHeader() {
                       { id: 'bank', label: 'ব্যাংক', labelEn: 'Bank', icon: '🏦' },
                       { id: 'ntrca', label: 'NTRCA', labelEn: 'NTRCA', icon: '📜' },
                       { id: 'primary', label: 'প্রাইমারি', labelEn: 'Primary', icon: '🏫' },
-                      { id: 'ministry', label: 'বিভিন্ন মন্ত্রনালয়', labelEn: 'Ministries', icon: '🏛️' }
+                      { id: 'ministry', label: 'বিভিন্ন মন্ত্রনালয়', labelEn: 'Ministries', icon: '🏛️' },
+                      { id: 'recent', label: 'রিসেন্ট প্রশ্ন', labelEn: 'Recent Questions', icon: '⏱️' },
+                      { id: 'subjectwise', label: 'বিষয়ভিত্তিক', labelEn: 'Subjectwise Questions', icon: '🗂️' }
                     ].map(cat => {
                       const isExpanded = expandedCategory === cat.id;
                       const papers = getQuestionsData().filter(p => p.category === cat.id);

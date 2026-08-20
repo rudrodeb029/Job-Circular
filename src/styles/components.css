@@ -1126,9 +1126,9 @@
 }
 
 .onboarding-slide-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--text-primary);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--text-secondary);
   margin-bottom: 10px;
   letter-spacing: -0.4px;
 }
