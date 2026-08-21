@@ -356,6 +356,9 @@ export default function JobDetails() {
 
                   target.onerror = null;
                   target.style.display = 'none';
+                  if (target.parentNode) {
+                    target.parentNode.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;gap:12px;background:var(--bg-secondary);border-radius:12px;border:1px dashed var(--border-light)"><div style="font-size:32px">📄</div><div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13.5px;font-weight:800;color:var(--text-secondary)">${isEn ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}</span><span style="font-size:11.5px;color:var(--text-muted);font-weight:600">${isEn ? 'Please click the button below to view or apply! 👇' : 'সার্কুলার দেখতে বা আবেদন করতে নিচের বাটনে চাপ দিন! 👇'}</span></div></div>`;
+                  }
                 }}
               />
 

@@ -275,51 +275,65 @@ export default function ResultDetails() {
           
           {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
           <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
-            <img
-              src={circularImages[activeImageIndex]}
-              alt="Result Sheet Preview"
-              onClick={() => setShowFullImage(!showFullImage)}
-              onError={(e) => {
-                const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
-                const driveId = getGoogleDriveFileId(rawSrc);
-                const step = parseInt(e.target.dataset.fallbackStep || '0', 10);
+            {circularImages.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center', gap: '12px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px dashed var(--border-light)' }}>
+                <div style={{ fontSize: '32px' }}>📄</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                    {isEn ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
+                  </span>
+                  <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                    {isEn ? 'Please click the button below to view or download! 👇' : 'ফলাফল দেখতে বা ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <img
+                src={circularImages[activeImageIndex]}
+                alt="Result Sheet Preview"
+                onClick={() => setShowFullImage(!showFullImage)}
+                onError={(e) => {
+                  const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
+                  const driveId = getGoogleDriveFileId(rawSrc);
+                  const step = parseInt(e.target.dataset.fallbackStep || '0', 10);
 
-                if (driveId) {
-                  if (step === 0) {
+                  if (driveId) {
+                    if (step === 0) {
+                      e.target.dataset.fallbackStep = '1';
+                      e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+                      return;
+                    }
+                    if (step === 1) {
+                      e.target.dataset.fallbackStep = '2';
+                      e.target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
+                      return;
+                    }
+                  }
+
+                  if (rawSrc.includes('cloudinary.com') && step === 0) {
                     e.target.dataset.fallbackStep = '1';
-                    e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+                    e.target.src = rawSrc.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg');
                     return;
                   }
-                  if (step === 1) {
-                    e.target.dataset.fallbackStep = '2';
-                    e.target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
-                    return;
+
+                  e.target.onerror = null;
+                  e.target.style.display = 'none';
+                  if (e.target.parentNode) {
+                    e.target.parentNode.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;gap:12px;background:var(--bg-secondary);border-radius:12px;border:1px dashed var(--border-light)"><div style="font-size:32px">📄</div><div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13.5px;font-weight:800;color:var(--text-secondary)">${isEn ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}</span><span style="font-size:11.5px;color:var(--text-muted);font-weight:600">${isEn ? 'Please click the button below to view or download! 👇' : 'ফলাফল দেখতে বা ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}</span></div></div>`;
                   }
-                }
-
-                if (rawSrc.includes('cloudinary.com') && step === 0) {
-                  e.target.dataset.fallbackStep = '1';
-                  e.target.src = rawSrc.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg');
-                  return;
-                }
-
-                e.target.onerror = null;
-                e.target.style.display = 'none';
-                if (e.target.parentNode) {
-                  e.target.parentNode.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;background:var(--bg-secondary)"><div style="width:48px;height:48px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px">📷</div><span style="font-size:14px;font-weight:800;color:var(--text-secondary)">No Photo</span></div>';
-                }
-              }}
-              style={{
-                width: '100%',
-                maxHeight: showFullImage ? 'none' : '380px',
-                objectFit: 'cover',
-                objectPosition: 'top',
-                display: 'block',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                filter: 'contrast(1.05) brightness(0.98)'
-              }}
-            />
+                }}
+                style={{
+                  width: '100%',
+                  maxHeight: showFullImage ? 'none' : '380px',
+                  objectFit: 'cover',
+                  objectPosition: 'top',
+                  display: 'block',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  filter: 'contrast(1.05) brightness(0.98)'
+                }}
+              />
+            )}
 
             {/* Prev & Next Floating Navigation Arrow Buttons */}
             {circularImages.length > 1 && (

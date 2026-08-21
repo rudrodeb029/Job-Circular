@@ -298,10 +298,23 @@ export default function ExamDetails() {
 
           {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
           <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
-            <img
-              src={circularImages[activeImageIndex]}
-              alt={`Circular Notice Page ${activeImageIndex + 1}`}
-              onClick={() => setShowFullImage(!showFullImage)}
+            {circularImages.length === 0 ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center', gap: '12px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px dashed var(--border-light)' }}>
+                <div style={{ fontSize: '32px' }}>📄</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                    {state.language === 'en' ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
+                  </span>
+                  <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                    {state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <img
+                src={circularImages[activeImageIndex]}
+                alt={`Circular Notice Page ${activeImageIndex + 1}`}
+                onClick={() => setShowFullImage(!showFullImage)}
                 onError={(e) => {
                   const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
                   const driveId = getGoogleDriveFileId(rawSrc);
@@ -329,19 +342,20 @@ export default function ExamDetails() {
                   e.target.onerror = null;
                   e.target.style.display = 'none';
                   if (e.target.parentNode) {
-                    e.target.parentNode.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px;text-align:center;gap:10px;background:var(--bg-secondary)"><div style="width:48px;height:48px;border-radius:50%;background:rgba(148,163,184,0.1);display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:20px">📷</div><span style="font-size:14px;font-weight:800;color:var(--text-secondary)">No Photo</span></div>';
+                    e.target.parentNode.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;gap:12px;background:var(--bg-secondary);border-radius:12px;border:1px dashed var(--border-light)"><div style="font-size:32px">📄</div><div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13.5px;font-weight:800;color:var(--text-secondary)">${state.language === 'en' ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}</span><span style="font-size:11.5px;color:var(--text-muted);font-weight:600">${state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}</span></div></div>`;
                   }
                 }}
-              style={{
-                width: '100%',
-                maxHeight: showFullImage ? 'none' : '380px',
-                objectFit: 'cover',
-                objectPosition: 'top',
-                display: 'block',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
-              }}
-            />
+                style={{
+                  width: '100%',
+                  maxHeight: showFullImage ? 'none' : '380px',
+                  objectFit: 'cover',
+                  objectPosition: 'top',
+                  display: 'block',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease'
+                }}
+              />
+            )}
 
             {/* Prev & Next Floating Navigation Arrow Buttons */}
             {circularImages.length > 1 && (
