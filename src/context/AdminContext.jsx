@@ -127,7 +127,8 @@ const adminReducer = (state, action) => {
       setDocument(COLLECTIONS.JOBS, job.id, job).catch(console.error);
 
       if (action.type === 'ADD_JOB' || job.shouldNotify) {
-          const title = job.organization || job.title;
+          const baseTitle = job.organization || job.title;
+          const title = baseTitle.includes('💼') ? baseTitle : `💼 ${baseTitle}`;
           const msg = `${job.organization || ''} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
           broadcastPush(title, msg, { jobId: job.id, type: 'new_job' })
               .then(res => {
@@ -143,7 +144,7 @@ const adminReducer = (state, action) => {
           const notifId = `notif-job-${job.id}`;
           const notifObj = {
             id: notifId,
-            title: job.organization || job.title,
+            title: title,
             organization: job.organization || '',
             message: msg,
             type: 'new_job',
@@ -208,6 +209,25 @@ const adminReducer = (state, action) => {
     case 'ADD_NOTIFICATION':
     case 'UPDATE_NOTIFICATION': {
       const notifItem = action.payload;
+      
+      // Automatically prepend a relative emoji to the notification title based on the type
+      let emojiPrefix = '';
+      if (notifItem.type === 'new_job') emojiPrefix = '💼';
+      else if (notifItem.type === 'admit_card') emojiPrefix = '🎟️';
+      else if (notifItem.type === 'result') emojiPrefix = '📜';
+      else if (notifItem.type === 'new_paper' || notifItem.type === 'new_question') emojiPrefix = '📝';
+      else if (notifItem.type === 'live_exam') emojiPrefix = '📢';
+      else if (notifItem.type === 'exam_reminder' || notifItem.type === 'deadline') emojiPrefix = '⏰';
+
+      if (emojiPrefix) {
+        if (notifItem.title && !notifItem.title.includes(emojiPrefix)) {
+          notifItem.title = `${emojiPrefix} ${notifItem.title}`;
+        }
+        if (notifItem.titleEn && !notifItem.titleEn.includes(emojiPrefix)) {
+          notifItem.titleEn = `${emojiPrefix} ${notifItem.titleEn}`;
+        }
+      }
+
       setDocument(COLLECTIONS.NOTIFICATIONS, notifItem.id, notifItem).catch(console.error);
 
       if (action.type === 'ADD_NOTIFICATION') {
@@ -250,12 +270,19 @@ const adminReducer = (state, action) => {
 
       if (admitItem && (admitItem.type === 'admit_card' || admitItem.type === 'result')) {
         const notifId = `notif-admit-${admitItem.id}`;
+        const isResult = admitItem.type === 'result';
+        const emojiPrefix = isResult ? '📜' : '🎟️';
+        const baseTitle = admitItem.organization || admitItem.examName;
+        const titleWithEmoji = (emojiPrefix && baseTitle && !baseTitle.includes(emojiPrefix))
+          ? `${emojiPrefix} ${baseTitle}`
+          : baseTitle;
+
         const notifObj = {
           id: notifId,
-          title: admitItem.organization || admitItem.examName,
+          title: titleWithEmoji,
           organization: admitItem.organization || '',
           message: admitItem.examName,
-          type: admitItem.type === 'result' ? 'result' : 'admit_card',
+          type: isResult ? 'result' : 'admit_card',
           jobId: admitItem.jobId,
           createdAt: admitItem.createdAt || new Date().toISOString()
         };
@@ -315,9 +342,11 @@ const adminReducer = (state, action) => {
           .catch(err => console.error('Push error for exam:', err));
 
         const notifId = `notif-exam-${examItem.id}`;
+        const baseTitle = examItem.title || 'লাইভ এমসিকিউ পরীক্ষা';
+        const titleWithEmoji = baseTitle.includes('📢') ? baseTitle : `📢 ${baseTitle}`;
         const notifObj = {
           id: notifId,
-          title: examItem.title || 'লাইভ এমসিকিউ পরীক্ষা',
+          title: titleWithEmoji,
           organization: 'MCQ Exam',
           message: `নতুন লাইভ পরীক্ষা তৈরি করা হয়েছে: ${examItem.title}`,
           type: 'live_exam',
@@ -364,9 +393,11 @@ const adminReducer = (state, action) => {
           .catch(err => console.error('Push error for question paper:', err));
 
         const notifId = `notif-paper-${paperItem.id}`;
+        const baseTitle = paperItem.title || 'নতুন প্রশ্নপত্র';
+        const titleWithEmoji = baseTitle.includes('📝') ? baseTitle : `📝 ${baseTitle}`;
         const notifObj = {
           id: notifId,
-          title: paperItem.title || 'নতুন প্রশ্নপত্র',
+          title: titleWithEmoji,
           organization: paperItem.organization || 'প্রশ্নব্যাংক',
           message: `${paperItem.title} - প্রস্তুতি নিন এখনই!`,
           type: 'new_paper',
