@@ -1084,16 +1084,16 @@
 
 .onboarding-illustration-box {
   position: relative;
-  width: 220px;
-  height: 220px;
+  width: 160px;
+  height: 160px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .onboarding-circle-bg {
-  width: 150px;
-  height: 150px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -1104,9 +1104,9 @@
 .onboarding-floating-badge {
   position: absolute;
   background: var(--white);
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: var(--radius-full);
-  font-size: 11px;
+  font-size: 9.5px;
   font-weight: 700;
   color: var(--text-primary);
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);

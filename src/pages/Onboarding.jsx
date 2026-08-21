@@ -12,11 +12,11 @@ const slides = [
     subtitleEn: 'Get notification of Government, Bank, NGO, and private job circulars first.',
     bgGradient: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
     iconColor: '#ffffff',
-    icon: <Briefcase size={64} color="white" />,
+    icon: <Briefcase size={48} color="white" />,
     floatingBadges: [
-      { text: '🏛️ সরকারি চাকরি', textEn: '🏛️ Govt Jobs', top: '10px', left: '-15px' },
-      { text: '🏦 ব্যাংক জব', textEn: '🏦 Bank Jobs', top: '75px', right: '-20px' },
-      { text: '🤝 এনজিও নিয়োগ', textEn: '🤝 NGO Jobs', bottom: '15px', left: '10px' }
+      { text: '🏛️ সরকারি চাকরি', textEn: '🏛️ Govt Jobs', top: '2px', left: '-12px' },
+      { text: '🏦 ব্যাংক জব', textEn: '🏦 Bank Jobs', top: '55px', right: '-15px' },
+      { text: '🤝 এনজিও নিয়োগ', textEn: '🤝 NGO Jobs', bottom: '10px', left: '8px' }
     ]
   },
   {
@@ -27,11 +27,11 @@ const slides = [
     subtitleEn: 'Download admit cards, get exam schedules, and receive instant result alerts.',
     bgGradient: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',
     iconColor: '#ffffff',
-    icon: <Bell size={64} color="white" />,
+    icon: <Bell size={48} color="white" />,
     floatingBadges: [
-      { text: '🎟️ অ্যাডমিট কার্ড', textEn: '🎟️ Admit Card', top: '15px', right: '-15px' },
-      { text: '📜 রেজাল্ট', textEn: '📜 Exam Result', top: '80px', left: '-20px' },
-      { text: '⏰ পরীক্ষার তারিখ', textEn: '⏰ Exam Date', bottom: '10px', right: '10px' }
+      { text: '🎟️ অ্যাডমিট কার্ড', textEn: '🎟️ Admit Card', top: '8px', right: '-10px' },
+      { text: '📜 রেজাল্ট', textEn: '📜 Exam Result', top: '60px', left: '-15px' },
+      { text: '⏰ পরীক্ষার তারিখ', textEn: '⏰ Exam Date', bottom: '8px', right: '8px' }
     ]
   },
   {
@@ -42,11 +42,11 @@ const slides = [
     subtitleEn: 'Filter jobs by your educational qualification and district, and bookmark circulars.',
     bgGradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
     iconColor: '#ffffff',
-    icon: <Search size={64} color="white" />,
+    icon: <Search size={48} color="white" />,
     floatingBadges: [
-      { text: '🔍 জেলা ফিল্টার', textEn: '🔍 District Filter', top: '12px', left: '-10px' },
-      { text: '🎓 যোগ্যতা ভিত্তিক', textEn: '🎓 Qualification', top: '75px', right: '-25px' },
-      { text: '📌 সেভড সার্কুলার', textEn: '📌 Saved Circulars', bottom: '15px', left: '15px' }
+      { text: '🔍 জেলা ফিল্টার', textEn: '🔍 District Filter', top: '4px', left: '-8px' },
+      { text: '🎓 যোগ্যতা ভিত্তিক', textEn: '🎓 Qualification', top: '55px', right: '-18px' },
+      { text: '📌 সেভড সার্কুলার', textEn: '📌 Saved Circulars', bottom: '10px', left: '10px' }
     ]
   }
 ];
