@@ -574,33 +574,23 @@ export default function JobDetails() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '48px 24px',
+              padding: '40px 20px',
               background: 'var(--bg-secondary)',
-              borderRadius: '14px',
+              borderRadius: '12px',
               border: '1px dashed var(--border-light)',
               textAlign: 'center',
               gap: '12px',
               marginBottom: '14px'
             }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                background: 'rgba(148, 163, 184, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#94a3b8'
-              }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="1" y1="1" x2="23" y2="23"></line>
-                  <path d="M21 21H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3m3-3h6l2 3h4a2 2 0 0 1 2 2v9.34"></path>
-                  <path d="M8.17 11.17A4 4 0 0 0 12 15c.67 0 1.3-.17 1.83-.46"></path>
-                </svg>
+              <div style={{ fontSize: '32px' }}>📄</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                  {isEn ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
+                </span>
+                <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                  {isEn ? 'Please click the button below to view or apply! 👇' : 'সার্কুলার দেখতে বা আবেদন করতে নিচের বাটনে চাপ দিন! 👇'}
+                </span>
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-secondary)' }}>
-                no Photo available
-              </span>
             </div>
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
