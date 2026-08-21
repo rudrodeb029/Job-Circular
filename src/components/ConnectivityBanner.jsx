@@ -72,13 +72,8 @@ export default function ConnectivityBanner() {
 
         <div style={{ flex: 1 }}>
           <h4 style={{ fontSize: '13px', fontWeight: 800, margin: 0 }}>
-            {isBackOnline ? 'Back Online' : 'No Internet Connection'}
+            {isBackOnline ? 'Back Online' : 'No internet'}
           </h4>
-          <p style={{ fontSize: '11px', margin: '2px 0 0 0', opacity: 0.9, fontWeight: 500 }}>
-            {isBackOnline
-              ? 'Connectivity restored. Syncing latest updates...'
-              : 'You are currently offline. Showing cached data.'}
-          </p>
         </div>
 
         {!isBackOnline && (
