@@ -111,7 +111,8 @@ export default function JobDetails() {
       state: {
         url: link,
         title: orgName || titleName || (isEn ? 'Official Application' : 'সরকারি চাকরির আবেদন'),
-        jobId: job.id
+        jobId: job.id,
+        type: 'new_job'
       }
     });
   };

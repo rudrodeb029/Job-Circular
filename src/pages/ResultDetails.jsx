@@ -115,7 +115,8 @@ export default function ResultDetails() {
       state: {
         url: link,
         title: orgName || titleName || (isEn ? 'Exam Result Portal' : 'পরীক্ষার ফলাফল পোর্টাল'),
-        jobId: job.id
+        jobId: job.id,
+        type: 'result'
       }
     });
   };

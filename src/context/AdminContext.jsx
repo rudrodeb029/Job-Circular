@@ -127,13 +127,31 @@ const adminReducer = (state, action) => {
       setDocument(COLLECTIONS.JOBS, job.id, job).catch(console.error);
 
       if (action.type === 'ADD_JOB' || job.shouldNotify) {
-          const baseTitle = job.organization || job.title;
-          const title = baseTitle.includes('💼') ? baseTitle : `💼 ${baseTitle}`;
-          const msg = `${job.organization || ''} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
-          broadcastPush(title, msg, { jobId: job.id, type: 'new_job' })
+          let type = 'new_job';
+          let title = '';
+          let msg = '';
+          
+          if (job.showInResult) {
+              type = 'result';
+              const baseTitle = job.organization || job.title;
+              title = baseTitle.includes('📜') ? baseTitle : `📜 ${baseTitle}`;
+              msg = `${job.organization || ''} -এর ${job.title} পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`;
+          } else if (job.showInExamDate) {
+              type = 'admit_card';
+              const baseTitle = job.organization || job.title;
+              title = baseTitle.includes('🎟️') ? baseTitle : `🎟️ ${baseTitle}`;
+              msg = `${job.organization || ''} -এর ${job.title} পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
+          } else {
+              type = 'new_job';
+              const baseTitle = job.organization || job.title;
+              title = baseTitle.includes('💼') ? baseTitle : `💼 ${baseTitle}`;
+              msg = `${job.organization || ''} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
+          }
+
+          broadcastPush(title, msg, { jobId: job.id, type: type })
               .then(res => {
                   if (res.success) {
-                      console.log(`✅ Push sent for new circular: "${job.title}" → ${res.recipients} device(s)`);
+                      console.log(`✅ Push sent for circular update ("${type}"): "${job.title}" → ${res.recipients} device(s)`);
                   } else {
                       console.error(`❌ Push failed for circular: "${job.title}" →`, res.error);
                   }
@@ -147,7 +165,7 @@ const adminReducer = (state, action) => {
             title: title,
             organization: job.organization || '',
             message: msg,
-            type: 'new_job',
+            type: type,
             jobId: job.id,
             createdAt: job.createdAt || new Date().toISOString()
           };

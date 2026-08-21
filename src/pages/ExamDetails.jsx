@@ -130,7 +130,8 @@ export default function ExamDetails() {
       state: {
         url: link,
         title: orgName || titleName || (isEn ? 'Admit Card Download' : 'অ্যাডমিট কার্ড ডাউনলোড'),
-        jobId: job.id
+        jobId: job.id,
+        type: 'admit_card'
       }
     });
   };

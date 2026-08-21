@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
 import { ButtonSpinner } from '../components/ModernLoader';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
+import { useAppContext } from '../context/AppContext';
 
 // Smart URL Formatter: BD Govt / Teletalk subdomains fail on HTTPS with ERR_CERT_AUTHORITY_INVALID, but work on HTTP
 export function sanitizePortalUrl(inputUrl) {
@@ -30,11 +31,31 @@ export function sanitizePortalUrl(inputUrl) {
 export default function CircularWebViewScreen() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { state: appState } = useAppContext();
+  const isEn = appState?.language === 'en';
 
   // Extract dynamic apply URL & Title from router state or query parameters
   const queryParams = new URLSearchParams(location.search);
   const rawUrl = location.state?.url || queryParams.get('url') || 'http://alljobs.teletalk.com.bd';
-  const pageTitle = location.state?.title || queryParams.get('title') || 'অনলাইন আবেদন পোর্টাল';
+  const pageTitle = location.state?.title || queryParams.get('title') || (isEn ? 'Online Application Portal' : 'অনলাইন আবেদন পোর্টাল');
+  const pageType = location.state?.type || queryParams.get('type') || 'new_job';
+
+  let descriptionText = isEn 
+    ? 'Click the button below to fill out the official application form and upload your photo/signature.'
+    : 'অফিসিয়াল আবেদন ফরম পূরণ ও ছবি/স্বাক্ষর আপলোড করতে নিচের বাটনে চাপ দিন।';
+  let buttonLabel = isEn ? 'Go to Application Portal' : 'আবেদন পোর্টালে যান';
+
+  if (pageType === 'result') {
+    descriptionText = isEn 
+      ? 'Click the button below to view or download the exam results.'
+      : 'পরীক্ষার ফলাফল দেখতে বা ডাউনলোড করতে নিচের বাটনে চাপ দিন।';
+    buttonLabel = isEn ? 'View Result' : 'ফলাফল দেখুন';
+  } else if (pageType === 'admit_card' || pageType === 'exam_date') {
+    descriptionText = isEn 
+      ? 'Click the button below to download the admit card or view the exam notice.'
+      : 'প্রবেশপত্র ডাউনলোড বা পরীক্ষার নোটিশ দেখতে নিচের বাটনে চাপ দিন।';
+    buttonLabel = isEn ? 'View Admit Card / Notice' : 'প্রবেশপত্র / নোটিশ দেখুন';
+  }
 
   const targetUrl = sanitizePortalUrl(rawUrl);
 
@@ -194,7 +215,7 @@ export default function CircularWebViewScreen() {
               lineHeight: 1.5
             }}
           >
-            অফিসিয়াল আবেদন ফরম পূরণ ও ছবি/স্বাক্ষর আপলোড করতে নিচের বাটনে চাপ দিন।
+            {descriptionText}
           </p>
         </div>
 
@@ -221,7 +242,7 @@ export default function CircularWebViewScreen() {
           }}
         >
           {loading && <ButtonSpinner size={14} color="#ffffff" />}
-          <span>{loading ? 'লোড হচ্ছে...' : 'আবেদন পোর্টালে যান'}</span>
+          <span>{loading ? (isEn ? 'Loading...' : 'লোড হচ্ছে...') : buttonLabel}</span>
           {!loading && <ExternalLink size={15} />}
         </button>
       </div>
