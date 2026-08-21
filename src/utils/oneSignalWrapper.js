@@ -196,10 +196,33 @@ export const broadcastPush = async (title, message, data = {}, sendAfter = null)
     try {
         const authHeader = restApiKey.startsWith('os_v2_app_') ? `Key ${restApiKey}` : `Basic ${restApiKey}`;
 
+        // Automatically prepend a relative emoji to the notification title based on the type
+        let emojiPrefix = '';
+        const notifType = data.type || data.feedType || '';
+        
+        if (notifType === 'new_job') {
+            emojiPrefix = '💼';
+        } else if (notifType === 'admit_card') {
+            emojiPrefix = '🎟️';
+        } else if (notifType === 'result') {
+            emojiPrefix = '📜';
+        } else if (notifType === 'new_paper' || notifType === 'new_question') {
+            emojiPrefix = '📝';
+        } else if (notifType === 'live_exam') {
+            emojiPrefix = '📢';
+        } else if (notifType === 'exam_reminder' || notifType === 'deadline') {
+            emojiPrefix = '⏰';
+        }
+
+        let finalTitle = title || '';
+        if (emojiPrefix && finalTitle && !finalTitle.includes(emojiPrefix)) {
+            finalTitle = `${emojiPrefix} ${finalTitle}`;
+        }
+
         const payload = {
             app_id: appId,
             included_segments: ["Total Subscriptions", "Subscribed Users"],
-            headings: { en: title, bn: title },
+            headings: { en: finalTitle, bn: finalTitle },
             contents: { en: message, bn: message },
             data: data,
             // Android delivery optimization
@@ -216,7 +239,7 @@ export const broadcastPush = async (title, message, data = {}, sendAfter = null)
             payload.send_after = sendAfter;
         }
 
-        console.log('OneSignal: Sending push →', title, sendAfter ? `(scheduled: ${sendAfter})` : '(immediate)');
+        console.log('OneSignal: Sending push →', finalTitle, sendAfter ? `(scheduled: ${sendAfter})` : '(immediate)');
 
         const response = await fetch('https://onesignal.com/api/v1/notifications', {
             method: 'POST',
