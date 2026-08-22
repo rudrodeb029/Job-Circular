@@ -241,13 +241,25 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
 
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!commentText.trim()) return;
+    const text = commentText.trim();
+    if (!text) return;
+
+    // Strict URL & link detection pattern
+    const urlPattern = /(https?:\/\/|www\.|[a-zA-Z0-9-]+\.(com|net|org|io|dev|app|xyz|site|online|me|info|biz|co|cc|tv|link|tech|store|shop|blog|bd|gov|edu))/i;
+    if (urlPattern.test(text)) {
+      alert(
+        isEn
+          ? 'Links and URLs are not allowed in comments.'
+          : 'মন্তব্যে কোনো প্রকার লিঙ্ক বা ইউআরএল (URL) পোস্ট করা যাবে না।'
+      );
+      return;
+    }
 
     const newComment = {
       id: 'c_' + Date.now(),
       userName: activeUser.name,
       userAvatar: activeUser.avatar,
-      text: commentText.trim(),
+      text: text,
       createdAt: new Date().toISOString()
     };
 
