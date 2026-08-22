@@ -321,7 +321,6 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
               height: '40px',
               borderRadius: '50%',
               objectFit: 'cover',
-              border: '1.5px solid var(--primary)',
               flexShrink: 0
             }}
             onError={(e) => {
