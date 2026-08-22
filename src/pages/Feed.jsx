@@ -168,31 +168,23 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         padding: '12px 14px 10px 14px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Avatar with Blue Ring */}
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            border: '2px solid #1877f2',
-            padding: '1.5px',
-            background: 'white',
-            flexShrink: 0
-          }}>
-            <div style={{
-              width: '100%',
-              height: '100%',
+          {/* Official Live Circular App Logo */}
+          <img
+            src="/app-logo.png"
+            alt="Live Circular Logo"
+            style={{
+              width: '40px',
+              height: '40px',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 800,
-              fontSize: '15px'
-            }}>
-              B
-            </div>
-          </div>
+              objectFit: 'cover',
+              border: '1.5px solid var(--primary)',
+              flexShrink: 0
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+            }}
+          />
 
           <div>
             <h4 style={{
@@ -227,16 +219,8 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
               marginTop: '2px'
             }}>
               <span>{timeAgo(post.createdAt, isEn)}</span>
-              <span>·</span>
-              <span>🌐</span>
             </div>
           </div>
-        </div>
-
-        {/* Top Right Options */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-muted)' }}>
-          <span style={{ fontSize: '18px', cursor: 'pointer', fontWeight: 'bold' }}>•••</span>
-          <span style={{ fontSize: '16px', cursor: 'pointer' }}>✕</span>
         </div>
       </div>
 
@@ -392,7 +376,7 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         </div>
       )}
 
-      {/* Facebook Interactive Reaction Footer Bar (Matches Reference Screenshot) */}
+      {/* Reaction Footer Bar */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -401,107 +385,41 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         background: 'var(--card-bg, #ffffff)',
         borderTop: '1px solid var(--border-light)'
       }}>
-        {/* Left Side Action Icons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Like Button & Counter Pill [👍 2] */}
-          <button
-            onClick={handleLike}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: isLiked ? '#eff6ff' : '#f8fafc',
-              border: isLiked ? '1px solid #93c5fd' : '1px solid #cbd5e1',
-              borderRadius: '20px',
-              padding: '3px 10px 3px 4px',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-              transform: likeAnimating ? 'scale(1.15)' : 'scale(1)',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
-            }}
-          >
-            <div style={{
-              width: '20px',
-              height: '20px',
-              borderRadius: '50%',
-              background: '#1877f2',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '11px',
-              fontWeight: 800
-            }}>
-              👍
-            </div>
-            <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
-              {totalLikes > 0 ? totalLikes : 2}
-            </span>
-          </button>
-
-          {/* Comment Icon */}
-          <button
-            onClick={() => alert(isEn ? 'Comments section coming soon!' : 'কমেন্ট অপশন শীঘ্রই আসছে!')}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '6px',
-              color: 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'center'
-            }}
-            title={isEn ? 'Comment' : 'কমেন্ট'}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </button>
-
-          {/* Share Icon */}
-          <button
-            onClick={() => {
-              if (navigator.share) {
-                navigator.share({ title: 'Job Circular Post', url: window.location.href });
-              } else {
-                alert(isEn ? 'Link copied!' : 'লিঙ্ক কপি হয়েছে!');
-              }
-            }}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              padding: '6px',
-              color: 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'center'
-            }}
-            title={isEn ? 'Share' : 'শেয়ার'}
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-              <polyline points="16 6 12 2 8 6"></polyline>
-              <line x1="12" y1="2" x2="12" y2="15"></line>
-            </svg>
-          </button>
-        </div>
-
-        {/* Right Side Facebook Blue Circle Badge Icon */}
-        <div style={{
-          width: '22px',
-          height: '22px',
-          borderRadius: '50%',
-          background: '#1877f2',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 1px 4px rgba(24, 119, 242, 0.35)',
-          cursor: 'pointer'
-        }}>
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/>
-          </svg>
-        </div>
+        {/* Like Button & Counter Pill [👍 2] */}
+        <button
+          onClick={handleLike}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: isLiked ? '#eff6ff' : '#f8fafc',
+            border: isLiked ? '1px solid #93c5fd' : '1px solid #cbd5e1',
+            borderRadius: '20px',
+            padding: '3px 10px 3px 4px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+          }}
+        >
+          <div style={{
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            background: '#1877f2',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '11px',
+            fontWeight: 800
+          }}>
+            👍
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {totalLikes > 0 ? totalLikes : 2}
+          </span>
+        </button>
       </div>
     </div>
   );
