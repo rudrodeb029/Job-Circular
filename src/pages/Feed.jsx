@@ -296,6 +296,18 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
     addFeedComment(post.id, newComment).catch(console.error);
   };
 
+  const [isInputFocused, setIsInputFocused] = useState(false);
+
+  const handleInputFocus = (e) => {
+    setIsInputFocused(true);
+    const el = e.target;
+    setTimeout(() => {
+      if (el && typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 300);
+  };
+
   const likesCount = Number(post.likes) || 0;
   const commentsCount = localComments.length;
 
@@ -650,16 +662,20 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
               type="text"
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
+              onFocus={handleInputFocus}
+              onBlur={() => setIsInputFocused(false)}
               placeholder={isEn ? 'Write a comment...' : 'একটি মন্তব্য লিখুন...'}
               style={{
                 flex: 1,
                 background: 'var(--card-bg, #ffffff)',
-                border: '1px solid var(--border-light)',
+                border: isInputFocused ? '1.5px solid #2563eb' : '1px solid var(--border-light)',
                 borderRadius: '20px',
                 padding: '8px 14px',
                 fontSize: '13px',
                 color: 'var(--text-primary)',
-                outline: 'none'
+                outline: 'none',
+                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: isInputFocused ? '0 0 0 3.5px rgba(37, 99, 235, 0.22), 0 2px 10px rgba(37, 99, 235, 0.12)' : 'none'
               }}
             />
             <button
