@@ -656,51 +656,68 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
             </div>
           )}
 
-          <form onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <UserAvatar name={activeUser.name} avatar={activeUser.avatar} size={32} />
-            <input
-              type="text"
-              value={commentText}
-              onChange={(e) => setCommentText(e.target.value)}
-              onFocus={handleInputFocus}
-              onBlur={() => setIsInputFocused(false)}
-              placeholder={isEn ? 'Write a comment...' : 'একটি মন্তব্য লিখুন...'}
-              style={{
-                flex: 1,
-                background: 'var(--card-bg, #ffffff)',
-                border: isInputFocused ? '1.5px solid #2563eb' : '1px solid var(--border-light)',
-                borderRadius: '20px',
-                padding: '8px 14px',
-                fontSize: '13px',
-                color: 'var(--text-primary)',
-                outline: 'none',
-                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
-                boxShadow: isInputFocused ? '0 0 0 3.5px rgba(37, 99, 235, 0.22), 0 2px 10px rgba(37, 99, 235, 0.12)' : 'none'
-              }}
-            />
-            <button
-              type="submit"
-              disabled={!commentText.trim()}
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                background: commentText.trim() ? 'var(--primary, #1877f2)' : '#cbd5e1',
-                border: 'none',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: commentText.trim() ? 'pointer' : 'default',
-                flexShrink: 0,
-                transition: 'background 0.2s'
-              }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-              </svg>
-            </button>
+          {/* Facebook-style Modern Comment Form */}
+          <form onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+            <UserAvatar name={activeUser.name} avatar={activeUser.avatar} size={36} />
+
+            <div style={{
+              flex: 1,
+              background: '#f0f2f5',
+              borderRadius: '18px',
+              padding: '8px 12px',
+              border: isInputFocused ? '1.5px solid #1877f2' : '1px solid #e4e6eb',
+              boxShadow: isInputFocused ? '0 0 0 3px rgba(24, 119, 242, 0.2)' : 'none',
+              transition: 'all 0.2s ease',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '4px'
+            }}>
+              <input
+                type="text"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onFocus={handleInputFocus}
+                onBlur={() => setIsInputFocused(false)}
+                placeholder={
+                  activeUser.name && activeUser.name !== 'ইউজার' && activeUser.name !== 'Candidate User'
+                    ? (isEn ? `Comment as ${activeUser.name}...` : `${activeUser.name} হিসেবে মন্তব্য লিখুন...`)
+                    : (isEn ? 'Write a comment...' : 'একটি মন্তব্য লিখুন...')
+                }
+                style={{
+                  width: '100%',
+                  background: 'transparent',
+                  border: 'none',
+                  outline: 'none',
+                  fontSize: '13.5px',
+                  color: '#050505',
+                  padding: '2px 0'
+                }}
+              />
+
+              {/* Bottom Right Send Action */}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <button
+                  type="submit"
+                  disabled={!commentText.trim()}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: '4px',
+                    cursor: commentText.trim() ? 'pointer' : 'default',
+                    color: commentText.trim() ? '#1877f2' : '#bcc0c4',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'color 0.2s ease'
+                  }}
+                  title={isEn ? 'Send Comment' : 'মন্তব্য পাঠান'}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </form>
         </div>
       )}
