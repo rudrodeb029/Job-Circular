@@ -60,37 +60,6 @@ export default function Feed() {
     return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [adminState.feedPosts, state.feedPosts]);
 
-  // Demo Stories Carousel Data
-  const stories = [
-    {
-      id: 'create',
-      isCreate: true,
-      name: isEn ? 'Create story' : 'স্টোরি লিখুন',
-      image: state.user.avatar || null
-    },
-    {
-      id: '1',
-      name: 'Sumit Hore',
-      avatar: 'https://i.pravatar.cc/100?img=12',
-      bg: 'linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%)',
-      text: 'কিন্তু বলার নেই 😭😭😭'
-    },
-    {
-      id: '2',
-      name: 'Palash Mondal',
-      avatar: 'https://i.pravatar.cc/100?img=33',
-      bg: 'linear-gradient(180deg, #0f766e 0%, #134e4a 100%)',
-      text: 'একটি চাকুরির জন্য মানুষ বেঁচে থাকে...'
-    },
-    {
-      id: '3',
-      name: 'Alok Mondal',
-      avatar: 'https://i.pravatar.cc/100?img=68',
-      bg: 'linear-gradient(180deg, #b45309 0%, #78350f 100%)',
-      text: 'NTRCA new update circular out'
-    }
-  ];
-
   return (
     <div className="page" style={{ paddingBottom: '80px', background: 'var(--bg-secondary, #f0f2f5)' }}>
       <AppHeader />
@@ -158,135 +127,6 @@ export default function Feed() {
           </div>
         </div>
 
-        {/* Stories / Reels Carousel Section */}
-        <div style={{
-          background: 'var(--card-bg, #ffffff)',
-          padding: '12px 0 12px 12px',
-          marginBottom: '8px',
-          borderBottom: '1px solid var(--border-light)'
-        }}>
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            msOverflowStyle: 'none',
-            paddingRight: '12px'
-          }}>
-            {stories.map(story => (
-              <div
-                key={story.id}
-                style={{
-                  width: '105px',
-                  height: '160px',
-                  borderRadius: '12px',
-                  flexShrink: 0,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  cursor: 'pointer',
-                  background: story.bg || 'var(--bg-secondary, #e2e8f0)',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: story.isCreate ? 0 : '8px'
-                }}
-              >
-                {story.isCreate ? (
-                  <>
-                    <div style={{ height: '110px', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {story.image ? (
-                        <img src={story.image} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <span style={{ fontSize: '32px' }}>👤</span>
-                      )}
-                    </div>
-                    <div style={{
-                      position: 'absolute',
-                      top: '94px',
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                      width: '28px',
-                      height: '28px',
-                      borderRadius: '50%',
-                      background: '#1877f2',
-                      color: 'white',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      border: '3px solid white'
-                    }}>
-                      +
-                    </div>
-                    <div style={{
-                      height: '50px',
-                      background: 'var(--card-bg, #ffffff)',
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      paddingBottom: '6px'
-                    }}>
-                      <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                        {story.name}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Story Author Avatar Circle with Blue Ring */}
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      border: '2.5px solid #1877f2',
-                      overflow: 'hidden',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-                    }}>
-                      <img src={story.avatar} alt={story.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-
-                    {/* Story Text / Quote Overlay */}
-                    {story.text && (
-                      <div style={{
-                        padding: '4px 6px',
-                        background: 'rgba(0,0,0,0.3)',
-                        borderRadius: '6px',
-                        backdropFilter: 'blur(2px)'
-                      }}>
-                        <p style={{
-                          fontSize: '10px',
-                          color: '#ffffff',
-                          fontWeight: 700,
-                          margin: 0,
-                          lineHeight: 1.3,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 3,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden'
-                        }}>
-                          {story.text}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Story Author Name */}
-                    <span style={{
-                      fontSize: '10.5px',
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      textShadow: '0 1px 3px rgba(0,0,0,0.8)'
-                    }}>
-                      {story.name}
-                    </span>
-                  </>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Feed Posts */}
         {feedPosts.length === 0 ? (
           <div style={{
@@ -294,20 +134,13 @@ export default function Feed() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            padding: '60px 24px',
+            padding: '80px 24px',
             textAlign: 'center',
-            gap: '16px',
             background: 'var(--card-bg, #ffffff)',
             borderRadius: '12px',
             margin: '0 8px'
           }}>
             <div style={{ fontSize: '48px' }}>📭</div>
-            <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-secondary)', margin: 0 }}>
-              {isEn ? 'No Posts Yet' : 'এখনো কোনো পোস্ট নেই'}
-            </h3>
-            <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: 0, maxWidth: '260px' }}>
-              {isEn ? 'Stay tuned! New updates, tips, and videos will appear here.' : 'অপেক্ষা করুন! নতুন আপডেট, টিপস ও ভিডিও এখানে দেখা যাবে।'}
-            </p>
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
