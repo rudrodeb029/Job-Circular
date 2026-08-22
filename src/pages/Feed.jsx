@@ -136,9 +136,51 @@ export default function Feed() {
   );
 }
 
+function UserAvatar({ name, avatar, size = 32 }) {
+  const [imgError, setImgError] = useState(false);
+  const initialLetter = (name && name.trim()) ? name.trim()[0].toUpperCase() : 'U';
+
+  if (avatar && !imgError) {
+    return (
+      <img
+        src={avatar}
+        alt={name || 'User'}
+        onError={() => setImgError(true)}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          borderRadius: '50%',
+          objectFit: 'cover',
+          flexShrink: 0,
+          border: '1px solid var(--border-light)'
+        }}
+      />
+    );
+  }
+
+  return (
+    <div style={{
+      width: `${size}px`,
+      height: `${size}px`,
+      borderRadius: '50%',
+      background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontWeight: 800,
+      fontSize: `${Math.round(size * 0.44)}px`,
+      flexShrink: 0,
+      boxShadow: '0 2px 6px rgba(26, 86, 219, 0.2)'
+    }}>
+      {initialLetter}
+    </div>
+  );
+}
+
 function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
   const { state: appState } = useAppContext();
-  const { dispatch: adminDispatch } = useAdminContext();
+  const { state: adminState, dispatch: adminDispatch } = useAdminContext();
 
   const [expanded, setExpanded] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
@@ -146,6 +188,40 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const [localComments, setLocalComments] = useState(Array.isArray(post.comments) ? post.comments : []);
+
+  const getActiveUser = () => {
+    let name = appState.user?.name;
+    if (!name || name.trim() === '') {
+      try {
+        const saved = JSON.parse(localStorage.getItem('job_user') || '{}');
+        if (saved.name) name = saved.name;
+      } catch(e) {}
+    }
+    if (!name || name.trim() === '') {
+      if (adminState.adminUser?.name) name = adminState.adminUser.name;
+      else {
+        try {
+          const adminSaved = JSON.parse(localStorage.getItem('admin_user') || '{}');
+          if (adminSaved.name) name = adminSaved.name;
+        } catch(e) {}
+      }
+    }
+    if (!name || name.trim() === '') {
+      name = isEn ? 'Candidate User' : 'ইউজার';
+    }
+
+    let avatar = appState.user?.avatar || adminState.adminUser?.photoURL || null;
+    if (!avatar) {
+      try {
+        const saved = JSON.parse(localStorage.getItem('job_user') || '{}');
+        if (saved.avatar) avatar = saved.avatar;
+      } catch(e) {}
+    }
+
+    return { name, avatar };
+  };
+
+  const activeUser = getActiveUser();
 
   const content = isEn ? (post.contentEn || post.content) : post.content;
   const isLong = content && content.length > 220;
@@ -169,8 +245,8 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
 
     const newComment = {
       id: 'c_' + Date.now(),
-      userName: appState.user?.name || (isEn ? 'Candidate User' : 'ইউজার'),
-      userAvatar: appState.user?.avatar || '/app-logo.png',
+      userName: activeUser.name,
+      userAvatar: activeUser.avatar,
       text: commentText.trim(),
       createdAt: new Date().toISOString()
     };
@@ -500,22 +576,7 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '12px' }}>
               {localComments.map((comment, index) => (
                 <div key={comment.id || index} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                  <img
-                    src={comment.userAvatar || '/app-logo.png'}
-                    alt="User"
-                    style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      objectFit: 'cover',
-                      flexShrink: 0,
-                      border: '1px solid var(--border-light)'
-                    }}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = '/app-logo.png';
-                    }}
-                  />
+                  <UserAvatar name={comment.userName} avatar={comment.userAvatar} size={32} />
 
                   <div style={{
                     background: 'var(--card-bg, #ffffff)',
@@ -550,22 +611,7 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
           )}
 
           <form onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <img
-              src={appState.user?.avatar || '/app-logo.png'}
-              alt="Me"
-              style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                flexShrink: 0,
-                border: '1px solid var(--border-light)'
-              }}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src = '/app-logo.png';
-              }}
-            />
+            <UserAvatar name={activeUser.name} avatar={activeUser.avatar} size={32} />
             <input
               type="text"
               value={commentText}
