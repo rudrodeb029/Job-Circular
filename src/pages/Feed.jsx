@@ -75,19 +75,42 @@ export default function Feed() {
       <AppHeader />
 
       <PullToRefresh>
-        {/* Standard App Search Bar for Feed Searching */}
+        {/* Search Bar Row with App Icon */}
         <div style={{
           background: 'var(--card-bg, #ffffff)',
           padding: '10px 14px',
           borderBottom: '1px solid var(--border-light)',
           marginBottom: '8px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
         }}>
-          <SearchBar
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={isEn ? 'Search feed posts...' : 'ফিড পোস্ট খুঁজুন...'}
+          {/* App Logo Icon */}
+          <img
+            src="/app-logo.png"
+            alt="Live Circular Logo"
+            style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+              border: '1.5px solid var(--primary, #1877f2)',
+              boxShadow: '0 2px 8px rgba(24, 119, 242, 0.2)',
+              flexShrink: 0
+            }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = 'none';
+            }}
           />
+          <div style={{ flex: 1 }}>
+            <SearchBar
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={isEn ? 'Search feed posts...' : 'ফিড পোস্ট খুঁজুন...'}
+            />
+          </div>
         </div>
 
         {/* Feed Posts */}
