@@ -453,6 +453,19 @@ const adminReducer = (state, action) => {
       newState.feedPosts = [post, ...(newState.feedPosts || state.feedPosts || [])].sort(sortByCreatedAt);
       saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
       window.dispatchEvent(new CustomEvent('feed_posts_updated', { detail: newState.feedPosts }));
+
+      if (post.shouldNotify !== false) {
+        try {
+          const pushTitle = '📢 লাইভ ফিড আপডেট (Live Feed)';
+          const pushMsg = post.content
+            ? (post.content.length > 90 ? post.content.slice(0, 90) + '...' : post.content)
+            : 'লাইভ ফিডে একটি নতুন আপডেট পোস্ট করা হয়েছে। দেখুন এখনই!';
+
+          broadcastPush(pushTitle, pushMsg, { type: 'feed_update', postId: post.id }).catch(console.error);
+        } catch (err) {
+          console.warn('Feed push notification error:', err);
+        }
+      }
       break;
     }
     case 'UPDATE_FEED_POST': {

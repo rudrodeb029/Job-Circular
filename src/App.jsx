@@ -94,6 +94,8 @@ function App() {
           navigate(`/result-details/${data.jobId}`);
         } else if (data.type === 'exam_date' && data.jobId) {
           navigate(`/exam-details/${data.jobId}`);
+        } else if (data.type === 'feed_update' || data.postId) {
+          navigate('/feed');
         } else {
           navigate('/notifications');
         }

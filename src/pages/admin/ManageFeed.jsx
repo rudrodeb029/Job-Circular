@@ -28,7 +28,7 @@ export default function ManageFeed() {
   const [content, setContent] = useState('');
   const [contentEn, setContentEn] = useState('');
   const [mediaUrl, setMediaUrl] = useState('');
-  const [bannerGradient, setBannerGradient] = useState(''); // 'fire' | 'ocean' | 'purple' | 'sunset' | 'emerald' | 'dark'
+  const [shouldNotify, setShouldNotify] = useState(true);
 
   const openCreateModal = () => {
     setEditingPost(null);
@@ -37,6 +37,7 @@ export default function ManageFeed() {
     setContentEn('');
     setMediaUrl('');
     setBannerGradient('fire');
+    setShouldNotify(true);
     setIsModalOpen(true);
   };
 
@@ -66,7 +67,8 @@ export default function ManageFeed() {
       bannerGradient: mediaType === 'text' ? bannerGradient : '',
       likes: editingPost ? editingPost.likes || 0 : 0,
       createdAt: editingPost ? editingPost.createdAt : new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
+      shouldNotify: !editingPost ? shouldNotify : false
     };
 
     if (editingPost) {
@@ -480,6 +482,30 @@ export default function ManageFeed() {
                   }}
                 />
               </div>
+
+              {/* Push Notification Toggle */}
+              {!editingPost && (
+                <div style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  padding: '10px 12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <input
+                    type="checkbox"
+                    id="shouldNotify"
+                    checked={shouldNotify}
+                    onChange={(e) => setShouldNotify(e.target.checked)}
+                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                  />
+                  <label htmlFor="shouldNotify" style={{ fontSize: '12.5px', fontWeight: 700, color: '#334155', cursor: 'pointer' }}>
+                    🔔 ইউজারদের পুশ নোটিফিকেশন পাঠান (Send Push Notification)
+                  </label>
+                </div>
+              )}
 
               {/* Modal Buttons */}
               <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
