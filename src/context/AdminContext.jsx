@@ -114,6 +114,9 @@ const adminReducer = (state, action) => {
     case 'SET_LIVE_EXAMS':
       newState.liveExams = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
       break;
+    case 'SET_FEED_POSTS':
+      newState.feedPosts = filterPendingDeletes([...action.payload]).sort(sortByCreatedAt);
+      break;
     case 'SET_ACTIVITIES':
       newState.activities = [...action.payload];
       break;
@@ -491,12 +494,13 @@ export const AdminProvider = ({ children }) => {
     try {
       setLoading(true);
 
-      const [jobsData, notifsData, admitsData, questionsData, liveExamsData] = await Promise.all([
+      const [jobsData, notifsData, admitsData, questionsData, liveExamsData, feedPostsData] = await Promise.all([
         getCollectionCached(COLLECTIONS.JOBS, forceServer),
         getCollectionCached(COLLECTIONS.NOTIFICATIONS, forceServer),
         getCollectionCached(COLLECTIONS.ADMITS, forceServer),
         getCollectionCached(COLLECTIONS.QUESTIONS, forceServer),
-        getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer)
+        getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer),
+        getCollectionCached(COLLECTIONS.FEED_POSTS, forceServer)
       ]);
 
       dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(jobsData) });
@@ -504,6 +508,7 @@ export const AdminProvider = ({ children }) => {
       dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(admitsData) });
       dispatch({ type: 'SET_QUESTIONS', payload: mapWithTimestamps(questionsData) });
       dispatch({ type: 'SET_LIVE_EXAMS', payload: mapWithTimestamps(liveExamsData) });
+      dispatch({ type: 'SET_FEED_POSTS', payload: mapWithTimestamps(feedPostsData) });
       dispatch({ type: 'SET_FIRESTORE_READY' });
     } catch (err) {
       console.error('Error fetching cached data:', err);
@@ -547,6 +552,7 @@ export const AdminProvider = ({ children }) => {
     let unsubscribeAdmits = () => {};
     let unsubscribeQuestions = () => {};
     let unsubscribeNotifs = () => {};
+    let unsubscribeFeedPosts = () => {};
     let unsubscribeActivities = () => {};
 
     if (isAdminRoute) {
@@ -611,6 +617,18 @@ export const AdminProvider = ({ children }) => {
       }
 
       try {
+        unsubscribeFeedPosts = onCollectionSnapshot(COLLECTIONS.FEED_POSTS, (feedPostsData) => {
+          if (Array.isArray(feedPostsData) && isMounted) {
+            const sortedFeedPosts = mapWithTimestamps(feedPostsData).sort(sortByCreatedAt);
+            dispatch({ type: 'SET_FEED_POSTS', payload: sortedFeedPosts });
+            saveLocalCache(COLLECTIONS.FEED_POSTS, sortedFeedPosts);
+          }
+        });
+      } catch (e) {
+        console.warn('FeedPosts realtime error:', e);
+      }
+
+      try {
         unsubscribeActivities = onCollectionSnapshot(COLLECTIONS.ACTIVITIES, (activitiesData) => {
           if (Array.isArray(activitiesData) && isMounted) {
             const sortedActivities = mapWithTimestamps(activitiesData).sort((a, b) => {
@@ -635,6 +653,7 @@ export const AdminProvider = ({ children }) => {
       unsubscribeAdmits();
       unsubscribeQuestions();
       unsubscribeNotifs();
+      unsubscribeFeedPosts();
       unsubscribeActivities();
       unsubscribeAuth();
     };
