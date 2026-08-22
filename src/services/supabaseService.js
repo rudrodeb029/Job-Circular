@@ -10,6 +10,7 @@ export const COLLECTIONS = {
   LIVE_EXAMS: 'live_exams',
   QUESTIONS: 'questions',
   USERS: 'users',
+  FEED_POSTS: 'feed_posts',
   APP_CONFIG: 'app_config'
 };
 
@@ -19,7 +20,8 @@ const SHORT_CACHE_COLLECTIONS = [
   COLLECTIONS.JOBS,
   COLLECTIONS.LIVE_EXAMS,
   COLLECTIONS.ADMITS,
-  COLLECTIONS.NOTIFICATIONS
+  COLLECTIONS.NOTIFICATIONS,
+  COLLECTIONS.FEED_POSTS
 ];
 const SHORT_TTL_MINUTES = 60; // 1 Hour
 const DEFAULT_TTL_MINUTES = 1440; // 24 Hours
@@ -98,6 +100,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
     COLLECTIONS.NOTIFICATIONS,
     COLLECTIONS.ADMITS,
     COLLECTIONS.LIVE_EXAMS,
+    COLLECTIONS.FEED_POSTS,
     COLLECTIONS.APP_CONFIG
   ];
 
@@ -110,6 +113,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
         localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
         localStorage.setItem(`cache_time_${col}`, String(Date.now()));
         _sessionRevalidatedCollections.add(col);
+        window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
       }
     }));
     _appInitialized = true;
@@ -148,7 +152,13 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
   // - A manual Pull-to-Refresh is triggered (forceServer)
   // - There is NO cached data at all (first time install)
   // - It's a non-core collection that hasn't been synced this session yet (e.g. specific Questions category)
-  const isCore = [COLLECTIONS.JOBS, COLLECTIONS.NOTIFICATIONS, COLLECTIONS.ADMITS, COLLECTIONS.LIVE_EXAMS].includes(collectionName);
+  const isCore = [
+    COLLECTIONS.JOBS,
+    COLLECTIONS.NOTIFICATIONS,
+    COLLECTIONS.ADMITS,
+    COLLECTIONS.LIVE_EXAMS,
+    COLLECTIONS.FEED_POSTS
+  ].includes(collectionName);
   const needsInitialSync = !cachedData || !_sessionRevalidatedCollections.has(collectionName);
 
   if ((forceServer || needsInitialSync) && navigator.onLine) {
@@ -233,6 +243,10 @@ const TABLE_COLUMNS = {
   [COLLECTIONS.USERS]: [
     'id', 'name', 'phone', 'qualification', 'category', 'location',
     'avatar', 'savedJobs', 'appliedJobs', 'updatedAt'
+  ],
+  [COLLECTIONS.FEED_POSTS]: [
+    'id', 'content', 'contentEn', 'mediaType', 'mediaUrl',
+    'likes', 'createdAt', 'updatedAt'
   ],
   [COLLECTIONS.APP_CONFIG]: [
     'id', 'contactEmail', 'contactPhone', 'whatsappNumber',
@@ -405,6 +419,33 @@ export const deleteDocument = async (collectionName, docId) => {
   } catch (error) {
     console.error(`Error deleting ${collectionName}/${docId}:`, error);
     throw error;
+  }
+};
+
+/**
+ * Atomically increment or decrement the likes counter for a feed post.
+ * @param {string} postId - The feed post ID
+ * @param {number} delta - +1 to like, -1 to unlike
+ */
+export const incrementFeedLike = async (postId, delta = 1) => {
+  try {
+    const { data: current } = await supabase
+      .from('feed_posts')
+      .select('likes')
+      .eq('id', postId)
+      .single();
+    
+    const newLikes = Math.max(0, (current?.likes || 0) + delta);
+    
+    await supabase
+      .from('feed_posts')
+      .update({ likes: newLikes })
+      .eq('id', postId);
+    
+    return newLikes;
+  } catch (err) {
+    console.error('incrementFeedLike error:', err);
+    return null;
   }
 };
 

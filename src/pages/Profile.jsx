@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, ChevronRight } from '../components/Icons';
+import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, ChevronRight, Rss } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
 import { notifications } from '../data/notifications';
@@ -253,6 +253,19 @@ export default function Profile() {
                 <Edit size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
+            </div>
+
+            {/* Feed Action */}
+            <div
+              className="menu-item"
+              onClick={() => navigate('/feed')}
+              style={{ borderBottom: '1px solid var(--border-light)' }}
+            >
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #ec4899, #f43f5e)', color: 'white' }}>
+                <Rss size={13} />
+              </div>
+              <span className="menu-item-label">{isEn ? 'Updates Feed' : 'আপডেট ফিড'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
 

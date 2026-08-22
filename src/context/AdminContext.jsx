@@ -54,6 +54,7 @@ const initialState = {
   admits: getLocalCache(COLLECTIONS.ADMITS),
   questions: getLocalCache(COLLECTIONS.QUESTIONS),
   liveExams: getLocalCache(COLLECTIONS.LIVE_EXAMS),
+  feedPosts: getLocalCache(COLLECTIONS.FEED_POSTS) || [],
   categories: categories,
   adminUser: (() => {
     try {
@@ -441,6 +442,28 @@ const adminReducer = (state, action) => {
       newState.questions = state.questions.filter(p => p.id !== action.payload);
       saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
       return newState;
+    }
+
+    case 'ADD_FEED_POST': {
+      const post = action.payload;
+      setDocument(COLLECTIONS.FEED_POSTS, post.id, post).catch(console.error);
+      newState.feedPosts = [post, ...(newState.feedPosts || state.feedPosts)].sort(sortByCreatedAt);
+      saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
+      break;
+    }
+    case 'UPDATE_FEED_POST': {
+      const updatedPost = action.payload;
+      setDocument(COLLECTIONS.FEED_POSTS, updatedPost.id, updatedPost).catch(console.error);
+      newState.feedPosts = (newState.feedPosts || state.feedPosts).map(p => p.id === updatedPost.id ? updatedPost : p);
+      saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
+      break;
+    }
+    case 'DELETE_FEED_POST': {
+      const deletePostId = action.payload;
+      deleteDocument(COLLECTIONS.FEED_POSTS, deletePostId).catch(console.error);
+      newState.feedPosts = (newState.feedPosts || state.feedPosts).filter(p => p.id !== deletePostId);
+      saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
+      break;
     }
 
     case 'ADMIN_LOGIN':

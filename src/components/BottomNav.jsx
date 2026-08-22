@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, LayoutGrid, Bookmark, Bell, User } from './Icons';
+import { Home, Rss, Bookmark, Bell, User } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
@@ -74,8 +74,8 @@ const BottomNav = () => {
         <Home size={24} />
       </NavLink>
 
-      <NavLink to="/categories" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
-        <LayoutGrid size={24} />
+      <NavLink to="/feed" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+        <Rss size={24} />
       </NavLink>
 
       {/* Raised Middle Button (Saved Circulars) sits exactly in the cutout */}

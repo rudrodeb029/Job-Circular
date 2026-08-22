@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight, Briefcase, Calendar } from './Icons';
+import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight, Briefcase, Calendar, Rss } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsData } from '../data/questionsData';
@@ -299,6 +299,11 @@ export default function AppHeader() {
               <Link to="/home" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Home size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Home' : 'হোম'}</span>
+              </Link>
+
+              <Link to="/feed" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
+                <div className="menu-item-icon"><Rss size={20} /></div>
+                <span className="menu-item-label">{state.language === 'en' ? 'Feed' : 'ফিড'}</span>
               </Link>
 
               <Link to="/all-circulars" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>

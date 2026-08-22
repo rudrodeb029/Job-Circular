@@ -41,6 +41,7 @@ import LiveExamsPage from './pages/LiveExamsPage'
 import LiveExamRoom from './pages/LiveExamRoom'
 import QuestionsHub from './pages/QuestionsHub'
 import CircularWebViewScreen from './pages/CircularWebViewScreen'
+import Feed from './pages/Feed'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -54,6 +55,7 @@ import Statistics from './pages/admin/Statistics'
 import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
 import AiManager from './pages/admin/AiManager'
+import ManageFeed from './pages/admin/ManageFeed'
 
 function App() {
   const { state } = useAppContext()
@@ -183,6 +185,7 @@ function App() {
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="ai-manager" element={<AiManager />} />
+          <Route path="feed" element={<ManageFeed />} />
         </Route>
       </Routes>
     )
@@ -203,6 +206,7 @@ function App() {
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/feed" element={<Feed />} />
           <Route path="/job/:id" element={<JobDetails />} />
           <Route path="/exam-details/:id" element={<ExamDetails />} />
           <Route path="/result-details/:id" element={<ResultDetails />} />

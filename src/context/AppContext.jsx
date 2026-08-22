@@ -24,6 +24,8 @@ const initialState = {
   savedJobs: JSON.parse(localStorage.getItem('savedJobs')) || [],
   appliedJobs: JSON.parse(localStorage.getItem('appliedJobs')) || [],
   readNotifications: JSON.parse(localStorage.getItem('readNotifications')) || [],
+  feedPosts: [],
+  likedPosts: JSON.parse(localStorage.getItem('liked_posts') || '[]'),
   theme: localStorage.getItem('theme_v2') || 'light',
   language: localStorage.getItem('language') || 'bn',
   installTime: localStorage.getItem('installTime') || new Date().toISOString(),
@@ -93,6 +95,17 @@ function appReducer(state, action) {
       };
       localStorage.setItem('readNotifications', JSON.stringify(newState.readNotifications));
       break;
+    case 'SET_FEED_POSTS':
+      return { ...state, feedPosts: action.payload || [] };
+    case 'TOGGLE_LIKE_POST': {
+      const postId = action.payload;
+      const isLiked = state.likedPosts.includes(postId);
+      const newLikedPosts = isLiked
+        ? state.likedPosts.filter(id => id !== postId)
+        : [...state.likedPosts, postId];
+      localStorage.setItem('liked_posts', JSON.stringify(newLikedPosts));
+      return { ...state, likedPosts: newLikedPosts };
+    }
     case 'SET_SEARCH_QUERY':
       return { ...state, searchQuery: action.payload };
     case 'SET_FILTERS':
@@ -132,6 +145,11 @@ export function AppProvider({ children }) {
     document.documentElement.setAttribute('data-theme', state.theme);
     document.documentElement.setAttribute('data-lang', state.language);
 
+    const handleFeedPostsUpdated = (e) => {
+      if (e.detail) dispatch({ type: 'SET_FEED_POSTS', payload: e.detail });
+    };
+    window.addEventListener('feed_posts_updated', handleFeedPostsUpdated);
+
     // Instant Realtime Broadcast Sync (0 DB Egress)
     // Instantly invalidates local cache and notifies candidate components when Admin publishes anything
     const unsubscribe = subscribeToAppUpdates((collectionName) => {
@@ -141,6 +159,7 @@ export function AppProvider({ children }) {
     });
 
     return () => {
+      window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
       if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, [state.theme, state.installTime, state.language]);

@@ -336,3 +336,82 @@ export const RefreshCw = ({ size = 22, color = 'currentColor', className = '' })
     <path d="M8 16H3v5" />
   </svg>
 );
+
+export const Heart = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+
+export const HeartFilled = ({ size = 22, color = '#ef4444', className = '' }) => (
+  <svg style={{ ...iconStyle(size, color), fill: color }} className={className} viewBox="0 0 24 24">
+    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+  </svg>
+);
+
+export const Rss = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M4 11a9 9 0 0 1 9 9" />
+    <path d="M4 4a16 16 0 0 1 16 16" />
+    <circle cx="5" cy="19" r="1" />
+  </svg>
+);
+
+export const PlayCircle = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" />
+    <polygon points="10 8 16 12 10 16 10 8" style={{ fill: color }} />
+  </svg>
+);
+
+export const Video = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18" />
+    <line x1="7" y1="2" x2="7" y2="22" />
+    <line x1="17" y1="2" x2="17" y2="22" />
+    <line x1="2" y1="12" x2="22" y2="12" />
+    <line x1="2" y1="7" x2="7" y2="7" />
+    <line x1="2" y1="17" x2="7" y2="17" />
+    <line x1="17" y1="7" x2="22" y2="7" />
+    <line x1="17" y1="17" x2="22" y2="17" />
+  </svg>
+);
+
+export const ImageIcon = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <circle cx="8.5" cy="8.5" r="1.5" />
+    <polyline points="21 15 16 10 5 21" />
+  </svg>
+);
+
+export const Type = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <polyline points="4 7 4 4 20 4 20 7" />
+    <line x1="9" y1="20" x2="15" y2="20" />
+    <line x1="12" y1="4" x2="12" y2="20" />
+  </svg>
+);
+
+export const Trash2 = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+    <line x1="10" y1="11" x2="10" y2="17" />
+    <line x1="14" y1="11" x2="14" y2="17" />
+  </svg>
+);
+
+export const Edit2 = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+  </svg>
+);
+
+export const Plus = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
