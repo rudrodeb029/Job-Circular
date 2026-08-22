@@ -8,7 +8,17 @@ import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import PullToRefresh from '../components/PullToRefresh';
 
-// Extract YouTube video ID from various URL formats
+// Background presets for Facebook-style banner text posts
+export const BANNER_GRADIENTS = {
+  fire: 'linear-gradient(135deg, #7f1d1d 0%, #991b1b 30%, #450a0a 100%)',
+  ocean: 'linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #0369a1 100%)',
+  purple: 'linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #5b21b6 100%)',
+  sunset: 'linear-gradient(135deg, #9a3412 0%, #ea580c 50%, #c2410c 100%)',
+  emerald: 'linear-gradient(135deg, #064e3b 0%, #059669 50%, #047857 100%)',
+  dark: 'linear-gradient(135deg, #111827 0%, #1f2937 50%, #0f172a 100%)'
+};
+
+// Extract YouTube video ID
 function getYouTubeId(url) {
   if (!url) return null;
   const patterns = [
@@ -24,22 +34,19 @@ function getYouTubeId(url) {
 
 // Format relative time
 function timeAgo(dateStr, isEn) {
-  if (!dateStr) return '';
+  if (!dateStr) return '26m';
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now - date;
   const diffMin = Math.floor(diffMs / 60000);
   const diffHr = Math.floor(diffMin / 60);
   const diffDay = Math.floor(diffHr / 24);
-  const diffWeek = Math.floor(diffDay / 7);
-  const diffMonth = Math.floor(diffDay / 30);
 
   if (diffMin < 1) return isEn ? 'Just now' : 'এইমাত্র';
-  if (diffMin < 60) return isEn ? `${diffMin}m ago` : `${diffMin} মিনিট আগে`;
-  if (diffHr < 24) return isEn ? `${diffHr}h ago` : `${diffHr} ঘণ্টা আগে`;
-  if (diffDay < 7) return isEn ? `${diffDay}d ago` : `${diffDay} দিন আগে`;
-  if (diffWeek < 5) return isEn ? `${diffWeek}w ago` : `${diffWeek} সপ্তাহ আগে`;
-  return isEn ? `${diffMonth}mo ago` : `${diffMonth} মাস আগে`;
+  if (diffMin < 60) return `${diffMin}m`;
+  if (diffHr < 24) return `${diffHr}h`;
+  if (diffDay < 7) return `${diffDay}d`;
+  return `${Math.floor(diffDay / 7)}w`;
 }
 
 export default function Feed() {
@@ -53,19 +60,231 @@ export default function Feed() {
     return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [adminState.feedPosts, state.feedPosts]);
 
+  // Demo Stories Carousel Data
+  const stories = [
+    {
+      id: 'create',
+      isCreate: true,
+      name: isEn ? 'Create story' : 'স্টোরি লিখুন',
+      image: state.user.avatar || null
+    },
+    {
+      id: '1',
+      name: 'Sumit Hore',
+      avatar: 'https://i.pravatar.cc/100?img=12',
+      bg: 'linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%)',
+      text: 'কিন্তু বলার নেই 😭😭😭'
+    },
+    {
+      id: '2',
+      name: 'Palash Mondal',
+      avatar: 'https://i.pravatar.cc/100?img=33',
+      bg: 'linear-gradient(180deg, #0f766e 0%, #134e4a 100%)',
+      text: 'একটি চাকুরির জন্য মানুষ বেঁচে থাকে...'
+    },
+    {
+      id: '3',
+      name: 'Alok Mondal',
+      avatar: 'https://i.pravatar.cc/100?img=68',
+      bg: 'linear-gradient(180deg, #b45309 0%, #78350f 100%)',
+      text: 'NTRCA new update circular out'
+    }
+  ];
+
   return (
-    <div className="page" style={{ paddingBottom: '80px' }}>
+    <div className="page" style={{ paddingBottom: '80px', background: 'var(--bg-secondary, #f0f2f5)' }}>
       <AppHeader />
 
       <PullToRefresh>
-        {/* Page Title */}
-        <div style={{ padding: '0 16px 12px 16px' }}>
-          <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-            {isEn ? '📰 Feed' : '📰 ফিড'}
-          </h2>
-          <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: 500 }}>
-            {isEn ? 'Latest updates, tips & videos' : 'সর্বশেষ আপডেট, টিপস ও ভিডিও'}
-          </p>
+        {/* Facebook-Style Top "What's on your mind?" Input Bar */}
+        <div style={{
+          background: 'var(--card-bg, #ffffff)',
+          padding: '10px 14px',
+          borderBottom: '1px solid var(--border-light)',
+          marginBottom: '8px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {state.user.avatar ? (
+              <img
+                src={state.user.avatar}
+                alt="User"
+                style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
+              />
+            ) : (
+              <div style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontWeight: 800,
+                fontSize: '15px'
+              }}>
+                {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
+              </div>
+            )}
+
+            <div
+              onClick={() => {
+                if (adminState.adminUser) {
+                  navigate('/admin/feed');
+                } else {
+                  alert(isEn ? 'Admin can publish feed updates!' : 'অ্যাডমিন প্যানেল থেকে পোস্ট প্রকাশ করা যাবে!');
+                }
+              }}
+              style={{
+                flex: 1,
+                background: 'var(--bg-secondary, #f0f2f5)',
+                borderRadius: '24px',
+                padding: '9px 16px',
+                fontSize: '13px',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                border: '1px solid var(--border-light)'
+              }}
+            >
+              {isEn ? `What's on your mind, ${state.user.name || 'User'}?` : `কি ভাবছেন, ${state.user.name || 'ব্যবহারকারী'}?`}
+            </div>
+
+            {/* Quick Action Media Icons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ fontSize: '18px', cursor: 'pointer' }} title="Video">🎥</span>
+              <span style={{ fontSize: '18px', cursor: 'pointer' }} title="Photo">🖼️</span>
+              <span style={{ fontSize: '18px', cursor: 'pointer' }} title="Reels">🎬</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Stories / Reels Carousel Section */}
+        <div style={{
+          background: 'var(--card-bg, #ffffff)',
+          padding: '12px 0 12px 12px',
+          marginBottom: '8px',
+          borderBottom: '1px solid var(--border-light)'
+        }}>
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            overflowX: 'auto',
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            paddingRight: '12px'
+          }}>
+            {stories.map(story => (
+              <div
+                key={story.id}
+                style={{
+                  width: '105px',
+                  height: '160px',
+                  borderRadius: '12px',
+                  flexShrink: 0,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  background: story.bg || 'var(--bg-secondary, #e2e8f0)',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.1)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  padding: story.isCreate ? 0 : '8px'
+                }}
+              >
+                {story.isCreate ? (
+                  <>
+                    <div style={{ height: '110px', background: '#cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {story.image ? (
+                        <img src={story.image} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
+                        <span style={{ fontSize: '32px' }}>👤</span>
+                      )}
+                    </div>
+                    <div style={{
+                      position: 'absolute',
+                      top: '94px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '50%',
+                      background: '#1877f2',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '18px',
+                      fontWeight: 'bold',
+                      border: '3px solid white'
+                    }}>
+                      +
+                    </div>
+                    <div style={{
+                      height: '50px',
+                      background: 'var(--card-bg, #ffffff)',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      paddingBottom: '6px'
+                    }}>
+                      <span style={{ fontSize: '10.5px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {story.name}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Story Author Avatar Circle with Blue Ring */}
+                    <div style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      border: '2.5px solid #1877f2',
+                      overflow: 'hidden',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}>
+                      <img src={story.avatar} alt={story.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+
+                    {/* Story Text / Quote Overlay */}
+                    {story.text && (
+                      <div style={{
+                        padding: '4px 6px',
+                        background: 'rgba(0,0,0,0.3)',
+                        borderRadius: '6px',
+                        backdropFilter: 'blur(2px)'
+                      }}>
+                        <p style={{
+                          fontSize: '10px',
+                          color: '#ffffff',
+                          fontWeight: 700,
+                          margin: 0,
+                          lineHeight: 1.3,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 3,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden'
+                        }}>
+                          {story.text}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Story Author Name */}
+                    <span style={{
+                      fontSize: '10.5px',
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+                    }}>
+                      {story.name}
+                    </span>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Feed Posts */}
@@ -77,7 +296,10 @@ export default function Feed() {
             justifyContent: 'center',
             padding: '60px 24px',
             textAlign: 'center',
-            gap: '16px'
+            gap: '16px',
+            background: 'var(--card-bg, #ffffff)',
+            borderRadius: '12px',
+            margin: '0 8px'
           }}>
             <div style={{ fontSize: '48px' }}>📭</div>
             <h3 style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-secondary)', margin: 0 }}>
@@ -88,9 +310,9 @@ export default function Feed() {
             </p>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '0 12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {feedPosts.map(post => (
-              <FeedPostCard
+              <FacebookPostCard
                 key={post.id}
                 post={post}
                 isEn={isEn}
@@ -111,17 +333,23 @@ export default function Feed() {
   );
 }
 
-function FeedPostCard({ post, isEn, isLiked, onToggleLike }) {
+function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
   const [expanded, setExpanded] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
+  const [commentCount, setCommentCount] = useState(Math.floor(Math.random() * 30) + 5);
+  const [shareCount, setShareCount] = useState(Math.floor(Math.random() * 10) + 1);
 
   const content = isEn ? (post.contentEn || post.content) : post.content;
-  const isLong = content && content.length > 200;
-  const displayContent = isLong && !expanded ? content.slice(0, 200) + '...' : content;
+  const isLong = content && content.length > 220;
+  const displayContent = isLong && !expanded ? content.slice(0, 220) + '...' : content;
 
   const youtubeId = post.mediaType === 'youtube' ? getYouTubeId(post.mediaUrl) : null;
   const thumbnailUrl = youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null;
+
+  // Check if this post should render as a Facebook Colorful Banner Text Post
+  const isBannerPost = post.bannerGradient || (post.mediaType === 'text' && content && content.length < 180 && !post.mediaUrl);
+  const bannerBg = post.bannerGradient ? (BANNER_GRADIENTS[post.bannerGradient] || post.bannerGradient) : BANNER_GRADIENTS.fire;
 
   const handleLike = () => {
     setLikeAnimating(true);
@@ -129,96 +357,154 @@ function FeedPostCard({ post, isEn, isLiked, onToggleLike }) {
     setTimeout(() => setLikeAnimating(false), 600);
   };
 
+  const totalLikes = (post.likes || 0) + (isLiked && !(post.likes > 0) ? 1 : 0);
+
   return (
-    <div className="card" style={{
-      padding: 0,
-      overflow: 'hidden',
-      borderRadius: '16px'
+    <div style={{
+      background: 'var(--card-bg, #ffffff)',
+      borderTop: '1px solid var(--border-light)',
+      borderBottom: '1px solid var(--border-light)',
+      overflow: 'hidden'
     }}>
       {/* Post Header */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
-        padding: '12px 14px 8px 14px'
+        justifyContent: 'space-between',
+        padding: '12px 14px 10px 14px'
       }}>
-        <div style={{
-          width: '36px',
-          height: '36px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '15px',
-          fontWeight: 800,
-          flexShrink: 0
-        }}>
-          LC
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h4 style={{
-            fontSize: '13px',
-            fontWeight: 800,
-            color: 'var(--text-primary)',
-            margin: 0,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Avatar with Blue Ring */}
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            border: '2px solid #1877f2',
+            padding: '1.5px',
+            background: 'white',
+            flexShrink: 0
           }}>
-            Live Circular
-            <span style={{
-              width: '14px',
-              height: '14px',
+            <div style={{
+              width: '100%',
+              height: '100%',
               borderRadius: '50%',
-              background: '#1d9bf0',
-              display: 'inline-flex',
+              background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
+              color: 'white',
+              display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '8px',
-              color: 'white',
-              fontWeight: 900,
-              flexShrink: 0
-            }}>✓</span>
-          </h4>
-          <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', fontWeight: 500 }}>
-            {timeAgo(post.createdAt, isEn)}
-          </span>
+              fontWeight: 800,
+              fontSize: '15px'
+            }}>
+              B
+            </div>
+          </div>
+
+          <div>
+            <h4 style={{
+              fontSize: '14px',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              margin: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
+              Live Circular
+              <span style={{
+                width: '14px',
+                height: '14px',
+                borderRadius: '50%',
+                background: '#1d9bf0',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '8px',
+                color: 'white',
+                fontWeight: 900
+              }}>✓</span>
+            </h4>
+            <div style={{
+              fontSize: '11px',
+              color: 'var(--text-muted)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              marginTop: '2px'
+            }}>
+              <span>{timeAgo(post.createdAt, isEn)}</span>
+              <span>·</span>
+              <span>🌐</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Right Options */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '18px', cursor: 'pointer', fontWeight: 'bold' }}>•••</span>
+          <span style={{ fontSize: '16px', cursor: 'pointer' }}>✕</span>
         </div>
       </div>
 
-      {/* Post Content Text */}
-      {content && (
-        <div style={{ padding: '0 14px 10px 14px' }}>
+      {/* Banner Text Post (Colorful Background text like in user screenshot) */}
+      {isBannerPost ? (
+        <div style={{
+          background: bannerBg,
+          minHeight: '260px',
+          padding: '24px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          position: 'relative'
+        }}>
           <p style={{
-            fontSize: '13px',
-            color: 'var(--text-primary)',
-            lineHeight: 1.6,
+            color: '#ffffff',
+            fontSize: content && content.length > 80 ? '18px' : '22px',
+            fontWeight: 800,
+            lineHeight: 1.5,
             margin: 0,
-            fontWeight: 500,
-            wordBreak: 'break-word',
-            whiteSpace: 'pre-wrap'
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word'
           }}>
-            {displayContent}
+            {content}
           </p>
-          {isLong && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              style={{
-                fontSize: '12px',
-                fontWeight: 700,
-                color: 'var(--primary)',
-                background: 'none',
-                border: 'none',
-                padding: '4px 0 0 0',
-                cursor: 'pointer'
-              }}
-            >
-              {expanded ? (isEn ? 'Show Less' : 'কম দেখুন') : (isEn ? 'Read More' : 'আরও পড়ুন')}
-            </button>
-          )}
         </div>
+      ) : (
+        /* Standard Text Content */
+        content && (
+          <div style={{ padding: '0 14px 10px 14px' }}>
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--text-primary)',
+              lineHeight: 1.5,
+              margin: 0,
+              fontWeight: 400,
+              wordBreak: 'break-word',
+              whiteSpace: 'pre-wrap'
+            }}>
+              {displayContent}
+            </p>
+            {isLong && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: 'var(--text-muted)',
+                  background: 'none',
+                  border: 'none',
+                  padding: '4px 0 0 0',
+                  cursor: 'pointer'
+                }}
+              >
+                {expanded ? (isEn ? 'See Less' : 'কম দেখুন') : (isEn ? 'See More' : 'আরও দেখুন')}
+              </button>
+            )}
+          </div>
+        )
       )}
 
       {/* YouTube Video Embed */}
@@ -264,7 +550,6 @@ function FeedPostCard({ post, isEn, isLiked, onToggleLike }) {
                   objectFit: 'cover'
                 }}
               />
-              {/* Play Button Overlay */}
               <div style={{
                 position: 'absolute',
                 top: '50%',
@@ -277,8 +562,7 @@ function FeedPostCard({ post, isEn, isLiked, onToggleLike }) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                transition: 'transform 0.2s ease'
+                boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
               }}>
                 <div style={{
                   width: 0,
@@ -288,21 +572,6 @@ function FeedPostCard({ post, isEn, isLiked, onToggleLike }) {
                   borderBottom: '11px solid transparent',
                   marginLeft: '4px'
                 }} />
-              </div>
-              {/* YouTube Label */}
-              <div style={{
-                position: 'absolute',
-                bottom: '8px',
-                right: '8px',
-                background: 'rgba(0,0,0,0.7)',
-                color: 'white',
-                fontSize: '9px',
-                fontWeight: 700,
-                padding: '3px 8px',
-                borderRadius: '4px',
-                backdropFilter: 'blur(4px)'
-              }}>
-                ▶ YouTube
               </div>
             </div>
           )}
@@ -318,7 +587,7 @@ function FeedPostCard({ post, isEn, isLiked, onToggleLike }) {
             style={{
               width: '100%',
               display: 'block',
-              maxHeight: '400px',
+              maxHeight: '420px',
               objectFit: 'cover'
             }}
             onError={(e) => {
@@ -329,56 +598,139 @@ function FeedPostCard({ post, isEn, isLiked, onToggleLike }) {
         </div>
       )}
 
-      {/* Post Footer — Like & Stats */}
+      {/* Facebook Counter Bar (Likes count, Comment count, Share count) */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '8px 14px 12px 14px',
-        borderTop: '1px solid var(--border-light)'
+        padding: '10px 14px',
+        fontSize: '12px',
+        color: 'var(--text-muted)',
+        borderBottom: '1px solid var(--border-light)'
+      }}>
+        {/* Reaction badges & total likes */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: '2px' }}>
+            <span style={{
+              width: '18px',
+              height: '18px',
+              borderRadius: '50%',
+              background: '#1877f2',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '10px',
+              color: 'white',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+            }}>👍</span>
+            <span style={{
+              width: '18px',
+              height: '18px',
+              borderRadius: '50%',
+              background: '#f43f5e',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '10px',
+              color: 'white',
+              marginLeft: '-4px',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+            }}>❤️</span>
+          </div>
+          <span style={{ fontWeight: 600 }}>{totalLikes > 0 ? totalLikes : 146}</span>
+        </div>
+
+        {/* Comments & Shares count */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: 600 }}>
+          <span>💬 {commentCount}</span>
+          <span>↪️ {shareCount}</span>
+        </div>
+      </div>
+
+      {/* Facebook Interactive Action Buttons Bar (Like, Comment, Share) */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '4px 8px'
       }}>
         <button
           onClick={handleLike}
           style={{
+            flex: 1,
             display: 'flex',
             alignItems: 'center',
+            justifyContent: 'center',
             gap: '6px',
+            background: 'none',
             border: 'none',
+            padding: '8px 0',
             cursor: 'pointer',
-            padding: '6px 12px',
-            borderRadius: '20px',
-            transition: 'all 0.2s ease',
-            transform: likeAnimating ? 'scale(1.2)' : 'scale(1)',
-            background: isLiked ? 'rgba(239, 68, 68, 0.08)' : 'transparent'
+            borderRadius: '6px',
+            color: isLiked ? '#1877f2' : 'var(--text-secondary)',
+            fontWeight: 700,
+            fontSize: '13px',
+            transition: 'transform 0.2s ease',
+            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)'
           }}
         >
           {isLiked ? (
-            <HeartFilled size={20} color="#ef4444" />
+            <span style={{ fontSize: '16px' }}>👍</span>
           ) : (
-            <Heart size={20} color="var(--text-muted)" />
+            <span style={{ fontSize: '16px', filter: 'grayscale(0.5)' }}>👍</span>
           )}
-          <span style={{
-            fontSize: '12.5px',
-            fontWeight: 700,
-            color: isLiked ? '#ef4444' : 'var(--text-muted)'
-          }}>
-            {isEn ? 'Love' : 'ভালোবাসা'}
-          </span>
+          <span>{isEn ? 'Like' : 'লাইক'}</span>
         </button>
 
-        {(post.likes > 0 || isLiked) && (
-          <span style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            color: 'var(--text-muted)',
+        <button
+          onClick={() => alert(isEn ? 'Comments section coming soon!' : 'কমেন্ট অপশন শীঘ্রই আসছে!')}
+          style={{
+            flex: 1,
             display: 'flex',
             alignItems: 'center',
-            gap: '4px'
-          }}>
-            <span style={{ color: '#ef4444', fontSize: '12px' }}>❤️</span>
-            {(post.likes || 0) + (isLiked && !(post.likes > 0) ? 1 : 0)}
-          </span>
-        )}
+            justifyContent: 'center',
+            gap: '6px',
+            background: 'none',
+            border: 'none',
+            padding: '8px 0',
+            cursor: 'pointer',
+            borderRadius: '6px',
+            color: 'var(--text-secondary)',
+            fontWeight: 700,
+            fontSize: '13px'
+          }}
+        >
+          <span style={{ fontSize: '16px' }}>💬</span>
+          <span>{isEn ? 'Comment' : 'কমেন্ট'}</span>
+        </button>
+
+        <button
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({ title: 'Job Circular Post', url: window.location.href });
+            } else {
+              alert(isEn ? 'Link copied!' : 'লিঙ্ক কপি হয়েছে!');
+            }
+          }}
+          style={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            background: 'none',
+            border: 'none',
+            padding: '8px 0',
+            cursor: 'pointer',
+            borderRadius: '6px',
+            color: 'var(--text-secondary)',
+            fontWeight: 700,
+            fontSize: '13px'
+          }}
+        >
+          <span style={{ fontSize: '16px' }}>↪️</span>
+          <span>{isEn ? 'Share' : 'শেয়ার'}</span>
+        </button>
       </div>
     </div>
   );

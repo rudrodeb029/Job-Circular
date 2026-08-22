@@ -28,13 +28,15 @@ export default function ManageFeed() {
   const [content, setContent] = useState('');
   const [contentEn, setContentEn] = useState('');
   const [mediaUrl, setMediaUrl] = useState('');
+  const [bannerGradient, setBannerGradient] = useState(''); // 'fire' | 'ocean' | 'purple' | 'sunset' | 'emerald' | 'dark'
 
   const openCreateModal = () => {
     setEditingPost(null);
-    setMediaType('youtube');
+    setMediaType('text');
     setContent('');
     setContentEn('');
     setMediaUrl('');
+    setBannerGradient('fire');
     setIsModalOpen(true);
   };
 
@@ -44,6 +46,7 @@ export default function ManageFeed() {
     setContent(post.content || '');
     setContentEn(post.contentEn || '');
     setMediaUrl(post.mediaUrl || '');
+    setBannerGradient(post.bannerGradient || '');
     setIsModalOpen(true);
   };
 
@@ -60,6 +63,7 @@ export default function ManageFeed() {
       contentEn: contentEn.trim(),
       mediaType,
       mediaUrl: mediaUrl.trim(),
+      bannerGradient: mediaType === 'text' ? bannerGradient : '',
       likes: editingPost ? editingPost.likes || 0 : 0,
       createdAt: editingPost ? editingPost.createdAt : new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -401,6 +405,43 @@ export default function ManageFeed() {
                       boxSizing: 'border-box'
                     }}
                   />
+                </div>
+              )}
+
+              {mediaType === 'text' && (
+                <div>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>
+                    Facebook Banner Background (ব্যনার ব্যাকগ্রাউন্ড)
+                  </label>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {[
+                      { id: 'fire', name: '🔥 Fire Red', bg: 'linear-gradient(135deg, #7f1d1d, #991b1b)' },
+                      { id: 'ocean', name: '🌊 Ocean Blue', bg: 'linear-gradient(135deg, #0c4a6e, #0284c7)' },
+                      { id: 'purple', name: '💜 Purple', bg: 'linear-gradient(135deg, #4c1d95, #7c3aed)' },
+                      { id: 'sunset', name: '🌅 Sunset', bg: 'linear-gradient(135deg, #9a3412, #ea580c)' },
+                      { id: 'emerald', name: '🌲 Emerald', bg: 'linear-gradient(135deg, #064e3b, #059669)' },
+                      { id: 'dark', name: '🖤 Dark Minimal', bg: 'linear-gradient(135deg, #111827, #1f2937)' },
+                      { id: '', name: '⚪ Standard Text', bg: '#ffffff', textColor: '#000000' }
+                    ].map(g => (
+                      <button
+                        key={g.id}
+                        type="button"
+                        onClick={() => setBannerGradient(g.id)}
+                        style={{
+                          padding: '8px 12px',
+                          borderRadius: '8px',
+                          border: bannerGradient === g.id ? '2.5px solid #2563eb' : '1px solid #cbd5e1',
+                          background: g.bg,
+                          color: g.textColor || '#ffffff',
+                          fontWeight: 700,
+                          fontSize: '11px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {g.name}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
