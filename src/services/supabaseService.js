@@ -431,17 +431,28 @@ export const incrementFeedLike = async (postId, delta = 1) => {
   try {
     const { data: current } = await supabase
       .from('feed_posts')
-      .select('likes')
+      .select('likes, raw_data')
       .eq('id', postId)
       .single();
-    
-    const newLikes = Math.max(0, (current?.likes || 0) + delta);
-    
+
+    const currentLikes = Number(current?.likes) || 0;
+    const newLikes = Math.max(0, currentLikes + delta);
+
+    let rawDataObj = current?.raw_data || {};
+    if (typeof rawDataObj === 'string') {
+      try { rawDataObj = JSON.parse(rawDataObj); } catch(e) { rawDataObj = {}; }
+    }
+    const updatedRawData = { ...rawDataObj, likes: newLikes, updatedAt: new Date().toISOString() };
+
     await supabase
       .from('feed_posts')
-      .update({ likes: newLikes })
+      .update({
+        likes: newLikes,
+        updatedAt: new Date().toISOString(),
+        raw_data: updatedRawData
+      })
       .eq('id', postId);
-    
+
     return newLikes;
   } catch (err) {
     console.error('incrementFeedLike error:', err);

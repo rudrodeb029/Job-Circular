@@ -53,7 +53,7 @@ function timeAgo(dateStr, isEn) {
 export default function Feed() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, dispatch: adminDispatch } = useAdminContext();
   const isEn = state.language === 'en';
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -113,8 +113,15 @@ export default function Feed() {
                 isLiked={state.likedPosts?.includes(post.id)}
                 onToggleLike={() => {
                   const isCurrentlyLiked = state.likedPosts?.includes(post.id);
+                  const delta = isCurrentlyLiked ? -1 : 1;
                   dispatch({ type: 'TOGGLE_LIKE_POST', payload: post.id });
-                  incrementFeedLike(post.id, isCurrentlyLiked ? -1 : 1).catch(console.error);
+                  
+                  // Update post object in state so like count updates immediately
+                  const newLikes = Math.max(0, (Number(post.likes) || 0) + delta);
+                  const updatedPost = { ...post, likes: newLikes };
+                  adminDispatch({ type: 'UPDATE_FEED_POST', payload: updatedPost });
+
+                  incrementFeedLike(post.id, delta).catch(console.error);
                 }}
               />
             ))}
@@ -131,8 +138,6 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
   const [expanded, setExpanded] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
-  const [commentCount, setCommentCount] = useState(Math.floor(Math.random() * 30) + 5);
-  const [shareCount, setShareCount] = useState(Math.floor(Math.random() * 10) + 1);
 
   const content = isEn ? (post.contentEn || post.content) : post.content;
   const isLong = content && content.length > 220;
@@ -151,7 +156,7 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
     setTimeout(() => setLikeAnimating(false), 600);
   };
 
-  const totalLikes = (post.likes || 0) + (isLiked && !(post.likes > 0) ? 1 : 0);
+  const likesCount = Number(post.likes) || 0;
 
   return (
     <div style={{
@@ -417,7 +422,7 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
             👍
           </div>
           <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
-            {totalLikes > 0 ? totalLikes : 2}
+            {likesCount}
           </span>
         </button>
       </div>
