@@ -152,11 +152,6 @@ export default function Profile() {
         <h2 style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
           {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
         </h2>
-        {state.user.phone && (
-          <p style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.75)', fontWeight: 600, margin: '2px 0' }}>
-            {state.user.phone}
-          </p>
-        )}
         {(state.user.qualification || state.user.location) && (
           <p style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 500, margin: '2px 0 6px 0' }}>
             {state.user.qualification} {state.user.qualification && state.user.location && '•'} {state.user.location}
@@ -229,13 +224,6 @@ export default function Profile() {
       <div className="page-content" style={{ padding: '0 20px 80px 20px' }}>
         {/* Section 1: Account & Activity */}
         <div style={{ marginBottom: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
-            <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
-            <h3 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '-0.1px' }}>
-              {isEn ? 'Account & Activity' : 'অ্যাকাউন্ট এবং কার্যক্রম'}
-            </h3>
-          </div>
-
           <div style={{
             background: 'var(--white)',
             borderRadius: '20px',
@@ -300,13 +288,6 @@ export default function Profile() {
 
         {/* Section 2: Preferences & System */}
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', paddingLeft: '4px' }}>
-            <div style={{ width: '3px', height: '13px', borderRadius: '2px', background: 'var(--primary)' }}></div>
-            <h3 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-secondary)', letterSpacing: '-0.1px' }}>
-              {isEn ? 'Preferences & System' : 'পছন্দ এবং সিস্টেম'}
-            </h3>
-          </div>
-
           <div style={{
             background: 'var(--white)',
             borderRadius: '20px',
