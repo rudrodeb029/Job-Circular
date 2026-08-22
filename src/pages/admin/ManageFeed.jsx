@@ -89,18 +89,10 @@ export default function ManageFeed() {
       {/* Header */}
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         alignItems: 'center',
         marginBottom: '24px'
       }}>
-        <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#1e293b', margin: 0 }}>
-            Feed Manager (ফিড ব্যবস্থাপনা)
-          </h1>
-          <p style={{ fontSize: '13px', color: '#64748b', margin: '4px 0 0 0' }}>
-            ইউজার ফিডের পোস্ট তৈরি, সম্পাদনা ও নিয়ন্ত্রণ করুন
-          </p>
-        </div>
         <button
           onClick={openCreateModal}
           style={{
