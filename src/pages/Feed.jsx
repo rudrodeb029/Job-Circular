@@ -392,139 +392,116 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         </div>
       )}
 
-      {/* Facebook Counter Bar (Likes count, Comment count, Share count) */}
+      {/* Facebook Interactive Reaction Footer Bar (Matches Reference Screenshot) */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '10px 14px',
-        fontSize: '12px',
-        color: 'var(--text-muted)',
-        borderBottom: '1px solid var(--border-light)'
+        padding: '8px 14px',
+        background: 'var(--card-bg, #ffffff)',
+        borderTop: '1px solid var(--border-light)'
       }}>
-        {/* Reaction badges & total likes */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', marginRight: '2px' }}>
-            <span style={{
-              width: '18px',
-              height: '18px',
+        {/* Left Side Action Icons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Like Button & Counter Pill [👍 2] */}
+          <button
+            onClick={handleLike}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              background: isLiked ? '#eff6ff' : '#f8fafc',
+              border: isLiked ? '1px solid #93c5fd' : '1px solid #cbd5e1',
+              borderRadius: '20px',
+              padding: '3px 10px 3px 4px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              transform: likeAnimating ? 'scale(1.15)' : 'scale(1)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+            }}
+          >
+            <div style={{
+              width: '20px',
+              height: '20px',
               borderRadius: '50%',
               background: '#1877f2',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '10px',
               color: 'white',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-            }}>👍</span>
-            <span style={{
-              width: '18px',
-              height: '18px',
-              borderRadius: '50%',
-              background: '#f43f5e',
+              fontSize: '11px',
+              fontWeight: 800
+            }}>
+              👍
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
+              {totalLikes > 0 ? totalLikes : 2}
+            </span>
+          </button>
+
+          {/* Comment Icon */}
+          <button
+            onClick={() => alert(isEn ? 'Comments section coming soon!' : 'কমেন্ট অপশন শীঘ্রই আসছে!')}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '6px',
+              color: 'var(--text-secondary)',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '10px',
-              color: 'white',
-              marginLeft: '-4px',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-            }}>❤️</span>
-          </div>
-          <span style={{ fontWeight: 600 }}>{totalLikes > 0 ? totalLikes : 146}</span>
+              alignItems: 'center'
+            }}
+            title={isEn ? 'Comment' : 'কমেন্ট'}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </button>
+
+          {/* Share Icon */}
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: 'Job Circular Post', url: window.location.href });
+              } else {
+                alert(isEn ? 'Link copied!' : 'লিঙ্ক কপি হয়েছে!');
+              }
+            }}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '6px',
+              color: 'var(--text-secondary)',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+            title={isEn ? 'Share' : 'শেয়ার'}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+              <polyline points="16 6 12 2 8 6"></polyline>
+              <line x1="12" y1="2" x2="12" y2="15"></line>
+            </svg>
+          </button>
         </div>
 
-        {/* Comments & Shares count */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontWeight: 600 }}>
-          <span>💬 {commentCount}</span>
-          <span>↪️ {shareCount}</span>
+        {/* Right Side Facebook Blue Circle Badge Icon */}
+        <div style={{
+          width: '22px',
+          height: '22px',
+          borderRadius: '50%',
+          background: '#1877f2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxShadow: '0 1px 4px rgba(24, 119, 242, 0.35)',
+          cursor: 'pointer'
+        }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.891h-2.33v6.988C18.343 21.128 22 16.991 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
         </div>
-      </div>
-
-      {/* Facebook Interactive Action Buttons Bar (Like, Comment, Share) */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '4px 8px'
-      }}>
-        <button
-          onClick={handleLike}
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            background: 'none',
-            border: 'none',
-            padding: '8px 0',
-            cursor: 'pointer',
-            borderRadius: '6px',
-            color: isLiked ? '#1877f2' : 'var(--text-secondary)',
-            fontWeight: 700,
-            fontSize: '13px',
-            transition: 'transform 0.2s ease',
-            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)'
-          }}
-        >
-          {isLiked ? (
-            <span style={{ fontSize: '16px' }}>👍</span>
-          ) : (
-            <span style={{ fontSize: '16px', filter: 'grayscale(0.5)' }}>👍</span>
-          )}
-          <span>{isEn ? 'Like' : 'লাইক'}</span>
-        </button>
-
-        <button
-          onClick={() => alert(isEn ? 'Comments section coming soon!' : 'কমেন্ট অপশন শীঘ্রই আসছে!')}
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            background: 'none',
-            border: 'none',
-            padding: '8px 0',
-            cursor: 'pointer',
-            borderRadius: '6px',
-            color: 'var(--text-secondary)',
-            fontWeight: 700,
-            fontSize: '13px'
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>💬</span>
-          <span>{isEn ? 'Comment' : 'কমেন্ট'}</span>
-        </button>
-
-        <button
-          onClick={() => {
-            if (navigator.share) {
-              navigator.share({ title: 'Job Circular Post', url: window.location.href });
-            } else {
-              alert(isEn ? 'Link copied!' : 'লিঙ্ক কপি হয়েছে!');
-            }
-          }}
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            background: 'none',
-            border: 'none',
-            padding: '8px 0',
-            cursor: 'pointer',
-            borderRadius: '6px',
-            color: 'var(--text-secondary)',
-            fontWeight: 700,
-            fontSize: '13px'
-          }}
-        >
-          <span style={{ fontSize: '16px' }}>↪️</span>
-          <span>{isEn ? 'Share' : 'শেয়ার'}</span>
-        </button>
       </div>
     </div>
   );
