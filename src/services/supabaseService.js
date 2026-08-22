@@ -246,7 +246,7 @@ const TABLE_COLUMNS = {
   ],
   [COLLECTIONS.FEED_POSTS]: [
     'id', 'content', 'contentEn', 'mediaType', 'mediaUrl',
-    'likes', 'createdAt', 'updatedAt'
+    'bannerGradient', 'likes', 'createdAt', 'updatedAt'
   ],
   [COLLECTIONS.APP_CONFIG]: [
     'id', 'contactEmail', 'contactPhone', 'whatsappNumber',

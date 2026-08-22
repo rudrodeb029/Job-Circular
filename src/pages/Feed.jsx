@@ -58,8 +58,10 @@ export default function Feed() {
   const [searchQuery, setSearchQuery] = useState('');
 
   const feedPosts = useMemo(() => {
-    let posts = adminState.feedPosts || state.feedPosts || [];
-    posts = [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const map = new Map();
+    (state.feedPosts || []).forEach(p => map.set(p.id, p));
+    (adminState.feedPosts || []).forEach(p => map.set(p.id, p));
+    let posts = Array.from(map.values()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     if (!searchQuery.trim()) return posts;
     const q = searchQuery.toLowerCase().trim();
     return posts.filter(post => 

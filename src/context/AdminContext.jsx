@@ -447,22 +447,25 @@ const adminReducer = (state, action) => {
     case 'ADD_FEED_POST': {
       const post = action.payload;
       setDocument(COLLECTIONS.FEED_POSTS, post.id, post).catch(console.error);
-      newState.feedPosts = [post, ...(newState.feedPosts || state.feedPosts)].sort(sortByCreatedAt);
+      newState.feedPosts = [post, ...(newState.feedPosts || state.feedPosts || [])].sort(sortByCreatedAt);
       saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
+      window.dispatchEvent(new CustomEvent('feed_posts_updated', { detail: newState.feedPosts }));
       break;
     }
     case 'UPDATE_FEED_POST': {
       const updatedPost = action.payload;
       setDocument(COLLECTIONS.FEED_POSTS, updatedPost.id, updatedPost).catch(console.error);
-      newState.feedPosts = (newState.feedPosts || state.feedPosts).map(p => p.id === updatedPost.id ? updatedPost : p);
+      newState.feedPosts = (newState.feedPosts || state.feedPosts || []).map(p => p.id === updatedPost.id ? updatedPost : p);
       saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
+      window.dispatchEvent(new CustomEvent('feed_posts_updated', { detail: newState.feedPosts }));
       break;
     }
     case 'DELETE_FEED_POST': {
       const deletePostId = action.payload;
       deleteDocument(COLLECTIONS.FEED_POSTS, deletePostId).catch(console.error);
-      newState.feedPosts = (newState.feedPosts || state.feedPosts).filter(p => p.id !== deletePostId);
+      newState.feedPosts = (newState.feedPosts || state.feedPosts || []).filter(p => p.id !== deletePostId);
       saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
+      window.dispatchEvent(new CustomEvent('feed_posts_updated', { detail: newState.feedPosts }));
       break;
     }
 
