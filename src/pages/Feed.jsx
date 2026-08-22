@@ -65,37 +65,50 @@ export default function Feed() {
       <AppHeader />
 
       <PullToRefresh>
-        {/* Facebook-Style Top "What's on your mind?" Input Bar */}
+        {/* Facebook-Style Top Modern "What's on your mind?" Input Bar */}
         <div style={{
           background: 'var(--card-bg, #ffffff)',
-          padding: '10px 14px',
+          padding: '12px 14px',
           borderBottom: '1px solid var(--border-light)',
-          marginBottom: '8px'
+          marginBottom: '8px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            {state.user.avatar ? (
-              <img
-                src={state.user.avatar}
-                alt="User"
-                style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
-              />
-            ) : (
-              <div style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 800,
-                fontSize: '15px'
-              }}>
-                {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
-              </div>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* User Avatar */}
+            <div style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              padding: '1.5px',
+              background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
+              flexShrink: 0,
+              boxShadow: '0 2px 6px rgba(26, 86, 219, 0.2)'
+            }}>
+              {state.user.avatar ? (
+                <img
+                  src={state.user.avatar}
+                  alt="User"
+                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
+                  color: 'white',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 800,
+                  fontSize: '15px'
+                }}>
+                  {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
+                </div>
+              )}
+            </div>
 
+            {/* Modern & Attractive Full-Width Input Search Bar */}
             <div
               onClick={() => {
                 if (adminState.adminUser) {
@@ -107,22 +120,30 @@ export default function Feed() {
               style={{
                 flex: 1,
                 background: 'var(--bg-secondary, #f0f2f5)',
-                borderRadius: '24px',
-                padding: '9px 16px',
+                borderRadius: '30px',
+                padding: '10px 18px',
                 fontSize: '13px',
+                fontWeight: '500',
                 color: 'var(--text-muted)',
                 cursor: 'pointer',
-                border: '1px solid var(--border-light)'
+                border: '1.5px solid var(--border-light)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04)',
+                transition: 'all 0.2s ease'
               }}
             >
-              {isEn ? `What's on your mind, ${state.user.name || 'User'}?` : `কি ভাবছেন, ${state.user.name || 'ব্যবহারকারী'}?`}
-            </div>
-
-            {/* Quick Action Media Icons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '18px', cursor: 'pointer' }} title="Video">🎥</span>
-              <span style={{ fontSize: '18px', cursor: 'pointer' }} title="Photo">🖼️</span>
-              <span style={{ fontSize: '18px', cursor: 'pointer' }} title="Reels">🎬</span>
+              <span style={{ fontSize: '15px', opacity: 0.75 }}>✏️</span>
+              <span style={{
+                color: 'var(--text-secondary)',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
+                {isEn ? `What's on your mind, ${state.user.name || 'Suvro'}?` : `কি ভাবছেন, ${state.user.name || 'Suvro'}?`}
+              </span>
             </div>
           </div>
         </div>
