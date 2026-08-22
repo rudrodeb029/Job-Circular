@@ -58,6 +58,20 @@ CREATE TABLE IF NOT EXISTS public.questions (
     raw_data JSONB DEFAULT '{}'::jsonb
 );
 
+-- FEED POSTS TABLE
+CREATE TABLE IF NOT EXISTS public.feed_posts (
+    id TEXT PRIMARY KEY,
+    content TEXT,
+    "contentEn" TEXT,
+    "mediaType" TEXT,
+    "mediaUrl" TEXT,
+    "bannerGradient" TEXT,
+    likes INTEGER DEFAULT 0,
+    "createdAt" TEXT,
+    "updatedAt" TEXT,
+    raw_data JSONB DEFAULT '{}'::jsonb
+);
+
 -- NOTIFICATIONS TABLE
 CREATE TABLE IF NOT EXISTS public.notifications (
     id TEXT PRIMARY KEY,
@@ -155,6 +169,7 @@ ALTER TABLE public.admits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.app_config ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.feed_posts ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Public read access on jobs" ON public.jobs FOR SELECT USING (true);
 CREATE POLICY "Public insert/update/delete on jobs" ON public.jobs FOR ALL USING (true) WITH CHECK (true);
@@ -180,6 +195,9 @@ CREATE POLICY "Public insert/update/delete on users" ON public.users FOR ALL USI
 CREATE POLICY "Public read access on app_config" ON public.app_config FOR SELECT USING (true);
 CREATE POLICY "Public insert/update/delete on app_config" ON public.app_config FOR ALL USING (true) WITH CHECK (true);
 
+CREATE POLICY "Public read access on feed_posts" ON public.feed_posts FOR SELECT USING (true);
+CREATE POLICY "Public insert/update/delete on feed_posts" ON public.feed_posts FOR ALL USING (true) WITH CHECK (true);
+
 -- 4. Create Indexes for High Performance Queries
 CREATE INDEX IF NOT EXISTS idx_activities_type_examid ON public.activities (type, "examId");
 CREATE INDEX IF NOT EXISTS idx_live_exams_status ON public.live_exams (status);
@@ -194,6 +212,7 @@ BEGIN
   ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
   ALTER PUBLICATION supabase_realtime ADD TABLE public.admits;
   ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.feed_posts;
 EXCEPTION WHEN duplicate_object THEN
   NULL;
 END $$;
