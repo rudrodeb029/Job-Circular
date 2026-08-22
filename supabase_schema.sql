@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS public.feed_posts (
     "mediaUrl" TEXT,
     "bannerGradient" TEXT,
     likes INTEGER DEFAULT 0,
+    comments JSONB DEFAULT '[]'::jsonb,
     "createdAt" TEXT,
     "updatedAt" TEXT,
     raw_data JSONB DEFAULT '{}'::jsonb
