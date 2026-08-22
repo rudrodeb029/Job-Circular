@@ -246,7 +246,7 @@ const TABLE_COLUMNS = {
   ],
   [COLLECTIONS.FEED_POSTS]: [
     'id', 'content', 'contentEn', 'mediaType', 'mediaUrl',
-    'bannerGradient', 'likes', 'createdAt', 'updatedAt'
+    'bannerGradient', 'likes', 'comments', 'createdAt', 'updatedAt'
   ],
   [COLLECTIONS.APP_CONFIG]: [
     'id', 'contactEmail', 'contactPhone', 'whatsappNumber',
@@ -456,6 +456,49 @@ export const incrementFeedLike = async (postId, delta = 1) => {
     return newLikes;
   } catch (err) {
     console.error('incrementFeedLike error:', err);
+    return null;
+  }
+};
+
+/**
+ * Add a comment to a feed post.
+ * @param {string} postId - The feed post ID
+ * @param {object} commentObj - { id, userName, userAvatar, text, createdAt }
+ */
+export const addFeedComment = async (postId, commentObj) => {
+  try {
+    const { data: current } = await supabase
+      .from('feed_posts')
+      .select('comments, raw_data')
+      .eq('id', postId)
+      .single();
+
+    let commentsList = current?.comments || [];
+    if (typeof commentsList === 'string') {
+      try { commentsList = JSON.parse(commentsList); } catch(e) { commentsList = []; }
+    }
+    if (!Array.isArray(commentsList)) commentsList = [];
+
+    const updatedComments = [...commentsList, commentObj];
+
+    let rawDataObj = current?.raw_data || {};
+    if (typeof rawDataObj === 'string') {
+      try { rawDataObj = JSON.parse(rawDataObj); } catch(e) { rawDataObj = {}; }
+    }
+    const updatedRawData = { ...rawDataObj, comments: updatedComments, updatedAt: new Date().toISOString() };
+
+    await supabase
+      .from('feed_posts')
+      .update({
+        comments: updatedComments,
+        updatedAt: new Date().toISOString(),
+        raw_data: updatedRawData
+      })
+      .eq('id', postId);
+
+    return updatedComments;
+  } catch (err) {
+    console.error('addFeedComment error:', err);
     return null;
   }
 };

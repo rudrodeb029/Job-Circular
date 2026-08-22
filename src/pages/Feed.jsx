@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Heart, HeartFilled, Search, X } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
-import { incrementFeedLike } from '../services/supabaseService';
+import { incrementFeedLike, addFeedComment } from '../services/supabaseService';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import PullToRefresh from '../components/PullToRefresh';
@@ -137,9 +137,15 @@ export default function Feed() {
 }
 
 function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
+  const { state: appState } = useAppContext();
+  const { dispatch: adminDispatch } = useAdminContext();
+
   const [expanded, setExpanded] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [localComments, setLocalComments] = useState(Array.isArray(post.comments) ? post.comments : []);
 
   const content = isEn ? (post.contentEn || post.content) : post.content;
   const isLong = content && content.length > 220;
@@ -148,7 +154,6 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
   const youtubeId = post.mediaType === 'youtube' ? getYouTubeId(post.mediaUrl) : null;
   const thumbnailUrl = youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null;
 
-  // Check if this post should render as a Facebook Colorful Banner Text Post
   const isBannerPost = post.bannerGradient || (post.mediaType === 'text' && content && content.length < 180 && !post.mediaUrl);
   const bannerBg = post.bannerGradient ? (BANNER_GRADIENTS[post.bannerGradient] || post.bannerGradient) : BANNER_GRADIENTS.fire;
 
@@ -158,7 +163,30 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
     setTimeout(() => setLikeAnimating(false), 600);
   };
 
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    const newComment = {
+      id: 'c_' + Date.now(),
+      userName: appState.user?.name || (isEn ? 'Candidate User' : 'ইউজার'),
+      userAvatar: appState.user?.avatar || '/app-logo.png',
+      text: commentText.trim(),
+      createdAt: new Date().toISOString()
+    };
+
+    const updatedComments = [...localComments, newComment];
+    setLocalComments(updatedComments);
+    setCommentText('');
+
+    const updatedPost = { ...post, comments: updatedComments };
+    adminDispatch({ type: 'UPDATE_FEED_POST', payload: updatedPost });
+
+    addFeedComment(post.id, newComment).catch(console.error);
+  };
+
   const likesCount = Number(post.likes) || 0;
+  const commentsCount = localComments.length;
 
   return (
     <div style={{
@@ -167,7 +195,6 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
       borderBottom: '1px solid var(--border-light)',
       overflow: 'hidden'
     }}>
-      {/* Post Header */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -175,7 +202,6 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         padding: '12px 14px 10px 14px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Official Live Circular App Logo */}
           <img
             src="/app-logo.png"
             alt="Live Circular Logo"
@@ -231,7 +257,6 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         </div>
       </div>
 
-      {/* Banner Text Post (Colorful Background text like in user screenshot) */}
       {isBannerPost ? (
         <div style={{
           background: bannerBg,
@@ -244,31 +269,26 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
           position: 'relative'
         }}>
           <p style={{
-            color: '#ffffff',
-            fontSize: content && content.length > 80 ? '18px' : '22px',
+            color: 'white',
+            fontSize: content && content.length < 80 ? '22px' : '18px',
             fontWeight: 800,
-            lineHeight: 1.5,
+            lineHeight: 1.45,
             margin: 0,
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-            whiteSpace: 'pre-wrap',
+            textShadow: '0 2px 8px rgba(0,0,0,0.3)',
             wordBreak: 'break-word'
           }}>
             {content}
           </p>
         </div>
       ) : (
-        /* Standard Text Content */
         content && (
-          <div style={{ padding: '0 14px 10px 14px' }}>
+          <div style={{ padding: '4px 14px 10px 14px' }}>
             <p style={{
               fontSize: '14px',
-              color: 'var(--text-primary)',
               lineHeight: 1.5,
+              color: 'var(--text-primary)',
               margin: 0,
-              fontWeight: 400,
-              wordBreak: 'break-word',
-              whiteSpace: 'pre-wrap'
+              whiteSpace: 'pre-line'
             }}>
               {displayContent}
             </p>
@@ -276,29 +296,67 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
               <button
                 onClick={() => setExpanded(!expanded)}
                 style={{
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  color: 'var(--text-muted)',
                   background: 'none',
                   border: 'none',
-                  padding: '4px 0 0 0',
+                  color: 'var(--primary)',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  padding: 0,
+                  marginTop: '4px',
                   cursor: 'pointer'
                 }}
               >
-                {expanded ? (isEn ? 'See Less' : 'কম দেখুন') : (isEn ? 'See More' : 'আরও দেখুন')}
+                {expanded ? (isEn ? 'See less' : 'কম দেখুন') : (isEn ? 'See more' : 'আরও দেখুন')}
               </button>
             )}
           </div>
         )
       )}
 
-      {/* YouTube Video Embed */}
       {post.mediaType === 'youtube' && youtubeId && (
         <div style={{ position: 'relative', width: '100%', background: '#000' }}>
-          {showVideo ? (
-            <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+          {!showVideo ? (
+            <div
+              onClick={() => setShowVideo(true)}
+              style={{
+                position: 'relative',
+                width: '100%',
+                paddingTop: '56.25%',
+                cursor: 'pointer',
+                backgroundImage: `url(${thumbnailUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(0, 0, 0, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 0, 0, 0.9)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 14px rgba(255, 0, 0, 0.5)',
+                  transition: 'transform 0.2s'
+                }}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white" style={{ marginLeft: '3px' }}>
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ position: 'relative', paddingTop: '56.25%', width: '100%' }}>
               <iframe
-                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1&rel=0`}
+                src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`}
                 title="YouTube Video"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
@@ -312,60 +370,12 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
                 }}
               />
             </div>
-          ) : (
-            <div
-              onClick={() => setShowVideo(true)}
-              style={{
-                position: 'relative',
-                paddingBottom: '56.25%',
-                height: 0,
-                cursor: 'pointer',
-                overflow: 'hidden'
-              }}
-            >
-              <img
-                src={thumbnailUrl}
-                alt="Video Thumbnail"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-              />
-              <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                background: 'rgba(255, 0, 0, 0.85)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-              }}>
-                <div style={{
-                  width: 0,
-                  height: 0,
-                  borderLeft: '18px solid white',
-                  borderTop: '11px solid transparent',
-                  borderBottom: '11px solid transparent',
-                  marginLeft: '4px'
-                }} />
-              </div>
-            </div>
           )}
         </div>
       )}
 
-      {/* Image Post */}
       {post.mediaType === 'image' && post.mediaUrl && (
-        <div style={{ width: '100%', overflow: 'hidden' }}>
+        <div style={{ width: '100%', overflow: 'hidden', background: '#f8fafc' }}>
           <img
             src={post.mediaUrl}
             alt="Post"
@@ -383,16 +393,14 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         </div>
       )}
 
-      {/* Reaction Footer Bar */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between',
+        gap: '10px',
         padding: '8px 14px',
         background: 'var(--card-bg, #ffffff)',
         borderTop: '1px solid var(--border-light)'
       }}>
-        {/* Like Button & Counter Pill [👍 2] */}
         <button
           onClick={handleLike}
           style={{
@@ -402,7 +410,7 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
             background: isLiked ? '#eff6ff' : '#f8fafc',
             border: isLiked ? '1px solid #93c5fd' : '1px solid #cbd5e1',
             borderRadius: '20px',
-            padding: '3px 10px 3px 4px',
+            padding: '4px 12px 4px 6px',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
             transform: likeAnimating ? 'scale(1.15)' : 'scale(1)',
@@ -427,7 +435,179 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
             {likesCount}
           </span>
         </button>
+
+        <button
+          onClick={() => setShowComments(!showComments)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: showComments ? '#f1f5f9' : '#f8fafc',
+            border: showComments ? '1px solid #cbd5e1' : '1px solid #cbd5e1',
+            borderRadius: '20px',
+            padding: '4px 12px 4px 6px',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+          }}
+        >
+          <div style={{
+            width: '20px',
+            height: '20px',
+            borderRadius: '50%',
+            background: '#10b981',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '11px',
+            fontWeight: 800
+          }}>
+            💬
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {commentsCount}
+          </span>
+        </button>
       </div>
+
+      {showComments && (
+        <div style={{
+          background: 'var(--bg-secondary, #f8fafc)',
+          borderTop: '1px solid var(--border-light)',
+          padding: '12px 14px 14px 14px'
+        }}>
+          <div style={{
+            fontSize: '13px',
+            fontWeight: 700,
+            color: 'var(--text-secondary)',
+            marginBottom: '10px'
+          }}>
+            {isEn ? `Comments (${commentsCount})` : `মন্তব্যসমূহ (${commentsCount})`}
+          </div>
+
+          {localComments.length === 0 ? (
+            <div style={{
+              fontSize: '12px',
+              color: 'var(--text-muted)',
+              fontStyle: 'italic',
+              marginBottom: '12px',
+              padding: '6px 0'
+            }}>
+              {isEn ? 'Be the first to comment...' : 'প্রথম মন্তব্যটি লিখুন...'}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '12px' }}>
+              {localComments.map((comment, index) => (
+                <div key={comment.id || index} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                  <img
+                    src={comment.userAvatar || '/app-logo.png'}
+                    alt="User"
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      flexShrink: 0,
+                      border: '1px solid var(--border-light)'
+                    }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/app-logo.png';
+                    }}
+                  />
+
+                  <div style={{
+                    background: 'var(--card-bg, #ffffff)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: '14px',
+                    padding: '8px 12px',
+                    maxWidth: '85%'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: '8px',
+                      marginBottom: '2px'
+                    }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                        {comment.userName || (isEn ? 'Candidate User' : 'ইউজার')}
+                      </span>
+                      {comment.createdAt && (
+                        <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                          {timeAgo(comment.createdAt, isEn)}
+                        </span>
+                      )}
+                    </div>
+                    <p style={{ fontSize: '13px', margin: 0, color: 'var(--text-primary)', lineHeight: 1.4 }}>
+                      {comment.text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <form onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img
+              src={appState.user?.avatar || '/app-logo.png'}
+              alt="Me"
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                objectFit: 'cover',
+                flexShrink: 0,
+                border: '1px solid var(--border-light)'
+              }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = '/app-logo.png';
+              }}
+            />
+            <input
+              type="text"
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder={isEn ? 'Write a comment...' : 'একটি মন্তব্য লিখুন...'}
+              style={{
+                flex: 1,
+                background: 'var(--card-bg, #ffffff)',
+                border: '1px solid var(--border-light)',
+                borderRadius: '20px',
+                padding: '8px 14px',
+                fontSize: '13px',
+                color: 'var(--text-primary)',
+                outline: 'none'
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!commentText.trim()}
+              style={{
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                background: commentText.trim() ? 'var(--primary, #1877f2)' : '#cbd5e1',
+                border: 'none',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: commentText.trim() ? 'pointer' : 'default',
+                flexShrink: 0,
+                transition: 'background 0.2s'
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
