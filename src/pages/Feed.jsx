@@ -523,14 +523,15 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
         background: 'var(--card-bg, #ffffff)',
         borderTop: '1px solid var(--border-light)'
       }}>
+        {/* Love Reaction Button & Counter Pill [❤️ 2] */}
         <button
           onClick={handleLike}
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: '6px',
-            background: isLiked ? '#eff6ff' : '#f8fafc',
-            border: isLiked ? '1px solid #93c5fd' : '1px solid #cbd5e1',
+            background: isLiked ? '#fef2f2' : '#f8fafc',
+            border: isLiked ? '1px solid #fca5a5' : '1px solid #cbd5e1',
             borderRadius: '20px',
             padding: '4px 12px 4px 6px',
             cursor: 'pointer',
@@ -543,15 +544,16 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
             width: '20px',
             height: '20px',
             borderRadius: '50%',
-            background: '#1877f2',
+            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             color: 'white',
             fontSize: '11px',
-            fontWeight: 800
+            fontWeight: 800,
+            boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)'
           }}>
-            👍
+            ❤️
           </div>
           <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
             {likesCount}
