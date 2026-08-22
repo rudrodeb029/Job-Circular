@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, HeartFilled } from '../components/Icons';
+import { Heart, HeartFilled, Search, X } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { incrementFeedLike } from '../services/supabaseService';
 import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import PullToRefresh from '../components/PullToRefresh';
+import SearchBar from '../components/SearchBar';
 
 // Background presets for Facebook-style banner text posts
 export const BANNER_GRADIENTS = {
@@ -54,98 +55,37 @@ export default function Feed() {
   const { state, dispatch } = useAppContext();
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
+  const [searchQuery, setSearchQuery] = useState('');
 
   const feedPosts = useMemo(() => {
-    const posts = adminState.feedPosts || state.feedPosts || [];
-    return [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [adminState.feedPosts, state.feedPosts]);
+    let posts = adminState.feedPosts || state.feedPosts || [];
+    posts = [...posts].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (!searchQuery.trim()) return posts;
+    const q = searchQuery.toLowerCase().trim();
+    return posts.filter(post => 
+      (post.content && post.content.toLowerCase().includes(q)) ||
+      (post.contentEn && post.contentEn.toLowerCase().includes(q))
+    );
+  }, [adminState.feedPosts, state.feedPosts, searchQuery]);
 
   return (
     <div className="page" style={{ paddingBottom: '80px', background: 'var(--bg-secondary, #f0f2f5)' }}>
       <AppHeader />
 
       <PullToRefresh>
-        {/* Facebook-Style Top Modern "What's on your mind?" Input Bar */}
+        {/* Standard App Search Bar for Feed Searching */}
         <div style={{
           background: 'var(--card-bg, #ffffff)',
-          padding: '12px 14px',
+          padding: '10px 14px',
           borderBottom: '1px solid var(--border-light)',
           marginBottom: '8px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* User Avatar */}
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              padding: '1.5px',
-              background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
-              flexShrink: 0,
-              boxShadow: '0 2px 6px rgba(26, 86, 219, 0.2)'
-            }}>
-              {state.user.avatar ? (
-                <img
-                  src={state.user.avatar}
-                  alt="User"
-                  style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }}
-                />
-              ) : (
-                <div style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #1a56db 0%, #3b82f6 100%)',
-                  color: 'white',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '15px'
-                }}>
-                  {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
-                </div>
-              )}
-            </div>
-
-            {/* Modern & Attractive Full-Width Input Search Bar */}
-            <div
-              onClick={() => {
-                if (adminState.adminUser) {
-                  navigate('/admin/feed');
-                } else {
-                  alert(isEn ? 'Admin can publish feed updates!' : 'অ্যাডমিন প্যানেল থেকে পোস্ট প্রকাশ করা যাবে!');
-                }
-              }}
-              style={{
-                flex: 1,
-                background: 'var(--bg-secondary, #f0f2f5)',
-                borderRadius: '30px',
-                padding: '10px 18px',
-                fontSize: '13px',
-                fontWeight: '500',
-                color: 'var(--text-muted)',
-                cursor: 'pointer',
-                border: '1.5px solid var(--border-light)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.04)',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <span style={{ fontSize: '15px', opacity: 0.75 }}>✏️</span>
-              <span style={{
-                color: 'var(--text-secondary)',
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis'
-              }}>
-                {isEn ? `What's on your mind, ${state.user.name || 'Suvro'}?` : `কি ভাবছেন, ${state.user.name || 'Suvro'}?`}
-              </span>
-            </div>
-          </div>
+          <SearchBar
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={isEn ? 'Search feed posts...' : 'ফিড পোস্ট খুঁজুন...'}
+          />
         </div>
 
         {/* Feed Posts */}
