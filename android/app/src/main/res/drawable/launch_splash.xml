@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- White background -->
+    <!-- Clean white background -->
     <item>
         <shape android:shape="rectangle">
             <solid android:color="#FFFFFF" />
         </shape>
     </item>
-    <!-- Small centered app icon (80dp x 80dp) -->
+    <!-- Professional centered app icon (108dp x 108dp per Android Material Splash Guidelines) -->
     <item
-        android:width="192dp"
-        android:height="192dp"
+        android:width="108dp"
+        android:height="108dp"
         android:gravity="center">
         <bitmap
             android:gravity="center"
