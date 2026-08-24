@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { getCloudinaryPlaceholder, optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import { getGoogleDriveFileId } from '../utils/mediaUtils';
+import { Eye, Download } from './Icons';
 
 /**
- * Progressive Image Loader Component
- * Supports Cloudinary, Google Drive, and standard URLs.
+ * Robust & Polished Progressive Image Loader Component
+ * Handles Google Drive, Cloudinary, PDFs, and standard URLs with graceful multi-tier fallbacks.
+ * Replaces raw browser broken image alt text with an elegant, polished document card.
  */
 export default function ProgressiveImage({
   src,
@@ -14,54 +16,128 @@ export default function ProgressiveImage({
   onClick,
   onLoad,
   onError,
-  maxWidth = 'none'
+  maxWidth = 'none',
+  objectFit = 'contain',
+  fallbackTitle = '',
+  downloadUrl = ''
 }) {
-  const isCloudinary = src?.includes('cloudinary.com');
   const driveId = getGoogleDriveFileId(src);
+  const isCloudinary = src?.includes('cloudinary.com');
 
-  // Set initial source: Blurry Cloudinary thumbnail OR Google Drive small thumbnail
-  const getInitialSrc = () => {
-    if (isCloudinary) return getCloudinaryPlaceholder(src);
-    if (driveId) return `https://drive.google.com/thumbnail?id=${driveId}&sz=w200`;
-    return src;
+  // Build candidate fallback URLs in priority order
+  const getFallbackCandidates = (urlStr) => {
+    if (!urlStr) return [];
+    const list = [];
+    const id = getGoogleDriveFileId(urlStr);
+
+    if (id) {
+      list.push(`https://drive.google.com/thumbnail?id=${id}&sz=w1600`);
+      list.push(`https://lh3.googleusercontent.com/d/${id}`);
+      list.push(`https://drive.google.com/uc?export=view&id=${id}`);
+    } else if (urlStr.includes('cloudinary.com')) {
+      list.push(optimizeCloudinaryUrl(urlStr));
+      list.push(urlStr.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg'));
+      list.push(urlStr);
+    } else {
+      list.push(urlStr);
+    }
+    return list;
   };
 
-  const [currentSrc, setCurrentSrc] = useState(getInitialSrc());
+  const [candidateIndex, setCandidateIndex] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
+
+  const candidates = getFallbackCandidates(src);
+  const currentUrl = candidates[candidateIndex] || src;
 
   useEffect(() => {
     setIsLoaded(false);
-    const initial = getInitialSrc();
-    setCurrentSrc(initial);
-
-    const img = new Image();
-    let highResUrl = src;
-
-    if (isCloudinary) {
-      highResUrl = optimizeCloudinaryUrl(src);
-    } else if (driveId) {
-      // Use 1600px width for Google Drive - sharp but optimized
-      highResUrl = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
-    }
-
-    img.src = highResUrl;
-    img.onload = () => {
-      setCurrentSrc(highResUrl);
-      setIsLoaded(true);
-      if (onLoad) onLoad();
-    };
-    img.onerror = (err) => {
-      console.warn('ProgressiveImage load failed for:', highResUrl);
-      // Final fallback to the direct Drive view or raw URL if optimization fails
-      if (driveId) {
-        setCurrentSrc(`https://drive.google.com/uc?export=view&id=${driveId}`);
-      } else {
-        setCurrentSrc(src);
-      }
-      setIsLoaded(true); // Stop the "Optimizing" state even if fallback used
-      if (onError) onError(err);
-    };
+    setHasError(false);
+    setCandidateIndex(0);
   }, [src]);
+
+  const handleImageError = () => {
+    if (candidateIndex < candidates.length - 1) {
+      setCandidateIndex(prev => prev + 1);
+    } else {
+      setHasError(true);
+      if (onError) onError();
+    }
+  };
+
+  const handleImageLoad = () => {
+    setIsLoaded(true);
+    setHasError(false);
+    if (onLoad) onLoad();
+  };
+
+  if (hasError || !src) {
+    return (
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '32px 20px',
+        textAlign: 'center',
+        gap: '12px',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)',
+        borderRadius: '16px',
+        border: '1px dashed #bfdbfe',
+        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
+        width: '100%',
+        margin: '8px 0',
+        ...style
+      }} className={className}>
+        <div style={{
+          width: '50px',
+          height: '50px',
+          borderRadius: '14px',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '22px',
+          boxShadow: '0 4px 14px rgba(37, 99, 235, 0.22)'
+        }}>
+          📄
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '320px' }}>
+          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
+            {fallbackTitle || 'অফিসিয়াল নিয়োগ বিজ্ঞপ্তি ডক্যুমেন্ট'}
+          </span>
+          <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.5 }}>
+            অফিসিয়াল বিজ্ঞপ্তি নোটিশ ও শর্তাবলী দেখতে নিচের বাটনে চাপ দিন
+          </span>
+        </div>
+        {downloadUrl && (
+          <a
+            href={downloadUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              marginTop: '4px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              borderRadius: '10px',
+              background: 'var(--primary)',
+              color: 'white',
+              fontSize: '12px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)'
+            }}
+          >
+            <Eye size={14} /> সম্পূর্ণ নোটিশ ফাইল দেখুন
+          </a>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -69,39 +145,57 @@ export default function ProgressiveImage({
       overflow: 'hidden',
       width: '100%',
       maxWidth,
-      background: 'var(--bg-secondary)',
+      background: '#f8fafc',
+      borderRadius: '14px',
       ...style
     }} className={className}>
       <img
-        src={currentSrc}
+        src={currentUrl}
         alt={alt}
         onClick={onClick}
+        onLoad={handleImageLoad}
+        onError={handleImageError}
         style={{
           width: '100%',
-          height: '100%',
-          objectFit: 'cover',
+          height: 'auto',
+          maxHeight: style.maxHeight || '480px',
+          objectFit: objectFit,
           display: 'block',
-          filter: isLoaded ? 'none' : 'blur(8px)',
-          transition: 'filter 0.4s ease-in-out',
-          opacity: 1
+          opacity: isLoaded ? 1 : 0.4,
+          filter: isLoaded ? 'none' : 'blur(4px)',
+          transition: 'opacity 0.3s ease, filter 0.3s ease',
+          cursor: onClick ? 'pointer' : 'default'
         }}
       />
 
       {!isLoaded && (
         <div style={{
           position: 'absolute',
-          top: '10px',
-          right: '10px',
-          background: 'rgba(0,0,0,0.4)',
-          color: 'white',
-          padding: '3px 10px',
-          borderRadius: '20px',
-          fontSize: '9px',
-          fontWeight: 800,
-          backdropFilter: 'blur(4px)',
-          pointerEvents: 'none'
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(248, 250, 252, 0.85)',
+          backdropFilter: 'blur(4px)'
         }}>
-          OPTIMIZING...
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'white',
+            padding: '6px 14px',
+            borderRadius: '20px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            fontSize: '11px',
+            fontWeight: 700,
+            color: 'var(--primary)'
+          }}>
+            <span className="spinner-border spinner-border-sm" style={{ width: '12px', height: '12px', borderWidth: '2px' }}></span>
+            বিজ্ঞপ্তি তথ্য লোড হচ্ছে...
+          </div>
         </div>
       )}
     </div>

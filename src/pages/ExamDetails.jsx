@@ -10,6 +10,7 @@ import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/M
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
+import ProgressiveImage from '../components/ProgressiveImage';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -311,48 +312,15 @@ export default function ExamDetails() {
                 </div>
               </div>
             ) : (
-              <img
+              <ProgressiveImage
                 src={circularImages[activeImageIndex]}
-                alt={`Circular Notice Page ${activeImageIndex + 1}`}
+                alt={`Exam Notice Page ${activeImageIndex + 1}`}
                 onClick={() => setShowFullImage(!showFullImage)}
-                onError={(e) => {
-                  const rawSrc = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || '';
-                  const driveId = getGoogleDriveFileId(rawSrc);
-                  const step = parseInt(e.target.dataset.fallbackStep || '0', 10);
-
-                  if (driveId) {
-                    if (step === 0) {
-                      e.target.dataset.fallbackStep = '1';
-                      e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
-                      return;
-                    }
-                    if (step === 1) {
-                      e.target.dataset.fallbackStep = '2';
-                      e.target.src = `https://drive.google.com/uc?export=view&id=${driveId}`;
-                      return;
-                    }
-                  }
-
-                  if (rawSrc.includes('cloudinary.com') && step === 0) {
-                    e.target.dataset.fallbackStep = '1';
-                    e.target.src = rawSrc.replace(/\/upload\//, '/upload/f_jpg,pg_1/').replace(/\.pdf$/i, '.jpg');
-                    return;
-                  }
-
-                  e.target.onerror = null;
-                  e.target.style.display = 'none';
-                  if (e.target.parentNode) {
-                    e.target.parentNode.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;gap:12px;background:var(--bg-secondary);border-radius:12px;border:1px dashed var(--border-light)"><div style="font-size:32px">📄</div><div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:13.5px;font-weight:800;color:var(--text-secondary)">${state.language === 'en' ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}</span><span style="font-size:11.5px;color:var(--text-muted);font-weight:600">${state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}</span></div></div>`;
-                  }
-                }}
+                fallbackTitle={state.language === 'en' ? 'Exam Notice Document' : 'পরীক্ষার অফিশিয়াল নোটিশ'}
+                downloadUrl={rawImagesList[activeImageIndex] || circularImages[activeImageIndex]}
+                objectFit="contain"
                 style={{
-                  width: '100%',
-                  maxHeight: showFullImage ? 'none' : '380px',
-                  objectFit: 'cover',
-                  objectPosition: 'top',
-                  display: 'block',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease'
+                  maxHeight: showFullImage ? 'none' : '420px'
                 }}
               />
             )}
