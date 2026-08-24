@@ -105,9 +105,6 @@ export default function ProgressiveImage({
           📄
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '320px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)' }}>
-            {fallbackTitle || 'অফিসিয়াল নিয়োগ বিজ্ঞপ্তি ডক্যুমেন্ট'}
-          </span>
           <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.5 }}>
             অফিসিয়াল বিজ্ঞপ্তি নোটিশ ও শর্তাবলী দেখতে নিচের বাটনে চাপ দিন
           </span>
