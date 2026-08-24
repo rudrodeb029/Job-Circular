@@ -6,10 +6,10 @@
             <solid android:color="#FFFFFF" />
         </shape>
     </item>
-    <!-- Professional centered app icon (108dp x 108dp per Android Material Splash Guidelines) -->
+    <!-- Centered app icon with built-in padding -->
     <item
-        android:width="108dp"
-        android:height="108dp"
+        android:width="160dp"
+        android:height="160dp"
         android:gravity="center">
         <bitmap
             android:gravity="center"
