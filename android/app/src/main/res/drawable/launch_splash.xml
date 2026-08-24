@@ -6,10 +6,10 @@
             <solid android:color="#FFFFFF" />
         </shape>
     </item>
-    <!-- Perfectly scaled centered app icon (130dp x 130dp) so top paper and bottom tail are 100% visible and uncropped -->
+    <!-- Professional centered app icon (108dp x 108dp per Android Material Splash Guidelines) -->
     <item
-        android:width="130dp"
-        android:height="130dp"
+        android:width="108dp"
+        android:height="108dp"
         android:gravity="center">
         <bitmap
             android:gravity="center"
