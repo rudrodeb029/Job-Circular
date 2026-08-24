@@ -6,15 +6,12 @@ import { categories } from '../../data/categories';
 export default function AiManager() {
   const { dispatch } = useAdminContext();
 
-  // User's OpenRouter API Key
-  const PROVIDED_KEY = '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';
-
   // Multi-API Configuration
   const [activeProvider, setActiveProvider] = useState(localStorage.getItem('ai_provider') || 'openrouter');
   const [geminiKey, setGeminiKey] = useState(localStorage.getItem('gemini_api_key') || '');
-  const [openRouterKey, setOpenRouterKey] = useState(localStorage.getItem('openrouter_api_key') || PROVIDED_KEY);
+  const [openRouterKey, setOpenRouterKey] = useState(localStorage.getItem('openrouter_api_key') || '');
 
-  // Specific OpenRouter Free Models requested by user
+  // Specific OpenRouter Free Models
   const [selectedModel, setSelectedModel] = useState(localStorage.getItem('openrouter_model') || 'nvidia/nemotron-3-ultra-550b-a55b:free');
   const freeModels = [
     { id: 'nvidia/nemotron-3-ultra-550b-a55b:free', name: 'Nvidia Nemotron 550B (Ultra Free)' },
@@ -31,13 +28,6 @@ export default function AiManager() {
   const [testLoading, setTestLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [status, setStatus] = useState({ type: '', message: '' });
-
-  useEffect(() => {
-    // Auto-save the provided key if not already present
-    if (!localStorage.getItem('openrouter_api_key')) {
-        localStorage.setItem('openrouter_api_key', PROVIDED_KEY);
-    }
-  }, []);
 
   const showStatus = (type, message) => {
     setStatus({ type, message });

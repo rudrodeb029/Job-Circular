@@ -1,6 +1,7 @@
 package com.jobcircular.app;
 
 import android.os.Bundle;
+import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
@@ -11,9 +12,13 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Install SplashScreen compat BEFORE super.onCreate()
+        // This ensures the app icon shows on Android 6-11 as well as Android 12+
+        SplashScreen.installSplashScreen(this);
+
         super.onCreate(savedInstanceState);
 
-        // OneSignal Initialization with verbose debug logging for emulator testing
+        // OneSignal Initialization
         OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
         OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
 

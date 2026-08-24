@@ -17,6 +17,12 @@ export const supabase = createClient(
   {
     global: {
       fetch: async (url, options = {}) => {
+        const customHeaders = {
+          ...(options.headers || {}),
+          'X-App-Client': 'live-circular-android'
+        };
+        const updatedOptions = { ...options, headers: customHeaders };
+
         if (
           SUPABASE_CONFIG.cloudflareProxyUrl &&
           typeof url === 'string' &&
@@ -24,19 +30,18 @@ export const supabase = createClient(
         ) {
           const proxiedUrl = url.replace(SUPABASE_CONFIG.projectUrl, SUPABASE_CONFIG.cloudflareProxyUrl);
           try {
-            const response = await fetch(proxiedUrl, options);
-            // If the worker returns a server error (5xx), fallback to direct Supabase
+            const response = await fetch(proxiedUrl, updatedOptions);
             if (response.status >= 500) {
               console.warn('Cloudflare Worker error, falling back to direct Supabase');
-              return fetch(url, options);
+              return fetch(url, updatedOptions);
             }
             return response;
           } catch (e) {
             console.error('Cloudflare Worker unreachable, falling back to direct Supabase:', e.message);
-            return fetch(url, options);
+            return fetch(url, updatedOptions);
           }
         }
-        return fetch(url, options);
+        return fetch(url, updatedOptions);
       }
     },
     auth: {

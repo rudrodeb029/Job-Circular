@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Base Config: Allow cleartext HTTP for BD Govt & Teletalk job application portals -->
-    <base-config cleartextTrafficPermitted="true">
+    <!-- Base Config: Secure HTTPS enforced by default, trusting system CA certificates -->
+    <base-config cleartextTrafficPermitted="false">
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
         </trust-anchors>
     </base-config>
 
@@ -20,14 +19,13 @@
         </trust-anchors>
     </domain-config>
 
-    <!-- Cleartext & Government Domain Config -->
+    <!-- Cleartext Exceptions for BD Government & Teletalk Legacy Portals -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">teletalk.com.bd</domain>
         <domain includeSubdomains="true">gov.bd</domain>
         <domain includeSubdomains="true">alljobs.com.bd</domain>
         <trust-anchors>
             <certificates src="system" />
-            <certificates src="user" />
         </trust-anchors>
     </domain-config>
 </network-security-config>

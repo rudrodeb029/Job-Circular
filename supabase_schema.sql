@@ -160,8 +160,8 @@ CREATE TABLE IF NOT EXISTS public.app_config (
     raw_data JSONB DEFAULT '{}'::jsonb
 );
 
--- 3. Row Level Security (RLS) Policies
--- Allow public SELECT (read-only for clients) and full access for authorized requests
+-- 3. Row Level Security (RLS) Hardened Security Lock
+-- Read-Only SELECT for public clients (anon_key); write operations restricted to admin auth / validated RPC
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.live_exams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
@@ -172,32 +172,35 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.app_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.feed_posts ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Public read access on jobs" ON public.jobs FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on jobs" ON public.jobs FOR ALL USING (true) WITH CHECK (true);
+-- Clean up any existing legacy policies
+DROP POLICY IF EXISTS "Public insert/update/delete on jobs" ON public.jobs;
+DROP POLICY IF EXISTS "Public insert/update/delete on live_exams" ON public.live_exams;
+DROP POLICY IF EXISTS "Public insert/update/delete on questions" ON public.questions;
+DROP POLICY IF EXISTS "Public insert/update/delete on notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Public insert/update/delete on admits" ON public.admits;
+DROP POLICY IF EXISTS "Public insert/update/delete on activities" ON public.activities;
+DROP POLICY IF EXISTS "Public insert/update/delete on users" ON public.users;
+DROP POLICY IF EXISTS "Public insert/update/delete on app_config" ON public.app_config;
+DROP POLICY IF EXISTS "Public insert/update/delete on feed_posts" ON public.feed_posts;
 
-CREATE POLICY "Public read access on live_exams" ON public.live_exams FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on live_exams" ON public.live_exams FOR ALL USING (true) WITH CHECK (true);
+-- Read-Only Content Locks (Prevent unauthorized modifications/deletions of circulars)
+CREATE POLICY "Public read-only on jobs" ON public.jobs FOR SELECT USING (true);
+CREATE POLICY "Public read-only on live_exams" ON public.live_exams FOR SELECT USING (true);
+CREATE POLICY "Public read-only on questions" ON public.questions FOR SELECT USING (true);
+CREATE POLICY "Public read-only on notifications" ON public.notifications FOR SELECT USING (true);
+CREATE POLICY "Public read-only on admits" ON public.admits FOR SELECT USING (true);
+CREATE POLICY "Public read-only on app_config" ON public.app_config FOR SELECT USING (true);
 
-CREATE POLICY "Public read access on questions" ON public.questions FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on questions" ON public.questions FOR ALL USING (true) WITH CHECK (true);
+-- Interactive Community & Exam Policies
+CREATE POLICY "Public read-only on feed_posts" ON public.feed_posts FOR SELECT USING (true);
+CREATE POLICY "Public update likes and comments on feed_posts" ON public.feed_posts FOR UPDATE USING (true);
 
-CREATE POLICY "Public read access on notifications" ON public.notifications FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on notifications" ON public.notifications FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public read-only on activities" ON public.activities FOR SELECT USING (true);
+CREATE POLICY "Public submit exam scores on activities" ON public.activities FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "Public read access on admits" ON public.admits FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on admits" ON public.admits FOR ALL USING (true) WITH CHECK (true);
-
-CREATE POLICY "Public read access on activities" ON public.activities FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on activities" ON public.activities FOR ALL USING (true) WITH CHECK (true);
-
-CREATE POLICY "Public read access on users" ON public.users FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on users" ON public.users FOR ALL USING (true) WITH CHECK (true);
-
-CREATE POLICY "Public read access on app_config" ON public.app_config FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on app_config" ON public.app_config FOR ALL USING (true) WITH CHECK (true);
-
-CREATE POLICY "Public read access on feed_posts" ON public.feed_posts FOR SELECT USING (true);
-CREATE POLICY "Public insert/update/delete on feed_posts" ON public.feed_posts FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public read users" ON public.users FOR SELECT USING (true);
+CREATE POLICY "Public user profile insert" ON public.users FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public user profile update" ON public.users FOR UPDATE USING (true);
 
 -- 4. Create Indexes for High Performance Queries
 CREATE INDEX IF NOT EXISTS idx_activities_type_examid ON public.activities (type, "examId");

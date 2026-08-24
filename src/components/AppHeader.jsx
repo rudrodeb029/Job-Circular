@@ -227,6 +227,8 @@ export default function AppHeader() {
               width: '280px',
               maxWidth: '85vw',
               background: 'var(--card-bg, #ffffff)',
+              borderRadius: '0 24px 24px 0',
+              overflow: 'hidden',
               boxShadow: '10px 0 35px rgba(0,0,0,0.25)',
               display: 'flex',
               flexDirection: 'column',
