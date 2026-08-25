@@ -269,6 +269,18 @@ const sanitizePayload = (collectionName, docId, data) => {
     }
   }
 
+  // Pack all other properties not mapped to direct columns into raw_data JSONB
+  const rawData = { ...(data.raw_data || {}) };
+  for (const key of Object.keys(data)) {
+    if (!allowed.includes(key) && key !== 'raw_data') {
+      rawData[key] = data[key];
+    }
+  }
+
+  if (Object.keys(rawData).length > 0) {
+    sanitized.raw_data = rawData;
+  }
+
   if (collectionName === COLLECTIONS.JOBS && Array.isArray(sanitized.images)) {
     sanitized.images = sanitized.images.join(', ');
   }

@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   showInExamDate BOOLEAN DEFAULT false,
   showInResult BOOLEAN DEFAULT false,
   isFeatured BOOLEAN DEFAULT false,
+  raw_data JSONB DEFAULT '{}'::jsonb,
   createdAt TIMESTAMPTZ DEFAULT NOW(),
   updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS public.live_exams (
   status TEXT DEFAULT 'scheduled',
   subjects JSONB DEFAULT '[]'::jsonb,
   questions JSONB DEFAULT '[]'::jsonb,
+  raw_data JSONB DEFAULT '{}'::jsonb,
   createdAt TIMESTAMPTZ DEFAULT NOW(),
   updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
@@ -65,6 +67,7 @@ CREATE TABLE IF NOT EXISTS public.questions (
   totalQuestions INTEGER DEFAULT 0,
   durationMinutes INTEGER DEFAULT 60,
   questions JSONB DEFAULT '[]'::jsonb,
+  raw_data JSONB DEFAULT '{}'::jsonb,
   createdAt TIMESTAMPTZ DEFAULT NOW(),
   updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
