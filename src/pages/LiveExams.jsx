@@ -268,7 +268,7 @@ export default function LiveExams() {
             <>
               {filteredExams.map(exam => {
             const status = getExamStatus(exam);
-            const startMs = new Date(exam.startTime).getTime();
+            const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt) || Date.now();
             const result = getExamResult(exam.id);
             const isRegistered = !!registrations[exam.id];
 
@@ -473,38 +473,45 @@ export default function LiveExams() {
                     gap: '8px',
                     border: isCompleted ? (state.theme === 'dark' ? '1px solid rgba(59, 130, 246, 0.15)' : '1px solid #dbeafe') : '1px solid var(--border-light)'
                   }}>
-                    {exam.subjectTopics && exam.subjectTopics.length > 0 ? (
-                      exam.subjectTopics.map((st, idx) => {
-                        const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
-                        const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
-                        const topicsList = Array.isArray(rawTopics) 
-                          ? rawTopics.map(t => safeStringify(t)) 
-                          : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
+                    {(() => {
+                      const activeSubjectTopics = (exam.subjectTopics && exam.subjectTopics.length > 0)
+                        ? exam.subjectTopics
+                        : (Array.isArray(exam.subjects) && exam.subjects.length > 0 ? exam.subjects : null);
 
-                        return (
-                          <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                            <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
-                              {subjText}
-                            </span>
-                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '2px' }}>
-                              {topicsList.map((t, tIdx) => (
-                                <span key={tIdx} style={{
-                                  fontSize: '9.5px',
-                                  fontWeight: 600,
-                                  background: 'var(--white)',
-                                  border: '1px solid var(--border)',
-                                  color: 'var(--text-primary)',
-                                  padding: '2px 7px',
-                                  borderRadius: '5px'
-                                }}>
-                                  {t}
-                                </span>
-                              ))}
+                      if (activeSubjectTopics) {
+                        return activeSubjectTopics.map((st, idx) => {
+                          const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
+                          const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
+                          const topicsList = Array.isArray(rawTopics) 
+                            ? rawTopics.map(t => safeStringify(t)) 
+                            : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
+
+                          return (
+                            <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                              <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.3px', borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
+                                {subjText}
+                              </span>
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', paddingLeft: '2px' }}>
+                                {topicsList.map((t, tIdx) => (
+                                  <span key={tIdx} style={{
+                                    fontSize: '9.5px',
+                                    fontWeight: 600,
+                                    background: 'var(--white)',
+                                    border: '1px solid var(--border)',
+                                    color: 'var(--text-primary)',
+                                    padding: '2px 7px',
+                                    borderRadius: '5px'
+                                  }}>
+                                    {t}
+                                  </span>
+                                ))}
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })
-                    ) : (
+                          );
+                        });
+                      }
+
+                      return (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                         <span style={{ fontSize: '10px', color: theme.accentColor, fontWeight: 700, borderLeft: `2px solid ${theme.accentColor}`, paddingLeft: '6px' }}>
                           {safeStringify(isEn ? (exam.subjectsEn || exam.subjects || 'General') : (exam.subjects || 'সাধারণ'))}
@@ -528,9 +535,10 @@ export default function LiveExams() {
                           ))}
                         </div>
                       </div>
-                    )}
-                  </div>
+                    );
+                  })()}
                 </div>
+              </div>
 
                 {/* Bottom Actions Row */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>

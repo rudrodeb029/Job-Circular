@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS public.live_exams (
   startTime TIMESTAMPTZ,
   endTime TIMESTAMPTZ,
   status TEXT DEFAULT 'scheduled',
+  subjects JSONB DEFAULT '[]'::jsonb,
   questions JSONB DEFAULT '[]'::jsonb,
   createdAt TIMESTAMPTZ DEFAULT NOW(),
   updatedAt TIMESTAMPTZ DEFAULT NOW()
