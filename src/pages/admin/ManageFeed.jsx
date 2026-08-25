@@ -28,6 +28,7 @@ export default function ManageFeed() {
   const [content, setContent] = useState('');
   const [contentEn, setContentEn] = useState('');
   const [mediaUrl, setMediaUrl] = useState('');
+  const [bannerGradient, setBannerGradient] = useState('');
   const [shouldNotify, setShouldNotify] = useState(true);
 
   const openCreateModal = () => {
