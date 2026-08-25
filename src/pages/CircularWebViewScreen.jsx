@@ -312,22 +312,7 @@ export default function CircularWebViewScreen() {
             border: '1px solid var(--border-light, #e2e8f0)',
             boxSizing: 'border-box'
           }}>
-            {/* Warning Icon */}
-            <div style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              backgroundColor: '#fef3c7',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px auto',
-              fontSize: '26px',
-              color: '#d97706',
-              boxShadow: '0 4px 10px rgba(217, 119, 6, 0.1)'
-            }}>
-              ⚠️
-            </div>
+
 
             <h3 style={{
               fontSize: '16px',
