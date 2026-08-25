@@ -456,7 +456,7 @@ const adminReducer = (state, action) => {
 
       if (post.shouldNotify !== false) {
         try {
-          const pushTitle = '📢 লাইভ ফিড আপডেট (Live Feed)';
+          const pushTitle = '📢 লাইভ ফিড আপডেট';
           const pushMsg = post.content
             ? (post.content.length > 90 ? post.content.slice(0, 90) + '...' : post.content)
             : 'লাইভ ফিডে একটি নতুন আপডেট পোস্ট করা হয়েছে। দেখুন এখনই!';

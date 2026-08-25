@@ -320,19 +320,21 @@ export const sendExamCountdownPush = async (exam) => {
 
     let timeMessage;
     if (diffMinutes <= 0) {
-        timeMessage = 'এখনই শুরু হচ্ছে!';
+        timeMessage = 'এখনই';
     } else if (diffMinutes < 60) {
-        timeMessage = `${diffMinutes} মিনিটে শুরু হবে!`;
+        timeMessage = `${diffMinutes} মিনিটে`;
     } else if (examStartTime.toDateString() === today.toDateString()) {
-        timeMessage = `আজ ${startTimeStr} টায় শুরু হবে`;
+        timeMessage = `আজ ${startTimeStr} টায়`;
     } else if (examStartTime.toDateString() === tomorrow.toDateString()) {
-        timeMessage = `আগামীকাল ${startTimeStr} টায় শুরু হবে`;
+        timeMessage = `আগামীকাল ${startTimeStr} টায়`;
     } else {
-        timeMessage = `${examDateStr}, ${startTimeStr} টায় শুরু হবে`;
+        timeMessage = `${examDateStr}, ${startTimeStr} টায়`;
     }
 
     const title = '📢 নতুন লাইভ পরীক্ষা প্রকাশিত!';
-    const message = `${exam.title} — পরীক্ষাটি ${timeMessage} শুরু হবে। অংশ নিতে প্রস্তুত হোন!`;
+    const message = diffMinutes <= 0 
+        ? `${exam.title} — পরীক্ষাটি এখনই শুরু হচ্ছে। অংশ নিতে প্রস্তুত হোন!`
+        : `${exam.title} — পরীক্ষাটি ${timeMessage} শুরু হবে। অংশ নিতে প্রস্তুত হোন!`;
 
     // 1. Send immediate push to all users
     const result = await broadcastPush(title, message, {
