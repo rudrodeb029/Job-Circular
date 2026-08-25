@@ -351,7 +351,7 @@ export default function CircularWebViewScreen() {
             <p style={{
               fontSize: '11px',
               color: 'var(--text-secondary, #64748b)',
-              margin: '0 0 18px 0',
+              margin: '0 0 24px 0',
               lineHeight: 1.55,
               textAlign: 'left'
             }}>
@@ -367,25 +367,6 @@ export default function CircularWebViewScreen() {
                 </>
               )}
             </p>
-
-            {/* Centered URL Box */}
-            <div style={{
-              background: 'var(--bg-secondary, #f8fafc)',
-              border: '1px solid var(--border-light, #e2e8f0)',
-              borderRadius: '12px',
-              padding: '10px 14px',
-              marginBottom: '20px',
-              textAlign: 'center',
-              wordBreak: 'break-all'
-            }}>
-              <span style={{
-                fontSize: '11px',
-                fontWeight: 700,
-                color: '#2563eb'
-              }}>
-                {targetUrl}
-              </span>
-            </div>
 
             {/* Actions Grid (Side-by-Side) */}
             <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
