@@ -73,16 +73,15 @@ export default function Home() {
   const { state } = useAppContext();
   const isEn = state.language === 'en';
   const { state: adminState, loading: adminLoading, refreshData } = useAdminContext();
-  const localJobs = adminState.jobs;
+  const localJobs = adminState.jobs || [];
   const localAdmits = adminState.admits || [];
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(localJobs.length === 0);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 20;
 
   useEffect(() => {
     if (!adminLoading) {
-      const timer = setTimeout(() => setLoading(false), 300);
-      return () => clearTimeout(timer);
+      setLoading(false);
     }
   }, [adminLoading]);
 

@@ -500,12 +500,16 @@ const adminReducer = (state, action) => {
 
 export const AdminProvider = ({ children }) => {
   const [state, dispatch] = useReducer(adminReducer, initialState);
-  const [loading, setLoading] = useState(false);
+  
+  const hasInitialCache = initialState.jobs && initialState.jobs.length > 0;
+  const [loading, setLoading] = useState(!hasInitialCache);
   const [authChecked, setAuthChecked] = useState(false);
 
-  const loadAllData = async (forceServer = true) => {
+  const loadAllData = async (forceServer = true, isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) {
+        setLoading(true);
+      }
 
       const [jobsData, notifsData, admitsData, questionsData, liveExamsData, feedPostsData] = await Promise.all([
         getCollectionCached(COLLECTIONS.JOBS, forceServer),
@@ -566,8 +570,8 @@ export const AdminProvider = ({ children }) => {
       if (isMounted) setAuthChecked(true);
     }, 1200);
 
-    // 2. Initial fetch from server
-    loadAllData(true).catch(console.error);
+    // 2. Initial fetch from server (Background sync if cache exists)
+    loadAllData(true, hasInitialCache).catch(console.error);
 
     // 3. Real-time snapshot listeners (Exclusively activated for Admin Panel, 0 socket load on mobile candidates)
     const isAdminRoute = window.location.pathname.startsWith('/admin');
