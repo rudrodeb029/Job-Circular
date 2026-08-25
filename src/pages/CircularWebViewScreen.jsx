@@ -43,7 +43,7 @@ export default function CircularWebViewScreen() {
   let descriptionText = isEn 
     ? 'Click the button below to fill out the official application form and upload your photo/signature.'
     : 'অফিসিয়াল আবেদন ফরম পূরণ ও ছবি/স্বাক্ষর আপলোড করতে নিচের বাটনে চাপ দিন।';
-  let buttonLabel = isEn ? 'Go to Application Portal' : 'আবেদন পোর্টালে যান';
+  let buttonLabel = isEn ? 'Apply Now' : 'আবেদন করুন';
 
   if (pageType === 'result') {
     descriptionText = isEn 
