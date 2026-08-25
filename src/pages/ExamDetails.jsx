@@ -11,6 +11,7 @@ import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import ProgressiveImage from '../components/ProgressiveImage';
+import PortalWarningModal from '../components/PortalWarningModal';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -39,6 +40,9 @@ export default function ExamDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalUrl, setModalUrl] = useState('');
+  const [modalType, setModalType] = useState('admit_card');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -127,14 +131,9 @@ export default function ExamDetails() {
 
   const handleDownloadAdmitCard = () => {
     const link = job.examLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
-    navigate('/apply-webview', {
-      state: {
-        url: link,
-        title: orgName || titleName || (isEn ? 'Admit Card Download' : 'অ্যাডমিট কার্ড ডাউনলোড'),
-        jobId: job.id,
-        type: 'admit_card'
-      }
-    });
+    setModalUrl(link);
+    setModalType('admit_card');
+    setIsModalOpen(true);
   };
 
   return (
@@ -524,6 +523,12 @@ export default function ExamDetails() {
       </div>
 
       <BottomNav />
+      <PortalWarningModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        url={modalUrl}
+        pageType={modalType}
+      />
     </div>
   );
 }

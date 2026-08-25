@@ -10,6 +10,7 @@ import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/M
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import ProgressiveImage from '../components/ProgressiveImage';
+import PortalWarningModal from '../components/PortalWarningModal';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -39,6 +40,9 @@ export default function ResultDetails() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const isEn = state.language === 'en';
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalUrl, setModalUrl] = useState('');
+  const [modalType, setModalType] = useState('result');
 
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
@@ -112,14 +116,9 @@ export default function ResultDetails() {
 
   const handleViewResult = () => {
     const link = job.examResult || job.applyLink || 'https://alljobs.teletalk.com.bd';
-    navigate('/apply-webview', {
-      state: {
-        url: link,
-        title: orgName || titleName || (isEn ? 'Exam Result Portal' : 'পরীক্ষার ফলাফল পোর্টাল'),
-        jobId: job.id,
-        type: 'result'
-      }
-    });
+    setModalUrl(link);
+    setModalType('result');
+    setIsModalOpen(true);
   };
 
   const handleApplyClick = () => {
@@ -473,6 +472,12 @@ export default function ResultDetails() {
       </div>
 
       <BottomNav />
+      <PortalWarningModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        url={modalUrl}
+        pageType={modalType}
+      />
     </div>
   );
 }

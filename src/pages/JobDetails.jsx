@@ -10,6 +10,7 @@ import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import ProgressiveImage from '../components/ProgressiveImage';
+import PortalWarningModal from '../components/PortalWarningModal';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -20,6 +21,9 @@ export default function JobDetails() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [downloading, setDownloading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalUrl, setModalUrl] = useState('');
+  const [modalType, setModalType] = useState('new_job');
 
   React.useEffect(() => {
     const t = setTimeout(() => setPageLoading(false), 160);
@@ -107,14 +111,12 @@ export default function JobDetails() {
   const handleOfficialApply = (e) => {
     if (e && e.preventDefault) e.preventDefault();
     const link = job.applyLink || job.applicationLink || job.link || job.circularLink || job.url || 'http://alljobs.teletalk.com.bd';
-    navigate('/apply-webview', {
-      state: {
-        url: link,
-        title: orgName || titleName || (isEn ? 'Official Application' : 'সরকারি চাকরির আবেদন'),
-        jobId: job.id,
-        type: 'new_job'
-      }
-    });
+    setModalUrl(link);
+    setModalType('new_job');
+    setIsModalOpen(true);
+    if (!isApplied) {
+      dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
+    }
   };
 
   return (
@@ -590,6 +592,12 @@ export default function JobDetails() {
         )}
       </div>
       <BottomNav />
+      <PortalWarningModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        url={modalUrl}
+        pageType={modalType}
+      />
     </div>
   );
 }

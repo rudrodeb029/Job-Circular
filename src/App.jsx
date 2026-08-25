@@ -40,7 +40,6 @@ import LiveExams from './pages/LiveExams'
 import LiveExamsPage from './pages/LiveExamsPage'
 import LiveExamRoom from './pages/LiveExamRoom'
 import QuestionsHub from './pages/QuestionsHub'
-import CircularWebViewScreen from './pages/CircularWebViewScreen'
 import Feed from './pages/Feed'
 
 // Admin Pages
@@ -233,8 +232,6 @@ function App() {
           <Route path="/live-exams" element={<LiveExams />} />
           <Route path="/live-exams-list" element={<LiveExams />} />
           <Route path="/live-exam-room/:id" element={<LiveExamRoom />} />
-          <Route path="/apply-webview" element={<CircularWebViewScreen />} />
-          <Route path="/webview" element={<CircularWebViewScreen />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <VersionUpdateModal 
