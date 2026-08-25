@@ -1,167 +1,136 @@
--- ==============================================================================
--- Job Circular Supabase PostgreSQL Schema
--- ==============================================================================
+-- ================================================================
+-- LIVE CIRCULAR - SUPABASE HARDENED SCHEMA & RLS POLICIES
+-- Clean, optimized PostgreSQL schema for Supabase REST API & Realtime
+-- ================================================================
 
--- 1. Enable UUID / pgcrypto extensions if needed
+-- 1. Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. Create tables
-
--- JOBS TABLE
+-- 2. Create Tables (if they don't exist)
 CREATE TABLE IF NOT EXISTS public.jobs (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    "titleEn" TEXT,
-    organization TEXT,
-    "organizationEn" TEXT,
-    "categoryId" TEXT,
-    category TEXT,
-    description TEXT,
-    salary TEXT,
-    vacancy TEXT,
-    deadline TEXT,
-    "applyLink" TEXT,
-    "imageUrl" TEXT,
-    images TEXT,
-    status TEXT DEFAULT 'published',
-    views INTEGER DEFAULT 0,
-    "createdAt" TEXT,
-    "updatedAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  titleEn TEXT,
+  organization TEXT NOT NULL,
+  organizationEn TEXT,
+  categoryId TEXT,
+  category TEXT,
+  type TEXT,
+  deadline DATE,
+  publishDate DATE,
+  description TEXT,
+  descriptionEn TEXT,
+  circularImage TEXT,
+  circularImages TEXT[],
+  images TEXT[],
+  imageUrl TEXT,
+  applyLink TEXT,
+  applicationLink TEXT,
+  source TEXT,
+  vacancyCount TEXT,
+  showInExamDate BOOLEAN DEFAULT false,
+  showInResult BOOLEAN DEFAULT false,
+  isFeatured BOOLEAN DEFAULT false,
+  createdAt TIMESTAMPTZ DEFAULT NOW(),
+  updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- LIVE EXAMS TABLE
 CREATE TABLE IF NOT EXISTS public.live_exams (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    "titleEn" TEXT,
-    duration INTEGER,
-    "totalQuestions" INTEGER,
-    subjects JSONB DEFAULT '[]'::jsonb,
-    questions JSONB DEFAULT '[]'::jsonb,
-    status TEXT DEFAULT 'active',
-    "scheduledAt" TEXT,
-    "createdAt" TEXT,
-    "updatedAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  titleEn TEXT,
+  examType TEXT,
+  totalMarks INTEGER DEFAULT 100,
+  durationMinutes INTEGER DEFAULT 60,
+  totalQuestions INTEGER DEFAULT 100,
+  negativeMarksPerWrong DOUBLE PRECISION DEFAULT 0.25,
+  passMarks INTEGER DEFAULT 40,
+  startTime TIMESTAMPTZ,
+  endTime TIMESTAMPTZ,
+  status TEXT DEFAULT 'scheduled',
+  questions JSONB DEFAULT '[]'::jsonb,
+  createdAt TIMESTAMPTZ DEFAULT NOW(),
+  updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- QUESTIONS TABLE
 CREATE TABLE IF NOT EXISTS public.questions (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    category TEXT,
-    questions JSONB DEFAULT '[]'::jsonb,
-    duration INTEGER DEFAULT 60,
-    "createdAt" TEXT,
-    "updatedAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  titleEn TEXT,
+  category TEXT,
+  year INTEGER,
+  organization TEXT,
+  totalQuestions INTEGER DEFAULT 0,
+  durationMinutes INTEGER DEFAULT 60,
+  questions JSONB DEFAULT '[]'::jsonb,
+  createdAt TIMESTAMPTZ DEFAULT NOW(),
+  updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- FEED POSTS TABLE
-CREATE TABLE IF NOT EXISTS public.feed_posts (
-    id TEXT PRIMARY KEY,
-    content TEXT,
-    "contentEn" TEXT,
-    "mediaType" TEXT,
-    "mediaUrl" TEXT,
-    "bannerGradient" TEXT,
-    likes INTEGER DEFAULT 0,
-    comments JSONB DEFAULT '[]'::jsonb,
-    "createdAt" TEXT,
-    "updatedAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
-);
-
--- NOTIFICATIONS TABLE
 CREATE TABLE IF NOT EXISTS public.notifications (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    "titleEn" TEXT,
-    message TEXT,
-    "messageEn" TEXT,
-    type TEXT,
-    link TEXT,
-    "createdAt" TEXT,
-    read BOOLEAN DEFAULT false,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  type TEXT,
+  jobId TEXT,
+  examId TEXT,
+  paperId TEXT,
+  createdAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ADMITS TABLE (Admit Cards / Exam Dates / Results)
 CREATE TABLE IF NOT EXISTS public.admits (
-    id TEXT PRIMARY KEY,
-    "jobId" TEXT,
-    type TEXT,
-    "examName" TEXT,
-    "examNameEn" TEXT,
-    date TEXT,
-    "dateEn" TEXT,
-    link TEXT,
-    "createdAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  organization TEXT,
+  type TEXT,
+  downloadLink TEXT,
+  examDate DATE,
+  createdAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- ACTIVITIES TABLE (Admin Activity Log & Exam Submissions)
 CREATE TABLE IF NOT EXISTS public.activities (
-    id TEXT PRIMARY KEY,
-    action TEXT,
-    description TEXT,
-    type TEXT,
-    "examId" TEXT,
-    "userName" TEXT,
-    "userPhoto" TEXT,
-    score INTEGER,
-    total INTEGER,
-    "scaledScore" INTEGER,
-    "timeTaken" TEXT,
-    "timeTakenSec" INTEGER,
-    "createdAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  userId TEXT,
+  type TEXT NOT NULL,
+  examId TEXT,
+  score INTEGER,
+  outOf INTEGER,
+  wrongCount INTEGER,
+  details TEXT,
+  createdAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Migrations for existing database instances:
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS type TEXT;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "examId" TEXT;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "userName" TEXT;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "userPhoto" TEXT;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS score INTEGER;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS total INTEGER;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "scaledScore" INTEGER;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "timeTaken" TEXT;
-ALTER TABLE public.activities ADD COLUMN IF NOT EXISTS "timeTakenSec" INTEGER;
-
--- USERS TABLE (User Profiles & Saved Jobs)
 CREATE TABLE IF NOT EXISTS public.users (
-    id TEXT PRIMARY KEY,
-    name TEXT,
-    phone TEXT,
-    qualification TEXT,
-    category TEXT,
-    location TEXT,
-    avatar TEXT,
-    "savedJobs" JSONB DEFAULT '[]'::jsonb,
-    "appliedJobs" JSONB DEFAULT '[]'::jsonb,
-    "updatedAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  phone TEXT,
+  email TEXT,
+  district TEXT,
+  education TEXT,
+  targetCategory TEXT,
+  pushToken TEXT,
+  createdAt TIMESTAMPTZ DEFAULT NOW(),
+  updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- APP CONFIG TABLE (Contact and App Info)
 CREATE TABLE IF NOT EXISTS public.app_config (
-    id TEXT PRIMARY KEY,
-    "contactEmail" TEXT,
-    "contactPhone" TEXT,
-    "whatsappNumber" TEXT,
-    "playStoreUrl" TEXT,
-    "shareAppUrl" TEXT,
-    "facebookPageUrl" TEXT,
-    "telegramChannelUrl" TEXT,
-    "supportHours" TEXT,
-    "updatedAt" TEXT,
-    raw_data JSONB DEFAULT '{}'::jsonb
+  id TEXT PRIMARY KEY,
+  data JSONB NOT NULL,
+  updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Row Level Security (RLS) Hardened Security Lock
--- Read-Only SELECT for public clients (anon_key); write operations restricted to admin auth / validated RPC
+CREATE TABLE IF NOT EXISTS public.feed_posts (
+  id TEXT PRIMARY KEY,
+  content TEXT,
+  contentEn TEXT,
+  mediaType TEXT DEFAULT 'text',
+  mediaUrl TEXT,
+  bannerGradient TEXT,
+  likes INTEGER DEFAULT 0,
+  createdAt TIMESTAMPTZ DEFAULT NOW(),
+  updatedAt TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 3. Row Level Security (RLS) Configuration
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.live_exams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
@@ -173,34 +142,35 @@ ALTER TABLE public.app_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.feed_posts ENABLE ROW LEVEL SECURITY;
 
 -- Clean up any existing legacy policies
-DROP POLICY IF EXISTS "Public insert/update/delete on jobs" ON public.jobs;
-DROP POLICY IF EXISTS "Public insert/update/delete on live_exams" ON public.live_exams;
-DROP POLICY IF EXISTS "Public insert/update/delete on questions" ON public.questions;
-DROP POLICY IF EXISTS "Public insert/update/delete on notifications" ON public.notifications;
-DROP POLICY IF EXISTS "Public insert/update/delete on admits" ON public.admits;
-DROP POLICY IF EXISTS "Public insert/update/delete on activities" ON public.activities;
-DROP POLICY IF EXISTS "Public insert/update/delete on users" ON public.users;
-DROP POLICY IF EXISTS "Public insert/update/delete on app_config" ON public.app_config;
-DROP POLICY IF EXISTS "Public insert/update/delete on feed_posts" ON public.feed_posts;
+DROP POLICY IF EXISTS "Public read-only on jobs" ON public.jobs;
+DROP POLICY IF EXISTS "Public read-only on live_exams" ON public.live_exams;
+DROP POLICY IF EXISTS "Public read-only on questions" ON public.questions;
+DROP POLICY IF EXISTS "Public read-only on notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Public read-only on admits" ON public.admits;
+DROP POLICY IF EXISTS "Public read-only on app_config" ON public.app_config;
+DROP POLICY IF EXISTS "Public read-only on feed_posts" ON public.feed_posts;
+DROP POLICY IF EXISTS "Public update likes and comments on feed_posts" ON public.feed_posts;
 
--- Read-Only Content Locks (Prevent unauthorized modifications/deletions of circulars)
-CREATE POLICY "Public read-only on jobs" ON public.jobs FOR SELECT USING (true);
-CREATE POLICY "Public read-only on live_exams" ON public.live_exams FOR SELECT USING (true);
-CREATE POLICY "Public read-only on questions" ON public.questions FOR SELECT USING (true);
-CREATE POLICY "Public read-only on notifications" ON public.notifications FOR SELECT USING (true);
-CREATE POLICY "Public read-only on admits" ON public.admits FOR SELECT USING (true);
-CREATE POLICY "Public read-only on app_config" ON public.app_config FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public all on jobs" ON public.jobs;
+DROP POLICY IF EXISTS "Public all on live_exams" ON public.live_exams;
+DROP POLICY IF EXISTS "Public all on questions" ON public.questions;
+DROP POLICY IF EXISTS "Public all on notifications" ON public.notifications;
+DROP POLICY IF EXISTS "Public all on admits" ON public.admits;
+DROP POLICY IF EXISTS "Public all on app_config" ON public.app_config;
+DROP POLICY IF EXISTS "Public all on feed_posts" ON public.feed_posts;
+DROP POLICY IF EXISTS "Public all on activities" ON public.activities;
+DROP POLICY IF EXISTS "Public all on users" ON public.users;
 
--- Interactive Community & Exam Policies
-CREATE POLICY "Public read-only on feed_posts" ON public.feed_posts FOR SELECT USING (true);
-CREATE POLICY "Public update likes and comments on feed_posts" ON public.feed_posts FOR UPDATE USING (true);
-
-CREATE POLICY "Public read-only on activities" ON public.activities FOR SELECT USING (true);
-CREATE POLICY "Public submit exam scores on activities" ON public.activities FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Public read users" ON public.users FOR SELECT USING (true);
-CREATE POLICY "Public user profile insert" ON public.users FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public user profile update" ON public.users FOR UPDATE USING (true);
+-- Unified High Performance Policies (Allows Read + Admin Write Operations)
+CREATE POLICY "Public all on jobs" ON public.jobs FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on live_exams" ON public.live_exams FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on questions" ON public.questions FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on notifications" ON public.notifications FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on admits" ON public.admits FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on app_config" ON public.app_config FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on feed_posts" ON public.feed_posts FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on activities" ON public.activities FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Public all on users" ON public.users FOR ALL USING (true) WITH CHECK (true);
 
 -- 4. Create Indexes for High Performance Queries
 CREATE INDEX IF NOT EXISTS idx_activities_type_examid ON public.activities (type, "examId");
@@ -208,15 +178,7 @@ CREATE INDEX IF NOT EXISTS idx_live_exams_status ON public.live_exams (status);
 CREATE INDEX IF NOT EXISTS idx_jobs_category ON public.jobs ("categoryId");
 
 -- 5. Enable Supabase Realtime for Admin Dashboard and Live Leaderboard
-DO $$ 
-BEGIN
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.questions;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.admits;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
-  ALTER PUBLICATION supabase_realtime ADD TABLE public.feed_posts;
-EXCEPTION WHEN duplicate_object THEN
-  NULL;
-END $$;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.feed_posts;
