@@ -13,7 +13,6 @@ public class MainActivity extends BridgeActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // Install SplashScreen compat BEFORE super.onCreate()
-        // This ensures the app icon shows on Android 6-11 as well as Android 12+
         SplashScreen.installSplashScreen(this);
 
         super.onCreate(savedInstanceState);
@@ -21,8 +20,16 @@ public class MainActivity extends BridgeActivity {
         // OneSignal Initialization
         OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
         OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
+    }
 
-        // Request push notification permission natively on startup
-        OneSignal.getNotifications().requestPermission(true, Continue.none());
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Request push notification permission when activity window is attached and active across all Android versions
+        try {
+            OneSignal.getNotifications().requestPermission(true, Continue.none());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

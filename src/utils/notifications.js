@@ -8,9 +8,9 @@ const FCM_LEGACY_SERVER_KEY = 'AAAAz8W-I_g:APA91bFv7yZ8_u9-j9_9_9_9_9_9_9_9_9_9_
 export const initializePushNotifications = async () => {
   if (Capacitor.getPlatform() === 'web') return;
 
-  // 1. Create Notification Channel (Required for Android 8+)
   try {
     if (Capacitor.isNativePlatform()) {
+      // 1. Create Notification Channel (Required for Android 8+)
       await LocalNotifications.createChannel({
         id: 'default_channel_id',
         name: 'Default',
@@ -23,9 +23,16 @@ export const initializePushNotifications = async () => {
         lightColor: '#1a56db'
       });
       console.log('Notification channel created via LocalNotifications');
+
+      // 2. Request Notification Permission (Required for Android 13+ API level 33+)
+      const status = await LocalNotifications.checkPermissions();
+      if (status.display !== 'granted') {
+        console.log('Requesting LocalNotifications permission...');
+        await LocalNotifications.requestPermissions();
+      }
     }
   } catch (err) {
-    console.error('Channel creation failed:', err);
+    console.error('Notification setup failed:', err);
   }
 };
 

@@ -149,15 +149,15 @@ export const initializeOneSignal = () => {
             OneSignal.setAppId(appId);
         }
 
-        // DELAYED PERMISSION PROMPT: Prevents "App Not Responding"
+        // Prompt for notification permission shortly after boot
         setTimeout(() => {
             if (OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
                 console.log('OneSignal: Requesting push permission...');
                 OneSignal.Notifications.requestPermission(true).then((accepted) => {
                     console.log('OneSignal: Permission result:', accepted);
-                });
+                }).catch(err => console.warn('OneSignal permission prompt error:', err));
             }
-        }, 8000); // 8 second delay for boot stability
+        }, 1500);
 
         console.log('OneSignal: SDK Initialized');
       } catch (e) {
@@ -169,8 +169,25 @@ export const initializeOneSignal = () => {
   if (window.cordova) {
       document.addEventListener('deviceready', performInit, false);
   } else {
-      setTimeout(performInit, 2000);
+      setTimeout(performInit, 1000);
   }
+};
+
+/**
+ * Manually trigger notification permission prompt anytime (e.g. from Settings or Profile).
+ */
+export const requestPushPermissionNow = async () => {
+  const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+  if (OneSignal && OneSignal.Notifications && typeof OneSignal.Notifications.requestPermission === 'function') {
+    try {
+      const accepted = await OneSignal.Notifications.requestPermission(true);
+      console.log('OneSignal: Manual permission prompt result:', accepted);
+      return accepted;
+    } catch (err) {
+      console.error('OneSignal manual permission error:', err);
+    }
+  }
+  return false;
 };
 
 /**
