@@ -114,9 +114,6 @@ export default function JobDetails() {
     setModalUrl(link);
     setModalType('new_job');
     setIsModalOpen(true);
-    if (!isApplied) {
-      dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
-    }
   };
 
   return (
