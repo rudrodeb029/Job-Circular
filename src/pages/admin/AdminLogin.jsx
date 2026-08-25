@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAdminContext } from '../../context/AdminContext';
 import { auth, googleProvider } from '../../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 
 const AdminLogin = () => {
   const [error, setError] = useState('');
@@ -14,17 +14,46 @@ const AdminLogin = () => {
   const { state: adminState, dispatch, authChecked } = useAdminContext();
   const navigate = useNavigate();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (authChecked && adminState.adminUser) {
       navigate('/admin', { replace: true });
     }
   }, [authChecked, adminState.adminUser, navigate]);
+
+  useEffect(() => {
+    // Check if user is returning from a Google Redirect login
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result && result.user) {
+          const userEmail = (result.user.email || '').toLowerCase().trim();
+          if (userEmail === 'rudrodeb029@gmail.com') {
+            dispatch({
+              type: 'ADMIN_LOGIN',
+              payload: {
+                name: result.user.displayName || 'SuVro Roy',
+                email: 'rudrodeb029@gmail.com',
+                role: 'Super Admin',
+                photoURL: result.user.photoURL || null
+              }
+            });
+            navigate('/admin');
+          } else {
+            auth.signOut();
+            setError(`Unauthorized access (${userEmail}). Only rudrodeb029@gmail.com is authorized.`);
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn('Redirect Result error:', err);
+      });
+  }, [dispatch, navigate]);
 
   const handleGoogleLogin = async () => {
     setError('');
     setLoading(true);
 
     try {
+      // 1. Try signInWithPopup first
       const result = await signInWithPopup(auth, googleProvider);
       const userEmail = (result.user?.email || '').toLowerCase().trim();
 
@@ -47,12 +76,21 @@ const AdminLogin = () => {
       }
     } catch (err) {
       console.error('Google Auth Error:', err);
-      if (err.code === 'auth/popup-closed-by-user') {
-        setError('Google Sign-In popup was closed or blocked by browser. Click the "Passcode Login" tab above to sign in directly!');
+      
+      // 2. If popup is blocked/closed, attempt signInWithRedirect automatically
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
+        try {
+          console.log('Popup blocked/closed. Attempting signInWithRedirect fallback...');
+          await signInWithRedirect(auth, googleProvider);
+          return; // Redirecting...
+        } catch (redirectErr) {
+          console.error('Redirect Auth Error:', redirectErr);
+          setError('Google Sign-In popup was blocked. Please use the Passcode Login tab below!');
+        }
       } else if (err.code === 'auth/configuration-not-found' || err.message?.includes('configuration-not-found')) {
-        setError('Google Sign-In is not enabled in Firebase Console. Click the "Passcode Login" tab above to sign in!');
+        setError('Google Sign-In is not enabled in Firebase Console. Click Passcode Login tab below to sign in!');
       } else if (err.code === 'auth/unauthorized-domain') {
-        setError('Domain not authorized in Firebase Console. Click the "Passcode Login" tab above to sign in!');
+        setError('Domain not authorized in Firebase Console. Click Passcode Login tab below to sign in!');
       } else {
         setError(err.message || 'Authentication failed. Please use Passcode Login tab.');
       }
