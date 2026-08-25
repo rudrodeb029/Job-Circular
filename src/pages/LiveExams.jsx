@@ -398,7 +398,7 @@ export default function LiveExams() {
                   {status === 'upcoming' && (
                     <div style={{
                       display: 'flex',
-                      justify: 'space-between',
+                      justifyContent: 'space-between',
                       alignItems: 'center',
                       background: theme.boxBg,
                       borderRadius: '10px',
