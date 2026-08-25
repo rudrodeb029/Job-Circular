@@ -340,14 +340,23 @@ export default function CircularWebViewScreen() {
             </h3>
 
             <p style={{
-              fontSize: '12px',
+              fontSize: '11px',
               color: 'var(--text-secondary, #64748b)',
               margin: '0 0 18px 0',
-              lineHeight: 1.5
+              lineHeight: 1.55,
+              textAlign: 'left'
             }}>
-              {isEn 
-                ? 'You are about to visit an external website. Please be careful when sharing personal information.' 
-                : 'আপনি অ্যাপ থেকে বের হয়ে একটি বাইরের ওয়েবসাইটে যাচ্ছেন। ব্যক্তিগত তথ্য সতর্কতার সাথে শেয়ার করবেন।'}
+              {isEn ? (
+                <>
+                  You are leaving the app to visit an external website.<br/><br/>
+                  <strong style={{ color: '#dc2626' }}>Disclaimer:</strong> This app is not affiliated with, endorsed by, or representing any government entity. We are not responsible for the content, privacy policies, security, or transactions on the linked portals.
+                </>
+              ) : (
+                <>
+                  আপনি অ্যাপ থেকে বের হয়ে একটি বাইরের ওয়েবসাইটে যাচ্ছেন।<br/><br/>
+                  <strong style={{ color: '#dc2626' }}>ডিসক্লেমার:</strong> এই অ্যাপটি কোনো সরকারি প্রতিষ্ঠানের সাথে জড়িত বা অনুমোদিত নয়। লিঙ্কযুক্ত ওয়েবসাইটের কোনো কনটেন্ট, গোপনীয়তা নীতি, নিরাপত্তা বা লেনদেনের জন্য এই অ্যাপ কর্তৃপক্ষ কোনো দায়ভার গ্রহণ করবে না।
+                </>
+              )}
             </p>
 
             {/* Box with URL & Copy Option */}
