@@ -261,7 +261,7 @@ const TABLE_COLUMNS = {
  */
 const sanitizePayload = (collectionName, docId, data) => {
   const allowed = TABLE_COLUMNS[collectionName] || ['id'];
-  const sanitized = { id: docId, raw_data: { id: docId, ...data } };
+  const sanitized = { id: docId };
 
   for (const key of allowed) {
     if (key !== 'id' && data[key] !== undefined) {
