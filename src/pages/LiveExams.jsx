@@ -64,7 +64,7 @@ export default function LiveExams() {
     if (!exam) return 'completed';
 
     const userResult = getExamResult(exam.id);
-    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt);
     const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
 
     if (startMs) {
@@ -81,6 +81,9 @@ export default function LiveExams() {
 
     if (exam.status === 'completed' || exam.status === 'ended') {
       return 'completed';
+    }
+    if (exam.status === 'scheduled' || exam.status === 'upcoming') {
+      return 'upcoming';
     }
     if (userResult) return 'completed';
     return 'running';
