@@ -56,7 +56,7 @@ export default function LiveExamRoom() {
       }
 
       // Tier 4: Direct Supabase database query by ID
-      if (!match) {
+      if (!match || !Array.isArray(match.questions) || match.questions.length === 0) {
         try {
           const doc = await getDocument(COLLECTIONS.LIVE_EXAMS, targetId, true);
           if (doc) match = doc;

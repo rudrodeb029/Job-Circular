@@ -67,9 +67,12 @@ export const normalizeDoc = (row) => {
  */
 export const getCollection = async (collectionName, forceServer = false) => {
   try {
-    const selectCols = collectionName === COLLECTIONS.QUESTIONS
-      ? 'id, title, category, duration, createdAt, updatedAt, raw_data'
-      : '*';
+    let selectCols = '*';
+    if (collectionName === COLLECTIONS.QUESTIONS) {
+      selectCols = 'id, title, category, duration, createdAt, updatedAt, raw_data';
+    } else if (collectionName === COLLECTIONS.LIVE_EXAMS) {
+      selectCols = 'id, title, titleEn, examType, totalMarks, durationMinutes, totalQuestions, negativeMarksPerWrong, passMarks, scheduledAt, endTime, status, subjects, createdAt, updatedAt, raw_data';
+    }
     let query = supabase.from(collectionName).select(selectCols);
     
     // Add bypass headers if forceServer is true
