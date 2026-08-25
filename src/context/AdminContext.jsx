@@ -536,16 +536,27 @@ export const AdminProvider = ({ children }) => {
     // 1. Real-time Firebase Auth state change listener (First Priority)
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       if (!isMounted) return;
+
+      const savedUserStr = localStorage.getItem('admin_user');
+      let savedUser = null;
+      try {
+        savedUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+      } catch (e) {}
+
       if (user && user.email === 'rudrodeb029@gmail.com') {
         const adminPayload = {
           name: user.displayName || 'Super Admin',
           email: user.email,
           role: 'Super Admin',
+          authMethod: 'google',
           photoURL: user.photoURL || null
         };
         dispatch({ type: 'ADMIN_LOGIN', payload: adminPayload });
       } else if (!user) {
-        dispatch({ type: 'ADMIN_LOGOUT' });
+        // ONLY log out if the current session was not created via local passcode login
+        if (!savedUser || savedUser.authMethod !== 'passcode') {
+          dispatch({ type: 'ADMIN_LOGOUT' });
+        }
       }
       setAuthChecked(true);
     });

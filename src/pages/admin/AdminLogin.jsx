@@ -111,6 +111,7 @@ const AdminLogin = () => {
         name: 'SuVro Roy (Super Admin)',
         email: 'rudrodeb029@gmail.com',
         role: 'Super Admin',
+        authMethod: 'passcode',
         photoURL: null
       };
       dispatch({ 
