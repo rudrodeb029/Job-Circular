@@ -1,6 +1,7 @@
 -- ================================================================
 -- LIVE CIRCULAR - SUPABASE HARDENED SCHEMA & RLS POLICIES
 -- Clean, optimized PostgreSQL schema for Supabase REST API & Realtime
+-- Authorized Admin: rudrodeb029@gmail.com
 -- ================================================================
 
 -- 1. Enable UUID extension
@@ -130,7 +131,7 @@ CREATE TABLE IF NOT EXISTS public.feed_posts (
   updatedAt TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Row Level Security (RLS) Configuration
+-- 3. Enable Row Level Security (RLS)
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.live_exams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
@@ -141,7 +142,7 @@ ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.app_config ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.feed_posts ENABLE ROW LEVEL SECURITY;
 
--- Clean up any existing legacy policies
+-- 4. Clean up any existing legacy restrictive policies
 DROP POLICY IF EXISTS "Public read-only on jobs" ON public.jobs;
 DROP POLICY IF EXISTS "Public read-only on live_exams" ON public.live_exams;
 DROP POLICY IF EXISTS "Public read-only on questions" ON public.questions;
@@ -161,7 +162,7 @@ DROP POLICY IF EXISTS "Public all on feed_posts" ON public.feed_posts;
 DROP POLICY IF EXISTS "Public all on activities" ON public.activities;
 DROP POLICY IF EXISTS "Public all on users" ON public.users;
 
--- Unified High Performance Policies (Allows Read + Admin Write Operations)
+-- 5. Full Operational Policies (Read + Write Access for App and Admin)
 CREATE POLICY "Public all on jobs" ON public.jobs FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public all on live_exams" ON public.live_exams FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public all on questions" ON public.questions FOR ALL USING (true) WITH CHECK (true);
@@ -172,13 +173,39 @@ CREATE POLICY "Public all on feed_posts" ON public.feed_posts FOR ALL USING (tru
 CREATE POLICY "Public all on activities" ON public.activities FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Public all on users" ON public.users FOR ALL USING (true) WITH CHECK (true);
 
--- 4. Create Indexes for High Performance Queries
+-- 6. High-Performance Database Indexes
 CREATE INDEX IF NOT EXISTS idx_activities_type_examid ON public.activities (type, "examId");
 CREATE INDEX IF NOT EXISTS idx_live_exams_status ON public.live_exams (status);
 CREATE INDEX IF NOT EXISTS idx_jobs_category ON public.jobs ("categoryId");
 
--- 5. Enable Supabase Realtime for Admin Dashboard and Live Leaderboard
-ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.feed_posts;
+-- 7. Enable Supabase Realtime Broadcasts (Safe Idempotent Check)
+DO $$ 
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'jobs'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'live_exams'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'activities'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'feed_posts'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.feed_posts;
+  END IF;
+END $$;
