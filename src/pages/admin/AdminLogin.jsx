@@ -48,11 +48,13 @@ const AdminLogin = () => {
     } catch (err) {
       console.error('Google Auth Error:', err);
       if (err.code === 'auth/popup-closed-by-user') {
-        setError('Login cancelled by user.');
+        setError('Google Sign-In popup was closed or blocked by browser. Click the "Passcode Login" tab above to sign in directly!');
       } else if (err.code === 'auth/configuration-not-found' || err.message?.includes('configuration-not-found')) {
-        setError('Google Sign-In is not enabled in Firebase Console. Please use Admin Password login below or enable Google Provider in Firebase.');
+        setError('Google Sign-In is not enabled in Firebase Console. Click the "Passcode Login" tab above to sign in!');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError('Domain not authorized in Firebase Console. Click the "Passcode Login" tab above to sign in!');
       } else {
-        setError(err.message || 'Authentication failed. Try password login below.');
+        setError(err.message || 'Authentication failed. Please use Passcode Login tab.');
       }
       setLoading(false);
     }
