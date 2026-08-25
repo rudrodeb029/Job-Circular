@@ -403,7 +403,7 @@ export default function CircularWebViewScreen() {
                   boxShadow: '0 4px 12px rgba(29, 78, 216, 0.2)'
                 }}
               >
-                {isEn ? 'Go to Website' : 'ওয়েবসাইটে যান'}
+                {buttonLabel}
               </button>
             </div>
           </div>
