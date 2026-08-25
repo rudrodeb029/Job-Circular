@@ -310,15 +310,39 @@ export default function CircularWebViewScreen() {
             textAlign: 'center',
             animation: 'scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
             border: '1px solid var(--border-light, #e2e8f0)',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            position: 'relative'
           }}>
-
+            {/* Top-Right Close Button */}
+            <button
+              onClick={() => setShowWarningModal(false)}
+              style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary, #64748b)',
+                fontSize: '18px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                width: '28px',
+                height: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                lineHeight: 1
+              }}
+            >
+              ✕
+            </button>
 
             <h3 style={{
               fontSize: '16px',
               fontWeight: 800,
               color: 'var(--text-primary, #0f172a)',
-              margin: '0 0 8px 0',
+              margin: '0 0 12px 0',
               lineHeight: 1.4
             }}>
               {isEn ? 'Security Warning' : 'সতর্কবার্তা'}
@@ -344,55 +368,49 @@ export default function CircularWebViewScreen() {
               )}
             </p>
 
-            {/* Box with URL & Copy Option */}
+            {/* Centered URL Box */}
             <div style={{
               background: 'var(--bg-secondary, #f8fafc)',
               border: '1px solid var(--border-light, #e2e8f0)',
               borderRadius: '12px',
-              padding: '8px 12px',
+              padding: '10px 14px',
               marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: '8px'
+              textAlign: 'center',
+              wordBreak: 'break-all'
             }}>
               <span style={{
                 fontSize: '11px',
                 fontWeight: 700,
-                color: '#2563eb',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                textAlign: 'left',
-                flex: 1
+                color: '#2563eb'
               }}>
                 {targetUrl}
               </span>
+            </div>
+
+            {/* Actions Grid (Side-by-Side) */}
+            <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
               <button
                 onClick={copyLink}
                 style={{
-                  background: copied ? '#d1fae5' : 'var(--bg-primary, #ffffff)',
+                  flex: 1,
+                  padding: '12px',
+                  borderRadius: '12px',
+                  border: '1.5px solid #2563eb',
+                  background: copied ? '#ecfdf5' : 'var(--bg-primary, #ffffff)',
                   color: copied ? '#065f46' : '#2563eb',
-                  border: '1px solid #2563eb',
-                  borderRadius: '8px',
-                  padding: '4px 10px',
-                  fontSize: '10px',
                   fontWeight: 800,
+                  fontSize: '13px',
                   cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  flexShrink: 0
+                  transition: 'all 0.15s ease'
                 }}
               >
-                {copied ? (isEn ? 'Copied' : 'কপি হয়েছে') : (isEn ? 'Copy' : 'লিংক কপি')}
+                {copied ? (isEn ? 'Copied' : 'কপি হয়েছে') : (isEn ? 'Copy Link' : 'লিংক কপি')}
               </button>
-            </div>
 
-            {/* Actions Grid */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button
                 onClick={proceedToPortal}
                 style={{
-                  width: '100%',
+                  flex: 1,
                   padding: '12px',
                   borderRadius: '12px',
                   border: 'none',
@@ -405,24 +423,6 @@ export default function CircularWebViewScreen() {
                 }}
               >
                 {isEn ? 'Go to Website' : 'ওয়েবসাইটে যান'}
-              </button>
-              
-              <button
-                onClick={() => setShowWarningModal(false)}
-                style={{
-                  width: '100%',
-                  padding: '11px',
-                  borderRadius: '12px',
-                  border: '1.5px solid var(--border-light, #e2e8f0)',
-                  background: 'transparent',
-                  color: 'var(--text-secondary, #64748b)',
-                  fontWeight: 800,
-                  fontSize: '13px',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {isEn ? 'Cancel' : 'বাতিল'}
               </button>
             </div>
           </div>
