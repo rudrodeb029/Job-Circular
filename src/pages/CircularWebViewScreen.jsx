@@ -69,6 +69,32 @@ export default function CircularWebViewScreen() {
   }
 
   const [loading, setLoading] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(targetUrl);
+      } else {
+        const el = document.createElement('textarea');
+        el.value = targetUrl;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      console.warn('Clipboard copy failed:', e);
+    }
+  };
+
+  const proceedToPortal = () => {
+    setShowWarningModal(false);
+    openPortal();
+  };
 
   // Opens the circular application link in Chrome Tab / Native In-App Browser
   const openPortal = async () => {
@@ -121,7 +147,7 @@ export default function CircularWebViewScreen() {
 
         {/* Chrome-Style Rounded URL Address Bar (Clickable) */}
         <div
-          onClick={openPortal}
+          onClick={() => setShowWarningModal(true)}
           style={{
             flex: 1,
             display: 'flex',
@@ -156,10 +182,10 @@ export default function CircularWebViewScreen() {
 
         {/* Action Buttons: Refresh & External Browser */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '2px', flexShrink: 0 }}>
-          <button className="back-btn" onClick={openPortal} title="Reload Portal">
+          <button className="back-btn" onClick={() => setShowWarningModal(true)} title="Reload Portal">
             <RefreshCw size={19} />
           </button>
-          <button className="back-btn" onClick={openPortal} title="Open Portal">
+          <button className="back-btn" onClick={() => setShowWarningModal(true)} title="Open Portal">
             <ExternalLink size={19} />
           </button>
         </div>
@@ -220,7 +246,7 @@ export default function CircularWebViewScreen() {
         </div>
 
         <button
-          onClick={openPortal}
+          onClick={() => setShowWarningModal(true)}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -246,6 +272,168 @@ export default function CircularWebViewScreen() {
           {!loading && <ExternalLink size={15} />}
         </button>
       </div>
+
+      {/* Modern Polish Warning Modal Overlay */}
+      {showWarningModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(6px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000,
+          padding: '20px',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <style>{`
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes scaleIn {
+              from { transform: scale(0.93); opacity: 0; }
+              to { transform: scale(1); opacity: 1; }
+            }
+          `}</style>
+          <div style={{
+            background: 'var(--bg-primary, #ffffff)',
+            borderRadius: '24px',
+            padding: '24px',
+            width: '100%',
+            maxWidth: '340px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            textAlign: 'center',
+            animation: 'scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            border: '1px solid var(--border-light, #e2e8f0)',
+            boxSizing: 'border-box'
+          }}>
+            {/* Warning Icon */}
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              backgroundColor: '#fef3c7',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px auto',
+              fontSize: '26px',
+              color: '#d97706',
+              boxShadow: '0 4px 10px rgba(217, 119, 6, 0.1)'
+            }}>
+              ⚠️
+            </div>
+
+            <h3 style={{
+              fontSize: '16px',
+              fontWeight: 800,
+              color: 'var(--text-primary, #0f172a)',
+              margin: '0 0 8px 0',
+              lineHeight: 1.4
+            }}>
+              {isEn ? 'Security Warning' : 'সতর্কবার্তা'}
+            </h3>
+
+            <p style={{
+              fontSize: '12px',
+              color: 'var(--text-secondary, #64748b)',
+              margin: '0 0 18px 0',
+              lineHeight: 1.5
+            }}>
+              {isEn 
+                ? 'You are about to visit an external website. Please be careful when sharing personal information.' 
+                : 'আপনি অ্যাপ থেকে বের হয়ে একটি বাইরের ওয়েবসাইটে যাচ্ছেন। ব্যক্তিগত তথ্য সতর্কতার সাথে শেয়ার করবেন।'}
+            </p>
+
+            {/* Box with URL & Copy Option */}
+            <div style={{
+              background: 'var(--bg-secondary, #f8fafc)',
+              border: '1px solid var(--border-light, #e2e8f0)',
+              borderRadius: '12px',
+              padding: '8px 12px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px'
+            }}>
+              <span style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                color: '#2563eb',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                textAlign: 'left',
+                flex: 1
+              }}>
+                {targetUrl}
+              </span>
+              <button
+                onClick={copyLink}
+                style={{
+                  background: copied ? '#d1fae5' : 'var(--bg-primary, #ffffff)',
+                  color: copied ? '#065f46' : '#2563eb',
+                  border: '1px solid #2563eb',
+                  borderRadius: '8px',
+                  padding: '4px 10px',
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0
+                }}
+              >
+                {copied ? (isEn ? 'Copied' : 'কপি হয়েছে') : (isEn ? 'Copy' : 'লিংক কপি')}
+              </button>
+            </div>
+
+            {/* Actions Grid */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                onClick={proceedToPortal}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+                  color: 'white',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 12px rgba(29, 78, 216, 0.2)'
+                }}
+              >
+                {isEn ? 'Go to Website' : 'ওয়েবসাইটে যান'}
+              </button>
+              
+              <button
+                onClick={() => setShowWarningModal(false)}
+                style={{
+                  width: '100%',
+                  padding: '11px',
+                  borderRadius: '12px',
+                  border: '1.5px solid var(--border-light, #e2e8f0)',
+                  background: 'transparent',
+                  color: 'var(--text-secondary, #64748b)',
+                  fontWeight: 800,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {isEn ? 'Cancel' : 'বাতিল'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
