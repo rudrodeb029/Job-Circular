@@ -71,7 +71,7 @@ export const getCollection = async (collectionName, forceServer = false) => {
     if (collectionName === COLLECTIONS.QUESTIONS) {
       selectCols = 'id, title, category, duration, createdAt, updatedAt, raw_data';
     } else if (collectionName === COLLECTIONS.LIVE_EXAMS) {
-      selectCols = 'id, title, titleEn, examType, totalMarks, durationMinutes, totalQuestions, negativeMarksPerWrong, passMarks, scheduledAt, endTime, status, subjects, createdAt, updatedAt, raw_data';
+      selectCols = 'id, title, titleEn, duration, totalQuestions, subjects, status, scheduledAt, createdAt, updatedAt, raw_data';
     }
     let query = supabase.from(collectionName).select(selectCols);
     
