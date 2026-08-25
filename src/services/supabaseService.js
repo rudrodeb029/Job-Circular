@@ -220,7 +220,7 @@ const TABLE_COLUMNS = {
   ],
   [COLLECTIONS.LIVE_EXAMS]: [
     'id', 'title', 'titleEn', 'duration', 'totalQuestions',
-    'subjects', 'questions', 'status', 'startTime', 'scheduledAt',
+    'subjects', 'questions', 'status', 'scheduledAt',
     'createdAt', 'updatedAt'
   ],
   [COLLECTIONS.QUESTIONS]: [

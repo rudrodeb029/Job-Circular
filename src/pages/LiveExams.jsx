@@ -64,7 +64,7 @@ export default function LiveExams() {
     if (!exam) return 'completed';
 
     const userResult = getExamResult(exam.id);
-    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt);
+    const startMs = parseExamDate(exam.scheduledAt) || parseExamDate(exam.startTime);
     const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
 
     if (startMs) {
@@ -271,7 +271,7 @@ export default function LiveExams() {
             <>
               {filteredExams.map(exam => {
             const status = getExamStatus(exam);
-            const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt) || Date.now();
+            const startMs = parseExamDate(exam.scheduledAt) || parseExamDate(exam.startTime) || parseExamDate(exam.createdAt) || Date.now();
             const result = getExamResult(exam.id);
             const isRegistered = !!registrations[exam.id];
 
