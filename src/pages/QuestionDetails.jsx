@@ -6,6 +6,8 @@ import { useAdminContext } from '../context/AdminContext';
 import { getQuestionById } from '../data/questionsData';
 import BottomNav from '../components/BottomNav';
 import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
+import { supabase } from '../services/supabaseClient';
+import { normalizeDoc } from '../services/supabaseService';
 
 export default function QuestionDetails() {
   const { id } = useParams();
@@ -16,19 +18,50 @@ export default function QuestionDetails() {
 
   const [pageLoading, setPageLoading] = useState(true);
   const [isSwitchingMode, setIsSwitchingMode] = useState(false);
+  const [paper, setPaper] = useState(null);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setPageLoading(false), 180);
-    return () => clearTimeout(t);
-  }, []);
-
-  const paper = useMemo(() => {
-    // 1. Check adminState.questions
+    // 1. Check if we have it in adminState.questions and it has questions
     const fromContext = (adminState?.questions || []).find(q => String(q.id) === String(id));
-    if (fromContext) return fromContext;
+    if (fromContext && Array.isArray(fromContext.questions) && fromContext.questions.length > 0) {
+      setPaper(fromContext);
+      setPageLoading(false);
+      return;
+    }
 
     // 2. Fallback to questionsData lookup
-    return getQuestionById(id);
+    const staticPaper = getQuestionById(id);
+    if (staticPaper && Array.isArray(staticPaper.questions) && staticPaper.questions.length > 0) {
+      setPaper(staticPaper);
+      setPageLoading(false);
+      return;
+    }
+
+    // 3. Otherwise query the full row from Supabase
+    const fetchFullPaper = async () => {
+      setLoadingQuestions(true);
+      try {
+        const { data, error } = await supabase
+          .from('questions')
+          .select('*')
+          .eq('id', id)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          const normalized = normalizeDoc(data);
+          setPaper(normalized);
+        }
+      } catch (err) {
+        console.error('Error fetching full paper questions:', err);
+      } finally {
+        setLoadingQuestions(false);
+        setPageLoading(false);
+      }
+    };
+
+    fetchFullPaper();
   }, [id, adminState?.questions]);
 
   // 'practice' or 'read'

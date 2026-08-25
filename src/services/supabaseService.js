@@ -29,7 +29,7 @@ const DEFAULT_TTL_MINUTES = 1440; // 24 Hours
 /**
  * Normalizes document record output to ensure clean JSON object format
  */
-const normalizeDoc = (row) => {
+export const normalizeDoc = (row) => {
   if (!row || typeof row !== 'object') return row;
   const { raw_data, ...rest } = row;
 
@@ -67,7 +67,10 @@ const normalizeDoc = (row) => {
  */
 export const getCollection = async (collectionName, forceServer = false) => {
   try {
-    let query = supabase.from(collectionName).select('*');
+    const selectCols = collectionName === COLLECTIONS.QUESTIONS
+      ? 'id, title, category, duration, createdAt, updatedAt, raw_data'
+      : '*';
+    let query = supabase.from(collectionName).select(selectCols);
     
     // Add bypass headers if forceServer is true
     if (forceServer) {
