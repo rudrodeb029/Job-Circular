@@ -221,7 +221,7 @@ export default function QuestionsList() {
                           <line x1="16" y1="13" x2="8" y2="13"></line>
                           <line x1="16" y1="17" x2="8" y2="17"></line>
                         </svg>
-                        {isEn ? `${paper.questions.length} Questions` : `${toBengaliNumber(paper.questions.length)}টি প্রশ্ন`}
+                        {isEn ? `${paper.totalQuestions || paper.questions?.length || 0} Questions` : `${toBengaliNumber(paper.totalQuestions || paper.questions?.length || 0)}টি প্রশ্ন`}
                       </span>
                     </div>
                   </div>

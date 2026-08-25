@@ -184,7 +184,7 @@ export default function QuestionsHub() {
                     <h3 style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>{isEn ? (paper.titleEn || paper.title) : paper.title}</h3>
                     <div style={{ display: 'flex', gap: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
                       <span>📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}</span>
-                      <span>📝 {isEn ? `${paper.questions.length} Items` : `${paper.questions.length}টি প্রশ্ন`}</span>
+                      <span>📝 {isEn ? `${paper.totalQuestions || paper.questions?.length || 0} Items` : `${paper.totalQuestions || paper.questions?.length || 0}টি প্রশ্ন`}</span>
                     </div>
                   </div>
                   <ChevronRight size={18} color="var(--border)" style={{ flexShrink: 0, marginLeft: 'auto' }} />
