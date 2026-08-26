@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
+import { getDocument, COLLECTIONS } from '../../services/supabaseService';
 
 export default function ManageQuestions() {
   const { state, dispatch } = useAdminContext();
@@ -9,6 +10,7 @@ export default function ManageQuestions() {
   const [showForm, setShowForm] = useState(false);
   const [currentPaper, setCurrentPaper] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [loadingPaper, setLoadingPaper] = useState(false);
 
   // Fields for adding/editing paper
   const [title, setTitle] = useState('');
@@ -61,27 +63,38 @@ export default function ManageQuestions() {
     setShowForm(true);
   };
 
-  const handleOpenEdit = (paper) => {
-    setCurrentPaper(paper);
-    setTitle(paper.title || '');
-    setTitleEn(paper.titleEn || '');
-    setCategory(paper.category || 'bcs');
-    setDate(paper.date || '');
-    setDateEn(paper.dateEn || '');
-    setTimeLimitEn(paper.timeLimitEn || '10 Mins');
-    setQuestions(paper.questions && paper.questions.length > 0 ? paper.questions : [
-      {
-        id: `q-${Date.now()}-1`,
-        question: '',
-        questionEn: '',
-        options: ['', '', '', ''],
-        optionsEn: ['', '', '', ''],
-        correctIndex: 0,
-        explanation: '',
-        explanationEn: ''
-      }
-    ]);
-    setShowForm(true);
+  const handleOpenEdit = async (paper) => {
+    setLoadingPaper(true);
+    try {
+      const fullDoc = await getDocument(COLLECTIONS.QUESTIONS, paper.id, true);
+      const activePaper = fullDoc || paper;
+
+      setCurrentPaper(activePaper);
+      setTitle(activePaper.title || '');
+      setTitleEn(activePaper.titleEn || '');
+      setCategory(activePaper.category || 'bcs');
+      setDate(activePaper.date || '');
+      setDateEn(activePaper.dateEn || '');
+      setTimeLimitEn(activePaper.timeLimitEn || '10 Mins');
+      setQuestions(activePaper.questions && activePaper.questions.length > 0 ? activePaper.questions : [
+        {
+          id: `q-${Date.now()}-1`,
+          question: '',
+          questionEn: '',
+          options: ['', '', '', ''],
+          optionsEn: ['', '', '', ''],
+          correctIndex: 0,
+          explanation: '',
+          explanationEn: ''
+        }
+      ]);
+      setShowForm(true);
+    } catch (e) {
+      console.error(e);
+      triggerToast('Failed to load paper details.', 'error');
+    } finally {
+      setLoadingPaper(false);
+    }
   };
 
   const handleAddQuestionRow = () => {
@@ -259,11 +272,21 @@ export default function ManageQuestions() {
         .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; borderRadius: 10px; outline: none; transition: border-color 0.2s; }
         .modern-input:focus { border-color: #2563eb; }
         .q-row-card { background: #f8fafc; border-radius: 16px; border: 1.5px solid #e2e8f0; padding: 24px; margin-bottom: 24px; position: relative; }
+        @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
       {toast.show && (
         <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 3000, background: '#10b981', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'slideInRight 0.3s' }}>
           {toast.message}
+        </div>
+      )}
+
+      {loadingPaper && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
+          <div style={{ background: 'white', padding: '24px 40px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: '16px', fontWeight: 700, color: '#1e293b' }}>
+            <span className="spinner" style={{ width: '20px', height: '20px', border: '3px solid #e2e8f0', borderTopColor: '#2563eb', borderRadius: '50%', animation: 'spin 1s linear infinite', display: 'inline-block' }}></span>
+            <span>Fetching question details...</span>
+          </div>
         </div>
       )}
 
