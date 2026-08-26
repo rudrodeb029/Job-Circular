@@ -176,7 +176,7 @@ export default function QuestionsList() {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <h3 style={{
-                      fontSize: '12.5px',
+                      fontSize: '11px',
                       fontWeight: 700,
                       color: 'var(--text-secondary)',
                       marginBottom: '4px',
