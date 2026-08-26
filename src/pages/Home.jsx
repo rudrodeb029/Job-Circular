@@ -450,7 +450,7 @@ export default function Home() {
                   <div key={item.id} className="job-card animate-fade-in" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(16, 185, 129, 0.12)', boxShadow: '0 4px 18px rgba(16, 185, 129, 0.04)' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #10b981, #34d399)', borderRadius: '4px 0 0 4px' }}></div>
                     <div className="job-card-content">
-                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
+                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '12px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
                       <p className="job-card-org" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', lineHeight: '1.4', marginBottom: '4px', fontWeight: 400 }}>{displayDesc}</p>
                       <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                         <span style={{ fontSize: '8.5px', color: '#059669', background: '#d1fae5', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}><Calendar size={10} /><span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span></span>
@@ -470,7 +470,7 @@ export default function Home() {
                 <div key={item.id} className="job-card animate-fade-in" onClick={() => navigate(`/result-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(124, 58, 237, 0.12)', boxShadow: '0 4px 18px rgba(124, 58, 237, 0.04)' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #7c3aed, #a78bfa)', borderRadius: '4px 0 0 4px' }}></div>
                   <div className="job-card-content">
-                    <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
+                    <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '12px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
                     <p className="job-card-org" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', lineHeight: '1.4', marginBottom: '4px', fontWeight: 400 }}>{displayDesc}</p>
                     <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                       <span style={{ fontSize: '8.5px', color: '#7e22ce', background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span></span>
