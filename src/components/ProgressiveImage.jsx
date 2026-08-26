@@ -183,24 +183,10 @@ export default function ProgressiveImage({
         }}>
           <div style={{
             display: 'flex',
-            flexDirection: 'column',
             alignItems: 'center',
-            gap: '12px'
+            justifyContent: 'center'
           }}>
             <ModernLoader size="md" icon="💼" />
-            <div style={{
-              fontSize: '11.5px',
-              fontWeight: 800,
-              color: 'var(--primary)',
-              background: 'white',
-              padding: '8px 18px',
-              borderRadius: '24px',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
-              border: '1.5px solid rgba(37, 99, 235, 0.08)',
-              animation: 'pulse 2s infinite'
-            }}>
-              বিজ্ঞপ্তি তথ্য লোড হচ্ছে...
-            </div>
           </div>
         </div>
       )}
