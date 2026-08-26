@@ -16,6 +16,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
     <application
+        android:hardwareAccelerated="true"
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -33,6 +34,7 @@
         <meta-data android:name="com.onesignal.messaging.default_notification_icon" android:resource="@drawable/ic_stat_onesignal_default" />
 
         <activity
+            android:hardwareAccelerated="true"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
