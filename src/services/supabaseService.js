@@ -68,9 +68,7 @@ export const normalizeDoc = (row) => {
 export const getCollection = async (collectionName, forceServer = false) => {
   try {
     let selectCols = '*';
-    if (collectionName === COLLECTIONS.QUESTIONS) {
-      selectCols = 'id, title, category, duration, createdAt, updatedAt, raw_data';
-    } else if (collectionName === COLLECTIONS.LIVE_EXAMS) {
+    if (collectionName === COLLECTIONS.LIVE_EXAMS) {
       selectCols = 'id, title, titleEn, duration, totalQuestions, subjects, status, scheduledAt, createdAt, updatedAt, raw_data';
     }
     let query = supabase.from(collectionName).select(selectCols);
