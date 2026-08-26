@@ -54,7 +54,7 @@ export default function CircularWebViewScreen() {
     descriptionText = isEn 
       ? 'Click the button below to download the admit card or view the exam notice.'
       : 'প্রবেশপত্র ডাউনলোড বা পরীক্ষার নোটিশ দেখতে নিচের বাটনে চাপ দিন।';
-    buttonLabel = isEn ? 'View Admit Card / Notice' : 'প্রবেশপত্র / নোটিশ দেখুন';
+    buttonLabel = isEn ? 'View' : 'দেখুন';
   }
 
   const targetUrl = sanitizePortalUrl(rawUrl);
