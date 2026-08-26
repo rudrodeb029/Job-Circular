@@ -438,6 +438,13 @@ const adminReducer = (state, action) => {
       return newState;
     }
 
+    case 'CACHE_FULL_QUESTION_PAPER': {
+      const paperItem = action.payload;
+      newState.questions = (newState.questions || state.questions).map(p => p.id === paperItem.id ? paperItem : p);
+      saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
+      return newState;
+    }
+
     case 'DELETE_QUESTION_PAPER': {
       deleteDocument(COLLECTIONS.QUESTIONS, action.payload).catch(console.error);
       const deletedPaper = state.questions.find(p => p.id === action.payload);

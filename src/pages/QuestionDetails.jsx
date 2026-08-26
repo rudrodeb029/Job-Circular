@@ -13,7 +13,7 @@ export default function QuestionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state } = useAppContext();
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, dispatch: adminDispatch } = useAdminContext();
   const isEn = state.language === 'en';
 
   const [pageLoading, setPageLoading] = useState(true);
@@ -52,6 +52,7 @@ export default function QuestionDetails() {
         if (data) {
           const normalized = normalizeDoc(data);
           setPaper(normalized);
+          adminDispatch({ type: 'CACHE_FULL_QUESTION_PAPER', payload: normalized });
         }
       } catch (err) {
         console.error('Error fetching full paper questions:', err);
@@ -156,7 +157,7 @@ export default function QuestionDetails() {
   };
 
   const attemptedCount = Object.keys(selectedAnswers).length;
-  const totalCount = paper.questions.length;
+  const totalCount = paper && Array.isArray(paper.questions) ? paper.questions.length : 0;
 
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
@@ -237,6 +238,33 @@ export default function QuestionDetails() {
         {isSwitchingMode ? (
           <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
             <ModernLoader size="md" icon={mode === 'practice' ? '🎯' : '📖'} />
+          </div>
+        ) : !paper.questions || paper.questions.length === 0 ? (
+          <div className="card" style={{ padding: '40px 20px', textAlign: 'center', borderRadius: '16px' }}>
+            <span style={{ fontSize: '40px', display: 'block', marginBottom: '12px' }}>📶</span>
+            <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
+              {isEn ? 'Offline Mode' : 'আপনি অফলাইনে আছেন'}
+            </h3>
+            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.5, marginBottom: '20px' }}>
+              {isEn 
+                ? 'This question paper has not been cached on your device. Please connect to the internet to download it once.' 
+                : 'এই প্রশ্নপত্রটি আপনার ডিভাইসে ক্যাশ করা নেই। অনুগ্রহ করে ইন্টারনেট সংযুক্ত করে একবার লোড করুন।'}
+            </p>
+            <button 
+              onClick={() => navigate(-1)} 
+              style={{
+                padding: '10px 24px',
+                borderRadius: '10px',
+                background: 'var(--primary)',
+                color: '#ffffff',
+                border: 'none',
+                fontWeight: 700,
+                fontSize: '13px',
+                cursor: 'pointer'
+              }}
+            >
+              {isEn ? 'Go Back' : 'ফিরে যান'}
+            </button>
           </div>
         ) : (
           <>
