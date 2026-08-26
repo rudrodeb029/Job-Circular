@@ -208,30 +208,17 @@ export default function ShareApp() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '10px',
+                  justifyContent: 'center',
                   padding: '12px',
                   borderRadius: '14px',
                   background: channel.bg,
                   textDecoration: 'none',
                   border: '1px solid transparent',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  minHeight: '48px',
+                  boxSizing: 'border-box'
                 }}
               >
-                <div style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '10px',
-                  background: '#ffffff',
-                  color: channel.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 800,
-                  fontSize: '14px',
-                  boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
-                }}>
-                  {channel.name[0]}
-                </div>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: channel.color }}>
                   {channel.name}
                 </span>
