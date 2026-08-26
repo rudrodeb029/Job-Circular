@@ -179,7 +179,7 @@ export default function ResultDetails() {
           }}>
             {displayIcon}
           </div>
-           <h2 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0' }}>
+           <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0' }}>
             {orgName}
           </h2>
         </div>

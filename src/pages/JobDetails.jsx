@@ -214,7 +214,7 @@ export default function JobDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '17px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '10px' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>
             {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
           </h2>
 
