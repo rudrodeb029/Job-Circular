@@ -145,6 +145,7 @@ export default function ProgressiveImage({
       maxWidth,
       background: '#f8fafc',
       borderRadius: '14px',
+      minHeight: isLoaded ? 'none' : '300px',
       ...style
     }} className={className}>
       <img
