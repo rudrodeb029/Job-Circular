@@ -244,13 +244,18 @@ ul, ol {
 }
 
 .page-header h1 {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  color: var(--text-primary);
+  font-size: 13.2px !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.2px;
+  color: var(--text-secondary) !important;
   margin: 0;
   display: flex;
   align-items: center;
+}
+
+.page-header h1 svg {
+  color: var(--text-secondary) !important;
+  stroke: var(--text-secondary) !important;
 }
 
 .page-header-blue {
