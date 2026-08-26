@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, ChevronRight, Rss } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
-import { notifications } from '../data/notifications';
+import { useAdminContext } from '../context/AdminContext';
+import { getFilteredNotifications } from '../utils/notificationHelpers';
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -15,9 +16,12 @@ const toBengaliNumber = (num) => {
 export default function Profile() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+  const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
 
-  const unreadNotifCount = notifications.filter(n => !state.readNotifications.includes(n.id)).length;
+  const rawNotifs = adminState.notifications || [];
+  const filteredNotifs = getFilteredNotifications(rawNotifs, state.installTime);
+  const unreadNotifCount = filteredNotifs.filter(n => !state.readNotifications.includes(n.id)).length;
 
   const toggleLanguage = () => {
     const nextLang = state.language === 'bn' ? 'en' : 'bn';
