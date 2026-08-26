@@ -56,6 +56,17 @@ export default function ProgressiveImage({
     setIsLoaded(false);
     setHasError(false);
     setCandidateIndex(0);
+
+    const timer = setTimeout(() => {
+      setIsLoaded(loaded => {
+        if (!loaded) {
+          setHasError(true);
+        }
+        return loaded;
+      });
+    }, 4000);
+
+    return () => clearTimeout(timer);
   }, [src]);
 
   const handleImageError = () => {

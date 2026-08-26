@@ -20,15 +20,10 @@ export default function JobDetails() {
   const [showFullImage, setShowFullImage] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [downloading, setDownloading] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
   const [modalType, setModalType] = useState('new_job');
-
-  React.useEffect(() => {
-    const t = setTimeout(() => setPageLoading(false), 160);
-    return () => clearTimeout(t);
-  }, [id]);
 
   const { state: adminState } = useAdminContext();
   const localJobs = adminState.jobs || [];

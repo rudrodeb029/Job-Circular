@@ -47,12 +47,7 @@ export default function ResultDetails() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
-  const [pageLoading, setPageLoading] = useState(true);
-
-  React.useEffect(() => {
-    const t = setTimeout(() => setPageLoading(false), 160);
-    return () => clearTimeout(t);
-  }, [id]);
+  const [pageLoading, setPageLoading] = useState(false);
 
   // Load jobs from AdminContext
   const { state: adminState } = useAdminContext();
