@@ -39,7 +39,7 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
   if (pageType === 'result') {
     buttonLabel = isEn ? 'View Result' : 'ফলাফল দেখুন';
   } else if (pageType === 'admit_card' || pageType === 'exam_date') {
-    buttonLabel = isEn ? 'View' : 'দেখুন';
+    buttonLabel = isEn ? 'Admit Card' : 'প্রবেশপত্র';
   }
 
   const copyLink = () => {
