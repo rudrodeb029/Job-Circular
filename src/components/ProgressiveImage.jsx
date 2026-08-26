@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getCloudinaryPlaceholder, optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import { getGoogleDriveFileId } from '../utils/mediaUtils';
 import { Eye, Download } from './Icons';
+import ModernLoader from './ModernLoader';
 
 /**
  * Robust & Polished Progressive Image Loader Component
@@ -175,23 +176,30 @@ export default function ProgressiveImage({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(248, 250, 252, 0.85)',
-          backdropFilter: 'blur(4px)'
+          background: 'rgba(248, 250, 252, 0.9)',
+          backdropFilter: 'blur(6px)',
+          zIndex: 10
         }}>
           <div style={{
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            gap: '8px',
-            background: 'white',
-            padding: '6px 14px',
-            borderRadius: '20px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
-            fontSize: '11px',
-            fontWeight: 700,
-            color: 'var(--primary)'
+            gap: '12px'
           }}>
-            <span className="spinner-border spinner-border-sm" style={{ width: '12px', height: '12px', borderWidth: '2px' }}></span>
-            বিজ্ঞপ্তি তথ্য লোড হচ্ছে...
+            <ModernLoader size="md" icon="💼" />
+            <div style={{
+              fontSize: '11.5px',
+              fontWeight: 800,
+              color: 'var(--primary)',
+              background: 'white',
+              padding: '8px 18px',
+              borderRadius: '24px',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+              border: '1.5px solid rgba(37, 99, 235, 0.08)',
+              animation: 'pulse 2s infinite'
+            }}>
+              বিজ্ঞপ্তি তথ্য লোড হচ্ছে...
+            </div>
           </div>
         </div>
       )}
