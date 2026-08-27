@@ -94,7 +94,7 @@ export default {
       if (authHeader) originHeaders.set('Authorization', authHeader);
       originHeaders.set('Host', new URL(SUPABASE_ORIGIN).host);
 
-      const collections = ['jobs', 'notifications', 'admits', 'live_exams', 'feed_posts', 'app_config'];
+      const collections = ['jobs', 'notifications', 'admits', 'live_exams', 'questions', 'feed_posts', 'app_config'];
       const lastUpdated = url.searchParams.get('last_updated') || '0';
 
       const fetchPromises = collections.map(col =>
@@ -108,7 +108,7 @@ export default {
         .then(r => r.ok ? r.json() : [])
         .catch(() => []);
 
-      const [jobs, notifications, admits, live_exams, feed_posts, app_config, offline_feed] = await Promise.all([
+      const [jobs, notifications, admits, live_exams, questions, feed_posts, app_config, offline_feed] = await Promise.all([
         ...fetchPromises,
         feedPromise
       ]);
@@ -118,6 +118,7 @@ export default {
         notifications,
         admits,
         live_exams,
+        questions,
         feed_posts,
         app_config,
         offline_feed,

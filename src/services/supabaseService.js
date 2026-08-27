@@ -126,6 +126,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
       [COLLECTIONS.NOTIFICATIONS]: data.notifications,
       [COLLECTIONS.ADMITS]: data.admits,
       [COLLECTIONS.LIVE_EXAMS]: data.live_exams,
+      [COLLECTIONS.QUESTIONS]: data.questions,
       [COLLECTIONS.FEED_POSTS]: data.feed_posts,
       [COLLECTIONS.APP_CONFIG]: data.app_config,
     };
@@ -134,6 +135,9 @@ export const syncCoreDataOnStartup = async (force = false) => {
       if (Array.isArray(items) && items.length > 0) {
         localStorage.setItem(`cache_data_${col}`, JSON.stringify(items));
         localStorage.setItem(`cache_time_${col}`, String(Date.now()));
+        if (col === COLLECTIONS.QUESTIONS) {
+          localStorage.setItem('questions_data', JSON.stringify(items));
+        }
         _sessionRevalidatedCollections.add(col);
         window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: items }));
       }
@@ -180,6 +184,7 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
     COLLECTIONS.NOTIFICATIONS,
     COLLECTIONS.ADMITS,
     COLLECTIONS.LIVE_EXAMS,
+    COLLECTIONS.QUESTIONS,
     COLLECTIONS.FEED_POSTS,
     COLLECTIONS.APP_CONFIG
   ].includes(collectionName);

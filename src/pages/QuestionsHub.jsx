@@ -7,6 +7,7 @@ import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader from '../components/ModernLoader';
+import { getQuestionsData } from '../data/questionsData';
 
 const categoryConfig = {
   bcs: { name: 'বিসিএস', nameEn: 'BCS', color: 'rgba(26, 86, 219, 0.05)', icon: '🎓' },
@@ -38,7 +39,7 @@ export default function QuestionsHub() {
     }, 180);
   };
 
-  const papers = adminState.questions || [];
+  const papers = (adminState.questions && adminState.questions.length > 0) ? adminState.questions : getQuestionsData();
   
   const allCategories = useMemo(() => {
     const config = { ...categoryConfig };
