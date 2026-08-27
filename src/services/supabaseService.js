@@ -101,31 +101,49 @@ export const syncCoreDataOnStartup = async (force = false) => {
   if ((_appInitialized && !force) || _isStartupSyncing || !navigator.onLine) return;
 
   _isStartupSyncing = true;
-  const coreCollections = [
-    COLLECTIONS.JOBS,
-    COLLECTIONS.NOTIFICATIONS,
-    COLLECTIONS.ADMITS,
-    COLLECTIONS.LIVE_EXAMS,
-    COLLECTIONS.FEED_POSTS,
-    COLLECTIONS.APP_CONFIG
-  ];
-
-  console.log(force ? 'Forced Refresh: Syncing core data...' : 'Strict Startup Sync: Fetching core data...');
+  console.log(force ? 'Forced Refresh: Executing 1 Unified Sync Request...' : 'Startup Sync: Executing 1 Unified Sync Request...');
 
   try {
-    await Promise.all(coreCollections.map(async (col) => {
-      const data = await getCollection(col, false);
-      if (data && data.length > 0) {
-        localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
+    const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
+    const syncUrl = `${proxyUrl}/sync-all${force ? '?cache=bypass' : ''}`;
+    
+    const headers = {
+      'apikey': SUPABASE_CONFIG.anonKey,
+      'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+      'X-App-Client': 'live-circular'
+    };
+    if (force) {
+      headers['Cache-Control'] = 'no-cache';
+    }
+
+    const response = await fetch(syncUrl, { headers });
+    if (!response.ok) throw new Error(`Sync HTTP error ${response.status}`);
+    
+    const data = await response.json();
+
+    const collectionsMap = {
+      [COLLECTIONS.JOBS]: data.jobs,
+      [COLLECTIONS.NOTIFICATIONS]: data.notifications,
+      [COLLECTIONS.ADMITS]: data.admits,
+      [COLLECTIONS.LIVE_EXAMS]: data.live_exams,
+      [COLLECTIONS.FEED_POSTS]: data.feed_posts,
+      [COLLECTIONS.APP_CONFIG]: data.app_config,
+    };
+
+    Object.entries(collectionsMap).forEach(([col, items]) => {
+      if (Array.isArray(items) && items.length > 0) {
+        localStorage.setItem(`cache_data_${col}`, JSON.stringify(items));
         localStorage.setItem(`cache_time_${col}`, String(Date.now()));
         _sessionRevalidatedCollections.add(col);
-        window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
+        window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: items }));
       }
-    }));
+    });
+
     _appInitialized = true;
-    console.log('Strict Startup Sync: Complete.');
+    console.log('✅ Single-Request Unified Sync: Complete! (EXACTLY 1 HTTP Request executed)');
+    return data;
   } catch (err) {
-    console.warn('Strict Startup Sync: Some collections failed to sync.', err.message);
+    console.warn('Unified Sync fallback:', err.message);
   } finally {
     _isStartupSyncing = false;
   }
