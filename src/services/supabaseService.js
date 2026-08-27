@@ -90,6 +90,7 @@ export const getCollection = async (collectionName, forceServer = false) => {
 // Per-session revalidation tracker
 const _sessionRevalidatedCollections = new Set();
 let _appInitialized = false;
+let _isStartupSyncing = false;
 
 /**
  * Global app initialization sync.
@@ -97,8 +98,9 @@ let _appInitialized = false;
  * @param {boolean} force - If true, bypasses the "already initialized" check.
  */
 export const syncCoreDataOnStartup = async (force = false) => {
-  if ((_appInitialized && !force) || !navigator.onLine) return;
+  if ((_appInitialized && !force) || _isStartupSyncing || !navigator.onLine) return;
 
+  _isStartupSyncing = true;
   const coreCollections = [
     COLLECTIONS.JOBS,
     COLLECTIONS.NOTIFICATIONS,
@@ -124,6 +126,8 @@ export const syncCoreDataOnStartup = async (force = false) => {
     console.log('Strict Startup Sync: Complete.');
   } catch (err) {
     console.warn('Strict Startup Sync: Some collections failed to sync.', err.message);
+  } finally {
+    _isStartupSyncing = false;
   }
 };
 

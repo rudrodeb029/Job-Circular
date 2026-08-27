@@ -6,6 +6,9 @@ const isNative = Capacitor.isNativePlatform();
 let sqliteConnection = null;
 let dbInstance = null;
 
+// Global Mutex Lock to prevent duplicate concurrent network requests
+let isDeltaSyncing = false;
+
 // Mock Web Fallback Database (IndexedDB / LocalMemory based)
 let mockDatabase = [];
 
@@ -28,6 +31,11 @@ const loadMockData = () => {
     console.warn('Failed to load mock SQLite database:', e);
   }
 };
+
+/**
+ * Check if a delta sync operation is currently active.
+ */
+export const isSyncInProgress = () => isDeltaSyncing;
 
 /**
  * Initialize SQLite Database & Tables
@@ -109,21 +117,31 @@ export const getOfflineFeed = async (limit = 20, offset = 0) => {
 };
 
 /**
- * Perform Background Delta Sync with Supabase
+ * Perform Background Delta Sync with Supabase / Cloudflare Worker.
+ * Guaranteed strictly SINGLE HTTP request execution using global mutex lock.
  */
 export const triggerDeltaSync = async () => {
+  // 1. API Call Locking Guard: Reject duplicate requests if a sync is already running
+  if (isDeltaSyncing) {
+    console.warn('🔒 Sync Lock Active: A delta sync is already running. Skipping redundant request to Cloudflare Worker.');
+    return false;
+  }
+
   if (!navigator.onLine) {
     console.log('📡 Offline: Bypassing Supabase background sync.');
     return false;
   }
 
+  // Acquire Lock
+  isDeltaSyncing = true;
+
   try {
-    // 1. Get local maximum updated_at
+    // 2. Get local maximum updated_at timestamp
     let localMaxUpdatedAt = 0;
 
     if (!isNative) {
       if (mockDatabase.length > 0) {
-        localMaxUpdatedAt = Math.max(...mockDatabase.map(d => d.updated_at));
+        localMaxUpdatedAt = Math.max(...mockDatabase.map(d => Number(d.updated_at) || 0));
       }
     } else {
       if (!dbInstance) await initDb();
@@ -134,27 +152,27 @@ export const triggerDeltaSync = async () => {
       }
     }
 
-    console.log(`🔄 Delta Sync: Checking Supabase for updates after timestamp: ${localMaxUpdatedAt}`);
+    console.log(`🔄 Single-Request Delta Sync: Querying Cloudflare Worker for updates after: ${localMaxUpdatedAt}`);
 
-    // 2. Fetch new rows from Supabase
+    // 3. Execute EXACTLY 1 HTTP GET request through Cloudflare Worker proxy
     const { data: newRows, error } = await supabase
       .from('offline_feed')
-      .select('*')
+      .select('id, title, content, updated_at')
       .gt('updated_at', localMaxUpdatedAt)
-      .order('updated_at', { ascending: true });
+      .order('updated_at', { ascending: true })
+      .limit(500);
 
     if (error) throw error;
 
     if (!newRows || newRows.length === 0) {
-      console.log('✅ Delta Sync: Local database is already up to date.');
+      console.log('✅ Delta Sync: Local SQLite is already up to date. (1 HTTP Request executed)');
       return false;
     }
 
-    console.log(`📥 Delta Sync: Found ${newRows.length} new records. Merging into SQLite...`);
+    console.log(`📥 Delta Sync: Received ${newRows.length} new records. Batch saving into SQLite...`);
 
-    // 3. Batch insert using Transaction
+    // 4. Batch insert into SQLite using a single transaction
     if (!isNative) {
-      // Merge into mock memory array
       newRows.forEach(row => {
         const idx = mockDatabase.findIndex(d => d.id === row.id);
         if (idx !== -1) {
@@ -165,22 +183,24 @@ export const triggerDeltaSync = async () => {
       });
       localStorage.setItem('sqlite_mock_offline_feed', JSON.stringify(mockDatabase));
     } else {
-      // Create batched transaction array for native SQLite
       const statements = newRows.map(row => ({
         statement: 'INSERT OR REPLACE INTO offline_feed (id, title, content, updated_at) VALUES (?, ?, ?, ?);',
-        values: [row.id, row.title, row.content, Number(row.updated_at)]
+        values: [String(row.id), String(row.title || ''), String(row.content || ''), Number(row.updated_at)]
       }));
       
       await dbInstance.executeTransaction(statements);
     }
 
-    console.log('🎉 Delta Sync: SQLite database updated.');
+    console.log('🎉 Delta Sync: SQLite database updated successfully.');
 
-    // 4. Notify app listeners that new data is available
+    // 5. Dispatch single event to UI listeners
     window.dispatchEvent(new CustomEvent('offline_feed_synced', { detail: newRows }));
     return true;
   } catch (err) {
-    console.error('❌ Background sync failed:', err);
+    console.error('❌ Delta sync failed:', err);
     return false;
+  } finally {
+    // Always release lock regardless of success or failure
+    isDeltaSyncing = false;
   }
 };

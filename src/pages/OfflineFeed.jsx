@@ -5,7 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import BottomNav from '../components/BottomNav';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
-import { getOfflineFeed, triggerDeltaSync } from '../services/sqliteService';
+import { getOfflineFeed, triggerDeltaSync, isSyncInProgress } from '../services/sqliteService';
 
 export default function OfflineFeed() {
   const navigate = useNavigate();
@@ -75,8 +75,12 @@ export default function OfflineFeed() {
     };
   }, [loadPageFromSqlite]);
 
-  // Pull to refresh manual sync trigger
+  // Pull to refresh manual sync trigger (Protected by Sync Mutex Lock)
   const handleRefresh = async () => {
+    if (isSyncing || isSyncInProgress()) {
+      console.warn('🔒 Manual Refresh Lock Active: A delta sync is already running. Skipping redundant pull-to-refresh.');
+      return;
+    }
     setIsSyncing(true);
     await triggerDeltaSync();
     await loadPageFromSqlite(0, true);

@@ -68,42 +68,56 @@ function App() {
 
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
+  const hasBootedRef = useRef(false)
+  const isNotificationProcessingRef = useRef(false)
 
-  // STRICT ONCE-PER-BOOT INITIALIZATION
+  // STRICT ONCE-PER-BOOT INITIALIZATION (Protected against React 18 StrictMode Double-Mount)
   useEffect(() => {
-    if (!isAdminRoute) {
-      console.log('App Boot: Initializing services...');
-      syncCoreDataOnStartup(); // Synchronize all categories exactly once
-      initializePushNotifications();
-      initializeOneSignal();
+    if (hasBootedRef.current || isAdminRoute) return;
+    hasBootedRef.current = true;
 
-      // Handle OneSignal Notification Clicks (Redirection & Update)
-      setupOneSignalClickHandler((data) => {
-        console.log('App: Handling notification click with data:', data);
+    console.log('App Boot: Initializing services (single execution)...');
+    syncCoreDataOnStartup(); // Synchronize all categories exactly once
+    initializePushNotifications();
+    initializeOneSignal();
 
-        // Force refresh core data & SQLite delta sync
-        syncCoreDataOnStartup(true).catch(err => console.error('Data refresh failed:', err));
-        triggerDeltaSync().catch(err => console.error('SQLite Sync from push failed:', err));
+    // Handle OneSignal Notification Clicks (Protected by Notification Processing Lock)
+    setupOneSignalClickHandler((data) => {
+      console.log('App: Handling notification click with data:', data);
 
-        // Navigate to relevant post
-        if (data.jobId) {
-          navigate(`/job/${data.jobId}`);
-        } else if (data.examId) {
-          navigate(`/live-exam-room/${data.examId}`);
-        } else if (data.paperId) {
-          navigate(`/question-details/${data.paperId}`);
-        } else if (data.type === 'result' && data.jobId) {
-          navigate(`/result-details/${data.jobId}`);
-        } else if (data.type === 'exam_date' && data.jobId) {
-          navigate(`/exam-details/${data.jobId}`);
-        } else if (data.type === 'feed_update' || data.postId) {
-          navigate('/feed');
-        } else {
-          navigate('/notifications');
-        }
-      });
-    }
-  }, []); // Empty dependency array ensures this ONLY runs when the app is first opened
+      if (isNotificationProcessingRef.current) {
+        console.warn('🔒 Push Notification Lock Active: Skipping duplicate notification click event.');
+        return;
+      }
+      isNotificationProcessingRef.current = true;
+
+      // Force refresh core data & SQLite delta sync
+      syncCoreDataOnStartup(true).catch(err => console.error('Data refresh failed:', err));
+      triggerDeltaSync().catch(err => console.error('SQLite Sync from push failed:', err));
+
+      // Release click lock after 1.5s
+      setTimeout(() => {
+        isNotificationProcessingRef.current = false;
+      }, 1500);
+
+      // Navigate to relevant post
+      if (data.jobId) {
+        navigate(`/job/${data.jobId}`);
+      } else if (data.examId) {
+        navigate(`/live-exam-room/${data.examId}`);
+      } else if (data.paperId) {
+        navigate(`/question-details/${data.paperId}`);
+      } else if (data.type === 'result' && data.jobId) {
+        navigate(`/result-details/${data.jobId}`);
+      } else if (data.type === 'exam_date' && data.jobId) {
+        navigate(`/exam-details/${data.jobId}`);
+      } else if (data.type === 'feed_update' || data.postId) {
+        navigate('/feed');
+      } else {
+        navigate('/notifications');
+      }
+    });
+  }, [isAdminRoute, navigate]);
 
   useEffect(() => {
     // Set StatusBar - prevent overlay and set proper colors

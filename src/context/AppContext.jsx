@@ -138,14 +138,18 @@ function appReducer(state, action) {
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const isSqliteInitRef = useRef(false);
 
   useEffect(() => {
-    // Initialize SQLite Database and run delta sync
-    initDb().then(success => {
-      if (success) {
-        triggerDeltaSync().catch(err => console.error('Background sync failed:', err));
-      }
-    });
+    if (!isSqliteInitRef.current) {
+      isSqliteInitRef.current = true;
+      // Initialize SQLite Database and run delta sync (once per session)
+      initDb().then(success => {
+        if (success) {
+          triggerDeltaSync().catch(err => console.error('Background sync failed:', err));
+        }
+      });
+    }
 
     if (!localStorage.getItem('installTime')) {
       localStorage.setItem('installTime', state.installTime);
