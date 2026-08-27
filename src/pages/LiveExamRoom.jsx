@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getLiveExams, generate100Questions } from '../data/liveExams';
 import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, COLLECTIONS } from '../services/supabaseService';
+import { supabase } from '../services/supabaseClient';
 import BottomNav from '../components/BottomNav';
 import ModernLoader from '../components/ModernLoader';
 
@@ -58,10 +59,10 @@ export default function LiveExamRoom() {
       // Tier 4: Direct Supabase database query by ID
       if (!match || !Array.isArray(match.questions) || match.questions.length === 0) {
         try {
-          const doc = await getDocument(COLLECTIONS.LIVE_EXAMS, targetId, true);
+          const doc = await getDocument(COLLECTIONS.LIVE_EXAMS, targetId, false);
           if (doc) match = doc;
         } catch (e) {
-          console.error('Error fetching live exam document directly:', e);
+          console.error('Error fetching live exam document from edge:', e);
         }
       }
 
@@ -94,13 +95,16 @@ export default function LiveExamRoom() {
     let isMounted = true;
     const targetId = String(id).trim();
 
-    const loadRealSubmissions = async (force = false) => {
+    const loadRealSubmissions = async () => {
       try {
-        const allActivities = await getCollectionCached(COLLECTIONS.ACTIVITIES, force, 2);
-        if (Array.isArray(allActivities) && isMounted) {
-          const examSubs = allActivities.filter(act => 
-            act.type === 'live_exam_submission' && String(act.examId).trim() === targetId
-          );
+        const { data: examSubs, error } = await supabase
+          .from('activities')
+          .select('*')
+          .eq('type', 'live_exam_submission')
+          .eq('examId', targetId);
+
+        if (error) throw error;
+        if (Array.isArray(examSubs) && isMounted) {
           setRealSubmissions(examSubs);
         }
       } catch (err) {
@@ -109,12 +113,12 @@ export default function LiveExamRoom() {
     };
 
     // 1. Initial immediate fetch
-    loadRealSubmissions(false);
+    loadRealSubmissions();
 
     // 2. Poll periodically every 20 seconds (0 Realtime socket usage, 100% scalable)
     const pollInterval = setInterval(() => {
       if (isMounted) {
-        loadRealSubmissions(true);
+        loadRealSubmissions();
       }
     }, 20000);
 
