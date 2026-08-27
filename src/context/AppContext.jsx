@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
 import { setDocument, subscribeToAppUpdates, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
 import { initDb, triggerDeltaSync } from '../services/sqliteService';
 
