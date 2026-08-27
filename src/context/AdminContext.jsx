@@ -4,6 +4,7 @@ import { broadcastPush, sendExamCountdownPush } from '../utils/oneSignalWrapper'
 import {
   getCollection,
   getCollectionCached,
+  syncCoreDataOnStartup,
   clearCollectionCache,
   onCollectionSnapshot,
   setDocument,
@@ -694,8 +695,9 @@ export const AdminProvider = ({ children }) => {
     };
   }, []);
 
-  const refreshData = async (forceServer = true) => {
-    await loadAllData(forceServer);
+  const refreshData = async (forceServer = false) => {
+    await syncCoreDataOnStartup(forceServer);
+    await loadAllData(false);
   };
 
   return (

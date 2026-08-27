@@ -160,7 +160,6 @@ export const syncCoreDataOnStartup = async (force = false) => {
 export const getCollectionCached = async (collectionName, forceServer = false, customTtlMinutes = null) => {
   const cacheKey = `cache_data_${collectionName}`;
   const timeKey = `cache_time_${collectionName}`;
-  const now = Date.now();
   const cachedDataStr = localStorage.getItem(cacheKey);
 
   // 1. Parse Cached Data
@@ -173,26 +172,35 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
     }
   }
 
-  // 2. Strict Revalidation Logic
-  // We ONLY fetch from network IF:
-  // - A manual Pull-to-Refresh is triggered (forceServer)
-  // - There is NO cached data at all (first time install)
-  // - It's a non-core collection that hasn't been synced this session yet (e.g. specific Questions category)
+  // 2. Strict Core Collection Protection:
+  // Core collections are synchronized EXCLUSIVELY via 1 unified request in syncCoreDataOnStartup().
+  // getCollectionCached MUST NEVER fire individual network GET requests for core collections.
   const isCore = [
     COLLECTIONS.JOBS,
     COLLECTIONS.NOTIFICATIONS,
     COLLECTIONS.ADMITS,
     COLLECTIONS.LIVE_EXAMS,
-    COLLECTIONS.FEED_POSTS
+    COLLECTIONS.FEED_POSTS,
+    COLLECTIONS.APP_CONFIG
   ].includes(collectionName);
-  const needsInitialSync = !cachedData || !_sessionRevalidatedCollections.has(collectionName);
 
-  if ((forceServer || needsInitialSync) && navigator.onLine) {
+  if (isCore) {
+    if (cachedData && cachedData.length > 0) {
+      return cachedData;
+    }
+    // If not in cache and forceServer is false, return empty array without making network calls
+    if (!forceServer) {
+      return cachedData || [];
+    }
+  }
+
+  // 3. Fallback for non-core collections if forced
+  if (forceServer && navigator.onLine) {
     try {
       const data = await getCollection(collectionName, forceServer);
       if (data && data.length > 0) {
         localStorage.setItem(cacheKey, JSON.stringify(data));
-        localStorage.setItem(timeKey, String(now));
+        localStorage.setItem(timeKey, String(Date.now()));
         _sessionRevalidatedCollections.add(collectionName);
         return data;
       }
