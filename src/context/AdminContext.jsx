@@ -577,8 +577,8 @@ export const AdminProvider = ({ children }) => {
       if (isMounted) setAuthChecked(true);
     }, 1200);
 
-    // 2. Initial fetch from server (Background sync if cache exists)
-    loadAllData(true, hasInitialCache).catch(console.error);
+    // 2. Initial fetch from local cache (Background sync if cache exists)
+    loadAllData(false, hasInitialCache).catch(console.error);
 
     // 3. Real-time snapshot listeners (Exclusively activated for Admin Panel, 0 socket load on mobile candidates)
     const isAdminRoute = window.location.pathname.startsWith('/admin');
