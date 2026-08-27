@@ -57,11 +57,6 @@ export default function OfflineFeed() {
       setPageLoading(true);
       await loadPageFromSqlite(0, true);
       setPageLoading(false);
-      
-      // Auto run sync in the background
-      setIsSyncing(true);
-      await triggerDeltaSync();
-      setIsSyncing(false);
     };
 
     initialLoad();

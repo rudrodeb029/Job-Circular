@@ -10,6 +10,7 @@ import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
 import { initializeOneSignal, setupOneSignalClickHandler } from './utils/oneSignalWrapper'
 import { syncCoreDataOnStartup } from './services/supabaseService'
+import { triggerDeltaSync } from './services/sqliteService'
 
 const CURRENT_VERSION = "1.0.9";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
@@ -80,8 +81,9 @@ function App() {
       setupOneSignalClickHandler((data) => {
         console.log('App: Handling notification click with data:', data);
 
-        // Force refresh data
+        // Force refresh core data & SQLite delta sync
         syncCoreDataOnStartup(true).catch(err => console.error('Data refresh failed:', err));
+        triggerDeltaSync().catch(err => console.error('SQLite Sync from push failed:', err));
 
         // Navigate to relevant post
         if (data.jobId) {
