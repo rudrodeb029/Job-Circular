@@ -41,6 +41,7 @@ import LiveExamsPage from './pages/LiveExamsPage'
 import LiveExamRoom from './pages/LiveExamRoom'
 import QuestionsHub from './pages/QuestionsHub'
 import Feed from './pages/Feed'
+import OfflineFeed from './pages/OfflineFeed'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -232,6 +233,7 @@ function App() {
           <Route path="/live-exams" element={<LiveExams />} />
           <Route path="/live-exams-list" element={<LiveExams />} />
           <Route path="/live-exam-room/:id" element={<LiveExamRoom />} />
+          <Route path="/offline-feed" element={<OfflineFeed />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <VersionUpdateModal 

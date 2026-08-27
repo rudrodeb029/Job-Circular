@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { setDocument, subscribeToAppUpdates, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
+import { initDb, triggerDeltaSync } from '../services/sqliteService';
 
 const AppContext = createContext();
 
@@ -139,6 +140,13 @@ export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
 
   useEffect(() => {
+    // Initialize SQLite Database and run delta sync
+    initDb().then(success => {
+      if (success) {
+        triggerDeltaSync().catch(err => console.error('Background sync failed:', err));
+      }
+    });
+
     if (!localStorage.getItem('installTime')) {
       localStorage.setItem('installTime', state.installTime);
     }

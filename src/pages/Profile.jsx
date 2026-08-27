@@ -280,11 +280,20 @@ export default function Profile() {
             </div>
 
             {/* Admit Card & Result */}
-            <div className="menu-item" onClick={() => navigate('/admit-card')}>
+            <div className="menu-item" onClick={() => navigate('/admit-card')} style={{ borderBottom: '1px solid var(--border-light)' }}>
               <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', color: 'white' }}>
                 <FileText size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
+              <ChevronRight size={15} className="menu-item-arrow" />
+            </div>
+
+            {/* Offline Text Feed */}
+            <div className="menu-item" onClick={() => navigate('/offline-feed')}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #f59e0b, #eab308)', color: 'white' }}>
+                <Rss size={13} />
+              </div>
+              <span className="menu-item-label">{isEn ? 'Offline Text Feed' : 'অফলাইন টেক্সট ফিড'}</span>
               <ChevronRight size={15} className="menu-item-arrow" />
             </div>
           </div>
