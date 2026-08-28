@@ -287,7 +287,7 @@ export default function ResultDetails() {
                 src={circularImages[activeImageIndex]}
                 alt={`Result Sheet Page ${activeImageIndex + 1}`}
                 onClick={() => setShowFullImage(!showFullImage)}
-                fallbackTitle={isEn ? 'Official Result Sheet Document' : 'পরীক্ষার অফিশিয়াল ফলাফল শীট'}
+                fallbackTitle={isEn ? 'Please click the button below to view official result sheet or download! 👇' : 'ফলাফল দেখতে বা ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
                 downloadUrl={rawImagesList[activeImageIndex] || circularImages[activeImageIndex]}
                 objectFit="contain"
                 style={{

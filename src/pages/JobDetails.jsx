@@ -318,7 +318,7 @@ export default function JobDetails() {
                 src={circularImages[activeImageIndex]}
                 alt={`Circular Notice Page ${activeImageIndex + 1}`}
                 onClick={() => setShowFullImage(!showFullImage)}
-                fallbackTitle={isEn ? 'Official Job Circular Notice' : 'অফিসিয়াল নিয়োগ বিজ্ঞপ্তি'}
+                fallbackTitle={isEn ? 'Please click the button below to view official circular or apply! 👇' : 'সার্কুলার দেখতে বা আবেদন করতে নিচের বাটনে চাপ দিন! 👇'}
                 downloadUrl={rawImagesList[activeImageIndex] || circularImages[activeImageIndex]}
                 objectFit="contain"
                 style={{

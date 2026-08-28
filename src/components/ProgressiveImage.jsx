@@ -117,8 +117,11 @@ export default function ProgressiveImage({
           📄
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '320px' }}>
-          <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.5 }}>
-            {fallbackTitle || 'অফিসিয়াল বিজ্ঞপ্তি নোটিশ ও শর্তাবলী দেখতে নিচের বাটনে চাপ দিন'}
+          <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+            প্রিভিউ দেখা যাচ্ছে না?
+          </span>
+          <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
+            {fallbackTitle || 'অফিসিয়াল নোটিশ বা বিজ্ঞপ্তি দেখতে নিচের বাটনে চাপ দিন! 👇'}
           </span>
         </div>
       </div>

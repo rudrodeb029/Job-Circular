@@ -310,7 +310,7 @@ export default function ExamDetails() {
                 src={circularImages[activeImageIndex]}
                 alt={`Exam Notice Page ${activeImageIndex + 1}`}
                 onClick={() => setShowFullImage(!showFullImage)}
-                fallbackTitle={state.language === 'en' ? 'Exam Notice Document' : 'পরীক্ষার অফিশিয়াল নোটিশ'}
+                fallbackTitle={state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
                 downloadUrl={rawImagesList[activeImageIndex] || circularImages[activeImageIndex]}
                 objectFit="contain"
                 style={{
