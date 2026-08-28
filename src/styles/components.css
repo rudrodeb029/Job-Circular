@@ -1393,17 +1393,3 @@
   }
 }
 
-/* Instant 0ms Tactile Feedback on Touch/Click */
-.job-card:active,
-.category-card:active,
-.notification-item:active,
-.btn:active,
-.menu-item:active,
-.bottom-nav-item:active,
-.bottom-nav-middle-item:active,
-.back-btn:active,
-.icon-btn:active {
-  transform: scale(0.97);
-  transition: transform 0.06s ease;
-}
-

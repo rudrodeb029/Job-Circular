@@ -16,26 +16,24 @@ export default function QuestionDetails() {
   const { state: adminState, dispatch: adminDispatch } = useAdminContext();
   const isEn = state.language === 'en';
 
-  const initialPaper = useMemo(() => {
-    const fromContext = (adminState?.questions || []).find(q => String(q.id) === String(id));
-    if (fromContext && Array.isArray(fromContext.questions) && fromContext.questions.length > 0) {
-      return fromContext;
-    }
-    const staticPaper = getQuestionById(id);
-    if (staticPaper && Array.isArray(staticPaper.questions) && staticPaper.questions.length > 0) {
-      return staticPaper;
-    }
-    return null;
-  }, [id, adminState?.questions]);
-
-  const [paper, setPaper] = useState(initialPaper);
-  const [pageLoading, setPageLoading] = useState(!initialPaper);
+  const [pageLoading, setPageLoading] = useState(true);
   const [isSwitchingMode, setIsSwitchingMode] = useState(false);
+  const [paper, setPaper] = useState(null);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
 
   useEffect(() => {
-    if (initialPaper) {
-      setPaper(initialPaper);
+    // 1. Check if we have it in adminState.questions and it has questions
+    const fromContext = (adminState?.questions || []).find(q => String(q.id) === String(id));
+    if (fromContext && Array.isArray(fromContext.questions) && fromContext.questions.length > 0) {
+      setPaper(fromContext);
+      setPageLoading(false);
+      return;
+    }
+
+    // 2. Fallback to questionsData lookup
+    const staticPaper = getQuestionById(id);
+    if (staticPaper && Array.isArray(staticPaper.questions) && staticPaper.questions.length > 0) {
+      setPaper(staticPaper);
       setPageLoading(false);
       return;
     }
