@@ -83,39 +83,82 @@ function App() {
 
     // Handle OneSignal Notification Clicks (Protected by Notification Processing Lock)
     setupOneSignalClickHandler((data) => {
-      console.log('App: Handling notification click with data:', data);
+      console.log('App: Handling notification click with payload:', data);
+      if (!data) {
+        navigate('/notifications');
+        return;
+      }
 
       if (isNotificationProcessingRef.current) {
-        console.warn('🔒 Push Notification Lock Active: Skipping duplicate notification click event.');
+        console.warn('🔒 Push Notification Lock Active: Skipping duplicate click event.');
         return;
       }
       isNotificationProcessingRef.current = true;
 
-      // Force refresh core data & SQLite delta sync
+      // Force refresh core data & SQLite delta sync on notification click
       syncCoreDataOnStartup(true).catch(err => console.error('Data refresh failed:', err));
       triggerDeltaSync().catch(err => console.error('SQLite Sync from push failed:', err));
 
-      // Release click lock after 1.5s
       setTimeout(() => {
         isNotificationProcessingRef.current = false;
       }, 1500);
 
-      // Navigate to relevant post
-      if (data.jobId) {
-        navigate(`/job/${data.jobId}`);
-      } else if (data.examId) {
-        navigate(`/live-exam-room/${data.examId}`);
-      } else if (data.paperId) {
-        navigate(`/question-details/${data.paperId}`);
-      } else if (data.type === 'result' && data.jobId) {
-        navigate(`/result-details/${data.jobId}`);
-      } else if (data.type === 'exam_date' && data.jobId) {
-        navigate(`/exam-details/${data.jobId}`);
-      } else if (data.type === 'feed_update' || data.postId) {
-        navigate('/feed');
-      } else {
-        navigate('/notifications');
+      const targetType = data.type || data.feedType || '';
+      const targetId = data.jobId || data.examId || data.paperId || data.questionId || data.postId || data.id;
+
+      // 1. Live Exam Push
+      if (data.examId || targetType === 'live_exam' || targetType === 'exam_reminder') {
+        const examId = data.examId || targetId;
+        if (examId) {
+          navigate(`/live-exam-room/${examId}`);
+          return;
+        }
       }
+
+      // 2. Question Bank Push
+      if (data.paperId || data.questionId || targetType === 'new_paper' || targetType === 'new_question') {
+        const paperId = data.paperId || data.questionId || targetId;
+        if (paperId) {
+          navigate(`/question-details/${paperId}`);
+          return;
+        }
+      }
+
+      // 3. Admit Card / Exam Date Push
+      if (targetType === 'admit_card' || targetType === 'exam_date' || targetType === 'admit') {
+        const jobId = data.jobId || targetId;
+        if (jobId) {
+          navigate(`/exam-details/${jobId}`);
+          return;
+        }
+      }
+
+      // 4. Exam Result Push
+      if (targetType === 'result') {
+        const jobId = data.jobId || targetId;
+        if (jobId) {
+          navigate(`/result-details/${jobId}`);
+          return;
+        }
+      }
+
+      // 5. Job Circular Push
+      if (data.jobId || targetType === 'new_job' || targetType === 'job') {
+        const jobId = data.jobId || targetId;
+        if (jobId) {
+          navigate(`/job/${jobId}`);
+          return;
+        }
+      }
+
+      // 6. Feed Post Push
+      if (data.postId || targetType === 'feed_update') {
+        navigate('/feed');
+        return;
+      }
+
+      // Default fallback
+      navigate('/notifications');
     });
   }, [isAdminRoute, navigate]);
 

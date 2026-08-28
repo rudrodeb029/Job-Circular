@@ -21,6 +21,8 @@ GRANT SELECT ON public.app_sync_control TO anon, authenticated;
 -- Enable RLS (Row Level Security) and allow public read
 ALTER TABLE public.app_sync_control ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Allow public read access to app_sync_control" ON public.app_sync_control;
+
 CREATE POLICY "Allow public read access to app_sync_control"
 ON public.app_sync_control FOR SELECT
 USING (true);
