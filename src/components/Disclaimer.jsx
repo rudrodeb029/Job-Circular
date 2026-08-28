@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useAppContext } from '../context/AppContext';
 
 export default function Disclaimer() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeLang, setActiveLang] = useState('bn'); // 'bn' | 'en'
+  const { state } = useAppContext();
+  const isEn = state.language === 'en';
 
   return (
     <div style={{
@@ -34,7 +36,7 @@ export default function Disclaimer() {
             textTransform: 'uppercase', 
             letterSpacing: '0.8px'
           }}>
-            Disclaimer & Legal Notice / আইনি দাবিত্যাগ
+            {isEn ? 'Disclaimer & Legal Notice' : 'সতর্কবার্তা ও আইনি দাবিত্যাগ'}
           </span>
         </div>
 
@@ -60,44 +62,11 @@ export default function Disclaimer() {
       {/* Conditionally Rendered Detailed Disclaimer */}
       {isExpanded && (
         <div className="animate-fade-in" style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid var(--border-light)' }}>
-          {/* Language Selector Tabs */}
-          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
-            <button
-              onClick={() => setActiveLang('bn')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '20px',
-                fontSize: '11px',
-                fontWeight: 700,
-                border: activeLang === 'bn' ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-                background: activeLang === 'bn' ? 'var(--primary-lightest, #eff6ff)' : 'transparent',
-                color: activeLang === 'bn' ? 'var(--primary)' : 'var(--text-secondary)',
-                cursor: 'pointer'
-              }}
-            >
-              🇧🇩 বাংলা
-            </button>
-            <button
-              onClick={() => setActiveLang('en')}
-              style={{
-                padding: '6px 14px',
-                borderRadius: '20px',
-                fontSize: '11px',
-                fontWeight: 700,
-                border: activeLang === 'en' ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-                background: activeLang === 'en' ? 'var(--primary-lightest, #eff6ff)' : 'transparent',
-                color: activeLang === 'en' ? 'var(--primary)' : 'var(--text-secondary)',
-                cursor: 'pointer'
-              }}
-            >
-              🇬🇧 English
-            </button>
-          </div>
-
-          {activeLang === 'bn' ? (
+          {!isEn ? (
+            /* 🇧🇩 Bangla Disclaimer Mode */
             <div style={{ fontSize: '11.5px', lineHeight: '1.65', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: '12px', padding: '10px 12px', color: '#873800', fontWeight: 600 }}>
-                📢 <strong>জরুরি সতর্কবার্তা:</strong> লাইভ সার্কুলার অ্যাপটি কোনো সরকারি সংস্থা বা কর্তৃপক্ষের সাথে সরাসরি সম্পৃক্ত নয়।
+                📢 <strong>জরুরি সতর্কবার্তা:</strong> এই অ্যাপটি বাংলাদেশ সরকার বা কোনো সরকারি কর্তৃপক্ষের অফিশিয়াল অ্যাপ্লিকেশন নয়।
               </div>
 
               <div>
@@ -112,7 +81,7 @@ export default function Disclaimer() {
 
               <div>
                 <strong style={{ color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>৩. কপিরাইট এবং মেধা সম্পত্তি (Copyright & Intellectual Property):</strong>
-                বিগত সালের পরীক্ষার মূল প্রশ্নপত্রের অধিকার সম্পূর্ণভাবে সংশ্লিষ্ট পরীক্ষা নিয়ন্ত্রণ কর্তৃপক্ষের। আমরা কোনো বাণিজ্যিক প্রকাশনী বা গাইড বইয়ের কপিরাইটযুক্ত কন্টেন্ট (যেমন: হুবহু স্ক্যান করা পাতা বা তাদের তৈরি করা এক্সক্লুসিভ সমাধান) প্রকাশ করি না। অ্যাপে থাকা সমাধানগুলো আমাদের নিজস্ব টিম দ্বারা পরীক্ষামূলকভাবে তৈরি বা উন্মুক্ত সোর্স থেকে সংগৃহীত। যেকোনো কন্টেন্ট অপসারণের জন্য আমাদের সাথে সরাসরি যোগাযোগ করুন, অভিযোগ প্রমাণিত হওয়া মাত্র ২৪-৪৮ ঘণ্টার মধ্যে কন্টেন্ট সরাব।
+                বিগত সালের পরীক্ষার মূল প্রশ্নপত্রের অধিকার সম্পূর্ণভাবে সংশ্লিষ্ট পরীক্ষা নিয়ন্ত্রণ কর্তৃপক্ষের। আমরা কোনো বাণিজ্যিক প্রকাশনী বা গাইড বইয়ের কপিরাইটযুক্ত কন্টেন্ট প্রকাশ করি না। অ্যাপে থাকা সমাধানগুলো আমাদের নিজস্ব টিম দ্বারা পরীক্ষামূলকভাবে তৈরি বা উন্মুক্ত সোর্স থেকে সংগৃহীত। যেকোনো কন্টেন্ট অপসারণের জন্য আমাদের সাথে সরাসরি যোগাযোগ করুন, অভিযোগ প্রমাণিত হওয়া মাত্র ২৪-৪৮ ঘণ্টার মধ্যে কন্টেন্ট সরাব।
               </div>
 
               <div>
@@ -125,6 +94,7 @@ export default function Disclaimer() {
               </div>
             </div>
           ) : (
+            /* 🇬🇧 English Disclaimer Mode */
             <div style={{ fontSize: '11.5px', lineHeight: '1.65', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '10px 12px', color: '#1e40af', fontWeight: 600 }}>
                 📢 <strong>Important Notice:</strong> Live Circular is an independent platform and does NOT represent any government entity.
@@ -167,7 +137,7 @@ export default function Disclaimer() {
             gap: '8px 16px',
             fontSize: '11px'
           }}>
-            <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>Official Sources:</span>
+            <span style={{ color: 'var(--text-muted)', fontWeight: 600 }}>{isEn ? 'Official Sources:' : 'অফিসিয়াল সোর্সসমূহ:'}</span>
             <a href="https://bangladesh.gov.bd" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 700 }}>
               bangladesh.gov.bd
             </a>
