@@ -101,7 +101,17 @@ export const syncCoreDataOnStartup = async (force = false) => {
   if ((_appInitialized && !force) || _isStartupSyncing || !navigator.onLine) return;
 
   _isStartupSyncing = true;
-  console.log(force ? 'Forced Refresh: Executing 1 Unified Sync Request...' : 'Startup Sync: Executing 1 Unified Sync Request...');
+  const coreCollections = [
+    COLLECTIONS.JOBS,
+    COLLECTIONS.NOTIFICATIONS,
+    COLLECTIONS.ADMITS,
+    COLLECTIONS.LIVE_EXAMS,
+    COLLECTIONS.QUESTIONS,
+    COLLECTIONS.FEED_POSTS,
+    COLLECTIONS.APP_CONFIG
+  ];
+
+  console.log(force ? 'Forced Refresh: Executing Unified Sync...' : 'Startup Sync: Executing Unified Sync...');
 
   try {
     const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
@@ -117,37 +127,57 @@ export const syncCoreDataOnStartup = async (force = false) => {
     }
 
     const response = await fetch(syncUrl, { headers });
-    if (!response.ok) throw new Error(`Sync HTTP error ${response.status}`);
-    
-    const data = await response.json();
+    if (response.ok) {
+      const data = await response.json();
+      if (data && (data.jobs || data.questions || data.notifications)) {
+        const collectionsMap = {
+          [COLLECTIONS.JOBS]: data.jobs,
+          [COLLECTIONS.NOTIFICATIONS]: data.notifications,
+          [COLLECTIONS.ADMITS]: data.admits,
+          [COLLECTIONS.LIVE_EXAMS]: data.live_exams,
+          [COLLECTIONS.QUESTIONS]: data.questions,
+          [COLLECTIONS.FEED_POSTS]: data.feed_posts,
+          [COLLECTIONS.APP_CONFIG]: data.app_config,
+        };
 
-    const collectionsMap = {
-      [COLLECTIONS.JOBS]: data.jobs,
-      [COLLECTIONS.NOTIFICATIONS]: data.notifications,
-      [COLLECTIONS.ADMITS]: data.admits,
-      [COLLECTIONS.LIVE_EXAMS]: data.live_exams,
-      [COLLECTIONS.QUESTIONS]: data.questions,
-      [COLLECTIONS.FEED_POSTS]: data.feed_posts,
-      [COLLECTIONS.APP_CONFIG]: data.app_config,
-    };
+        Object.entries(collectionsMap).forEach(([col, items]) => {
+          if (Array.isArray(items) && items.length > 0) {
+            localStorage.setItem(`cache_data_${col}`, JSON.stringify(items));
+            localStorage.setItem(`cache_time_${col}`, String(Date.now()));
+            if (col === COLLECTIONS.QUESTIONS) {
+              localStorage.setItem('questions_data', JSON.stringify(items));
+            }
+            _sessionRevalidatedCollections.add(col);
+            window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: items }));
+          }
+        });
 
-    Object.entries(collectionsMap).forEach(([col, items]) => {
-      if (Array.isArray(items) && items.length > 0) {
-        localStorage.setItem(`cache_data_${col}`, JSON.stringify(items));
+        _appInitialized = true;
+        console.log('✅ Single-Request Unified Sync: Complete! (1 HTTP Request executed)');
+        return data;
+      }
+    }
+  } catch (err) {
+    console.warn('Unified Sync /sync-all endpoint failed or un-deployed, falling back to direct collection fetch:', err.message);
+  }
+
+  // Fallback: If /sync-all endpoint is unavailable, sync core collections directly
+  try {
+    await Promise.all(coreCollections.map(async (col) => {
+      const data = await getCollection(col, force);
+      if (data && data.length > 0) {
+        localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
         localStorage.setItem(`cache_time_${col}`, String(Date.now()));
         if (col === COLLECTIONS.QUESTIONS) {
-          localStorage.setItem('questions_data', JSON.stringify(items));
+          localStorage.setItem('questions_data', JSON.stringify(data));
         }
         _sessionRevalidatedCollections.add(col);
-        window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: items }));
+        window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
       }
-    });
-
+    }));
     _appInitialized = true;
-    console.log('✅ Single-Request Unified Sync: Complete! (EXACTLY 1 HTTP Request executed)');
-    return data;
-  } catch (err) {
-    console.warn('Unified Sync fallback:', err.message);
+  } catch (e) {
+    console.error('Fallback core sync failed:', e);
   } finally {
     _isStartupSyncing = false;
   }
@@ -155,11 +185,9 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
 /**
  * Multi-Tier Caching Collection Fetcher
- * - Tier 1: Device localStorage (Indefinite Cache)
- * - Tier 2: Cloudflare Global Edge CDN (bypassed on forceServer=true)
+ * - Tier 1: Device localStorage (Indefinite Offline Cache)
+ * - Tier 2: Cloudflare Global Edge CDN
  * - Tier 3: Supabase PostgreSQL Database
- * 
- * Strategy: RETURNS CACHE ONLY after the initial startup sync is done.
  */
 export const getCollectionCached = async (collectionName, forceServer = false, customTtlMinutes = null) => {
   const cacheKey = `cache_data_${collectionName}`;
@@ -176,41 +204,26 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
     }
   }
 
-  // 2. Strict Core Collection Protection:
-  // Core collections are synchronized EXCLUSIVELY via 1 unified request in syncCoreDataOnStartup().
-  // getCollectionCached MUST NEVER fire individual network GET requests for core collections.
-  const isCore = [
-    COLLECTIONS.JOBS,
-    COLLECTIONS.NOTIFICATIONS,
-    COLLECTIONS.ADMITS,
-    COLLECTIONS.LIVE_EXAMS,
-    COLLECTIONS.QUESTIONS,
-    COLLECTIONS.FEED_POSTS,
-    COLLECTIONS.APP_CONFIG
-  ].includes(collectionName);
-
-  if (isCore) {
-    if (cachedData && cachedData.length > 0) {
-      return cachedData;
-    }
-    // If not in cache and forceServer is false, return empty array without making network calls
-    if (!forceServer) {
-      return cachedData || [];
-    }
+  // 2. Return valid local cache instantly if available and forceServer is false (0 Network Requests)
+  if (cachedData && Array.isArray(cachedData) && cachedData.length > 0 && !forceServer) {
+    return cachedData;
   }
 
-  // 3. Fallback for non-core collections if forced
-  if (forceServer && navigator.onLine) {
+  // 3. Network Fetch Fallback if local cache is empty or forceServer is requested
+  if (navigator.onLine) {
     try {
       const data = await getCollection(collectionName, forceServer);
       if (data && data.length > 0) {
         localStorage.setItem(cacheKey, JSON.stringify(data));
         localStorage.setItem(timeKey, String(Date.now()));
+        if (collectionName === COLLECTIONS.QUESTIONS) {
+          localStorage.setItem('questions_data', JSON.stringify(data));
+        }
         _sessionRevalidatedCollections.add(collectionName);
         return data;
       }
     } catch (error) {
-      console.warn(`Fetch failed for ${collectionName}, using cache.`);
+      console.warn(`Fetch failed for ${collectionName}, returning cache fallback.`, error);
     }
   }
 
