@@ -132,6 +132,16 @@ export default function LiveExamRoom() {
   const [submitted, setSubmitted] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [activeRoomTab, setActiveRoomTab] = useState('solutions'); // 'solutions' | 'leaderboard'
+  const [tabLoading, setTabLoading] = useState(false);
+
+  const handleRoomTabChange = (tabName) => {
+    if (tabName === activeRoomTab) return;
+    setTabLoading(true);
+    setActiveRoomTab(tabName);
+    setTimeout(() => {
+      setTabLoading(false);
+    }, 150);
+  };
 
   // Retrieve user results from localStorage if they have already taken it
   const savedResult = useMemo(() => {
@@ -502,7 +512,7 @@ export default function LiveExamRoom() {
           padding: '0 8px'
         }}>
           <button
-            onClick={() => setActiveRoomTab('solutions')}
+            onClick={() => handleRoomTabChange('solutions')}
             style={{
               flex: 1,
               padding: '14px 0',
@@ -519,7 +529,7 @@ export default function LiveExamRoom() {
             📋 {isEn ? 'Solutions' : 'সমাধান দেখুন'}
           </button>
           <button
-            onClick={() => setActiveRoomTab('leaderboard')}
+            onClick={() => handleRoomTabChange('leaderboard')}
             style={{
               flex: 1,
               padding: '14px 0',
@@ -539,6 +549,12 @@ export default function LiveExamRoom() {
       )}
 
       <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+        {tabLoading ? (
+          <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
+            <ModernLoader size="md" icon="📄" />
+          </div>
+        ) : (
+          <>
         
         {/* Result Header Panel */}
         {currentResult && activeRoomTab === 'solutions' && (
@@ -1011,6 +1027,8 @@ export default function LiveExamRoom() {
           >
             🚀 {isEn ? 'Submit Live Exam' : 'পরীক্ষা সম্পন্ন করুন'}
           </button>
+        )}
+          </>
         )}
       </div>
 
