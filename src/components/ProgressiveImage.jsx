@@ -91,9 +91,9 @@ export default function ProgressiveImage({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '32px 20px',
+        padding: '24px 20px',
         textAlign: 'center',
-        gap: '12px',
+        gap: '8px',
         background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)',
         borderRadius: '16px',
         border: '1px dashed #bfdbfe',
@@ -116,34 +116,6 @@ export default function ProgressiveImage({
         }}>
           📄
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '320px' }}>
-          <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.5 }}>
-            অফিসিয়াল বিজ্ঞপ্তি নোটিশ ও শর্তাবলী দেখতে নিচের বাটনে চাপ দিন
-          </span>
-        </div>
-        {downloadUrl && (
-          <a
-            href={downloadUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              marginTop: '4px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '8px 16px',
-              borderRadius: '10px',
-              background: 'var(--primary)',
-              color: 'white',
-              fontSize: '12px',
-              fontWeight: 700,
-              textDecoration: 'none',
-              boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)'
-            }}
-          >
-            <Eye size={14} /> সম্পূর্ণ নোটিশ ফাইল দেখুন
-          </a>
-        )}
       </div>
     );
   }
