@@ -94,13 +94,45 @@ export default function JobDetails() {
 
   const handleDownloadNotice = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
-    const rawFileUrl = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || job.imageUrl || job.circularImage;
-    if (!rawFileUrl) return;
+    
+    const rawFileUrl = rawImagesList[activeImageIndex] ||
+                       circularImages[activeImageIndex] ||
+                       job.imageUrl ||
+                       job.circularImage ||
+                       job.noticeUrl ||
+                       job.noticeImage ||
+                       job.pdfUrl ||
+                       (job.images && job.images[0]) ||
+                       job.downloadLink ||
+                       job.applyLink;
+
+    if (!rawFileUrl || rawFileUrl === '#' || rawFileUrl.trim() === '') {
+      const link = job.applyLink || job.applicationLink || job.link || job.url || 'https://alljobs.teletalk.com.bd';
+      setModalUrl(link);
+      setModalType('new_job');
+      setIsModalOpen(true);
+      return;
+    }
 
     setDownloading(true);
-    const fileName = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
-    await downloadSecurely(rawFileUrl, fileName);
-    setDownloading(false);
+    try {
+      const fileName = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
+      const success = await downloadSecurely(rawFileUrl, fileName);
+      if (!success) {
+        const link = normalizeMediaUrl(rawFileUrl) || job.applyLink || 'https://alljobs.teletalk.com.bd';
+        setModalUrl(link);
+        setModalType('new_job');
+        setIsModalOpen(true);
+      }
+    } catch (err) {
+      console.error('Job notice download error:', err);
+      const link = normalizeMediaUrl(rawFileUrl) || job.applyLink || 'https://alljobs.teletalk.com.bd';
+      setModalUrl(link);
+      setModalType('new_job');
+      setIsModalOpen(true);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const handleOfficialApply = (e) => {
@@ -558,6 +590,34 @@ export default function JobDetails() {
             </div>
 
             <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
+              <button
+                type="button"
+                disabled={downloading}
+                onClick={handleDownloadNotice}
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  padding: '10px 10px',
+                  borderRadius: '12px',
+                  background: 'var(--primary-bg)',
+                  color: 'var(--primary)',
+                  fontWeight: 700,
+                  fontSize: '12px',
+                  border: '1.5px solid #dbeafe',
+                  boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
+                  transition: 'all 0.15s ease',
+                  cursor: downloading ? 'wait' : 'pointer',
+                  textAlign: 'center',
+                  opacity: downloading ? 0.75 : 1
+                }}
+              >
+                {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={14} />} 
+                <span>{downloading ? (isEn ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') : (isEn ? 'Notice' : 'নোটিশ')}</span>
+              </button>
+
               <button
                 onClick={handleOfficialApply}
                 style={{
