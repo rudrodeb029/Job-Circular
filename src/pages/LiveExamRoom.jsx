@@ -17,8 +17,20 @@ export default function LiveExamRoom() {
   const isEn = state.language === 'en';
   const roomEntryTime = useRef(Date.now());
 
-  const [exam, setExam] = useState(null);
-  const [loadingExam, setLoadingExam] = useState(true);
+  const initialExam = useMemo(() => {
+    if (!id) return null;
+    const targetId = String(id).trim();
+    const adminExams = adminState.liveExams || [];
+    let match = adminExams.find(e => e && String(e.id).trim() === targetId);
+    if (!match) {
+      const cachedExams = getLiveExams();
+      match = cachedExams.find(e => e && String(e.id).trim() === targetId);
+    }
+    return match || null;
+  }, [id, adminState?.liveExams]);
+
+  const [exam, setExam] = useState(initialExam);
+  const [loadingExam, setLoadingExam] = useState(!initialExam);
   const [realSubmissions, setRealSubmissions] = useState([]);
 
   // Multi-tier resolution for exam details (Handles high concurrency, direct links, and notifications)
@@ -26,6 +38,10 @@ export default function LiveExamRoom() {
     let isMounted = true;
 
     const findExam = async () => {
+      if (initialExam && isMounted) {
+        setExam(initialExam);
+        setLoadingExam(false);
+      }
       if (!id) {
         if (isMounted) setLoadingExam(false);
         return;
