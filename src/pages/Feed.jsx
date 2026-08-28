@@ -71,7 +71,7 @@ export default function Feed() {
   }, [adminState.feedPosts, state.feedPosts, searchQuery]);
 
   return (
-    <div className="page" style={{ paddingBottom: '80px', background: 'var(--bg-secondary, #f0f2f5)' }}>
+    <div className="page page-content animate-fade-in" style={{ paddingBottom: '80px', background: 'var(--bg-secondary, #f0f2f5)' }}>
       <AppHeader />
 
       <PullToRefresh>
