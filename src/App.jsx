@@ -252,37 +252,9 @@ function App() {
     )
   }
 
-  const navigationType = useNavigationType();
-  const prevPathRef = useRef(location.pathname);
-
-  // Tab index order for bottom navigation bar
-  const TAB_ORDER = {
-    '/': 0,
-    '/home': 0,
-    '/feed': 1,
-    '/saved': 2,
-    '/notifications': 3,
-    '/profile': 4
-  };
-
-  const prevIndex = TAB_ORDER[prevPathRef.current] ?? -1;
-  const currentIndex = TAB_ORDER[location.pathname] ?? -1;
-
-  let isBackNavigation = navigationType === 'POP';
-
-  if (prevIndex !== -1 && currentIndex !== -1) {
-    if (currentIndex < prevIndex) {
-      isBackNavigation = true; // Moving to a lower tab index (e.g. Feed -> Home): Left-to-Right
-    } else if (currentIndex > prevIndex) {
-      isBackNavigation = false; // Moving to a higher tab index (e.g. Home -> Feed): Right-to-Left
-    }
-  } else if (currentIndex === 0) {
-    isBackNavigation = true; // Returning to Homepage from any secondary page: Left-to-Right
-  }
-
-  useEffect(() => {
-    prevPathRef.current = location.pathname;
-  }, [location.pathname]);
+  const navigationType = useNavigationType()
+  const isHomePage = location.pathname === '/' || location.pathname === '/home';
+  const isBackNavigation = navigationType === 'POP' || isHomePage;
 
   return (
     <ErrorBoundary>
