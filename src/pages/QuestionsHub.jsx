@@ -27,8 +27,15 @@ export default function QuestionsHub() {
   const isEn = state.language === 'en';
 
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
-  const [isFiltering, setIsFiltering] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsFiltering(false);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleCategorySelect = (key) => {
     if (activeCategory === key) return;
