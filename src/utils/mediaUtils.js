@@ -143,5 +143,13 @@ export function extractJobMediaList(item) {
     rawList = [item.pdf];
   }
 
+  if (rawList.length === 0 && item.examResult && typeof item.examResult === 'string' && item.examResult.trim() && item.examResult !== '#') {
+    rawList = [item.examResult];
+  }
+
+  if (rawList.length === 0 && item.downloadLink && typeof item.downloadLink === 'string' && item.downloadLink.trim() && item.downloadLink !== '#') {
+    rawList = [item.downloadLink];
+  }
+
   return rawList.map(u => (typeof u === 'string' ? u.trim() : '')).filter(Boolean);
 }

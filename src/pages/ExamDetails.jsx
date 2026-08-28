@@ -115,13 +115,46 @@ export default function ExamDetails() {
 
   const handleDownloadNotice = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
-    const rawFileUrl = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || job.imageUrl || job.circularImage;
-    if (!rawFileUrl) return;
+    
+    const rawFileUrl = rawImagesList[activeImageIndex] ||
+                       circularImages[activeImageIndex] ||
+                       job.imageUrl ||
+                       job.circularImage ||
+                       job.noticeUrl ||
+                       job.noticeImage ||
+                       job.pdfUrl ||
+                       (job.images && job.images[0]) ||
+                       job.downloadLink ||
+                       job.examLink ||
+                       job.applyLink;
+
+    if (!rawFileUrl || rawFileUrl === '#' || rawFileUrl.trim() === '') {
+      const link = job.examLink || job.downloadLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
+      setModalUrl(link);
+      setModalType('admit_card');
+      setIsModalOpen(true);
+      return;
+    }
 
     setDownloading(true);
-    const fileName = `${orgName || titleName || 'Exam'}_Notice_Page_${activeImageIndex + 1}`;
-    await downloadSecurely(rawFileUrl, fileName);
-    setDownloading(false);
+    try {
+      const fileName = `${job.organization || orgName || 'Exam'}_Notice_Page_${activeImageIndex + 1}`;
+      const success = await downloadSecurely(rawFileUrl, fileName);
+      if (!success) {
+        const link = normalizeMediaUrl(rawFileUrl) || job.examLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
+        setModalUrl(link);
+        setModalType('admit_card');
+        setIsModalOpen(true);
+      }
+    } catch (err) {
+      console.error('Notice download error:', err);
+      const link = normalizeMediaUrl(rawFileUrl) || job.examLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
+      setModalUrl(link);
+      setModalType('admit_card');
+      setIsModalOpen(true);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const handleDownloadAdmitCard = () => {
