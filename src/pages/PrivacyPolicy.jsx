@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield } from '../components/Icons';
 import BottomNav from '../components/BottomNav';
-import Disclaimer from '../components/Disclaimer';
 
 export default function PrivacyPolicy() {
   const navigate = useNavigate();
@@ -310,9 +309,6 @@ export default function PrivacyPolicy() {
             </div>
           </div>
         )}
-
-        {/* Shared Disclaimer Footer */}
-        <Disclaimer />
       </div>
       <BottomNav />
     </div>
