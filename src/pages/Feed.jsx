@@ -71,10 +71,11 @@ export default function Feed() {
   }, [adminState.feedPosts, state.feedPosts, searchQuery]);
 
   return (
-    <div className="page page-content animate-fade-in" style={{ paddingBottom: '80px', background: 'var(--bg-secondary, #f0f2f5)' }}>
+    <div className="page" style={{ paddingBottom: '80px' }}>
       <AppHeader />
 
       <PullToRefresh>
+        <div className="page-content animate-fade-in">
         {/* Search Bar Row with App Icon */}
         <div style={{
           background: 'var(--card-bg, #ffffff)',
@@ -152,6 +153,7 @@ export default function Feed() {
             ))}
           </div>
         )}
+        </div>
       </PullToRefresh>
 
       <BottomNav />
