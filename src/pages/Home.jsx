@@ -10,7 +10,6 @@ import SearchBar from '../components/SearchBar';
 import TabBar from '../components/TabBar';
 import { HomeSkeleton } from '../components/SkeletonLoader';
 import { categories } from '../data/categories';
-import Disclaimer from '../components/Disclaimer';
 import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import PullToRefresh from '../components/PullToRefresh';
 
@@ -493,7 +492,6 @@ export default function Home() {
             </div>
           )}
         </div>
-        <Disclaimer />
       </div>
       </PullToRefresh>
       <BottomNav />
