@@ -253,7 +253,8 @@ function App() {
   }
 
   const navigationType = useNavigationType()
-  const isBackNavigation = navigationType === 'POP'
+  const isHomePage = location.pathname === '/' || location.pathname === '/home';
+  const isBackNavigation = navigationType === 'POP' || isHomePage;
 
   return (
     <ErrorBoundary>
