@@ -190,9 +190,12 @@ export default function ManageJobs() {
       ? editingJob.id 
       : (formData.linkedCircularId ? formData.linkedCircularId : `job_${Date.now()}`);
 
+    const jobTitle = formData.organization || 'নিয়োগ বিজ্ঞপ্তি';
     const jobData = {
       ...formData,
       id: targetId,
+      title: jobTitle,
+      titleEn: formData.organizationEn || jobTitle,
       examDate: finalExamDate,
       examResult: finalExamResult,
       requirements: reqArray,
@@ -226,8 +229,8 @@ export default function ManageJobs() {
       const admitData = {
         id: admitId,
         jobId: targetId,
-        examName: `${formData.title} পরীক্ষা`,
-        examNameEn: `${formData.titleEn || formData.title} Exam`,
+        examName: `${formData.organization} পরীক্ষার তারিখ`,
+        examNameEn: `${formData.organizationEn || formData.organization} Exam Date`,
         organization: formData.organization,
         organizationEn: formData.organizationEn || formData.organization,
         category: formData.categoryId,
@@ -250,8 +253,8 @@ export default function ManageJobs() {
       const resultData = {
         id: resultId,
         jobId: targetId,
-        examName: `${formData.title} পরীক্ষার ফলাফল`,
-        examNameEn: `${formData.titleEn || formData.title} Exam Result`,
+        examName: `${formData.organization} পরীক্ষার ফলাফল`,
+        examNameEn: `${formData.organizationEn || formData.organization} Exam Result`,
         organization: formData.organization,
         organizationEn: formData.organizationEn || formData.organization,
         category: formData.categoryId,
@@ -380,12 +383,8 @@ export default function ManageJobs() {
 
           <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
             <div className="input-group">
-               <label>Title (Bengali)</label>
-               <input name="title" className="modern-input" value={formData.title} onChange={handleInputChange} required />
-            </div>
-            <div className="input-group">
                <label>Organization (Bengali)</label>
-               <input name="organization" className="modern-input" value={formData.organization} onChange={handleInputChange} required />
+               <input name="organization" className="modern-input" value={formData.organization} onChange={handleInputChange} required placeholder="যেমন: বাংলাদেশ সেনাবাহিনী" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               <div className="input-group">

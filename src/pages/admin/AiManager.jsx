@@ -278,12 +278,8 @@ export default function AiManager() {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '30px' }}>
             <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Job Title (Bengali)</label>
-              <input value={result.title} onChange={(e) => setResult({...result, title: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px', fontWeight: '700', fontSize: '16px' }} />
-            </div>
-            <div>
-              <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Organization Name</label>
-              <input value={result.organization} onChange={(e) => setResult({...result, organization: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px', fontWeight: '600' }} />
+              <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Organization Name (Bengali)</label>
+              <input value={result.organization} onChange={(e) => setResult({...result, organization: e.target.value, title: e.target.value})} style={{ width: '100%', padding: '14px', border: '1px solid #e2e8f0', borderRadius: '10px', fontWeight: '700', fontSize: '16px' }} placeholder="যেমন: বাংলাদেশ সেনাবাহিনী" />
             </div>
             <div>
               <label style={{ fontSize: '12px', fontWeight: '900', color: '#64748b', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Total Vacancy</label>

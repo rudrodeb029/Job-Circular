@@ -133,32 +133,29 @@ const adminReducer = (state, action) => {
 
       if (action.type === 'ADD_JOB' || job.shouldNotify) {
           let type = 'new_job';
-          let title = '';
-          let msg = '';
-          
           if (job.showInResult) {
               type = 'result';
-              const baseTitle = job.organization || job.title;
-              title = baseTitle.includes('📜') ? baseTitle : `📜 ${baseTitle}`;
-              msg = `${job.organization || ''} -এর ${job.title} পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`;
           } else if (job.showInExamDate) {
               type = 'admit_card';
-              const baseTitle = job.organization || job.title;
-              title = baseTitle.includes('🎟️') ? baseTitle : `🎟️ ${baseTitle}`;
-              msg = `${job.organization || ''} -এর ${job.title} পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
-          } else {
-              type = 'new_job';
-              const baseTitle = job.organization || job.title;
-              title = baseTitle.includes('💼') ? baseTitle : `💼 ${baseTitle}`;
-              msg = `${job.organization || ''} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে: ${job.title}`;
           }
 
-          broadcastPush(title, msg, { jobId: job.id, type: type })
+          // Push Notification Title: Organization name strictly
+          const pushTitle = job.organization || 'নিয়োগ বিজ্ঞপ্তি';
+          // Push Notification Body: Description strictly (or clean fallback if description is empty)
+          const pushMsg = (job.description && job.description.trim())
+            ? job.description.trim()
+            : (type === 'result'
+                ? `${job.organization} -এর পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`
+                : type === 'admit_card'
+                ? `${job.organization} -এর পরীক্ষার তারিখ প্রকাশিত হয়েছে।`
+                : `${job.organization} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে।`);
+
+          broadcastPush(pushTitle, pushMsg, { jobId: job.id, type: type })
               .then(res => {
                   if (res.success) {
-                      console.log(`✅ Push sent for circular update ("${type}"): "${job.title}" → ${res.recipients} device(s)`);
+                      console.log(`✅ Push sent for circular update ("${type}"): "${pushTitle}" → ${res.recipients} device(s)`);
                   } else {
-                      console.error(`❌ Push failed for circular: "${job.title}" →`, res.error);
+                      console.error(`❌ Push failed for circular: "${pushTitle}" →`, res.error);
                   }
               })
               .catch(err => console.error('Push error for circular:', err));
@@ -167,9 +164,9 @@ const adminReducer = (state, action) => {
           const notifId = `notif-job-${job.id}`;
           const notifObj = {
             id: notifId,
-            title: title,
+            title: pushTitle,
             organization: job.organization || '',
-            message: msg,
+            message: pushMsg,
             type: type,
             jobId: job.id,
             createdAt: job.createdAt || new Date().toISOString()
