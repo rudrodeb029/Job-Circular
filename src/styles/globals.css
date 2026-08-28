@@ -374,7 +374,7 @@ ul, ol {
   }
 }
 
-/* Professional Native App Page Transitions */
+/* Professional Native App Page Transitions (0-Jumping Scroll Optimization) */
 @keyframes slideInFromRight {
   0% {
     opacity: 0;
@@ -382,7 +382,7 @@ ul, ol {
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
@@ -393,7 +393,7 @@ ul, ol {
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: none;
   }
 }
 
@@ -402,21 +402,18 @@ ul, ol {
 .animate-fade-in,
 .animate-slide-in-right {
   animation: slideInFromRight 0.24s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  will-change: opacity;
   -webkit-overflow-scrolling: touch;
 }
 
 .animate-slide-up {
   animation: slideUp 0.26s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  will-change: opacity;
 }
 
 .animate-scale-in {
   animation: scaleIn 0.22s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  will-change: opacity;
 }
 
 /* Backward Navigation: Left-to-Right Slide */
@@ -427,23 +424,13 @@ ul, ol {
 .nav-direction-back .animate-fade-in,
 .nav-direction-back .animate-slide-in-right {
   animation: slideInFromLeft 0.24s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  will-change: opacity;
 }
 
 /* GPU Acceleration & Performance Tuning */
 .job-card, .category-card, .notification-item {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-}
-
-.job-card, .notification-item {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 120px;
-}
-
-img {
-  content-visibility: auto;
 }
 
 /* English Mode Text Scaling to Prevent Layout Wrappings */
