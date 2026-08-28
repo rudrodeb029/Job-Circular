@@ -91,9 +91,9 @@ export default function ProgressiveImage({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px 20px',
+        padding: '32px 20px',
         textAlign: 'center',
-        gap: '8px',
+        gap: '12px',
         background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)',
         borderRadius: '16px',
         border: '1px dashed #bfdbfe',
@@ -115,6 +115,11 @@ export default function ProgressiveImage({
           boxShadow: '0 4px 14px rgba(37, 99, 235, 0.22)'
         }}>
           📄
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '320px' }}>
+          <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.5 }}>
+            {fallbackTitle || 'অফিসিয়াল বিজ্ঞপ্তি নোটিশ ও শর্তাবলী দেখতে নিচের বাটনে চাপ দিন'}
+          </span>
         </div>
       </div>
     );
