@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
-import { setDocument, subscribeToAppUpdates, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
+import { setDocument, syncCoreDataOnStartup, subscribeToAppUpdates, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
 import { initDb, triggerDeltaSync } from '../services/sqliteService';
 
 const AppContext = createContext();
