@@ -397,33 +397,33 @@ ul, ol {
   }
 }
 
-/* Forward Navigation: Right-to-Left Slide (0.19s Super Fast) */
+/* Forward Navigation: Right-to-Left Slide (0.22s Professional Speed) */
 .page-content,
 .animate-fade-in,
 .animate-slide-in-right {
-  animation: slideInFromRight 0.19s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInFromRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: opacity;
   -webkit-overflow-scrolling: touch;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: opacity;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scaleIn 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: opacity;
 }
 
-/* Backward Navigation: Left-to-Right Slide (0.19s Super Fast) */
+/* Backward Navigation: Left-to-Right Slide (0.22s Professional Speed) */
 [data-nav-direction="back"] .page-content,
 [data-nav-direction="back"] .animate-fade-in,
 [data-nav-direction="back"] .animate-slide-in-right,
 .nav-direction-back .page-content,
 .nav-direction-back .animate-fade-in,
 .nav-direction-back .animate-slide-in-right {
-  animation: slideInFromLeft 0.19s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInFromLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: opacity;
 }
 
