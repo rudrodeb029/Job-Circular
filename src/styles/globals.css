@@ -374,31 +374,61 @@ ul, ol {
   }
 }
 
-@keyframes pureFadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+/* Super Fast & Smooth Native App Page Transitions */
+@keyframes slideInFromRight {
+  0% {
+    opacity: 0;
+    transform: translate3d(36px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
-.page-content {
-  animation: pureFadeIn 0.22s ease-out forwards;
-  will-change: opacity;
+@keyframes slideInFromLeft {
+  0% {
+    opacity: 0;
+    transform: translate3d(-36px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Forward Navigation: Right-to-Left Slide */
+.page-content,
+.animate-fade-in,
+.animate-slide-in-right {
+  animation: slideInFromRight 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform: translateZ(0);
   -webkit-overflow-scrolling: touch;
 }
 
-.animate-fade-in { animation: pureFadeIn 0.22s ease-out forwards; will-change: opacity; }
-.animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
-.animate-slide-in-right { animation: pureFadeIn 0.22s ease-out forwards; will-change: opacity; }
-.animate-scale-in { animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
+.animate-slide-up {
+  animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
 
-/* Smooth Fade Transitions for Navigation Back Actions */
+.animate-scale-in {
+  animation: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Backward Navigation: Left-to-Right Slide */
 [data-nav-direction="back"] .page-content,
 [data-nav-direction="back"] .animate-fade-in,
 [data-nav-direction="back"] .animate-slide-in-right,
 .nav-direction-back .page-content,
 .nav-direction-back .animate-fade-in,
 .nav-direction-back .animate-slide-in-right {
-  animation: pureFadeIn 0.22s ease-out forwards;
-  will-change: opacity;
+  animation: slideInFromLeft 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 /* GPU Acceleration & Performance Tuning */
