@@ -374,11 +374,11 @@ ul, ol {
   }
 }
 
-/* Super Fast & Smooth Native App Page Transitions */
+/* Professional Native App Page Transitions */
 @keyframes slideInFromRight {
   0% {
     opacity: 0;
-    transform: translate3d(36px, 0, 0);
+    transform: translate3d(28px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -389,7 +389,7 @@ ul, ol {
 @keyframes slideInFromLeft {
   0% {
     opacity: 0;
-    transform: translate3d(-36px, 0, 0);
+    transform: translate3d(-28px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -401,20 +401,20 @@ ul, ol {
 .page-content,
 .animate-fade-in,
 .animate-slide-in-right {
-  animation: slideInFromRight 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInFromRight 0.24s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
   will-change: transform, opacity;
   transform: translateZ(0);
   -webkit-overflow-scrolling: touch;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideUp 0.26s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
   will-change: transform, opacity;
   transform: translateZ(0);
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: scaleIn 0.22s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
   will-change: transform, opacity;
   transform: translateZ(0);
 }
@@ -426,7 +426,7 @@ ul, ol {
 .nav-direction-back .page-content,
 .nav-direction-back .animate-fade-in,
 .nav-direction-back .animate-slide-in-right {
-  animation: slideInFromLeft 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideInFromLeft 0.24s cubic-bezier(0.2, 0.8, 0.25, 1) forwards;
   will-change: transform, opacity;
   transform: translateZ(0);
 }
