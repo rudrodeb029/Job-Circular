@@ -1,215 +1,98 @@
--- ================================================================
--- LIVE CIRCULAR - SUPABASE HARDENED SCHEMA & RLS POLICIES
--- Clean, optimized PostgreSQL schema for Supabase REST API & Realtime
--- Authorized Admin: rudrodeb029@gmail.com
--- ================================================================
+-- ====================================================================
+-- SUPABASE SCHEMA MODIFICATION: AUTOMATED MASTER TIMESTAMP TRIGGER SYSTEM
+-- Project: Job Circular
+-- Purpose: Automates 304 Not Modified conditional checks for Cloudflare Worker & App Client
+-- ====================================================================
 
--- 1. Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- 2. Create Tables (if they don't exist)
-CREATE TABLE IF NOT EXISTS public.jobs (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  titleEn TEXT,
-  organization TEXT NOT NULL,
-  organizationEn TEXT,
-  categoryId TEXT,
-  category TEXT,
-  type TEXT,
-  deadline DATE,
-  publishDate DATE,
-  description TEXT,
-  descriptionEn TEXT,
-  circularImage TEXT,
-  circularImages TEXT[],
-  images TEXT[],
-  imageUrl TEXT,
-  applyLink TEXT,
-  applicationLink TEXT,
-  source TEXT,
-  vacancyCount TEXT,
-  showInExamDate BOOLEAN DEFAULT false,
-  showInResult BOOLEAN DEFAULT false,
-  isFeatured BOOLEAN DEFAULT false,
-  raw_data JSONB DEFAULT '{}'::jsonb,
-  createdAt TIMESTAMPTZ DEFAULT NOW(),
-  updatedAt TIMESTAMPTZ DEFAULT NOW()
+-- 1. Create Single-Row Master Sync Control Table
+CREATE TABLE IF NOT EXISTS public.app_sync_control (
+  id INT PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS public.live_exams (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  titleEn TEXT,
-  examType TEXT,
-  totalMarks INTEGER DEFAULT 100,
-  durationMinutes INTEGER DEFAULT 60,
-  totalQuestions INTEGER DEFAULT 100,
-  negativeMarksPerWrong DOUBLE PRECISION DEFAULT 0.25,
-  passMarks INTEGER DEFAULT 40,
-  startTime TIMESTAMPTZ,
-  endTime TIMESTAMPTZ,
-  status TEXT DEFAULT 'scheduled',
-  subjects JSONB DEFAULT '[]'::jsonb,
-  questions JSONB DEFAULT '[]'::jsonb,
-  raw_data JSONB DEFAULT '{}'::jsonb,
-  createdAt TIMESTAMPTZ DEFAULT NOW(),
-  updatedAt TIMESTAMPTZ DEFAULT NOW()
-);
+-- Seed initial row
+INSERT INTO public.app_sync_control (id, last_updated)
+VALUES (1, NOW())
+ON CONFLICT (id) DO NOTHING;
 
-CREATE TABLE IF NOT EXISTS public.questions (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  titleEn TEXT,
-  category TEXT,
-  year INTEGER,
-  organization TEXT,
-  totalQuestions INTEGER DEFAULT 0,
-  durationMinutes INTEGER DEFAULT 60,
-  questions JSONB DEFAULT '[]'::jsonb,
-  raw_data JSONB DEFAULT '{}'::jsonb,
-  createdAt TIMESTAMPTZ DEFAULT NOW(),
-  updatedAt TIMESTAMPTZ DEFAULT NOW()
-);
+-- Grant Read Access to public/anon role
+GRANT SELECT ON public.app_sync_control TO anon, authenticated;
 
-CREATE TABLE IF NOT EXISTS public.notifications (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  message TEXT NOT NULL,
-  type TEXT,
-  jobId TEXT,
-  examId TEXT,
-  paperId TEXT,
-  createdAt TIMESTAMPTZ DEFAULT NOW()
-);
+-- Enable RLS (Row Level Security) and allow public read
+ALTER TABLE public.app_sync_control ENABLE ROW LEVEL SECURITY;
 
-CREATE TABLE IF NOT EXISTS public.admits (
-  id TEXT PRIMARY KEY,
-  title TEXT NOT NULL,
-  organization TEXT,
-  type TEXT,
-  downloadLink TEXT,
-  examDate DATE,
-  createdAt TIMESTAMPTZ DEFAULT NOW()
-);
+CREATE POLICY "Allow public read access to app_sync_control"
+ON public.app_sync_control FOR SELECT
+USING (true);
 
-CREATE TABLE IF NOT EXISTS public.activities (
-  id TEXT PRIMARY KEY,
-  userId TEXT,
-  type TEXT NOT NULL,
-  examId TEXT,
-  score INTEGER,
-  outOf INTEGER,
-  wrongCount INTEGER,
-  details TEXT,
-  createdAt TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS public.users (
-  id TEXT PRIMARY KEY,
-  phone TEXT,
-  email TEXT,
-  district TEXT,
-  education TEXT,
-  targetCategory TEXT,
-  pushToken TEXT,
-  createdAt TIMESTAMPTZ DEFAULT NOW(),
-  updatedAt TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS public.app_config (
-  id TEXT PRIMARY KEY,
-  data JSONB NOT NULL,
-  updatedAt TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE IF NOT EXISTS public.feed_posts (
-  id TEXT PRIMARY KEY,
-  content TEXT,
-  contentEn TEXT,
-  mediaType TEXT DEFAULT 'text',
-  mediaUrl TEXT,
-  bannerGradient TEXT,
-  likes INTEGER DEFAULT 0,
-  createdAt TIMESTAMPTZ DEFAULT NOW(),
-  updatedAt TIMESTAMPTZ DEFAULT NOW()
-);
-
--- 3. Enable Row Level Security (RLS)
-ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.live_exams ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.questions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.admits ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.app_config ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.feed_posts ENABLE ROW LEVEL SECURITY;
-
--- 4. Clean up any existing legacy restrictive policies
-DROP POLICY IF EXISTS "Public read-only on jobs" ON public.jobs;
-DROP POLICY IF EXISTS "Public read-only on live_exams" ON public.live_exams;
-DROP POLICY IF EXISTS "Public read-only on questions" ON public.questions;
-DROP POLICY IF EXISTS "Public read-only on notifications" ON public.notifications;
-DROP POLICY IF EXISTS "Public read-only on admits" ON public.admits;
-DROP POLICY IF EXISTS "Public read-only on app_config" ON public.app_config;
-DROP POLICY IF EXISTS "Public read-only on feed_posts" ON public.feed_posts;
-DROP POLICY IF EXISTS "Public update likes and comments on feed_posts" ON public.feed_posts;
-
-DROP POLICY IF EXISTS "Public all on jobs" ON public.jobs;
-DROP POLICY IF EXISTS "Public all on live_exams" ON public.live_exams;
-DROP POLICY IF EXISTS "Public all on questions" ON public.questions;
-DROP POLICY IF EXISTS "Public all on notifications" ON public.notifications;
-DROP POLICY IF EXISTS "Public all on admits" ON public.admits;
-DROP POLICY IF EXISTS "Public all on app_config" ON public.app_config;
-DROP POLICY IF EXISTS "Public all on feed_posts" ON public.feed_posts;
-DROP POLICY IF EXISTS "Public all on activities" ON public.activities;
-DROP POLICY IF EXISTS "Public all on users" ON public.users;
-
--- 5. Full Operational Policies (Read + Write Access for App and Admin)
-CREATE POLICY "Public all on jobs" ON public.jobs FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on live_exams" ON public.live_exams FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on questions" ON public.questions FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on notifications" ON public.notifications FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on admits" ON public.admits FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on app_config" ON public.app_config FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on feed_posts" ON public.feed_posts FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on activities" ON public.activities FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Public all on users" ON public.users FOR ALL USING (true) WITH CHECK (true);
-
--- 6. High-Performance Database Indexes
-CREATE INDEX IF NOT EXISTS idx_activities_type_examid ON public.activities (type, "examId");
-CREATE INDEX IF NOT EXISTS idx_live_exams_status ON public.live_exams (status);
-CREATE INDEX IF NOT EXISTS idx_jobs_category ON public.jobs ("categoryId");
-
--- 7. Enable Supabase Realtime Broadcasts (Safe Idempotent Check)
-DO $$ 
+-- 2. PostgreSQL Function to Update Master Timestamp
+CREATE OR REPLACE FUNCTION public.auto_update_app_sync_control()
+RETURNS TRIGGER AS $$
 BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables 
-    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'jobs'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.jobs;
-  END IF;
+  UPDATE public.app_sync_control
+  SET last_updated = NOW()
+  WHERE id = 1;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables 
-    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'live_exams'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.live_exams;
-  END IF;
+-- 3. Attach PostgreSQL Database Triggers across Core Tables
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables 
-    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'activities'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
-  END IF;
+-- Jobs Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_jobs ON public.jobs;
+CREATE TRIGGER trg_update_sync_control_jobs
+AFTER INSERT OR UPDATE OR DELETE ON public.jobs
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
 
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables 
-    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'feed_posts'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.feed_posts;
-  END IF;
-END $$;
+-- Notifications Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_notifications ON public.notifications;
+CREATE TRIGGER trg_update_sync_control_notifications
+AFTER INSERT OR UPDATE OR DELETE ON public.notifications
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
+
+-- Admits Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_admits ON public.admits;
+CREATE TRIGGER trg_update_sync_control_admits
+AFTER INSERT OR UPDATE OR DELETE ON public.admits
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
+
+-- Questions Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_questions ON public.questions;
+CREATE TRIGGER trg_update_sync_control_questions
+AFTER INSERT OR UPDATE OR DELETE ON public.questions
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
+
+-- Feed Posts Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_feed_posts ON public.feed_posts;
+CREATE TRIGGER trg_update_sync_control_feed_posts
+AFTER INSERT OR UPDATE OR DELETE ON public.feed_posts
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
+
+-- App Config Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_app_config ON public.app_config;
+CREATE TRIGGER trg_update_sync_control_app_config
+AFTER INSERT OR UPDATE OR DELETE ON public.app_config
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
+
+-- Offline Feed Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_offline_feed ON public.offline_feed;
+CREATE TRIGGER trg_update_sync_control_offline_feed
+AFTER INSERT OR UPDATE OR DELETE ON public.offline_feed
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
+
+-- Live Exams Trigger
+DROP TRIGGER IF EXISTS trg_update_sync_control_live_exams ON public.live_exams;
+CREATE TRIGGER trg_update_sync_control_live_exams
+AFTER INSERT OR UPDATE OR DELETE ON public.live_exams
+FOR EACH STATEMENT
+EXECUTE FUNCTION public.auto_update_app_sync_control();
+
+-- Verify Table Verification
+SELECT * FROM public.app_sync_control;

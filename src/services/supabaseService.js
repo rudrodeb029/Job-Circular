@@ -111,7 +111,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
     COLLECTIONS.APP_CONFIG
   ];
 
-  console.log(force ? 'Forced Refresh: Executing Unified Sync...' : 'Startup Sync: Executing Unified Sync...');
+  console.log(force ? 'Forced Refresh: Executing Unified Sync (no-cache)...' : 'Startup Sync: Executing Unified Sync (with 304 check)...');
 
   try {
     const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
@@ -122,11 +122,25 @@ export const syncCoreDataOnStartup = async (force = false) => {
       'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
       'X-App-Client': 'live-circular'
     };
+
     if (force) {
       headers['Cache-Control'] = 'no-cache';
+    } else {
+      const lastSyncedAt = localStorage.getItem('last_updated_server');
+      if (lastSyncedAt) {
+        headers['If-Modified-Since'] = lastSyncedAt;
+      }
     }
 
     const response = await fetch(syncUrl, { headers });
+
+    if (response.status === 304) {
+      console.log('⚡ 304 Not Modified: Server timestamp matches local data! 0 bytes downloaded.');
+      localStorage.setItem('last_sync_timestamp', String(Date.now()));
+      _appInitialized = true;
+      return null;
+    }
+
     if (response.ok) {
       const data = await response.json();
       if (data && (data.jobs || data.questions || data.notifications)) {
@@ -152,13 +166,18 @@ export const syncCoreDataOnStartup = async (force = false) => {
           }
         });
 
+        if (data.syncedAt) {
+          localStorage.setItem('last_updated_server', data.syncedAt);
+        }
+        localStorage.setItem('last_sync_timestamp', String(Date.now()));
+
         _appInitialized = true;
-        console.log('✅ Single-Request Unified Sync: Complete! (1 HTTP Request executed)');
+        console.log('✅ Single-Request Unified Sync: Complete!');
         return data;
       }
     }
   } catch (err) {
-    console.warn('Unified Sync /sync-all endpoint failed or un-deployed, falling back to direct collection fetch:', err.message);
+    console.warn('Unified Sync /sync-all endpoint failed, falling back:', err.message);
   }
 
   // Fallback: If /sync-all endpoint is unavailable, sync core collections directly

@@ -431,13 +431,18 @@ export default function LiveExamRoom() {
       createdAt: new Date().toISOString()
     };
 
-    try {
-      await setDocument(COLLECTIONS.ACTIVITIES, submissionId, submissionDoc);
-    } catch (err) {
-      console.warn('Failed to sync live exam submission to Supabase:', err);
-    }
-
+    // 1. Instant UI Score Display (< 100ms CPU Grading)
     setSubmitted(true);
+
+    // 2. Silent Queueing: Push to Supabase with random delay (500ms - 3500ms) to prevent database connection spikes
+    setTimeout(async () => {
+      try {
+        await setDocument(COLLECTIONS.ACTIVITIES, submissionId, submissionDoc);
+        console.log('⚡ Silent Queueing: Live exam result synced to Supabase database.');
+      } catch (err) {
+        console.warn('Failed to sync live exam submission to Supabase:', err);
+      }
+    }, Math.floor(Math.random() * 3000) + 500);
   };
 
   const formatTimer = (totalSeconds) => {

@@ -143,12 +143,28 @@ export function AppProvider({ children }) {
   useEffect(() => {
     if (!isSqliteInitRef.current) {
       isSqliteInitRef.current = true;
-      // Initialize SQLite Database and run delta sync (once per session)
+      // Initialize SQLite Database
       initDb().then(success => {
         if (success) {
           triggerDeltaSync().catch(err => console.error('Background sync failed:', err));
         }
       });
+
+      // ─── 1-Hour Sync Lock & New User Boot Policy ───
+      const lastSyncTimestamp = Number(localStorage.getItem('last_sync_timestamp') || 0);
+      const now = Date.now();
+      const ONE_HOUR_MS = 60 * 60 * 1000; // 3,600,000 ms
+
+      if (!lastSyncTimestamp || lastSyncTimestamp === 0) {
+        console.log('🆕 New User Initial Boot: Executing first-time /sync-all download...');
+        syncCoreDataOnStartup(false).catch(err => console.error('Initial sync error:', err));
+      } else if (now - lastSyncTimestamp < ONE_HOUR_MS) {
+        const remainingMins = Math.round((ONE_HOUR_MS - (now - lastSyncTimestamp)) / 60000);
+        console.log(`🔒 1-Hour Sync Lock Active (${remainingMins} mins remaining): 0 Network Requests to Cloudflare Worker. Using local SQLite data.`);
+      } else {
+        console.log('⏳ 1-Hour Sync Lock Expired: Running background revalidation check with 304 If-Modified-Since...');
+        syncCoreDataOnStartup(false).catch(err => console.error('Background revalidation error:', err));
+      }
     }
 
     if (!localStorage.getItem('installTime')) {
