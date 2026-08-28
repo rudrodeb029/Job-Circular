@@ -101,7 +101,7 @@ export default function Home() {
       .filter(item => item.type === 'admit_card')
       .map(item => {
         const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
-        if (!parentJob) return null;
+        if (!parentJob || !parentJob.showInExamDate) return null;
         return {
           ...item,
           description: parentJob?.description || '',
@@ -121,7 +121,7 @@ export default function Home() {
       .filter(item => item.type === 'result')
       .map(item => {
         const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
-        if (!parentJob) return null;
+        if (!parentJob || !parentJob.showInResult) return null;
         return {
           ...item,
           description: parentJob?.description || '',

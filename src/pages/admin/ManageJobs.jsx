@@ -252,6 +252,8 @@ export default function ManageJobs() {
       id: targetId,
       title: jobTitle,
       titleEn: formData.organizationEn || jobTitle,
+      showInExamDate: !!formData.showInExamDate,
+      showInResult: !!formData.showInResult,
       examDate: finalExamDate,
       examResult: finalExamResult,
       requirements: reqArray,

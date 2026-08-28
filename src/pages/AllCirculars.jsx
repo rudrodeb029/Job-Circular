@@ -78,7 +78,7 @@ export default function AllCirculars() {
     }));
 
     // Exam Date jobs from localJobs
-    const examJobs = localJobs.filter(job => job.examDate).map(job => ({
+    const examJobs = localJobs.filter(job => job.showInExamDate && job.examDate).map(job => ({
       ...job,
       id: `exam_${job.id}`,
       originalId: job.id,
@@ -96,7 +96,7 @@ export default function AllCirculars() {
     }));
 
     // Result jobs from localJobs
-    const resultJobs = localJobs.filter(job => job.examResult).map(job => ({
+    const resultJobs = localJobs.filter(job => job.showInResult && job.examResult).map(job => ({
       ...job,
       id: `result_${job.id}`,
       originalId: job.id,
@@ -116,7 +116,7 @@ export default function AllCirculars() {
       .filter(item => item.type === 'admit_card')
       .map(item => {
         const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
-        if (!parentJob) return null;
+        if (!parentJob || !parentJob.showInExamDate) return null;
         return {
           ...item,
           description: parentJob?.description || '',
@@ -137,7 +137,7 @@ export default function AllCirculars() {
       .filter(item => item.type === 'result')
       .map(item => {
         const parentJob = localJobs.find(j => String(j.id) === String(item.jobId));
-        if (!parentJob) return null;
+        if (!parentJob || !parentJob.showInResult) return null;
         return {
           ...item,
           description: parentJob?.description || '',
