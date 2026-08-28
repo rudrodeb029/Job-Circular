@@ -112,7 +112,7 @@ export default function ResultDetails() {
   const { icon: displayIcon, style: styleConfig } = getJobIconAndStyle(job);
 
   const handleViewResult = () => {
-    const link = job.examResult || job.applyLink || 'https://alljobs.teletalk.com.bd';
+    const link = job.applyLink || job.applicationLink || job.link || job.url || job.downloadLink || job.examResult || 'https://alljobs.teletalk.com.bd';
     setModalUrl(link);
     setModalType('result');
     setIsModalOpen(true);
