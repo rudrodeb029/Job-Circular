@@ -135,7 +135,7 @@ export default function SavedJobs() {
         </h1>
       </div>
 
-      <div className="page-content">
+      <div className="page-content animate-fade-in">
         {/* Search Bar for Saved Jobs */}
         <div style={{ marginBottom: 'var(--space-md)' }}>
           <SearchBar

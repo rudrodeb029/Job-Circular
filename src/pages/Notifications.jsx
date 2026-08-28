@@ -60,7 +60,7 @@ export default function Notifications() {
       </div>
 
       <PullToRefresh onRefresh={refreshData}>
-        <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
+        <div className="page-content animate-fade-in" style={{ padding: '16px 16px 80px 16px' }}>
           {notificationsList.length > 0 ? (
             <div>
               {notificationsList.map(item => (

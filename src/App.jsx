@@ -252,9 +252,41 @@ function App() {
     )
   }
 
-  const navigationType = useNavigationType()
-  const isHomePage = location.pathname === '/' || location.pathname === '/home';
-  const isBackNavigation = navigationType === 'POP' || isHomePage;
+  const navigationType = useNavigationType();
+  const prevPathRef = useRef(location.pathname);
+
+  // Smart Tab Index Mapping:
+  // Home (0) -> Feed (1) -> Saved (2) -> Notifications (3) -> Profile (4)
+  const TAB_ORDER = {
+    '/': 0,
+    '/home': 0,
+    '/feed': 1,
+    '/saved': 2,
+    '/notifications': 3,
+    '/profile': 4
+  };
+
+  const prevIndex = TAB_ORDER[prevPathRef.current] ?? -1;
+  const currentIndex = TAB_ORDER[location.pathname] ?? -1;
+
+  let isBackNavigation = navigationType === 'POP';
+
+  // Rule 1 & 2: Tab-to-Tab Index comparison (Forward: Right-to-Left, Back: Left-to-Right)
+  if (prevIndex !== -1 && currentIndex !== -1) {
+    if (currentIndex < prevIndex) {
+      isBackNavigation = true; // Higher -> Lower Index (Left to Right)
+    } else if (currentIndex > prevIndex) {
+      isBackNavigation = false; // Lower -> Higher Index (Right to Left)
+    }
+  } 
+  // Rule 3: Returning to Homepage from any secondary or detail page (Left to Right)
+  else if (currentIndex === 0) {
+    isBackNavigation = true;
+  }
+
+  useEffect(() => {
+    prevPathRef.current = location.pathname;
+  }, [location.pathname]);
 
   return (
     <ErrorBoundary>

@@ -170,7 +170,7 @@ export default function Profile() {
       </div>
 
       {/* Floating Activity Stats Bar */}
-      <div style={{
+      <div className="page-content animate-fade-in" style={{
         padding: '0 20px',
         marginTop: '-32px',
         marginBottom: '20px',
