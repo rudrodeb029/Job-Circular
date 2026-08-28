@@ -51,6 +51,62 @@ export default function ManageJobs() {
   const [formData, setFormData] = useState(initialFormState);
 
   const [uploadProgress, setUploadProgress] = useState('');
+  const [resultUploadProgress, setResultUploadProgress] = useState('');
+
+  const handleResultCloudinaryUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    const cloudName = CLOUDINARY_CONFIG.cloudName;
+    const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
+
+    if (!cloudName || !uploadPreset || cloudName === 'dqy39gghx') {
+      showToast('Cloudinary is not connected yet!', 'error');
+      return;
+    }
+
+    const uploadedUrls = [];
+    let successCount = 0;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      setResultUploadProgress(files.length === 1 ? 'Uploading...' : `Uploading ${i + 1} of ${files.length}...`);
+
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', uploadPreset);
+
+      try {
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+          method: 'POST',
+          body: data
+        });
+        const fileData = await res.json();
+        if (fileData.secure_url) {
+          const optimizedUrl = optimizeCloudinaryUrl(fileData.secure_url);
+          uploadedUrls.push(optimizedUrl);
+          successCount++;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    if (uploadedUrls.length > 0) {
+      setFormData(prev => {
+        const currentUrls = prev.examResult ? prev.examResult.split(',').map(url => url.trim()).filter(url => url) : [];
+        const mergedUrls = Array.from(new Set([...currentUrls, ...uploadedUrls]));
+        return {
+          ...prev,
+          examResult: mergedUrls.join(', ')
+        };
+      });
+      showToast(`Successfully uploaded ${successCount} result notice file(s)!`);
+    }
+
+    setResultUploadProgress('');
+    e.target.value = '';
+  };
 
   const handleCloudinaryUpload = async (e) => {
     const files = Array.from(e.target.files);
@@ -526,14 +582,83 @@ export default function ManageJobs() {
             )}
 
             {formData.showInResult && (
-              <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 <div className="input-group">
                    <label>Exam Date (পরীক্ষার তারিখ)</label>
                    <input name="examDate" className="modern-input" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024 / ১৫ জুন ২০২৪" />
                 </div>
+
                 <div className="input-group">
-                   <label>Result Notice Link / Image URL (ফলাফল নোটিশ লিংক)</label>
-                   <input name="examResult" className="modern-input" value={formData.examResult || ''} onChange={handleInputChange} placeholder="Image/PDF URL or portal link" />
+                  <label>Result Notice Images / PDF (URLs)</label>
+                  <input name="examResult" className="modern-input" value={formData.examResult || ''} onChange={handleInputChange} style={{ marginBottom: '12px' }} placeholder="Comma-separated image/PDF URLs or upload below" />
+
+                  <div style={{ background: '#f8fafc', border: '1.5px dashed #cbd5e1', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <input type="file" multiple accept="image/*,application/pdf" onChange={handleResultCloudinaryUpload} disabled={!!resultUploadProgress} style={{ fontSize: '13px' }} />
+                    {resultUploadProgress && <span style={{ fontSize: '13px', color: '#1a56db', fontWeight: 'bold' }}>{resultUploadProgress}</span>}
+                  </div>
+
+                  {formData.examResult && (
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+                      {Array.from(new Set(formData.examResult.split(',').map(i => i.trim()).filter(i => i))).map((rawFileUrl, index) => {
+                        const displayUrl = normalizeMediaUrl(rawFileUrl);
+                        const driveId = getGoogleDriveFileId(rawFileUrl);
+                        const isPdf = rawFileUrl.toLowerCase().includes('.pdf');
+                        return (
+                          <div key={index} style={{ position: 'relative', width: '90px', height: '90px', borderRadius: '12px', border: '1.5px solid #cbd5e1', overflow: 'hidden', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 6px rgba(0,0,0,0.06)' }}>
+                            {isPdf ? (
+                              <a href={displayUrl} target="_blank" rel="noopener noreferrer" style={{ textAlign: 'center', padding: '6px', color: '#ef4444', textDecoration: 'none', fontSize: '11px', fontWeight: 800 }}>
+                                📄 PDF Doc
+                              </a>
+                            ) : (
+                              <a href={displayUrl} target="_blank" rel="noopener noreferrer" style={{ width: '100%', height: '100%', display: 'block' }}>
+                                <img
+                                  src={displayUrl}
+                                  alt="Result Preview"
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                  onError={(e) => {
+                                    if (driveId && !e.target.dataset.triedFallback) {
+                                      e.target.dataset.triedFallback = 'true';
+                                      e.target.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`;
+                                    }
+                                  }}
+                                />
+                              </a>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = formData.examResult.split(',').map(i => i.trim()).filter(i => i);
+                                current.splice(index, 1);
+                                setFormData(prev => ({ ...prev, examResult: current.join(', ') }));
+                              }}
+                              style={{
+                                position: 'absolute',
+                                top: '4px',
+                                right: '4px',
+                                width: '22px',
+                                height: '22px',
+                                borderRadius: '50%',
+                                background: '#ef4444',
+                                color: 'white',
+                                border: 'none',
+                                cursor: 'pointer',
+                                fontSize: '11px',
+                                fontWeight: 'bold',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                                zIndex: 10
+                              }}
+                              title="Remove item"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
