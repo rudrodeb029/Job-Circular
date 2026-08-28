@@ -26,7 +26,10 @@ export default function LiveExamRoom() {
       const cachedExams = getLiveExams();
       match = cachedExams.find(e => e && String(e.id).trim() === targetId);
     }
-    return match || null;
+    if (match && Array.isArray(match.questions) && match.questions.length > 0) {
+      return match;
+    }
+    return null;
   }, [id, adminState?.liveExams]);
 
   const [exam, setExam] = useState(initialExam);
@@ -41,6 +44,7 @@ export default function LiveExamRoom() {
       if (initialExam && isMounted) {
         setExam(initialExam);
         setLoadingExam(false);
+        return;
       }
       if (!id) {
         if (isMounted) setLoadingExam(false);
