@@ -520,8 +520,21 @@ export default function ManageJobs() {
 
             {formData.showInExamDate && (
               <div style={{ gridColumn: 'span 2' }} className="input-group">
-                 <label>Exam Date Information</label>
-                 <input name="examDate" className="modern-input" value={formData.examDate} onChange={handleInputChange} placeholder="e.g. 15 June 2024" />
+                 <label>Exam Date Information (পরীক্ষার তারিখ)</label>
+                 <input name="examDate" className="modern-input" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024 / ১৫ জুন ২০২৪" />
+              </div>
+            )}
+
+            {formData.showInResult && (
+              <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="input-group">
+                   <label>Exam Date (পরীক্ষার তারিখ)</label>
+                   <input name="examDate" className="modern-input" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024 / ১৫ জুন ২০২৪" />
+                </div>
+                <div className="input-group">
+                   <label>Result Notice Link / Image URL (ফলাফল নোটিশ লিংক)</label>
+                   <input name="examResult" className="modern-input" value={formData.examResult || ''} onChange={handleInputChange} placeholder="Image/PDF URL or portal link" />
+                </div>
               </div>
             )}
 

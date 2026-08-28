@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bookmark, BookmarkCheck, FileText, Download, Briefcase, Eye } from '../components/Icons';
+import { ArrowLeft, Bookmark, BookmarkCheck, FileText, Download, Briefcase, Eye, Calendar } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
 import BottomNav from '../components/BottomNav';
 import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/ModernLoader';
+import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import ProgressiveImage from '../components/ProgressiveImage';
@@ -48,6 +49,7 @@ export default function ResultDetails() {
   const [showFullImage, setShowFullImage] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   // Load jobs from AdminContext
   const { state: adminState } = useAdminContext();
@@ -116,6 +118,15 @@ export default function ResultDetails() {
     setIsModalOpen(true);
   };
 
+  const handleDownloadNotice = async () => {
+    if (circularImages.length === 0 && !job.examResult) return;
+    setDownloading(true);
+    const rawFileUrl = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || job.examResult;
+    const fileName = `${job.organization || 'Result'}_Notice_Page_${activeImageIndex + 1}`;
+    await downloadSecurely(rawFileUrl, fileName);
+    setDownloading(false);
+  };
+
   const handleApplyClick = () => {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
@@ -179,9 +190,29 @@ export default function ResultDetails() {
           }}>
             {displayIcon}
           </div>
-           <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
             {orgName}
           </h2>
+
+          {/* Exam Date & Meta Pills */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginTop: '10px' }}>
+            {(job.examDate || job.date || job.resultDate) && (
+              <div style={{ background: 'var(--primary-bg)', color: 'var(--primary)', padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <Calendar size={12} />
+                <span>{isEn ? 'Exam Date:' : 'পরীক্ষার তারিখ:'} {job.examDate || job.date || job.resultDate}</span>
+              </div>
+            )}
+            {job.vacancy && (
+              <div style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
+                {isEn ? 'Vacancy:' : 'পদসংখ্যা:'} {job.vacancy}
+              </div>
+            )}
+            {job.publishDate && (
+              <div style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)', padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }}>
+                {isEn ? 'Published:' : 'প্রকাশিত:'} {job.publishDate}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Description Section */}
@@ -437,7 +468,7 @@ export default function ResultDetails() {
             </div>
           )}
 
-          <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+          <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
             <button
               onClick={handleViewResult}
               style={{
@@ -461,6 +492,35 @@ export default function ResultDetails() {
             >
               <FileText size={16} color="#ffffff" />
               {isEn ? 'View Result' : 'ফলাফল দেখুন'} {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
+            </button>
+
+            <button
+              onClick={handleDownloadNotice}
+              disabled={downloading}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '12px 8px',
+                borderRadius: '12px',
+                background: 'var(--primary-bg)',
+                color: 'var(--primary)',
+                border: '1.5px solid var(--primary)',
+                fontWeight: 700,
+                fontSize: '13px',
+                cursor: downloading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={16} />}
+              <span>
+                {downloading 
+                  ? (isEn ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') 
+                  : `${isEn ? 'Notice' : 'নোটিশ'} ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}
+              </span>
             </button>
           </div>
         </div>
