@@ -201,7 +201,7 @@ function UserAvatar({ name, avatar, size = 32 }) {
   );
 }
 
-function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
+const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
   const { state: appState } = useAppContext();
   const { state: adminState, dispatch: adminDispatch } = useAdminContext();
 
@@ -725,4 +725,4 @@ function FacebookPostCard({ post, isEn, isLiked, onToggleLike }) {
       )}
     </div>
   );
-}
+});

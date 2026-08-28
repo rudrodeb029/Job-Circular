@@ -6,7 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsData } from '../data/questionsData';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
 
-export default function AppHeader() {
+const AppHeader = React.memo(function AppHeader() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const { state: adminState } = useAdminContext();
@@ -546,7 +546,7 @@ export default function AppHeader() {
       )}
     </>
   );
-}
+});
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -554,3 +554,5 @@ const toBengaliNumber = (num) => {
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
+
+export default AppHeader;

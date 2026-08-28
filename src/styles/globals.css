@@ -374,25 +374,31 @@ ul, ol {
   }
 }
 
-.page-content {
-  animation: pageContentSlideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes pureFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
-.animate-fade-in { animation: pageContentSlideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform, opacity; transform: translateZ(0); }
-.animate-slide-up { animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
-.animate-slide-in-right { animation: pageContentSlideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards; will-change: transform, opacity; transform: translateZ(0); }
-.animate-scale-in { animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
+.page-content {
+  animation: pureFadeIn 0.22s ease-out forwards;
+  will-change: opacity;
+  -webkit-overflow-scrolling: touch;
+}
 
-/* Left-to-Right Transitions when going Back */
+.animate-fade-in { animation: pureFadeIn 0.22s ease-out forwards; will-change: opacity; }
+.animate-slide-up { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
+.animate-slide-in-right { animation: pureFadeIn 0.22s ease-out forwards; will-change: opacity; }
+.animate-scale-in { animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform, opacity; transform: translateZ(0); }
+
+/* Smooth Fade Transitions for Navigation Back Actions */
 [data-nav-direction="back"] .page-content,
 [data-nav-direction="back"] .animate-fade-in,
 [data-nav-direction="back"] .animate-slide-in-right,
 .nav-direction-back .page-content,
 .nav-direction-back .animate-fade-in,
 .nav-direction-back .animate-slide-in-right {
-  animation: pageContentSlideInLeft 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: transform, opacity;
-  transform: translateZ(0);
+  animation: pureFadeIn 0.22s ease-out forwards;
+  will-change: opacity;
 }
 
 /* GPU Acceleration & Performance Tuning */
