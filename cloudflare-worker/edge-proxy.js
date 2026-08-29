@@ -3,7 +3,7 @@
  * 
  * Active Features & Edge Services:
  * 1. Single-Request Unified Endpoint (/sync-all): Bundles 8 core collections into 1 single HTTP GET response.
- * 2. Un-cached Realtime Timestamp Check (/check-updates & app_sync_control): Direct live check for instant loader icon popups.
+ * 2. Un-cached Realtime Timestamp Check (/check-updates & app_sync_control): Direct live check using valid publishable key for instant loader icon popups.
  * 3. Dynamic Edge Cache Bypass (?cache=bypass & no-cache headers): Instant fresh data sync on Push Notification clicks & loader icon clicks.
  * 4. 304 Not Modified Conditional Sync: Verifies client timestamp against Supabase `app_sync_control` master timestamp (0 Bytes / 0 DB Egress when unchanged).
  * 5. 4-Hour Global Edge CDN Caching (CACHE_TTL_SECONDS = 14400): Delivers 20ms response times worldwide.
@@ -80,7 +80,7 @@ export default {
 
     const cache = caches.default;
 
-    // Common Origin Headers setup
+    // Correct Publishable API Key
     const apiKey = request.headers.get('apikey') || env.SUPABASE_ANON_KEY || 'sb_publishable_6U3mjliIxh7zfUdlBYp0aA_joaBHdPd';
     const authHeader = request.headers.get('Authorization') || (apiKey ? `Bearer ${apiKey}` : '');
 
