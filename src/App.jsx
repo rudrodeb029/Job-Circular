@@ -83,8 +83,8 @@ function App() {
     initializeOneSignal();
 
     // Handle OneSignal Notification Clicks (Protected by Notification Processing Lock)
-    setupOneSignalClickHandler((data) => {
-      console.log('App: Handling notification click with payload:', data);
+    setupOneSignalClickHandler(async (data) => {
+      console.log('⚡ Push Notification Clicked! Payload:', data);
       if (!data) {
         navigate('/notifications');
         return;
@@ -96,9 +96,16 @@ function App() {
       }
       isNotificationProcessingRef.current = true;
 
-      // Force refresh core data & SQLite delta sync on notification click
-      syncCoreDataOnStartup(true).catch(err => console.error('Data refresh failed:', err));
-      triggerDeltaSync().catch(err => console.error('SQLite Sync from push failed:', err));
+      // Execute unified background sync from Cloudflare Worker & SQLite delta update on push click
+      try {
+        await Promise.all([
+          syncCoreDataOnStartup(true),
+          triggerDeltaSync()
+        ]);
+        console.log('✅ Push Notification Click Sync Complete!');
+      } catch (err) {
+        console.error('Data refresh from push click failed:', err);
+      }
 
       setTimeout(() => {
         isNotificationProcessingRef.current = false;
