@@ -142,7 +142,6 @@ export function AppProvider({ children }) {
   const isSqliteInitRef = useRef(false);
 
   const triggerPillRefresh = async () => {
-    setHasNewUpdates(false);
     try {
       const data = await syncCoreDataOnStartup(true);
       await triggerDeltaSync();
@@ -150,11 +149,11 @@ export function AppProvider({ children }) {
         localStorage.setItem('last_updated_server', data.masterLastUpdated || data.syncedAt);
       }
       window.dispatchEvent(new CustomEvent('force_app_data_reload'));
-      setHasNewUpdates(false);
       console.log('⚡ Floating Loader Clicked: Fresh data synced & UI re-rendered instantly!');
+      return data;
     } catch (err) {
       console.error('Floating loader sync error:', err);
-      setHasNewUpdates(false);
+      return null;
     }
   };
 

@@ -1467,8 +1467,9 @@
   100% { transform: scale(1.4); opacity: 0; }
 }
 
+.new-data-icon-btn.is-syncing .new-data-icon-svg,
 .new-data-icon-svg.spinning {
-  animation: spinSlow 0.75s linear infinite;
+  animation: spinSlow 0.65s linear infinite !important;
 }
 
 @keyframes spinSlow {
