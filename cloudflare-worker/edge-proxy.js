@@ -81,7 +81,7 @@ export default {
     const cache = caches.default;
 
     // Common Origin Headers setup
-    const apiKey = request.headers.get('apikey') || env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJheGR1Z2V4ZXNyZ2xmcHh1ZXNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg3MjUsImV4cCI6MjA1NjgxNDcyNX0.7QW1j9_f-_8_1x51yWwZ_1-g1J9k_1_1';
+    const apiKey = request.headers.get('apikey') || env.SUPABASE_ANON_KEY || 'sb_publishable_6U3mjliIxh7zfUdlBYp0aA_joaBHdPd';
     const authHeader = request.headers.get('Authorization') || (apiKey ? `Bearer ${apiKey}` : '');
 
     const originHeaders = new Headers();
