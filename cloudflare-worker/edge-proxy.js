@@ -68,9 +68,13 @@ export default {
     const cacheControl = request.headers.get('Cache-Control') || '';
     const pragma = request.headers.get('Pragma') || '';
     const ifModifiedSince = request.headers.get('If-Modified-Since') || '';
+
+    // Explicitly check for cache=bypass query param or no-cache headers to bypass edge CDN
     const shouldBypassCache = request.method !== 'GET' || 
                               cacheControl.includes('no-cache') || 
-                              pragma.includes('no-cache');
+                              pragma.includes('no-cache') ||
+                              url.searchParams.get('cache') === 'bypass' ||
+                              url.search.includes('cache=bypass');
 
     const cache = caches.default;
 

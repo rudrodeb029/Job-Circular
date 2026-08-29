@@ -124,7 +124,8 @@ export const syncCoreDataOnStartup = async (force = false) => {
     };
 
     if (force) {
-      headers['Cache-Control'] = 'no-cache';
+      headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      headers['Pragma'] = 'no-cache';
     } else {
       const lastSyncedAt = localStorage.getItem('last_updated_server');
       if (lastSyncedAt) {
