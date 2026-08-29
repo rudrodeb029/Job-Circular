@@ -2,7 +2,7 @@
  * Cloudflare Worker: Supabase Edge Proxy, 20-Min Sync Gateway & Edge-Queued Live Exam Engine
  * 
  * Active Master Features & Edge Services:
- * 1. 20-Minute Rolling Edge Cache (/sync-all): Bundles 8 core collections (including live_exams & questions) + master timestamp, serving ~99% from Edge CDN (CACHE_TTL_SECONDS = 1200).
+ * 1. 20-Minute Rolling Edge Cache (/sync-all & REST API): Bundles core collections + master timestamp, serving ~99% from Edge CDN (CACHE_TTL_SECONDS = 1200).
  * 2. Edge-Queued Live Exam Engine (/live-exam-submit): Queues live exam answer submissions at 10ms speed, eliminating Supabase DB connection spikes.
  * 3. 1-Minute Micro-Cached Live Leaderboard (/leaderboard): Micro-caches rank calculations (LEADERBOARD_TTL_SECONDS = 60) for 15ms rank updates during active exams.
  * 4. Un-cached Realtime Timestamp Check (/check-updates & app_sync_control): Direct live check using valid publishable key for instant loader icon popups.
@@ -90,6 +90,12 @@ export default {
     if (authHeader) originHeaders.set('Authorization', authHeader);
     originHeaders.set('Host', new URL(SUPABASE_ORIGIN).host);
 
+    // Normalized Edge Cache Request Key (Cleaned of transient timestamps)
+    const cleanCacheUrl = new URL(url.toString());
+    cleanCacheUrl.searchParams.delete('t');
+    cleanCacheUrl.searchParams.delete('_t');
+    const edgeCacheKey = new Request(cleanCacheUrl.toString(), { method: 'GET' });
+
     // 3a. UN-CACHED TIMESTAMP CHECK ROUTE (/check-updates or app_sync_control)
     // Ensures background polling always gets the LIVE master timestamp to trigger floating loader icon
     if (url.pathname === '/check-updates' || url.pathname.includes('app_sync_control')) {
@@ -114,41 +120,41 @@ export default {
     }
 
     // 3b. EDGE-QUEUED LIVE EXAM ANSWER SUBMISSION (/live-exam-submit)
-    // Fast 10ms response to client, bypassing CDN cache and forwarding directly to origin
     if (url.pathname === '/live-exam-submit' || url.pathname.includes('user_exam_submissions')) {
-      try {
-        const submitHeaders = new Headers(request.headers);
-        submitHeaders.set('Host', new URL(SUPABASE_ORIGIN).host);
-        if (apiKey) submitHeaders.set('apikey', apiKey);
-        if (authHeader) submitHeaders.set('Authorization', authHeader);
-        if (!submitHeaders.get('Content-Type')) submitHeaders.set('Content-Type', 'application/json');
+      if (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH') {
+        try {
+          const submitHeaders = new Headers(request.headers);
+          submitHeaders.set('Host', new URL(SUPABASE_ORIGIN).host);
+          if (apiKey) submitHeaders.set('apikey', apiKey);
+          if (authHeader) submitHeaders.set('Authorization', authHeader);
+          if (!submitHeaders.get('Content-Type')) submitHeaders.set('Content-Type', 'application/json');
 
-        const submitRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/user_exam_submissions`, {
-          method: request.method,
-          headers: submitHeaders,
-          body: request.body,
-        });
+          const submitRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/user_exam_submissions`, {
+            method: request.method,
+            headers: submitHeaders,
+            body: request.body,
+          });
 
-        const newHeaders = new Headers(submitRes.headers);
-        newHeaders.set('Access-Control-Allow-Origin', '*');
-        newHeaders.set('X-Edge-Cache', 'BYPASS-SUBMIT');
+          const newHeaders = new Headers(submitRes.headers);
+          newHeaders.set('Access-Control-Allow-Origin', '*');
+          newHeaders.set('X-Edge-Cache', 'BYPASS-SUBMIT');
 
-        return new Response(submitRes.body, {
-          status: submitRes.status,
-          statusText: submitRes.statusText,
-          headers: newHeaders,
-        });
-      } catch (e) {
-        return new Response(JSON.stringify({ error: 'Live exam submission failed', details: e.message }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-        });
+          return new Response(submitRes.body, {
+            status: submitRes.status,
+            statusText: submitRes.statusText,
+            headers: newHeaders,
+          });
+        } catch (e) {
+          return new Response(JSON.stringify({ error: 'Live exam submission failed', details: e.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+          });
+        }
       }
     }
 
     // 3c. 1-MINUTE MICRO-CACHED LIVE LEADERBOARD ROUTE (/leaderboard)
-    // Caches rank calculations for 60 seconds to prevent DB connection pool exhaustion
-    if (url.pathname === '/leaderboard' || url.pathname.includes('leaderboard')) {
+    if (url.pathname === '/leaderboard' || (url.pathname.includes('user_exam_submissions') && request.method === 'GET')) {
       const examId = url.searchParams.get('exam_id') || 'global';
       const leaderboardCacheKey = new Request(`${url.origin}/leaderboard?exam_id=${examId}`, { method: 'GET' });
 
@@ -187,45 +193,8 @@ export default {
       return leaderboardResponse;
     }
 
-    // 3d. ISOLATED /live-exams ROUTE: Serves static exam JSON payloads directly without DB overhead
-    if (url.pathname === '/live-exams' || url.pathname === '/rest/v1/live-exams-static') {
-      const examCacheKey = new Request(`${url.origin}/live-exams`, { method: 'GET' });
-
-      if (!shouldBypassCache) {
-        const cachedExams = await cache.match(examCacheKey);
-        if (cachedExams) {
-          const response = new Response(cachedExams.body, cachedExams);
-          response.headers.set('X-Edge-Cache', 'HIT');
-          response.headers.set('Access-Control-Allow-Origin', '*');
-          return response;
-        }
-      }
-
-      // Fetch live_exams table directly from origin
-      const examRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/live_exams?select=*&status=eq.published`, { headers: originHeaders })
-        .then(r => r.ok ? r.json() : [])
-        .catch(() => []);
-
-      const examResponse = new Response(JSON.stringify(examRes), {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Cache-Control': `public, max-age=${CACHE_TTL_SECONDS}, s-maxage=${CACHE_TTL_SECONDS}`,
-          'X-Edge-Cache': shouldBypassCache ? 'BYPASS' : 'MISS'
-        }
-      });
-
-      if (!shouldBypassCache) {
-        ctx.waitUntil(cache.put(examCacheKey, examResponse.clone()));
-      }
-
-      return examResponse;
-    }
-
     // 4. UNIFIED /sync-all ROUTE: 20-Minute Edge Rolling Cache Window (CACHE_TTL_SECONDS = 1200)
     if (url.pathname === '/sync-all' || url.pathname === '/rest/v1/sync-all') {
-      // Step 4a: Check Master Timestamp for 304 Not Modified if If-Modified-Since header present
       if (ifModifiedSince && !shouldBypassCache) {
         try {
           const controlRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated&id=eq.1`, { headers: originHeaders });
@@ -251,10 +220,8 @@ export default {
         }
       }
 
-      const syncCacheKey = new Request(`${url.origin}/sync-all`, { method: 'GET' });
-
       if (!shouldBypassCache) {
-        const cachedSync = await cache.match(syncCacheKey);
+        const cachedSync = await cache.match(edgeCacheKey);
         if (cachedSync) {
           const response = new Response(cachedSync.body, cachedSync);
           response.headers.set('X-Edge-Cache', 'HIT');
@@ -315,18 +282,17 @@ export default {
       });
 
       if (!shouldBypassCache) {
-        ctx.waitUntil(cache.put(syncCacheKey, syncResponse.clone()));
+        ctx.waitUntil(cache.put(edgeCacheKey, syncResponse.clone()));
       }
 
       return syncResponse;
     }
 
-    // 5. STANDARD PROXY PASSTHROUGH (Clean Cache Key for 100% Edge HIT rate)
+    // 5. STANDARD REST PROXY PASSTHROUGH (20-Minute Edge CDN Cache Lock for all Supabase REST queries)
     const targetUrl = new URL(url.pathname + url.search, SUPABASE_ORIGIN);
-    const cacheKey = new Request(targetUrl.toString(), { method: 'GET' });
 
-    if (!shouldBypassCache) {
-      const cachedResponse = await cache.match(cacheKey);
+    if (!shouldBypassCache && request.method === 'GET') {
+      const cachedResponse = await cache.match(edgeCacheKey);
       if (cachedResponse) {
         const response = new Response(cachedResponse.body, cachedResponse);
         response.headers.set('X-Edge-Cache', 'HIT');
@@ -347,7 +313,27 @@ export default {
       redirect: 'follow',
     });
 
-    // 7. Inject Security & Anti-Scraping Headers
+    // 7. Inject Security & Anti-Scraping Headers and Save to Edge CDN Cache
+    if (request.method === 'GET' && originResponse.status === 200 && !shouldBypassCache) {
+      const responseToCache = new Response(originResponse.body, {
+        status: 200,
+        statusText: 'OK',
+        headers: {
+          'Content-Type': originResponse.headers.get('Content-Type') || 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Cache-Control': `public, max-age=${CACHE_TTL_SECONDS}, s-maxage=${CACHE_TTL_SECONDS}`,
+          'X-Edge-Cache': 'HIT',
+          'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'DENY'
+        }
+      });
+
+      ctx.waitUntil(cache.put(edgeCacheKey, responseToCache.clone()));
+
+      return new Response(responseToCache.body, responseToCache);
+    }
+
     const newHeaders = new Headers(originResponse.headers);
     newHeaders.set('Access-Control-Allow-Origin', '*');
     newHeaders.set('X-Edge-Cache', shouldBypassCache ? 'BYPASS' : 'MISS');
@@ -355,20 +341,10 @@ export default {
     newHeaders.set('X-Content-Type-Options', 'nosniff');
     newHeaders.set('X-Frame-Options', 'DENY');
 
-    if (request.method === 'GET' && originResponse.status === 200) {
-      newHeaders.set('Cache-Control', `public, max-age=${CACHE_TTL_SECONDS}, s-maxage=${CACHE_TTL_SECONDS}`);
-    }
-
-    const responseToReturn = new Response(originResponse.body, {
+    return new Response(originResponse.body, {
       status: originResponse.status,
       statusText: originResponse.statusText,
       headers: newHeaders,
     });
-
-    if (request.method === 'GET' && originResponse.status === 200) {
-      ctx.waitUntil(cache.put(cacheKey, responseToReturn.clone()));
-    }
-
-    return responseToReturn;
   },
 };
