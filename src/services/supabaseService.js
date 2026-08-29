@@ -167,8 +167,9 @@ export const syncCoreDataOnStartup = async (force = false) => {
           }
         });
 
-        if (data.syncedAt) {
-          localStorage.setItem('last_updated_server', data.syncedAt);
+        const serverSyncTime = data.masterLastUpdated || data.syncedAt;
+        if (serverSyncTime) {
+          localStorage.setItem('last_updated_server', serverSyncTime);
         }
         localStorage.setItem('last_sync_timestamp', String(Date.now()));
 

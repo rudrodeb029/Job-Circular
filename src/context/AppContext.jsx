@@ -144,14 +144,17 @@ export function AppProvider({ children }) {
   const triggerPillRefresh = async () => {
     setHasNewUpdates(false);
     try {
-      await Promise.all([
-        syncCoreDataOnStartup(true),
-        triggerDeltaSync()
-      ]);
+      const data = await syncCoreDataOnStartup(true);
+      await triggerDeltaSync();
+      if (data && (data.masterLastUpdated || data.syncedAt)) {
+        localStorage.setItem('last_updated_server', data.masterLastUpdated || data.syncedAt);
+      }
       window.dispatchEvent(new CustomEvent('force_app_data_reload'));
+      setHasNewUpdates(false);
       console.log('⚡ Floating Loader Clicked: Fresh data synced & UI re-rendered instantly!');
     } catch (err) {
       console.error('Floating loader sync error:', err);
+      setHasNewUpdates(false);
     }
   };
 
@@ -193,13 +196,13 @@ export function AppProvider({ children }) {
     };
     window.addEventListener('feed_posts_updated', handleFeedPostsUpdated);
 
-    // Instant Realtime Broadcast Sync Signal: Set floating loader icon state to true ONLY
+    // Instant Realtime Broadcast Sync Signal
     const unsubscribe = subscribeToAppUpdates((collectionName) => {
       console.log('⚡ Realtime Update Signal Received for collection:', collectionName);
       setHasNewUpdates(true);
     });
 
-    // Periodic Low-Frequency Check (Every 15 Seconds) against Cloudflare Worker /check-updates
+    // Periodic Check (Every 15 Seconds) against Cloudflare Worker /check-updates
     const checkInterval = setInterval(async () => {
       try {
         const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
@@ -219,6 +222,9 @@ export function AppProvider({ children }) {
           if (serverTime > 0 && serverTime > clientTime) {
             console.log('⚡ Cloudflare Master Timestamp update detected! Showing floating loader icon...');
             setHasNewUpdates(true);
+          } else {
+            // If device timestamp matches or exceeds server timestamp, auto-hide loader icon
+            setHasNewUpdates(false);
           }
         }
       } catch (e) {}

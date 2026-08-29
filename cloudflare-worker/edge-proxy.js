@@ -2,7 +2,7 @@
  * Cloudflare Worker: Supabase Edge Proxy & Single-Request Sync Gateway
  * 
  * Active Features & Edge Services:
- * 1. Single-Request Unified Endpoint (/sync-all): Bundles 8 core collections into 1 single HTTP GET response.
+ * 1. Single-Request Unified Endpoint (/sync-all): Bundles 8 core collections + master timestamp into 1 single HTTP GET response.
  * 2. Un-cached Realtime Timestamp Check (/check-updates & app_sync_control): Direct live check using valid publishable key for instant loader icon popups.
  * 3. Dynamic Edge Cache Bypass (?cache=bypass & no-cache headers): Instant fresh data sync on Push Notification clicks & loader icon clicks.
  * 4. 304 Not Modified Conditional Sync: Verifies client timestamp against Supabase `app_sync_control` master timestamp (0 Bytes / 0 DB Egress when unchanged).
@@ -148,7 +148,7 @@ export default {
       return examResponse;
     }
 
-    // 4. UNIFIED /sync-all ROUTE: Bundles 8 core collections into 1 single HTTP GET response
+    // 4. UNIFIED /sync-all ROUTE: Bundles 8 core collections + master timestamp into 1 single HTTP GET response
     if (url.pathname === '/sync-all' || url.pathname === '/rest/v1/sync-all') {
       // Step 4a: Check Master Timestamp for 304 Not Modified if If-Modified-Since header present
       if (ifModifiedSince && !shouldBypassCache) {
@@ -188,7 +188,7 @@ export default {
         }
       }
 
-      // Parallel fetch of 8 core collections inside Cloudflare Worker
+      // Parallel fetch of 8 core collections + master timestamp inside Cloudflare Worker
       const collections = ['jobs', 'notifications', 'admits', 'results', 'questions', 'feed_posts', 'app_config'];
       const lastUpdated = url.searchParams.get('last_updated') || '0';
 
@@ -202,10 +202,17 @@ export default {
         .then(r => r.ok ? r.json() : [])
         .catch(() => []);
 
-      const [jobs, notifications, admits, results, questions, feed_posts, app_config, offline_feed] = await Promise.all([
+      const controlPromise = fetch(`${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated&id=eq.1`, { headers: originHeaders })
+        .then(r => r.ok ? r.json() : [])
+        .catch(() => []);
+
+      const [jobs, notifications, admits, results, questions, feed_posts, app_config, offline_feed, controlData] = await Promise.all([
         ...fetchPromises,
-        feedPromise
+        feedPromise,
+        controlPromise
       ]);
+
+      const masterLastUpdated = controlData?.[0]?.last_updated || new Date().toISOString();
 
       const payload = {
         jobs,
@@ -216,7 +223,8 @@ export default {
         feed_posts,
         app_config,
         offline_feed,
-        syncedAt: new Date().toUTCString()
+        syncedAt: masterLastUpdated,
+        masterLastUpdated: masterLastUpdated
       };
 
       const syncResponse = new Response(JSON.stringify(payload), {
