@@ -198,7 +198,7 @@ export function AppProvider({ children }) {
       setHasNewUpdates(true);
     });
 
-    // Periodic Low-Frequency Check (Every 30 Seconds) against Cloudflare Worker /check-updates
+    // Periodic Low-Frequency Check (Every 15 Seconds) against Cloudflare Worker /check-updates
     const checkInterval = setInterval(async () => {
       try {
         const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
@@ -221,7 +221,7 @@ export function AppProvider({ children }) {
           }
         }
       } catch (e) {}
-    }, 30000);
+    }, 15000);
 
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);

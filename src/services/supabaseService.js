@@ -403,7 +403,7 @@ export const broadcastAppUpdate = (collectionName) => {
  */
 export const subscribeToAppUpdates = (callback) => {
   try {
-    const channel = supabase.channel(`client_broadcast_${Math.random().toString(36).substr(2, 5)}`, {
+    const channel = supabase.channel('global_app_updates', {
       config: { broadcast: { ack: false } }
     });
 
