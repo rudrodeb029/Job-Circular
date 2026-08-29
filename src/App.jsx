@@ -76,8 +76,9 @@ function App() {
     if (hasBootedRef.current || isAdminRoute) return;
     hasBootedRef.current = true;
 
-    console.log('App Boot: Initializing services (single execution)...');
-    syncCoreDataOnStartup(); // Synchronize all categories exactly once
+    console.log('⚡ App Boot: Executing fresh background data sync from Cloudflare Worker...');
+    syncCoreDataOnStartup(true).catch(err => console.error('App launch refresh failed:', err));
+    triggerDeltaSync().catch(err => console.error('SQLite delta sync failed:', err));
     initializePushNotifications();
     initializeOneSignal();
 
