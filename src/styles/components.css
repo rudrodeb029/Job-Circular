@@ -1393,18 +1393,19 @@
   }
 }
 
-/* Global Floating Modern Loader Icon (Positioned Below Header & Above Search Bar/Content) */
+/* Global Floating Modern Loader Icon (Positioned in Red Circled Area Below Header & Above Search Bar) */
 .new-data-icon-container {
-  position: sticky;
-  top: 60px;
+  position: absolute;
+  top: 68px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 6px auto;
+  margin: 0;
   width: max-content;
+  pointer-events: auto;
   animation: popInPill 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
