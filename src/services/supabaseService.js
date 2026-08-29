@@ -383,6 +383,15 @@ export const broadcastAppUpdate = (collectionName) => {
       event: 'CONTENT_PUBLISHED',
       payload: { collection: collectionName, timestamp: Date.now() }
     });
+
+    // Update master sync timestamp in app_sync_control table to invalidate 304 cache
+    supabase.from('app_sync_control').upsert({
+      id: 1,
+      last_updated: new Date().toISOString(),
+      updated_by: collectionName
+    }).then(({ error }) => {
+      if (error) console.warn('Master timestamp update warning:', error.message);
+    }).catch(() => {});
   } catch (e) {
     console.warn('Failed to broadcast app update signal:', e);
   }
