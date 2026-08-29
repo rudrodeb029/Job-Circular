@@ -201,9 +201,16 @@ export function AppProvider({ children }) {
       setHasNewUpdates(true);
     });
 
-    // Single 1-Time Check 5 Seconds After App Launch against Cloudflare Worker /check-updates
+    // Single 1-Time Check 5 Seconds After App Launch (Respects 20-Minute Client Lock)
     const appOpenTimer = setTimeout(async () => {
       try {
+        const lastClientSync = Number(localStorage.getItem('last_client_sync_time') || 0);
+        const timeSinceLastSync = Date.now() - lastClientSync;
+        if (timeSinceLastSync < 20 * 60 * 1000 && lastClientSync > 0) {
+          console.log('🔒 AppContext 5s Check Skipped: 20-Min Client Lock Active (0 Requests).');
+          return;
+        }
+
         const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
         const res = await fetch(`${proxyUrl}/check-updates?t=${Date.now()}`, {
           headers: { 

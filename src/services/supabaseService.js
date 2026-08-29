@@ -97,8 +97,22 @@ let _isStartupSyncing = false;
  * Fetches core data when the app opens or when a forced refresh is needed.
  * @param {boolean} force - If true, bypasses the "already initialized" check.
  */
+const CLIENT_SYNC_LOCK_MS = 20 * 60 * 1000; // 20 Minutes Client Hard-Lock
+
 export const syncCoreDataOnStartup = async (force = false) => {
-  if ((_appInitialized && !force) || _isStartupSyncing || !navigator.onLine) return;
+  if (!navigator.onLine) return null;
+  if (_isStartupSyncing) return null;
+
+  const isExplicitAdminBypass = force === 'admin_force';
+  const lastClientSync = Number(localStorage.getItem('last_client_sync_time') || 0);
+  const timeSinceLastSync = Date.now() - lastClientSync;
+
+  // 🛡️ 20-Minute Client Hard-Lock: If synced within 20 mins and not an explicit admin override, skip Cloudflare Worker request entirely!
+  if (timeSinceLastSync < CLIENT_SYNC_LOCK_MS && !isExplicitAdminBypass && lastClientSync > 0) {
+    console.log(`🔒 20-Min Client Lock Active (${Math.round((CLIENT_SYNC_LOCK_MS - timeSinceLastSync) / 1000)}s remaining): 0 Cloudflare Requests!`);
+    _appInitialized = true;
+    return null;
+  }
 
   _isStartupSyncing = true;
   const coreCollections = [
@@ -115,7 +129,6 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
   try {
     const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
-    const isExplicitAdminBypass = force === 'admin_force';
     const syncUrl = `${proxyUrl}/sync-all${isExplicitAdminBypass ? '?cache=bypass' : ''}`;
     
     const headers = {
@@ -138,8 +151,10 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
     if (response.status === 304) {
       console.log('⚡ 304 Not Modified: Server timestamp matches local data! 0 bytes downloaded.');
+      localStorage.setItem('last_client_sync_time', String(Date.now()));
       localStorage.setItem('last_sync_timestamp', String(Date.now()));
       _appInitialized = true;
+      _isStartupSyncing = false;
       return null;
     }
 
@@ -173,9 +188,11 @@ export const syncCoreDataOnStartup = async (force = false) => {
           localStorage.setItem('last_updated_server', serverSyncTime);
         }
         localStorage.setItem('last_sync_timestamp', String(Date.now()));
+        localStorage.setItem('last_client_sync_time', String(Date.now()));
 
         _appInitialized = true;
-        console.log('✅ Single-Request Unified Sync: Complete!');
+        _isStartupSyncing = false;
+        console.log('✅ Single-Request Unified Sync: Complete! 20-Min Client Lock Activated.');
         return data;
       }
     }
