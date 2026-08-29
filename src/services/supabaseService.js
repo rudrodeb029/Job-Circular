@@ -115,7 +115,8 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
   try {
     const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
-    const syncUrl = `${proxyUrl}/sync-all${force ? '?cache=bypass' : ''}`;
+    const isExplicitAdminBypass = force === 'admin_force';
+    const syncUrl = `${proxyUrl}/sync-all${isExplicitAdminBypass ? '?cache=bypass' : ''}`;
     
     const headers = {
       'apikey': SUPABASE_CONFIG.anonKey,
@@ -123,7 +124,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
       'X-App-Client': 'live-circular'
     };
 
-    if (force) {
+    if (isExplicitAdminBypass) {
       headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
       headers['Pragma'] = 'no-cache';
     } else {
