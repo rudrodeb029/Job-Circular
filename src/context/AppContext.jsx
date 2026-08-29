@@ -148,7 +148,8 @@ export function AppProvider({ children }) {
         syncCoreDataOnStartup(true),
         triggerDeltaSync()
       ]);
-      console.log('⚡ Floating Loader Clicked: Fresh data synced from Cloudflare Worker!');
+      window.dispatchEvent(new CustomEvent('force_app_data_reload'));
+      console.log('⚡ Floating Loader Clicked: Fresh data synced & UI re-rendered instantly!');
     } catch (err) {
       console.error('Floating loader sync error:', err);
     }

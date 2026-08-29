@@ -678,6 +678,18 @@ export const AdminProvider = ({ children }) => {
       }
     }
 
+    // Listen for instant data reload events dispatched by floating loader or syncCoreDataOnStartup
+    const handleInstantReload = () => {
+      if (isMounted) {
+        console.log('⚡ AdminContext: Re-loading state from cache for instant UI update...');
+        loadAllData(false);
+      }
+    };
+    window.addEventListener('force_app_data_reload', handleInstantReload);
+    window.addEventListener('jobs_updated', handleInstantReload);
+    window.addEventListener('notifications_updated', handleInstantReload);
+    window.addEventListener('admits_updated', handleInstantReload);
+
     return () => {
       isMounted = false;
       clearTimeout(authTimeout);
@@ -689,6 +701,10 @@ export const AdminProvider = ({ children }) => {
       unsubscribeFeedPosts();
       unsubscribeActivities();
       unsubscribeAuth();
+      window.removeEventListener('force_app_data_reload', handleInstantReload);
+      window.removeEventListener('jobs_updated', handleInstantReload);
+      window.removeEventListener('notifications_updated', handleInstantReload);
+      window.removeEventListener('admits_updated', handleInstantReload);
     };
   }, []);
 
