@@ -3,11 +3,12 @@
  * 
  * Active Features & Edge Services:
  * 1. Single-Request Unified Endpoint (/sync-all): Bundles 8 core collections into 1 single HTTP GET response.
- * 2. Dynamic Edge Cache Bypass (?cache=bypass & no-cache headers): Instant fresh data sync on Push Notification clicks.
- * 3. 304 Not Modified Conditional Sync: Verifies client timestamp against Supabase `app_sync_control` master timestamp (0 Bytes / 0 DB Egress when unchanged).
- * 4. 4-Hour Global Edge CDN Caching (CACHE_TTL_SECONDS = 14400): Delivers 20ms response times worldwide.
- * 5. Isolated /live-exams Static Edge Gateway: Serves static exam JSON payloads for high-concurrency exam scaling.
- * 6. Anti-Bot & Anti-Scraping Security Shield: Blocks malicious automated scrapers while keeping app access 100% fast.
+ * 2. Un-cached Realtime Timestamp Check (/check-updates & app_sync_control): Direct live check for instant loader icon popups.
+ * 3. Dynamic Edge Cache Bypass (?cache=bypass & no-cache headers): Instant fresh data sync on Push Notification clicks & loader icon clicks.
+ * 4. 304 Not Modified Conditional Sync: Verifies client timestamp against Supabase `app_sync_control` master timestamp (0 Bytes / 0 DB Egress when unchanged).
+ * 5. 4-Hour Global Edge CDN Caching (CACHE_TTL_SECONDS = 14400): Delivers 20ms response times worldwide.
+ * 6. Isolated /live-exams Static Edge Gateway: Serves static exam JSON payloads for high-concurrency exam scaling.
+ * 7. Anti-Bot & Anti-Scraping Security Shield: Blocks malicious automated scrapers while keeping app access 100% fast.
  */
 
 const SUPABASE_ORIGIN = 'https://baxdugexesrglfpxuess.supabase.co';
@@ -88,7 +89,30 @@ export default {
     if (authHeader) originHeaders.set('Authorization', authHeader);
     originHeaders.set('Host', new URL(SUPABASE_ORIGIN).host);
 
-    // 3. ISOLATED /live-exams ROUTE: Serves static exam JSON payloads directly without DB overhead
+    // 3a. UN-CACHED TIMESTAMP CHECK ROUTE (/check-updates or app_sync_control)
+    // Ensures background polling always gets the LIVE master timestamp to trigger floating loader icon
+    if (url.pathname === '/check-updates' || url.pathname.includes('app_sync_control')) {
+      try {
+        const controlRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated,updated_by&id=eq.1`, { headers: originHeaders });
+        if (controlRes.ok) {
+          const controlData = await controlRes.json();
+          return new Response(JSON.stringify(controlData), {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'X-Edge-Cache': 'BYPASS-LIVE'
+            }
+          });
+        }
+      } catch (e) {
+        console.warn('Check updates error:', e);
+      }
+    }
+
+    // 3b. ISOLATED /live-exams ROUTE: Serves static exam JSON payloads directly without DB overhead
     if (url.pathname === '/live-exams' || url.pathname === '/rest/v1/live-exams-static') {
       const examCacheKey = new Request(`${url.origin}/live-exams`, { method: 'GET' });
 

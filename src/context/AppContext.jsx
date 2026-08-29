@@ -198,12 +198,16 @@ export function AppProvider({ children }) {
       setHasNewUpdates(true);
     });
 
-    // Periodic Low-Frequency Check (Every 45 Seconds) against Cloudflare Worker app_sync_control
+    // Periodic Low-Frequency Check (Every 30 Seconds) against Cloudflare Worker /check-updates
     const checkInterval = setInterval(async () => {
       try {
         const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
-        const res = await fetch(`${proxyUrl}/rest/v1/app_sync_control?select=last_updated&id=eq.1`, {
-          headers: { 'X-App-Client': 'live-circular' }
+        const res = await fetch(`${proxyUrl}/check-updates?t=${Date.now()}`, {
+          headers: { 
+            'X-App-Client': 'live-circular',
+            'Cache-Control': 'no-cache, no-store'
+          },
+          cache: 'no-store'
         });
         if (res.ok) {
           const data = await res.json();
@@ -217,7 +221,7 @@ export function AppProvider({ children }) {
           }
         }
       } catch (e) {}
-    }, 45000);
+    }, 30000);
 
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
