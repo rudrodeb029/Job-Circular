@@ -12,6 +12,7 @@ import { HomeSkeleton } from '../components/SkeletonLoader';
 import { categories } from '../data/categories';
 import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import PullToRefresh from '../components/PullToRefresh';
+import NewDataIcon from '../components/NewDataIcon';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -191,6 +192,9 @@ export default function Home() {
         <div className="mb-lg" onClick={() => navigate('/search')} style={{ cursor: 'pointer' }}>
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
         </div>
+
+        {/* Floating Modern Loader Icon (Appears only when new data is posted on Cloudflare) */}
+        <NewDataIcon />
 
         {/* COMPACT HERO STATS CARD - REDUCED HEIGHT & TEXT SIZE */}
         <div style={{

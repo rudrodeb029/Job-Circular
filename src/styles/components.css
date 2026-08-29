@@ -1393,3 +1393,72 @@
   }
 }
 
+/* Floating Modern Loader Icon (Red-Circled Area below Search Bar) */
+.new-data-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto 4px auto;
+  width: 100%;
+  animation: popInPill 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popInPill {
+  0% { opacity: 0; transform: scale(0.6) translateY(-8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.new-data-icon-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1a56db 0%, #3b82f6 100%);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 14px rgba(26, 86, 219, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
+  z-index: 10;
+}
+
+.new-data-icon-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 6px 20px rgba(26, 86, 219, 0.6);
+}
+
+.new-data-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.pulse-glow-ring {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(37, 99, 235, 0.7);
+  animation: pulseGlowRing 1.8s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes pulseGlowRing {
+  0% { transform: scale(0.9); opacity: 0.9; }
+  70% { transform: scale(1.4); opacity: 0; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+.new-data-icon-svg.spinning {
+  animation: spinSlow 0.75s linear infinite;
+}
+
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+

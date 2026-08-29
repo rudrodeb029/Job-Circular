@@ -138,7 +138,21 @@ function appReducer(state, action) {
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
+  const [hasNewUpdates, setHasNewUpdates] = React.useState(false);
   const isSqliteInitRef = useRef(false);
+
+  const triggerPillRefresh = async () => {
+    setHasNewUpdates(false);
+    try {
+      await Promise.all([
+        syncCoreDataOnStartup(true),
+        triggerDeltaSync()
+      ]);
+      console.log('⚡ Floating Loader Clicked: Fresh data synced from Cloudflare Worker!');
+    } catch (err) {
+      console.error('Floating loader sync error:', err);
+    }
+  };
 
   useEffect(() => {
     if (!isSqliteInitRef.current) {
@@ -178,22 +192,42 @@ export function AppProvider({ children }) {
     };
     window.addEventListener('feed_posts_updated', handleFeedPostsUpdated);
 
-    // Instant Realtime Broadcast Sync (0 DB Egress)
-    // Instantly invalidates local cache and notifies candidate components when Admin publishes anything
+    // Instant Realtime Broadcast Sync Signal: Set floating loader icon state to true ONLY
     const unsubscribe = subscribeToAppUpdates((collectionName) => {
-      clearCollectionCache(collectionName);
-      window.dispatchEvent(new CustomEvent(`${collectionName}_updated`));
-      window.dispatchEvent(new CustomEvent('app_content_updated', { detail: { collectionName } }));
+      console.log('⚡ Realtime Update Signal Received for collection:', collectionName);
+      setHasNewUpdates(true);
     });
+
+    // Periodic Low-Frequency Check (Every 45 Seconds) against Cloudflare Worker app_sync_control
+    const checkInterval = setInterval(async () => {
+      try {
+        const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
+        const res = await fetch(`${proxyUrl}/rest/v1/app_sync_control?select=last_updated&id=eq.1`, {
+          headers: { 'X-App-Client': 'live-circular' }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const serverTime = data?.[0]?.last_updated ? new Date(data[0].last_updated).getTime() : 0;
+          const lastSyncedAt = localStorage.getItem('last_updated_server');
+          const clientTime = lastSyncedAt ? new Date(lastSyncedAt).getTime() : 0;
+
+          if (serverTime > 0 && serverTime > clientTime) {
+            console.log('⚡ Cloudflare Master Timestamp update detected! Showing floating loader icon...');
+            setHasNewUpdates(true);
+          }
+        }
+      } catch (e) {}
+    }, 45000);
 
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
+      clearInterval(checkInterval);
       if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, [state.theme, state.installTime, state.language]);
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, hasNewUpdates, setHasNewUpdates, triggerPillRefresh }}>
       {children}
     </AppContext.Provider>
   );
