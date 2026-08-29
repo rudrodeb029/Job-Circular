@@ -12,6 +12,8 @@ import { initializeOneSignal, setupOneSignalClickHandler } from './utils/oneSign
 import { syncCoreDataOnStartup } from './services/supabaseService'
 import { triggerDeltaSync } from './services/sqliteService'
 
+import NewDataIcon from './components/NewDataIcon'
+
 const CURRENT_VERSION = "1.0.9";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
 import Onboarding from './pages/Onboarding'
@@ -303,7 +305,12 @@ function App() {
         data-theme={state.theme}
         data-nav-direction={isBackNavigation ? 'back' : 'forward'}
       >
-        {!isAdminRoute && <ConnectivityBanner />}
+        {!isAdminRoute && (
+          <>
+            <ConnectivityBanner />
+            <NewDataIcon />
+          </>
+        )}
         <Routes location={location}>
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />

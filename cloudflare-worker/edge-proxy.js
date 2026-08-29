@@ -2,7 +2,7 @@
  * Cloudflare Worker: Supabase Edge Proxy & Single-Request Sync Gateway
  * 
  * Active Features & Edge Services:
- * 1. Single-Request Unified Endpoint (/sync-all): Bundles 8 core collections + master timestamp into 1 single HTTP GET response.
+ * 1. Single-Request Unified Endpoint (/sync-all): Bundles 8 core collections (including live_exams & questions) + master timestamp into 1 single HTTP GET response.
  * 2. Un-cached Realtime Timestamp Check (/check-updates & app_sync_control): Direct live check using valid publishable key for instant loader icon popups.
  * 3. Dynamic Edge Cache Bypass (?cache=bypass & no-cache headers): Instant fresh data sync on Push Notification clicks & loader icon clicks.
  * 4. 304 Not Modified Conditional Sync: Verifies client timestamp against Supabase `app_sync_control` master timestamp (0 Bytes / 0 DB Egress when unchanged).
@@ -189,7 +189,7 @@ export default {
       }
 
       // Parallel fetch of 8 core collections + master timestamp inside Cloudflare Worker
-      const collections = ['jobs', 'notifications', 'admits', 'results', 'questions', 'feed_posts', 'app_config'];
+      const collections = ['jobs', 'notifications', 'admits', 'results', 'questions', 'live_exams', 'feed_posts', 'app_config'];
       const lastUpdated = url.searchParams.get('last_updated') || '0';
 
       const fetchPromises = collections.map(col =>
@@ -206,7 +206,7 @@ export default {
         .then(r => r.ok ? r.json() : [])
         .catch(() => []);
 
-      const [jobs, notifications, admits, results, questions, feed_posts, app_config, offline_feed, controlData] = await Promise.all([
+      const [jobs, notifications, admits, results, questions, live_exams, feed_posts, app_config, offline_feed, controlData] = await Promise.all([
         ...fetchPromises,
         feedPromise,
         controlPromise
@@ -220,6 +220,7 @@ export default {
         admits,
         results,
         questions,
+        live_exams,
         feed_posts,
         app_config,
         offline_feed,

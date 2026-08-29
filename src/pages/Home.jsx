@@ -193,8 +193,7 @@ export default function Home() {
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
         </div>
 
-        {/* Floating Modern Loader Icon (Appears only when new data is posted on Cloudflare) */}
-        <NewDataIcon />
+
 
         {/* COMPACT HERO STATS CARD - REDUCED HEIGHT & TEXT SIZE */}
         <div style={{

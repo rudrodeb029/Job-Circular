@@ -202,8 +202,8 @@ export function AppProvider({ children }) {
       setHasNewUpdates(true);
     });
 
-    // Periodic Check (Every 15 Seconds) against Cloudflare Worker /check-updates
-    const checkInterval = setInterval(async () => {
+    // Single 1-Time Check 5 Seconds After App Launch against Cloudflare Worker /check-updates
+    const appOpenTimer = setTimeout(async () => {
       try {
         const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
         const res = await fetch(`${proxyUrl}/check-updates?t=${Date.now()}`, {
@@ -220,7 +220,7 @@ export function AppProvider({ children }) {
           const clientTime = lastSyncedAt ? new Date(lastSyncedAt).getTime() : 0;
 
           if (serverTime > 0 && serverTime > clientTime) {
-            console.log('⚡ Cloudflare Master Timestamp update detected! Showing floating loader icon...');
+            console.log('⚡ Cloudflare Master Timestamp update detected 5s after App Launch! Showing loader icon...');
             setHasNewUpdates(true);
           } else {
             // If device timestamp matches or exceeds server timestamp, auto-hide loader icon
@@ -228,11 +228,11 @@ export function AppProvider({ children }) {
           }
         }
       } catch (e) {}
-    }, 15000);
+    }, 5000);
 
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
-      clearInterval(checkInterval);
+      clearTimeout(appOpenTimer);
       if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, [state.theme, state.installTime, state.language]);
