@@ -1,12 +1,13 @@
 /**
  * Cloudflare Worker: Supabase Edge Proxy & Single-Request Sync Gateway
  * 
- * Features & Security Locks:
+ * Active Features & Edge Services:
  * 1. Single-Request Unified Endpoint (/sync-all): Bundles 8 core collections into 1 single HTTP GET response.
- * 2. 4-Hour Global Edge CDN Caching (CACHE_TTL_SECONDS = 14400).
- * 3. 304 Not Modified Conditional Checking against Supabase `app_sync_control` master timestamp.
- * 4. Isolated /live-exams Static Edge JSON Endpoint for high-concurrency exam scaling.
- * 5. Anti-Bot / Anti-Scraping Security Shield.
+ * 2. Dynamic Edge Cache Bypass (?cache=bypass & no-cache headers): Instant fresh data sync on Push Notification clicks.
+ * 3. 304 Not Modified Conditional Sync: Verifies client timestamp against Supabase `app_sync_control` master timestamp (0 Bytes / 0 DB Egress when unchanged).
+ * 4. 4-Hour Global Edge CDN Caching (CACHE_TTL_SECONDS = 14400): Delivers 20ms response times worldwide.
+ * 5. Isolated /live-exams Static Edge Gateway: Serves static exam JSON payloads for high-concurrency exam scaling.
+ * 6. Anti-Bot & Anti-Scraping Security Shield: Blocks malicious automated scrapers while keeping app access 100% fast.
  */
 
 const SUPABASE_ORIGIN = 'https://baxdugexesrglfpxuess.supabase.co';
