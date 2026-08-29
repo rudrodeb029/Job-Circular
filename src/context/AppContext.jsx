@@ -150,9 +150,21 @@ export function AppProvider({ children }) {
         }
       });
 
-      // ─── Instant Background Revalidation on App Open ───
-      console.log('⚡ App Boot: Running background data refresh from Cloudflare Worker...');
-      syncCoreDataOnStartup(true).catch(err => console.error('Background refresh error:', err));
+      // ─── 4-Hour Sync Lock Policy (Preserves Cache for General Navigation) ───
+      const lastSyncTimestamp = Number(localStorage.getItem('last_sync_timestamp') || 0);
+      const now = Date.now();
+      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000; // 4 Hours
+
+      if (!lastSyncTimestamp || lastSyncTimestamp === 0) {
+        console.log('🆕 First Time Boot: Executing /sync-all download...');
+        syncCoreDataOnStartup(true).catch(err => console.error('Initial sync error:', err));
+      } else if (now - lastSyncTimestamp < FOUR_HOURS_MS) {
+        const remainingMins = Math.round((FOUR_HOURS_MS - (now - lastSyncTimestamp)) / 60000);
+        console.log(`🔒 4-Hour Cache Lock Active (${remainingMins} mins remaining): Preserving cache for internal app navigation.`);
+      } else {
+        console.log('⏳ 4-Hour Sync Lock Expired: Running background revalidation check...');
+        syncCoreDataOnStartup(false).catch(err => console.error('Background revalidation error:', err));
+      }
     }
 
     if (!localStorage.getItem('installTime')) {
