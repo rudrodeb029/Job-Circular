@@ -9,8 +9,8 @@ export const SUPABASE_CONFIG = {
 };
 
 // Initialize Supabase client
-// - REST database queries route through Cloudflare Global Edge CDN proxy
-// - Realtime WebSockets and Auth connect directly to Supabase
+// - 100% of ALL REST & Storage database queries route through Cloudflare Global Edge CDN proxy
+// - Neither Candidate App nor Admin Panel EVER queries Supabase directly
 export const supabase = createClient(
   SUPABASE_CONFIG.projectUrl,
   SUPABASE_CONFIG.anonKey,
@@ -24,19 +24,14 @@ export const supabase = createClient(
         if (
           SUPABASE_CONFIG.cloudflareProxyUrl &&
           typeof url === 'string' &&
-          url.startsWith(SUPABASE_CONFIG.projectUrl + '/rest/v1/')
+          url.startsWith(SUPABASE_CONFIG.projectUrl)
         ) {
           const proxiedUrl = url.replace(SUPABASE_CONFIG.projectUrl, SUPABASE_CONFIG.cloudflareProxyUrl);
           try {
-            const response = await fetch(proxiedUrl, updatedOptions);
-            if (response.status >= 400) {
-              console.warn('Cloudflare Proxy status:', response.status, 'falling back to direct Supabase URL');
-              return fetch(url, updatedOptions);
-            }
-            return response;
+            return await fetch(proxiedUrl, updatedOptions);
           } catch (e) {
-            console.error('Cloudflare Proxy unreachable, falling back to direct Supabase:', e.message);
-            return fetch(url, updatedOptions);
+            console.error('Cloudflare Proxy network error:', e.message);
+            return fetch(proxiedUrl, updatedOptions);
           }
         }
         return fetch(url, updatedOptions);
