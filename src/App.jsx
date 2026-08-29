@@ -298,6 +298,20 @@ function App() {
     prevPathRef.current = location.pathname;
   }, [location.pathname]);
 
+  const EXCLUDED_LOADER_PATHS = [
+    '/profile',
+    '/edit-profile',
+    '/settings',
+    '/privacy',
+    '/terms',
+    '/share',
+    '/rate',
+    '/contact',
+    '/about',
+    '/onboarding'
+  ];
+  const isExcludedLoaderRoute = EXCLUDED_LOADER_PATHS.some(path => location.pathname.startsWith(path));
+
   return (
     <ErrorBoundary>
       <div 
@@ -305,12 +319,8 @@ function App() {
         data-theme={state.theme}
         data-nav-direction={isBackNavigation ? 'back' : 'forward'}
       >
-        {!isAdminRoute && (
-          <>
-            <ConnectivityBanner />
-            <NewDataIcon />
-          </>
-        )}
+        {!isAdminRoute && <ConnectivityBanner />}
+        {!isAdminRoute && !isExcludedLoaderRoute && <NewDataIcon />}
         <Routes location={location}>
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />
