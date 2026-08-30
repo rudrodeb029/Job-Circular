@@ -111,6 +111,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
   let syncSuccess = false;
   _isStartupSyncing = true;
+  window.dispatchEvent(new CustomEvent('app_sync_started'));
   const coreCollections = [
     COLLECTIONS.JOBS,
     COLLECTIONS.NOTIFICATIONS,
@@ -151,6 +152,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
       localStorage.setItem('last_sync_timestamp', String(Date.now()));
       _appInitialized = true;
       _isStartupSyncing = false;
+      window.dispatchEvent(new CustomEvent('app_sync_finished'));
       return null;
     }
 
@@ -193,6 +195,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
         _isStartupSyncing = false;
         console.log('✅ Single-Request Unified Sync: Complete! 20-Min Client Lock Activated.');
         syncSuccess = true;
+        window.dispatchEvent(new CustomEvent('app_sync_finished'));
         return data;
       } else {
         console.warn('⚠️ Unified Sync JSON response did not contain expected collections structure.', data);
@@ -223,6 +226,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
     } finally {
       _isStartupSyncing = false;
       window.dispatchEvent(new CustomEvent('force_app_data_reload'));
+      window.dispatchEvent(new CustomEvent('app_sync_finished'));
     }
   }
 };

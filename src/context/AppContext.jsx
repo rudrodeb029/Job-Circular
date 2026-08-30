@@ -139,6 +139,7 @@ function appReducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState);
   const [hasNewUpdates, setHasNewUpdates] = React.useState(false);
+  const [isStartupSyncing, setIsStartupSyncing] = React.useState(false);
   const isSqliteInitRef = useRef(false);
 
   // ✅ Loader ক্লিক: Cloudflare Worker থেকে সর্বদা তাজা/নতুন ডাটা সিঙ্ক করে UI আপডেট করে
@@ -182,17 +183,24 @@ export function AppProvider({ children }) {
     const handleFeedPostsUpdated = (e) => {
       if (e.detail) dispatch({ type: 'SET_FEED_POSTS', payload: e.detail });
     };
+    const handleSyncStarted = () => setIsStartupSyncing(true);
+    const handleSyncFinished = () => setIsStartupSyncing(false);
+
     window.addEventListener('feed_posts_updated', handleFeedPostsUpdated);
+    window.addEventListener('app_sync_started', handleSyncStarted);
+    window.addEventListener('app_sync_finished', handleSyncFinished);
 
     // Realtime Signal removed for infinite scale (0 Supabase WebSockets).
     // Data syncs perfectly via Cloudflare KV on App Open / Refresh.
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
+      window.removeEventListener('app_sync_started', handleSyncStarted);
+      window.removeEventListener('app_sync_finished', handleSyncFinished);
     };
   }, [state.theme, state.installTime, state.language]);
 
   return (
-    <AppContext.Provider value={{ state, dispatch, hasNewUpdates, setHasNewUpdates, triggerPillRefresh }}>
+    <AppContext.Provider value={{ state, dispatch, hasNewUpdates, setHasNewUpdates, triggerPillRefresh, isStartupSyncing }}>
       {children}
     </AppContext.Provider>
   );

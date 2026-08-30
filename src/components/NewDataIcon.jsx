@@ -3,14 +3,16 @@ import { RefreshCw } from './Icons';
 import { useAppContext } from '../context/AppContext';
 
 export default function NewDataIcon() {
-  const { hasNewUpdates, setHasNewUpdates, triggerPillRefresh } = useAppContext();
+  const { hasNewUpdates, setHasNewUpdates, triggerPillRefresh, isStartupSyncing } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [isHiding, setIsHiding] = useState(false);
 
-  if (!hasNewUpdates) return null;
+  const shouldShow = hasNewUpdates || isStartupSyncing;
+
+  if (!shouldShow) return null;
 
   const handleClick = async () => {
-    if (loading || isHiding) return;
+    if (loading || isHiding || isStartupSyncing) return;
     setLoading(true);
 
     const startTime = Date.now();
@@ -41,19 +43,21 @@ export default function NewDataIcon() {
     }
   };
 
+  const isSyncing = loading || isStartupSyncing;
+
   return (
     <div 
       className={`new-data-icon-container ${isHiding ? 'pop-out' : ''}`} 
-      title="নতুন পোস্ট যুক্ত হয়েছে • চাপুন"
+      title={isStartupSyncing ? "আপডেট করা হচ্ছে..." : "নতুন পোস্ট যুক্ত হয়েছে • চাপুন"}
     >
       <button 
-        className={`new-data-icon-btn ${loading ? 'is-syncing' : ''}`}
+        className={`new-data-icon-btn ${isSyncing ? 'is-syncing' : ''}`}
         onClick={handleClick}
-        disabled={loading || isHiding}
-        aria-label="New data available - click to refresh"
+        disabled={isSyncing || isHiding}
+        aria-label={isStartupSyncing ? "Syncing data in progress" : "New data available - click to refresh"}
       >
-        <span className={`pulse-glow-ring ${loading ? 'syncing-ring' : ''}`}></span>
-        <RefreshCw size={18} className={`new-data-icon-svg ${loading ? 'spinning' : ''}`} />
+        <span className={`pulse-glow-ring ${isSyncing ? 'syncing-ring' : ''}`}></span>
+        <RefreshCw size={18} className={`new-data-icon-svg ${isSyncing ? 'spinning' : ''}`} />
       </button>
     </div>
   );
