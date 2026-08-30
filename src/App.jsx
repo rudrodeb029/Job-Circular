@@ -11,6 +11,7 @@ import { initializePushNotifications } from './utils/notifications'
 import { initializeOneSignal, setupOneSignalClickHandler } from './utils/oneSignalWrapper'
 import { syncCoreDataOnStartup } from './services/supabaseService'
 import { triggerDeltaSync } from './services/sqliteService'
+import { Capacitor } from '@capacitor/core'
 
 import NewDataIcon from './components/NewDataIcon'
 
@@ -174,15 +175,15 @@ function App() {
 
   useEffect(() => {
     // Set StatusBar - prevent overlay and set proper colors
-    if (!isAdminRoute) {
+    if (!isAdminRoute && Capacitor.isNativePlatform()) {
       try {
         // CRITICAL: Prevent status bar from overlapping WebView content
-        StatusBar.setOverlaysWebView({ overlay: false });
+        StatusBar.setOverlaysWebView({ overlay: false }).catch(() => {});
         
         // Set status bar appearance based on theme
         const isDark = state.theme === 'dark';
-        StatusBar.setBackgroundColor({ color: isDark ? '#0f172a' : '#ffffff' });
-        StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
+        StatusBar.setBackgroundColor({ color: isDark ? '#0f172a' : '#ffffff' }).catch(() => {});
+        StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light }).catch(() => {});
       } catch (e) {
         // StatusBar plugin not available on web
       }
