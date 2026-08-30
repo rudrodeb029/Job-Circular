@@ -115,16 +115,8 @@ export default function LiveExamRoom() {
     // 1. Initial immediate fetch
     loadRealSubmissions();
 
-    // 2. Poll periodically every 20 seconds (0 Realtime socket usage, 100% scalable)
-    const pollInterval = setInterval(() => {
-      if (isMounted) {
-        loadRealSubmissions();
-      }
-    }, 20000);
-
     return () => {
       isMounted = false;
-      clearInterval(pollInterval);
     };
   }, [id]);
 
