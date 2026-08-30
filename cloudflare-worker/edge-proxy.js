@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Cloudflare Worker: Ultimate Edge Shield — Cron + KV Architecture
  *
  * Rules:
@@ -20,8 +20,8 @@ const BLOCKED_USER_AGENTS = [
 ];
 
 const CORE_COLLECTIONS = [
-  'jobs', 'notifications', 'admits', 'results',
-  'questions', 'live_exams', 'feed_posts', 'app_config', 'offline_feed'
+  'jobs', 'notifications', 'admits', 
+  'questions', 'live_exams', 'feed_posts', 'app_config'
 ];
 
 export default {
@@ -240,7 +240,7 @@ export default {
     for (const col of CORE_COLLECTIONS) {
       const queryUrl = col === 'questions'
         ? `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&createdAt=gt.${sinceTs}&order=createdAt.desc&limit=500`
-        : `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&updated_at=gt.${sinceTs}&order=updated_at.desc`;
+        : `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&updatedAt=gt.${sinceTs}&order=updatedAt.desc`;
 
       const newRows = await fetch(queryUrl, { headers: h })
         .then(r => r.ok ? r.json() : []).catch(() => []);

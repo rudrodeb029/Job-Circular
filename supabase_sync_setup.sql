@@ -39,11 +39,6 @@ CREATE TRIGGER trg_admits_sync
 AFTER INSERT OR UPDATE OR DELETE ON public.admits
 FOR EACH STATEMENT EXECUTE FUNCTION update_app_sync_timestamp();
 
-DROP TRIGGER IF EXISTS trg_results_sync ON public.results;
-CREATE TRIGGER trg_results_sync
-AFTER INSERT OR UPDATE OR DELETE ON public.results
-FOR EACH STATEMENT EXECUTE FUNCTION update_app_sync_timestamp();
-
 DROP TRIGGER IF EXISTS trg_questions_sync ON public.questions;
 CREATE TRIGGER trg_questions_sync
 AFTER INSERT OR UPDATE OR DELETE ON public.questions
