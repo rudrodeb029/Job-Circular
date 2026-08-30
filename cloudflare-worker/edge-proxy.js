@@ -102,11 +102,27 @@ export default {
         const newTimestamp = new Date().toISOString();
         kvData.masterLastUpdated = newTimestamp;
 
-        await Promise.all([
+        const updatePromises = [
           env.CACHE_KV?.put('sync_all_data', JSON.stringify(kvData)),
           env.CACHE_KV?.put('last_sync_timestamp', newTimestamp),
           env.CACHE_KV?.put('last_updated_by', 'supabase-webhook')
-        ]);
+        ];
+
+        if (table === 'live_exams') {
+          const lbHeaders = new Headers();
+          const anonKey = env.SUPABASE_ANON_KEY || 'sb_publishable_6U3mjliIxh7zfUdlBYp0aA_joaBHdPd';
+          lbHeaders.set('apikey', anonKey);
+          lbHeaders.set('Authorization', `Bearer ${anonKey}`);
+          
+          updatePromises.push(
+            fetch(`${SUPABASE_ORIGIN}/rest/v1/live_exam_results?select=*&order=score.desc&limit=100`, { headers: lbHeaders })
+              .then(r => r.ok ? r.json() : [])
+              .then(lb => env.CACHE_KV?.put('leaderboard_data', JSON.stringify(lb)))
+              .catch(err => console.error('Webhook leaderboard update failed:', err))
+          );
+        }
+
+        await Promise.all(updatePromises);
 
         console.log(`🔔 Webhook: Successfully synced ${type} on table "${table}" to Cloudflare KV.`);
         return new Response(JSON.stringify({ success: true, table, type, timestamp: newTimestamp }), {
