@@ -255,8 +255,8 @@ export default {
     console.log(`Cron: Incremental sync since ${sinceTs}`);
 
     for (const col of CORE_COLLECTIONS) {
-      const queryUrl = col === 'questions'
-        ? `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&createdAt=gt.${sinceTs}&order=createdAt.desc&limit=500`
+      const queryUrl = (col === 'questions' || col === 'notifications' || col === 'admits')
+        ? `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&createdAt=gt.${sinceTs}&order=createdAt.desc&limit=1000`
         : `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&updatedAt=gt.${sinceTs}&order=updatedAt.desc`;
 
       const newRows = await fetch(queryUrl, { headers: h })

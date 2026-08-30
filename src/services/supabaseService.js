@@ -153,6 +153,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
       return null;
     }
 
+    let syncSuccess = false;
     if (response.ok) {
       const data = await response.json();
       if (data && (data.jobs || data.questions || data.notifications)) {
@@ -189,32 +190,40 @@ export const syncCoreDataOnStartup = async (force = false) => {
         _appInitialized = true;
         _isStartupSyncing = false;
         console.log('✅ Single-Request Unified Sync: Complete! 20-Min Client Lock Activated.');
+        syncSuccess = true;
         return data;
+      } else {
+        console.warn('⚠️ Unified Sync JSON response did not contain expected collections structure.', data);
       }
+    } else {
+      console.warn(`⚠️ Unified Sync /sync-all endpoint returned non-OK status: ${response.status}`);
     }
   } catch (err) {
-    console.warn('Unified Sync /sync-all endpoint failed, falling back:', err.message);
+    console.error('❌ Unified Sync /sync-all endpoint failed, falling back:', err.message || err);
   }
 
   // Fallback: If /sync-all endpoint is unavailable, sync core collections directly
-  try {
-    await Promise.all(coreCollections.map(async (col) => {
-      const data = await getCollection(col, force);
-      if (data && data.length > 0) {
-        localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
-        localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-        if (col === COLLECTIONS.QUESTIONS) {
-          localStorage.setItem('questions_data', JSON.stringify(data));
+  if (!syncSuccess) {
+    console.warn('⚠️ Running direct GET fallback to Supabase because sync-all was unsuccessful or incomplete.');
+    try {
+      await Promise.all(coreCollections.map(async (col) => {
+        const data = await getCollection(col, force);
+        if (data && data.length > 0) {
+          localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
+          localStorage.setItem(`cache_time_${col}`, String(Date.now()));
+          if (col === COLLECTIONS.QUESTIONS) {
+            localStorage.setItem('questions_data', JSON.stringify(data));
+          }
+          _sessionRevalidatedCollections.add(col);
+          window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
         }
-        _sessionRevalidatedCollections.add(col);
-        window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
-      }
-    }));
-    _appInitialized = true;
-  } catch (e) {
-    console.error('Fallback core sync failed:', e);
-  } finally {
-    _isStartupSyncing = false;
+      }));
+      _appInitialized = true;
+    } catch (e) {
+      console.error('Fallback core sync failed:', e);
+    } finally {
+      _isStartupSyncing = false;
+    }
   }
 };
 
