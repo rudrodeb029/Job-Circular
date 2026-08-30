@@ -234,11 +234,14 @@ export default {
       const collections = ['jobs', 'notifications', 'admits', 'results', 'questions', 'live_exams', 'feed_posts', 'app_config'];
       const lastUpdated = url.searchParams.get('last_updated') || '0';
 
-      const fetchPromises = collections.map(col =>
-        fetch(`${SUPABASE_ORIGIN}/rest/v1/${col}?select=*`, { headers: originHeaders })
+      const fetchPromises = collections.map(col => {
+        const queryUrl = col === 'questions'
+          ? `${SUPABASE_ORIGIN}/rest/v1/questions?select=*&order=createdAt.desc&limit=1000`
+          : `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*`;
+        return fetch(queryUrl, { headers: originHeaders })
           .then(r => r.ok ? r.json() : [])
-          .catch(() => [])
-      );
+          .catch(() => []);
+      });
 
       const feedPromise = fetch(`${SUPABASE_ORIGIN}/rest/v1/offline_feed?select=id,title,content,updated_at&updated_at=gt.${lastUpdated}&order=updated_at.asc&limit=500`, { headers: originHeaders })
         .then(r => r.ok ? r.json() : [])
