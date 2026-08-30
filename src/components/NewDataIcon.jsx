@@ -9,14 +9,12 @@ export default function NewDataIcon() {
   const [showPill, setShowPill] = useState(false);
 
   useEffect(() => {
-    // Show the floating loader 10 seconds after it is hidden
-    if (!showPill && !isStartupSyncing) {
-      const timer = setTimeout(() => {
-        setShowPill(true);
-      }, 10000);
-      return () => clearTimeout(timer);
-    }
-  }, [showPill, isStartupSyncing]);
+    // Show the floating loader 10 seconds after app mount (only once)
+    const timer = setTimeout(() => {
+      setShowPill(true);
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Keep it visible if startup syncing is in progress
   const shouldShow = showPill || isStartupSyncing;
