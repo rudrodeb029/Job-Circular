@@ -109,6 +109,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
   const isExplicitForce = Boolean(force);
   const isExplicitAdminBypass = force === 'admin_force';
 
+  let syncSuccess = false;
   _isStartupSyncing = true;
   const coreCollections = [
     COLLECTIONS.JOBS,
@@ -153,7 +154,6 @@ export const syncCoreDataOnStartup = async (force = false) => {
       return null;
     }
 
-    let syncSuccess = false;
     if (response.ok) {
       const data = await response.json();
       if (data && (data.jobs || data.questions || data.notifications)) {
@@ -169,13 +169,18 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
         Object.entries(collectionsMap).forEach(([col, items]) => {
           if (Array.isArray(items) && items.length > 0) {
-            localStorage.setItem(`cache_data_${col}`, JSON.stringify(items));
-            localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-            if (col === COLLECTIONS.QUESTIONS) {
-              localStorage.setItem('questions_data', JSON.stringify(items));
+            try {
+              const normalizedItems = items.map(normalizeDoc);
+              localStorage.setItem(`cache_data_${col}`, JSON.stringify(normalizedItems));
+              localStorage.setItem(`cache_time_${col}`, String(Date.now()));
+              if (col === COLLECTIONS.QUESTIONS) {
+                localStorage.setItem('questions_data', JSON.stringify(normalizedItems));
+              }
+              _sessionRevalidatedCollections.add(col);
+              window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: normalizedItems }));
+            } catch (storageErr) {
+              console.warn(`⚠️ LocalStorage write failed for ${col} (likely storage limit exceeded):`, storageErr.message || storageErr);
             }
-            _sessionRevalidatedCollections.add(col);
-            window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: items }));
           }
         });
 
