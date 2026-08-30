@@ -1,10 +1,10 @@
-﻿name = "job-circular-proxy"
+name = "job-circular-proxy"
 main = "edge-proxy.js"
 compatibility_date = "2024-01-01"
 
 [[kv_namespaces]]
 binding = "CACHE_KV"
-id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+id = "ea9b95e256ed4e46999d1a13dcc19edf"
 
 [triggers]
 crons = ["0 * * * *"]
