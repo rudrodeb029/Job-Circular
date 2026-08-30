@@ -190,12 +190,32 @@ export function AppProvider({ children }) {
     window.addEventListener('app_sync_started', handleSyncStarted);
     window.addEventListener('app_sync_finished', handleSyncFinished);
 
-    // Realtime Signal removed for infinite scale (0 Supabase WebSockets).
-    // Data syncs perfectly via Cloudflare KV on App Open / Refresh.
+    // Periodic Low-Frequency Check (Every 60 Seconds) against Cloudflare Worker check-updates
+    const checkInterval = setInterval(async () => {
+      try {
+        const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
+        const res = await fetch(`${proxyUrl}/check-updates`, {
+          headers: { 'X-App-Client': 'live-circular' }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const serverTime = data?.[0]?.last_updated ? new Date(data[0].last_updated).getTime() : 0;
+          const lastSyncedAt = localStorage.getItem('last_updated_server');
+          const clientTime = lastSyncedAt ? new Date(lastSyncedAt).getTime() : 0;
+
+          if (serverTime > 0 && serverTime > clientTime) {
+            console.log('⚡ Cloudflare Master Timestamp update detected! Showing floating loader icon...');
+            setHasNewUpdates(true);
+          }
+        }
+      } catch (e) {}
+    }, 60000);
+
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
       window.removeEventListener('app_sync_started', handleSyncStarted);
       window.removeEventListener('app_sync_finished', handleSyncFinished);
+      clearInterval(checkInterval);
     };
   }, [state.theme, state.installTime, state.language]);
 

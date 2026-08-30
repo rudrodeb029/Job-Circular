@@ -369,7 +369,25 @@ const sanitizePayload = (collectionName, docId, data) => {
   return sanitized;
 };
 
+const triggerKvCacheInvalidation = () => {
+  // Only trigger from Admin Panel (check path or if adminUser exists in localStorage)
+  const isAdmin = window.location.pathname.startsWith('/admin') || localStorage.getItem('admin_user');
+  if (!isAdmin) return;
 
+  console.log('⚡ Admin change detected: Silently invalidating Cloudflare KV cache in background...');
+  const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
+  fetch(`${proxyUrl}/sync-all?cache=bypass`, {
+    headers: {
+      'apikey': SUPABASE_CONFIG.anonKey,
+      'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+      'X-App-Client': 'live-circular-admin'
+    }
+  }).then(res => {
+    if (res.ok) console.log('⚡ Cloudflare KV cache successfully updated in realtime!');
+  }).catch(err => {
+    console.warn('Failed to invalidate Cloudflare KV cache:', err);
+  });
+};
 
 /**
  * Insert a new document
@@ -387,6 +405,7 @@ export const addDocument = async (collectionName, data) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    triggerKvCacheInvalidation();
 
     return normalizeDoc(inserted || payload);
   } catch (error) {
@@ -409,6 +428,7 @@ export const setDocument = async (collectionName, docId, data) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    triggerKvCacheInvalidation();
 
     return normalizeDoc(upserted || payload);
   } catch (error) {
@@ -431,6 +451,7 @@ export const updateDocument = async (collectionName, docId, updates) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    triggerKvCacheInvalidation();
 
     return normalizeDoc(updated || payload);
   } catch (error) {
@@ -451,6 +472,7 @@ export const deleteDocument = async (collectionName, docId) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    triggerKvCacheInvalidation();
 
     return true;
   } catch (error) {
@@ -591,6 +613,7 @@ export const batchSetDocuments = async (collectionName, items) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
+    triggerKvCacheInvalidation();
 
     return true;
   } catch (error) {
