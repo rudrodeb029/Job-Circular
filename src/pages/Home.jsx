@@ -72,18 +72,20 @@ export default function Home() {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const isEn = state.language === 'en';
-  const { state: adminState, loading: adminLoading, refreshData } = useAdminContext();
+  const { state: adminState, loading: adminLoading, refreshData, initialSyncComplete } = useAdminContext();
   const localJobs = adminState.jobs || [];
   const localAdmits = adminState.admits || [];
-  const [loading, setLoading] = useState(localJobs.length === 0);
+  const [loading, setLoading] = useState(localJobs.length === 0 && !initialSyncComplete);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 20;
 
   useEffect(() => {
-    if (!adminLoading) {
+    if (!adminLoading && (initialSyncComplete || localJobs.length > 0)) {
       setLoading(false);
+    } else if (adminLoading || (!initialSyncComplete && localJobs.length === 0)) {
+      setLoading(true);
     }
-  }, [adminLoading]);
+  }, [adminLoading, initialSyncComplete, localJobs.length]);
 
   const combinedFeedItems = useMemo(() => {
     if (localJobs.length === 0) return [];

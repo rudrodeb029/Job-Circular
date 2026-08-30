@@ -509,6 +509,7 @@ export const AdminProvider = ({ children }) => {
   const hasInitialCache = initialState.jobs && initialState.jobs.length > 0;
   const [loading, setLoading] = useState(!hasInitialCache);
   const [authChecked, setAuthChecked] = useState(false);
+  const [initialSyncComplete, setInitialSyncComplete] = useState(hasInitialCache);
 
   const loadAllData = async (forceServer = false, isBackground = false) => {
     try {
@@ -682,6 +683,7 @@ export const AdminProvider = ({ children }) => {
     const handleInstantReload = () => {
       if (isMounted) {
         console.log('⚡ AdminContext: Re-loading state from cache for instant UI update...');
+        setInitialSyncComplete(true);
         loadAllData(false);
       }
     };
@@ -709,7 +711,7 @@ export const AdminProvider = ({ children }) => {
 
   return (
     <div className="admin-context-provider">
-        <AdminContext.Provider value={{ state, dispatch, loading, authChecked, refreshData }}>
+        <AdminContext.Provider value={{ state, dispatch, loading, authChecked, refreshData, initialSyncComplete }}>
         {children}
         </AdminContext.Provider>
     </div>

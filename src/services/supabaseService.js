@@ -173,9 +173,6 @@ export const syncCoreDataOnStartup = async (force = false) => {
               const normalizedItems = items.map(normalizeDoc);
               localStorage.setItem(`cache_data_${col}`, JSON.stringify(normalizedItems));
               localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-              if (col === COLLECTIONS.QUESTIONS) {
-                localStorage.setItem('questions_data', JSON.stringify(normalizedItems));
-              }
               _sessionRevalidatedCollections.add(col);
               window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: normalizedItems }));
             } catch (storageErr) {
@@ -216,9 +213,6 @@ export const syncCoreDataOnStartup = async (force = false) => {
         if (data && data.length > 0) {
           localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
           localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-          if (col === COLLECTIONS.QUESTIONS) {
-            localStorage.setItem('questions_data', JSON.stringify(data));
-          }
           _sessionRevalidatedCollections.add(col);
           window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
         }
@@ -228,6 +222,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
       console.error('Fallback core sync failed:', e);
     } finally {
       _isStartupSyncing = false;
+      window.dispatchEvent(new CustomEvent('force_app_data_reload'));
     }
   }
 };
