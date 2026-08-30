@@ -2,6 +2,9 @@ name = "job-circular-proxy"
 main = "edge-proxy.js"
 compatibility_date = "2024-01-01"
 
+[vars]
+WEBHOOK_SECRET = "sync-all-data-secret-2026"
+
 [[kv_namespaces]]
 binding = "CACHE_KV"
 id = "ea9b95e256ed4e46999d1a13dcc19edf"

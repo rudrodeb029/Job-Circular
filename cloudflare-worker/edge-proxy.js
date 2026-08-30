@@ -64,6 +64,64 @@ export default {
     if (authHeader) originHeaders.set('Authorization', authHeader);
     originHeaders.set('Host', new URL(SUPABASE_ORIGIN).host);
 
+    // Rule 14: /webhook-sync -> Catch Supabase database webhooks and update CACHE_KV immediately
+    if (url.pathname === '/webhook-sync' && request.method === 'POST') {
+      const webhookAuth = request.headers.get('Authorization');
+      const expectedSecret = env.WEBHOOK_SECRET || 'sync-all-data-secret-2026';
+      if (webhookAuth !== `Bearer ${expectedSecret}`) {
+        return new Response('Unauthorized', { status: 401 });
+      }
+
+      try {
+        const payload = await request.json();
+        const { type, table, record, old_record } = payload;
+        if (!type || !table) {
+          return new Response('Invalid Payload', { status: 400 });
+        }
+
+        const validCollections = ['jobs', 'notifications', 'admits', 'questions', 'feed_posts', 'app_config', 'live_exams'];
+        if (!validCollections.includes(table)) {
+          return new Response(`Skipping unsupported collection: ${table}`, { status: 200 });
+        }
+
+        const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null) || {};
+        let list = kvData[table] || [];
+
+        if (type === 'DELETE') {
+          const deleteId = old_record?.id || record?.id;
+          list = list.filter(item => item.id !== deleteId);
+        } else {
+          // INSERT or UPDATE
+          list = [
+            record,
+            ...list.filter(item => item.id !== record.id)
+          ];
+        }
+
+        kvData[table] = list;
+        const newTimestamp = new Date().toISOString();
+        kvData.masterLastUpdated = newTimestamp;
+
+        await Promise.all([
+          env.CACHE_KV?.put('sync_all_data', JSON.stringify(kvData)),
+          env.CACHE_KV?.put('last_sync_timestamp', newTimestamp),
+          env.CACHE_KV?.put('last_updated_by', 'supabase-webhook')
+        ]);
+
+        console.log(`🔔 Webhook: Successfully synced ${type} on table "${table}" to Cloudflare KV.`);
+        return new Response(JSON.stringify({ success: true, table, type, timestamp: newTimestamp }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+        });
+      } catch (err) {
+        console.error('Webhook sync failed:', err);
+        return new Response(JSON.stringify({ error: err.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+        });
+      }
+    }
+
     // Rule 9: /check-updates -> KV (0 Supabase!)
     if (url.pathname === '/check-updates' || url.pathname.includes('app_sync_control')) {
       const kvTs = await env.CACHE_KV?.get('last_sync_timestamp').catch(() => null);
