@@ -252,10 +252,18 @@ export default {
       }
     }
 
-    // STRICT GET CACHE LOCK: Block any unhandled direct GET request to Supabase to prevent Supabase spam!
-    if (request.method === 'GET') {
+    // Extract table name from /rest/v1/tablename to identify the requested collection
+    let targetTable = '';
+    const restMatch = url.pathname.match(/\/rest\/v1\/([a-zA-Z0-9_-]+)/);
+    if (restMatch) {
+      targetTable = restMatch[1];
+    }
+
+    // STRICT GET CACHE LOCK: Block unhandled direct GET queries targeting CORE tables to prevent database spam.
+    // Non-core tables (e.g. offline_feed, activities) are allowed to pass through.
+    if (request.method === 'GET' && CORE_COLLECTIONS.includes(targetTable)) {
       return new Response(JSON.stringify({ 
-        error: 'Strict GET Cache Lock: Direct GET queries to Supabase are blocked. Please use /sync-all endpoint.',
+        error: `Strict GET Cache Lock: Direct GET queries to core table "${targetTable}" are blocked. Please use /sync-all endpoint.`,
         url: url.pathname + url.search
       }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
     }
