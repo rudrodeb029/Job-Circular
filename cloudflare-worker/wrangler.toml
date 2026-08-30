@@ -1,0 +1,19 @@
+﻿name = "job-circular-proxy"
+main = "edge-proxy.js"
+compatibility_date = "2024-01-01"
+
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+[triggers]
+crons = ["0 * * * *"]
+
+[[queues.producers]]
+queue = "live-exam-queue"
+binding = "EXAM_QUEUE"
+
+[[queues.consumers]]
+queue = "live-exam-queue"
+max_batch_size = 50
+max_batch_timeout = 5

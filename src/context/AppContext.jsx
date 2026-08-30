@@ -201,44 +201,10 @@ export function AppProvider({ children }) {
       setHasNewUpdates(true);
     });
 
-    // Single 1-Time Check 5 Seconds After App Launch (Respects 20-Minute Client Lock)
-    const appOpenTimer = setTimeout(async () => {
-      try {
-        const lastClientSync = Number(localStorage.getItem('last_client_sync_time') || 0);
-        const timeSinceLastSync = Date.now() - lastClientSync;
-        if (timeSinceLastSync < 20 * 60 * 1000 && lastClientSync > 0) {
-          console.log('🔒 AppContext 5s Check Skipped: 20-Min Client Lock Active (0 Requests).');
-          return;
-        }
-
-        const proxyUrl = 'https://job-circular-proxy.rudrodeb029.workers.dev';
-        const res = await fetch(`${proxyUrl}/check-updates?t=${Date.now()}`, {
-          headers: { 
-            'X-App-Client': 'live-circular',
-            'Cache-Control': 'no-cache, no-store'
-          },
-          cache: 'no-store'
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const serverTime = data?.[0]?.last_updated ? new Date(data[0].last_updated).getTime() : 0;
-          const lastSyncedAt = localStorage.getItem('last_updated_server');
-          const clientTime = lastSyncedAt ? new Date(lastSyncedAt).getTime() : 0;
-
-          if (serverTime > 0 && serverTime > clientTime) {
-            console.log('⚡ Cloudflare Master Timestamp update detected 5s after App Launch! Showing loader icon...');
-            setHasNewUpdates(true);
-          } else {
-            // If device timestamp matches or exceeds server timestamp, auto-hide loader icon
-            setHasNewUpdates(false);
-          }
-        }
-      } catch (e) {}
-    }, 5000);
-
+    // Rule 11: Only 2 triggers allowed — App Open & Loader Click.
+    // No background polling, no auto-timers. Cloudflare KV is always fresh via Cron.
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
-      clearTimeout(appOpenTimer);
       if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, [state.theme, state.installTime, state.language]);
