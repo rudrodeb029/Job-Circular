@@ -179,15 +179,11 @@ export default {
     }
 
     // STRICT GET CACHE LOCK: Block any unhandled direct GET request to Supabase to prevent Supabase spam!
-    // Allow bypassing only for Admin panel (Cache-Control: no-cache)
     if (request.method === 'GET') {
-      const cacheControl = request.headers.get('Cache-Control') || '';
-      if (!cacheControl.includes('no-cache')) {
-        return new Response(JSON.stringify({ 
-          error: 'Strict GET Cache Lock: Direct GET queries to Supabase are blocked. Please use /sync-all endpoint.',
-          url: url.pathname + url.search
-        }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
-      }
+      return new Response(JSON.stringify({ 
+        error: 'Strict GET Cache Lock: Direct GET queries to Supabase are blocked. Please use /sync-all endpoint.',
+        url: url.pathname + url.search
+      }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
     }
 
     // Standard REST Proxy Passthrough (write methods and Admin GET bypass reach here)

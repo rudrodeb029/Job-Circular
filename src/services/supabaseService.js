@@ -227,7 +227,6 @@ export const syncCoreDataOnStartup = async (force = false) => {
  */
 export const getCollectionCached = async (collectionName, forceServer = false, customTtlMinutes = null) => {
   const cacheKey = `cache_data_${collectionName}`;
-  const timeKey = `cache_time_${collectionName}`;
   const cachedDataStr = localStorage.getItem(cacheKey);
 
   // 1. Parse Cached Data
@@ -240,30 +239,12 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
     }
   }
 
-  // 2. Return valid local cache instantly if available and forceServer is false (0 Network Requests)
-  if (cachedData && Array.isArray(cachedData) && cachedData.length > 0 && !forceServer) {
+  // 2. Return local cache instantly if available (0 Network Requests)
+  if (cachedData && Array.isArray(cachedData)) {
     return cachedData;
   }
 
-  // 3. Network Fetch Fallback if local cache is empty or forceServer is requested
-  if (navigator.onLine) {
-    try {
-      const data = await getCollection(collectionName, forceServer);
-      if (data && data.length > 0) {
-        localStorage.setItem(cacheKey, JSON.stringify(data));
-        localStorage.setItem(timeKey, String(Date.now()));
-        if (collectionName === COLLECTIONS.QUESTIONS) {
-          localStorage.setItem('questions_data', JSON.stringify(data));
-        }
-        _sessionRevalidatedCollections.add(collectionName);
-        return data;
-      }
-    } catch (error) {
-      console.warn(`Fetch failed for ${collectionName}, returning cache fallback.`, error);
-    }
-  }
-
-  return cachedData || [];
+  return [];
 };
 
 /**

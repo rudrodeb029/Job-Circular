@@ -510,7 +510,7 @@ export const AdminProvider = ({ children }) => {
   const [loading, setLoading] = useState(!hasInitialCache);
   const [authChecked, setAuthChecked] = useState(false);
 
-  const loadAllData = async (forceServer = true, isBackground = false) => {
+  const loadAllData = async (forceServer = false, isBackground = false) => {
     try {
       if (!isBackground) {
         setLoading(true);
