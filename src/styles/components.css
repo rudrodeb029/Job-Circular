@@ -1396,7 +1396,7 @@
 /* Global Floating Modern Loader Icon (Positioned in Red Circled Area Below Header & Above Search Bar) */
 .new-data-icon-container {
   position: absolute;
-  top: calc(52px + var(--safe-area-top, 0px) + 20px);
+  top: calc(52px + var(--safe-area-top, 0px) + 2px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 999;
