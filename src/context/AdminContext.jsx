@@ -686,9 +686,6 @@ export const AdminProvider = ({ children }) => {
       }
     };
     window.addEventListener('force_app_data_reload', handleInstantReload);
-    window.addEventListener('jobs_updated', handleInstantReload);
-    window.addEventListener('notifications_updated', handleInstantReload);
-    window.addEventListener('admits_updated', handleInstantReload);
 
     return () => {
       isMounted = false;
@@ -702,9 +699,6 @@ export const AdminProvider = ({ children }) => {
       unsubscribeActivities();
       unsubscribeAuth();
       window.removeEventListener('force_app_data_reload', handleInstantReload);
-      window.removeEventListener('jobs_updated', handleInstantReload);
-      window.removeEventListener('notifications_updated', handleInstantReload);
-      window.removeEventListener('admits_updated', handleInstantReload);
     };
   }, []);
 

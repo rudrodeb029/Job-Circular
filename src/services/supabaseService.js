@@ -73,6 +73,10 @@ export const getCollection = async (collectionName, forceServer = false) => {
     }
     let query = supabase.from(collectionName).select(selectCols);
     
+    if (collectionName === COLLECTIONS.QUESTIONS) {
+      query = query.order('createdAt', { ascending: false }).limit(1000);
+    }
+    
     // Add bypass headers if forceServer is true
     if (forceServer) {
       query = query.setHeader('Cache-Control', 'no-cache').setHeader('Pragma', 'no-cache');
@@ -179,6 +183,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
         if (serverSyncTime) {
           localStorage.setItem('last_updated_server', serverSyncTime);
         }
+        window.dispatchEvent(new CustomEvent('force_app_data_reload'));
         localStorage.setItem('last_sync_timestamp', String(Date.now()));
         localStorage.setItem('last_client_sync_time', String(Date.now()));
 
