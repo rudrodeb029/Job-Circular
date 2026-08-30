@@ -97,7 +97,7 @@ let _isStartupSyncing = false;
  * Fetches core data when the app opens or when a forced refresh is needed (e.g. floating loader click).
  * @param {boolean|string} force - If true, checks Cloudflare Worker for new data immediately.
  */
-const CLIENT_SYNC_LOCK_MS = 20 * 60 * 1000; // 20 Minutes Client Hard-Lock for internal navigation
+
 
 export const syncCoreDataOnStartup = async (force = false) => {
   if (!navigator.onLine) return null;
@@ -105,15 +105,6 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
   const isExplicitForce = Boolean(force);
   const isExplicitAdminBypass = force === 'admin_force';
-  const lastClientSync = Number(localStorage.getItem('last_client_sync_time') || 0);
-  const timeSinceLastSync = Date.now() - lastClientSync;
-
-  // 🛡️ Client Lock: Only active if NOT an explicit force refresh (loader click or initial force)
-  if (timeSinceLastSync < CLIENT_SYNC_LOCK_MS && !isExplicitForce && lastClientSync > 0) {
-    console.log(`🔒 20-Min Client Lock Active (${Math.round((CLIENT_SYNC_LOCK_MS - timeSinceLastSync) / 1000)}s remaining): Using local cache.`);
-    _appInitialized = true;
-    return null;
-  }
 
   _isStartupSyncing = true;
   const coreCollections = [
