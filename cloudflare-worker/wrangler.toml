@@ -7,7 +7,7 @@ binding = "CACHE_KV"
 id = "ea9b95e256ed4e46999d1a13dcc19edf"
 
 [triggers]
-crons = [ "0 * * * *" ]
+crons = [ "*/10 * * * *" ]
 
 [[queues.producers]]
 queue = "live-exam-queue"
