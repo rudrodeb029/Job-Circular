@@ -1,5 +1,4 @@
-// Supabase Service Layer — Centralizes Supabase PostgreSQL CRUD, Multi-tier Caching, and Realtime sync
-import { supabase } from './supabaseClient';
+import { supabase, SUPABASE_CONFIG } from './supabaseClient';
 
 // ─── Table / Collection Constants ──────────────────────────────
 export const COLLECTIONS = {
