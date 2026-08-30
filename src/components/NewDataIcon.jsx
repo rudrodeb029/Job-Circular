@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RefreshCw } from './Icons';
 import { useAppContext } from '../context/AppContext';
 
 export default function NewDataIcon() {
-  const { hasNewUpdates, setHasNewUpdates, triggerPillRefresh, isStartupSyncing } = useAppContext();
+  const { triggerPillRefresh, isStartupSyncing } = useAppContext();
   const [loading, setLoading] = useState(false);
   const [isHiding, setIsHiding] = useState(false);
+  const [showPill, setShowPill] = useState(false);
 
-  const shouldShow = hasNewUpdates || isStartupSyncing;
+  useEffect(() => {
+    // Show the floating loader 10 seconds after it is hidden
+    if (!showPill && !isStartupSyncing) {
+      const timer = setTimeout(() => {
+        setShowPill(true);
+      }, 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [showPill, isStartupSyncing]);
+
+  // Keep it visible if startup syncing is in progress
+  const shouldShow = showPill || isStartupSyncing;
 
   if (!shouldShow) return null;
 
@@ -18,25 +30,25 @@ export default function NewDataIcon() {
     const startTime = Date.now();
 
     try {
-      // 1. Trigger background sync & UI reload
+      // Trigger background sync & UI reload (checks Cloudflare for updates)
       await triggerPillRefresh();
 
-      // 2. Guarantee a smooth, professional 5-second spin time
+      // Guarantee a smooth spin animation for at least 1.5 seconds
       const elapsedTime = Date.now() - startTime;
-      const remainingSpinTime = Math.max(0, 5000 - elapsedTime);
+      const remainingSpinTime = Math.max(0, 1500 - elapsedTime);
       if (remainingSpinTime > 0) {
         await new Promise(resolve => setTimeout(resolve, remainingSpinTime));
       }
 
-      // 3. Smooth scale-down pop-out exit animation
+      // Smooth exit animation
       setIsHiding(true);
       await new Promise(resolve => setTimeout(resolve, 350));
 
-      // 4. Hide icon completely
-      setHasNewUpdates(false);
+      // Hide icon completely
+      setShowPill(false);
     } catch (err) {
       console.error('Refresh click error:', err);
-      setHasNewUpdates(false);
+      setShowPill(false);
     } finally {
       setLoading(false);
       setIsHiding(false);
@@ -48,13 +60,13 @@ export default function NewDataIcon() {
   return (
     <div 
       className={`new-data-icon-container ${isHiding ? 'pop-out' : ''}`} 
-      title={isStartupSyncing ? "আপডেট করা হচ্ছে..." : "নতুন পোস্ট যুক্ত হয়েছে • চাপুন"}
+      title={isSyncing ? "আপডেট করা হচ্ছে..." : "নতুন বিজ্ঞপ্তি দেখুন • চাপুন"}
     >
       <button 
         className={`new-data-icon-btn ${isSyncing ? 'is-syncing' : ''}`}
         onClick={handleClick}
         disabled={isSyncing || isHiding}
-        aria-label={isStartupSyncing ? "Syncing data in progress" : "New data available - click to refresh"}
+        aria-label={isStartupSyncing ? "Syncing data in progress" : "Check for new updates"}
       >
         <span className={`pulse-glow-ring ${isSyncing ? 'syncing-ring' : ''}`}></span>
         <RefreshCw size={18} className={`new-data-icon-svg ${isSyncing ? 'spinning' : ''}`} />
