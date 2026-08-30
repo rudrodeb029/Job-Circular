@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback } from 'react';
-import { setDocument, syncCoreDataOnStartup, subscribeToAppUpdates, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
+import { setDocument, syncCoreDataOnStartup, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
 import { initDb, triggerDeltaSync } from '../services/sqliteService';
 
 const AppContext = createContext();
@@ -184,17 +184,10 @@ export function AppProvider({ children }) {
     };
     window.addEventListener('feed_posts_updated', handleFeedPostsUpdated);
 
-    // Instant Realtime Broadcast Sync Signal
-    const unsubscribe = subscribeToAppUpdates((collectionName) => {
-      console.log('⚡ Realtime Update Signal Received for collection:', collectionName);
-      setHasNewUpdates(true);
-    });
-
-    // Rule 11: Only 2 triggers allowed — App Open & Loader Click.
-    // No background polling, no auto-timers. Cloudflare KV is always fresh via Cron.
+    // Realtime Signal removed for infinite scale (0 Supabase WebSockets).
+    // Data syncs perfectly via Cloudflare KV on App Open / Refresh.
     return () => {
       window.removeEventListener('feed_posts_updated', handleFeedPostsUpdated);
-      if (typeof unsubscribe === 'function') unsubscribe();
     };
   }, [state.theme, state.installTime, state.language]);
 
