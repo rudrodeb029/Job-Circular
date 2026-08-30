@@ -131,16 +131,26 @@ export default {
     }
 
     // Rule 12: Leaderboard -> KV (0 Supabase!)
-    if (url.pathname === '/leaderboard' || (url.pathname.includes('user_exam_submissions') && request.method === 'GET')) {
-      const examId = url.searchParams.get('exam_id') || 'global';
+    if (url.pathname === '/leaderboard' || 
+       (url.pathname.includes('user_exam_submissions') && request.method === 'GET') ||
+       (url.pathname.includes('activities') && url.search.includes('type=eq.live_exam_submission') && request.method === 'GET')
+    ) {
+      let examId = url.searchParams.get('exam_id') || 'global';
+      if (url.search.includes('examId=eq.')) {
+        const match = url.search.match(/examId=eq\.([a-zA-Z0-9_-]+)/);
+        examId = match ? match[1] : 'global';
+      }
+      
       const kvKey = `leaderboard_${examId}`;
       const cachedBoard = await env.CACHE_KV?.get(kvKey, 'json').catch(() => null);
       if (cachedBoard) {
         return new Response(JSON.stringify(cachedBoard), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=60', 'X-Edge-Cache': 'KV-HIT', 'X-Supabase-Queries': '0' } });
       }
+      
       const lbTarget = examId !== 'global'
-        ? `${SUPABASE_ORIGIN}/rest/v1/user_exam_submissions?select=*&exam_id=eq.${examId}&order=score.desc,time_taken_seconds.asc&limit=100`
-        : `${SUPABASE_ORIGIN}/rest/v1/user_exam_submissions?select=*&order=score.desc,time_taken_seconds.asc&limit=100`;
+        ? `${SUPABASE_ORIGIN}/rest/v1/activities?select=*&type=eq.live_exam_submission&examId=eq.${examId}&order=score.desc,timeTakenSec.asc&limit=100`
+        : `${SUPABASE_ORIGIN}/rest/v1/activities?select=*&type=eq.live_exam_submission&order=score.desc,timeTakenSec.asc&limit=100`;
+        
       const lbData = await fetch(lbTarget, { headers: originHeaders }).then(r => r.ok ? r.json() : []).catch(() => []);
       ctx.waitUntil(env.CACHE_KV?.put(kvKey, JSON.stringify(lbData), { expirationTtl: 3600 }));
       return new Response(JSON.stringify(lbData), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'X-Edge-Cache': 'KV-MISS-SUPABASE-FALLBACK' } });
@@ -148,7 +158,7 @@ export default {
 
     // Rule 13: Live Exam -> Cloudflare Queue (burst-safe!)
     if (url.pathname === '/live-exam-submit' ||
-       (url.pathname.includes('user_exam_submissions') &&
+       ((url.pathname.includes('user_exam_submissions') || url.pathname.includes('activities')) &&
         (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH'))) {
       try {
         const body = await request.json().catch(() => null);
@@ -157,8 +167,7 @@ export default {
           await env.EXAM_QUEUE.send({ ...body, receivedAt: new Date().toISOString() });
           return new Response(JSON.stringify({ success: true, queued: true }), { status: 202, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
         }
-        // Fallback: direct to Supabase if queue not configured
-        const submitRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/user_exam_submissions`, {
+        const submitRes = await fetch(`${SUPABASE_ORIGIN}/rest/v1/activities`, {
           method: request.method, headers: originHeaders, body: JSON.stringify(body)
         });
         const nh = new Headers(submitRes.headers);
@@ -169,7 +178,19 @@ export default {
       }
     }
 
-    // Standard REST Proxy Passthrough (write methods only reach here)
+    // STRICT GET CACHE LOCK: Block any unhandled direct GET request to Supabase to prevent Supabase spam!
+    // Allow bypassing only for Admin panel (Cache-Control: no-cache)
+    if (request.method === 'GET') {
+      const cacheControl = request.headers.get('Cache-Control') || '';
+      if (!cacheControl.includes('no-cache')) {
+        return new Response(JSON.stringify({ 
+          error: 'Strict GET Cache Lock: Direct GET queries to Supabase are blocked. Please use /sync-all endpoint.',
+          url: url.pathname + url.search
+        }), { status: 403, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+      }
+    }
+
+    // Standard REST Proxy Passthrough (write methods and Admin GET bypass reach here)
     const targetUrl = new URL(url.pathname + url.search, SUPABASE_ORIGIN);
     const headers = new Headers(request.headers);
     headers.set('Host', new URL(SUPABASE_ORIGIN).host);
@@ -181,7 +202,7 @@ export default {
     });
     const newHeaders = new Headers(originResponse.headers);
     newHeaders.set('Access-Control-Allow-Origin', '*');
-    newHeaders.set('X-Edge-Cache', 'BYPASS-WRITE');
+    newHeaders.set('X-Edge-Cache', 'BYPASS');
     newHeaders.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
     newHeaders.set('X-Content-Type-Options', 'nosniff');
     newHeaders.set('X-Frame-Options', 'DENY');
@@ -201,7 +222,7 @@ export default {
     });
     for (const message of batch.messages) {
       try {
-        await fetch(`${SUPABASE_ORIGIN}/rest/v1/user_exam_submissions`, {
+        await fetch(`${SUPABASE_ORIGIN}/rest/v1/activities`, {
           method: 'POST', headers, body: JSON.stringify(message.body)
         });
         message.ack();
@@ -265,7 +286,7 @@ export default {
 
     // Step 5: Leaderboard KV আপডেট
     const lbData = await fetch(
-      `${SUPABASE_ORIGIN}/rest/v1/user_exam_submissions?select=*&order=score.desc,time_taken_seconds.asc&limit=100`,
+      `${SUPABASE_ORIGIN}/rest/v1/activities?select=*&type=eq.live_exam_submission&order=score.desc,timeTakenSec.asc&limit=100`,
       { headers: h }
     ).then(r => r.ok ? r.json() : []).catch(() => []);
     await env.CACHE_KV?.put('leaderboard_global', JSON.stringify(lbData), { expirationTtl: 3600 }).catch(() => {});
