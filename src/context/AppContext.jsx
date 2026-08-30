@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useRef, useCallback } from 'react';
 import { setDocument, syncCoreDataOnStartup, subscribeToAppUpdates, clearCollectionCache, COLLECTIONS } from '../services/supabaseService';
 import { initDb, triggerDeltaSync } from '../services/sqliteService';
 
@@ -141,8 +141,10 @@ export function AppProvider({ children }) {
   const [hasNewUpdates, setHasNewUpdates] = React.useState(false);
   const isSqliteInitRef = useRef(false);
 
-  const triggerPillRefresh = async () => {
+  // ✅ Loader ক্লিক: Cloudflare Worker থেকে সর্বদা তাজা/নতুন ডাটা সিঙ্ক করে UI আপডেট করে
+  const triggerPillRefresh = useCallback(async () => {
     try {
+      console.log('⚡ Floating Loader Clicked: Fetching fresh data from Cloudflare Worker...');
       const data = await syncCoreDataOnStartup(true);
       await triggerDeltaSync();
       if (data && (data.masterLastUpdated || data.syncedAt)) {
@@ -155,9 +157,12 @@ export function AppProvider({ children }) {
       console.error('Floating loader sync error:', err);
       return null;
     }
-  };
+  }, []);
 
+  // ✅ App খোলার সময় একবার: syncCoreDataOnStartup চালায়
   useEffect(() => {
+    syncCoreDataOnStartup().catch(err => console.error('Initial startup sync error:', err));
+
     if (!isSqliteInitRef.current) {
       isSqliteInitRef.current = true;
       // Initialize SQLite Database
@@ -166,22 +171,6 @@ export function AppProvider({ children }) {
           triggerDeltaSync().catch(err => console.error('Background sync failed:', err));
         }
       });
-
-      // ─── 4-Hour Sync Lock Policy (Preserves Cache for General Navigation) ───
-      const lastSyncTimestamp = Number(localStorage.getItem('last_sync_timestamp') || 0);
-      const now = Date.now();
-      const FOUR_HOURS_MS = 4 * 60 * 60 * 1000; // 4 Hours
-
-      if (!lastSyncTimestamp || lastSyncTimestamp === 0) {
-        console.log('🆕 First Time Boot: Executing /sync-all download...');
-        syncCoreDataOnStartup(true).catch(err => console.error('Initial sync error:', err));
-      } else if (now - lastSyncTimestamp < FOUR_HOURS_MS) {
-        const remainingMins = Math.round((FOUR_HOURS_MS - (now - lastSyncTimestamp)) / 60000);
-        console.log(`🔒 4-Hour Cache Lock Active (${remainingMins} mins remaining): Preserving cache for internal app navigation.`);
-      } else {
-        console.log('⏳ 4-Hour Sync Lock Expired: Running background revalidation check...');
-        syncCoreDataOnStartup(false).catch(err => console.error('Background revalidation error:', err));
-      }
     }
 
     if (!localStorage.getItem('installTime')) {

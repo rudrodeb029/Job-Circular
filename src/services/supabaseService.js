@@ -94,22 +94,23 @@ let _isStartupSyncing = false;
 
 /**
  * Global app initialization sync.
- * Fetches core data when the app opens or when a forced refresh is needed.
- * @param {boolean} force - If true, bypasses the "already initialized" check.
+ * Fetches core data when the app opens or when a forced refresh is needed (e.g. floating loader click).
+ * @param {boolean|string} force - If true, checks Cloudflare Worker for new data immediately.
  */
-const CLIENT_SYNC_LOCK_MS = 20 * 60 * 1000; // 20 Minutes Client Hard-Lock
+const CLIENT_SYNC_LOCK_MS = 20 * 60 * 1000; // 20 Minutes Client Hard-Lock for internal navigation
 
 export const syncCoreDataOnStartup = async (force = false) => {
   if (!navigator.onLine) return null;
   if (_isStartupSyncing) return null;
 
+  const isExplicitForce = Boolean(force);
   const isExplicitAdminBypass = force === 'admin_force';
   const lastClientSync = Number(localStorage.getItem('last_client_sync_time') || 0);
   const timeSinceLastSync = Date.now() - lastClientSync;
 
-  // 🛡️ 20-Minute Client Hard-Lock: If synced within 20 mins and not an explicit admin override, skip Cloudflare Worker request entirely!
-  if (timeSinceLastSync < CLIENT_SYNC_LOCK_MS && !isExplicitAdminBypass && lastClientSync > 0) {
-    console.log(`🔒 20-Min Client Lock Active (${Math.round((CLIENT_SYNC_LOCK_MS - timeSinceLastSync) / 1000)}s remaining): 0 Cloudflare Requests!`);
+  // 🛡️ Client Lock: Only active if NOT an explicit force refresh (loader click or initial force)
+  if (timeSinceLastSync < CLIENT_SYNC_LOCK_MS && !isExplicitForce && lastClientSync > 0) {
+    console.log(`🔒 20-Min Client Lock Active (${Math.round((CLIENT_SYNC_LOCK_MS - timeSinceLastSync) / 1000)}s remaining): Using local cache.`);
     _appInitialized = true;
     return null;
   }
@@ -125,7 +126,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
     COLLECTIONS.APP_CONFIG
   ];
 
-  console.log(force ? 'Forced Refresh: Executing Unified Sync (no-cache)...' : 'Startup Sync: Executing Unified Sync (with 304 check)...');
+  console.log(isExplicitForce ? '🔄 Loader / Forced Refresh: Checking Cloudflare KV for updates...' : '🚀 Startup Sync: Checking Cloudflare KV with 304 conditional check...');
 
   try {
     const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
@@ -150,7 +151,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
     const response = await fetch(syncUrl, { headers });
 
     if (response.status === 304) {
-      console.log('⚡ 304 Not Modified: Server timestamp matches local data! 0 bytes downloaded.');
+      console.log('⚡ 304 Not Modified: Server timestamp matches local data! 0 bytes downloaded from Cloudflare KV.');
       localStorage.setItem('last_client_sync_time', String(Date.now()));
       localStorage.setItem('last_sync_timestamp', String(Date.now()));
       _appInitialized = true;
