@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { RefreshCw } from './Icons';
 import { useAppContext } from '../context/AppContext';
 
+// Persistent session flag to ensure the loader shows only once per app open session
+let hasShownPillThisSession = false;
+
 export default function NewDataIcon() {
   const { triggerPillRefresh, isStartupSyncing } = useAppContext();
   const [loading, setLoading] = useState(false);
@@ -9,9 +12,12 @@ export default function NewDataIcon() {
   const [showPill, setShowPill] = useState(false);
 
   useEffect(() => {
-    // Show the floating loader 20 seconds after app mount (only once, unconditionally)
+    // If it has already been shown in this app session, do not show it again
+    if (hasShownPillThisSession) return;
+
     const timer = setTimeout(() => {
       setShowPill(true);
+      hasShownPillThisSession = true;
     }, 20000);
     return () => clearTimeout(timer);
   }, []);
