@@ -353,13 +353,13 @@ export default function LiveExamRoom() {
 
   // Secure background fetch for exam correct answer keys (solutions)
   useEffect(() => {
-    if (!exam || !id || !currentResult || currentResult.didNotAttend) return;
+    if (!exam || !id || !currentResult) return;
 
     // Check if we already have correctIndex in questions to avoid duplicate calls
     const alreadyHasAnswers = exam.questions?.some(q => q.correctIndex !== undefined);
     if (alreadyHasAnswers) return;
 
-    const submissionId = currentResult.submissionId || currentResult.id;
+    const submissionId = currentResult.didNotAttend ? null : (currentResult.submissionId || currentResult.id);
     const examEnded = exam.status === 'completed' || exam.status === 'ended';
 
     if (submissionId || examEnded) {

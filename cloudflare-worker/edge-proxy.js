@@ -189,12 +189,16 @@ export default {
           const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
           const exam = (kvData?.live_exams || []).find(e => String(e.id) === String(examId));
           if (exam) {
-            const startStr = exam.startTime || exam.scheduledAt || exam.createdAt;
-            const duration = Number(exam.duration) || 60;
-            if (startStr) {
-              const startMs = new Date(startStr).getTime();
-              if (!isNaN(startMs) && Date.now() > (startMs + duration * 60 * 1000)) {
-                authorized = true;
+            if (exam.status === 'completed' || exam.status === 'ended') {
+              authorized = true;
+            } else {
+              const startStr = exam.startTime || exam.scheduledAt || exam.createdAt;
+              const duration = Number(exam.duration) || 60;
+              if (startStr) {
+                const startMs = new Date(startStr).getTime();
+                if (!isNaN(startMs) && Date.now() > (startMs + duration * 60 * 1000)) {
+                  authorized = true;
+                }
               }
             }
           }
