@@ -1228,7 +1228,9 @@ const isValidAvatar = (url) => {
 
 const getInitials = (name) => {
   if (!name || typeof name !== 'string') return 'U';
-  const parts = name.split(' ').filter(p => p.length > 0);
+  // Strip "(আপনি)" or "(You)" or brackets and content inside brackets
+  const cleanName = name.replace(/\([^)]*\)/g, '').trim();
+  const parts = cleanName.split(' ').filter(p => p.length > 0);
   if (parts.length === 0) return 'U';
   if (parts.length === 1) return parts[0].substring(0, 1).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
