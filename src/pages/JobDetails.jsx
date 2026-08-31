@@ -546,7 +546,7 @@ export default function JobDetails() {
                   transition: 'all 0.2s ease'
                 }}
               >
-                {isApplied ? "✓ Applied" : "Apply Now"}
+                {isApplied ? "✓ Applied" : (job.showInExamDate ? "Get Details" : "Apply Now")}
               </button>
             </div>
           </div>
@@ -637,7 +637,7 @@ export default function JobDetails() {
                   transition: 'all 0.2s ease'
                 }}
               >
-                {isApplied ? "✓ Applied" : "Apply Now"}
+                {isApplied ? "✓ Applied" : (job.showInExamDate ? "Get Details" : "Apply Now")}
               </button>
             </div>
           </div>
