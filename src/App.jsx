@@ -299,19 +299,7 @@ function App() {
     prevPathRef.current = location.pathname;
   }, [location.pathname]);
 
-  const EXCLUDED_LOADER_PATHS = [
-    '/profile',
-    '/edit-profile',
-    '/settings',
-    '/privacy',
-    '/terms',
-    '/share',
-    '/rate',
-    '/contact',
-    '/about',
-    '/onboarding'
-  ];
-  const isExcludedLoaderRoute = EXCLUDED_LOADER_PATHS.some(path => location.pathname.startsWith(path));
+  const isHomeOrFeed = location.pathname === '/' || location.pathname === '/home' || location.pathname === '/feed';
 
   return (
     <ErrorBoundary>
@@ -321,7 +309,7 @@ function App() {
         data-nav-direction={isBackNavigation ? 'back' : 'forward'}
       >
         {!isAdminRoute && <ConnectivityBanner />}
-        {!isAdminRoute && !isExcludedLoaderRoute && <NewDataIcon />}
+        {!isAdminRoute && isHomeOrFeed && <NewDataIcon />}
         <Routes location={location}>
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />

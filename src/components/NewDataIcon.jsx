@@ -9,10 +9,10 @@ export default function NewDataIcon() {
   const [showPill, setShowPill] = useState(false);
 
   useEffect(() => {
-    // Show the floating loader 10 seconds after app mount (only once, unconditionally)
+    // Show the floating loader 20 seconds after app mount (only once, unconditionally)
     const timer = setTimeout(() => {
       setShowPill(true);
-    }, 10000);
+    }, 20000);
     return () => clearTimeout(timer);
   }, []);
 
