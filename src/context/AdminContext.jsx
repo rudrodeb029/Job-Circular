@@ -684,7 +684,7 @@ export const AdminProvider = ({ children }) => {
       if (isMounted) {
         console.log('⚡ AdminContext: Re-loading state from cache for instant UI update...');
         setInitialSyncComplete(true);
-        loadAllData(false);
+        loadAllData(false, true);
       }
     };
     window.addEventListener('force_app_data_reload', handleInstantReload);
@@ -706,7 +706,7 @@ export const AdminProvider = ({ children }) => {
 
   const refreshData = async (forceServer = false) => {
     await syncCoreDataOnStartup(forceServer);
-    await loadAllData(false);
+    await loadAllData(false, true);
   };
 
   return (

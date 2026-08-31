@@ -80,9 +80,11 @@ export default function Home() {
   const postsPerPage = 20;
 
   useEffect(() => {
-    if (!adminLoading && (initialSyncComplete || localJobs.length > 0)) {
+    if (localJobs.length > 0) {
       setLoading(false);
-    } else if (adminLoading || (!initialSyncComplete && localJobs.length === 0)) {
+    } else if (!adminLoading && initialSyncComplete) {
+      setLoading(false);
+    } else {
       setLoading(true);
     }
   }, [adminLoading, initialSyncComplete, localJobs.length]);
