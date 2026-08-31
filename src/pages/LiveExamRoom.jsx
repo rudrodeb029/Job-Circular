@@ -93,41 +93,48 @@ export default function LiveExamRoom() {
     };
   }, [id, adminState.liveExams]);
 
-  // Load REAL participant submissions from Supabase Activities via Polling / Fetch
+  // Load REAL participant submissions from Cloudflare D1/KV via Stale-While-Revalidate and Polling
   useEffect(() => {
     let isMounted = true;
+    let pollInterval = null;
     const targetId = String(id).trim();
 
-    const loadRealSubmissions = async () => {
+    const loadRealSubmissions = async (bypassCache = false) => {
       try {
-        // First check SQLite cache
-        const cachedLb = await getLeaderboard(targetId);
-        if (cachedLb && cachedLb.length > 0) {
-          if (isMounted) setRealSubmissions(cachedLb);
-          return;
+        // 1. Stale: Try loading from SQLite cache first for 0ms startup
+        if (!bypassCache) {
+          const cachedLb = await getLeaderboard(targetId);
+          if (cachedLb && cachedLb.length > 0 && isMounted) {
+            setRealSubmissions(cachedLb);
+          }
         }
 
-        const { data: examSubs, error } = await supabase
-          .from('activities')
-          .select('*')
-          .eq('type', 'live_exam_submission')
-          .eq('examId', targetId);
+        // 2. Revalidate: Query Cloudflare Worker's D1 leaderboard endpoint (Real-time ranks!)
+        const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
+        const response = await fetch(`${WORKER_URL}/leaderboard?exam_id=${targetId}`);
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+        const data = await response.json();
 
-        if (error) throw error;
-        if (Array.isArray(examSubs) && isMounted) {
-          setRealSubmissions(examSubs);
-          await saveLeaderboard(targetId, examSubs);
+        if (Array.isArray(data) && isMounted) {
+          setRealSubmissions(data);
+          await saveLeaderboard(targetId, data);
         }
       } catch (err) {
-        console.warn('Error fetching leaderboard submissions:', err);
+        console.warn('Error fetching leaderboard from D1:', err);
       }
     };
 
-    // 1. Initial immediate fetch
+    // 1. Initial revalidation
     loadRealSubmissions();
+
+    // 2. Poll every 15 seconds for real-time live ranks
+    pollInterval = setInterval(() => {
+      loadRealSubmissions(true);
+    }, 15000);
 
     return () => {
       isMounted = false;
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [id]);
 
