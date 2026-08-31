@@ -121,16 +121,22 @@ function appReducer(state, action) {
       return state;
   }
 
-  // Sync profile/saved data to Firestore
+  // Sync profile/saved data to D1 Queue (0 direct Supabase calls!)
   if (['UPDATE_USER_PROFILE', 'TOGGLE_SAVE_JOB', 'TOGGLE_APPLY_JOB', 'MARK_APPLIED'].includes(action.type)) {
       const { id, ...userData } = newState.user;
-      console.log('Syncing user profile to Firestore:', id);
-      setDocument(COLLECTIONS.USERS, id, {
-          ...userData,
-          savedJobs: newState.savedJobs,
-          appliedJobs: newState.appliedJobs,
-          updatedAt: new Date().toISOString()
-      }).catch(err => console.error('Firestore sync error details:', err.message || err));
+      const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
+      fetch(`${WORKER_URL}/user/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              userId: id,
+              userData: {
+                  ...userData,
+                  savedJobs: newState.savedJobs,
+                  appliedJobs: newState.appliedJobs
+              }
+          })
+      }).catch(err => console.error('Cloudflare profile sync error:', err));
   }
 
   return newState;

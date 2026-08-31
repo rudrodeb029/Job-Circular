@@ -9,6 +9,12 @@ WEBHOOK_SECRET = "sync-all-data-secret-2026"
 binding = "CACHE_KV"
 id = "ea9b95e256ed4e46999d1a13dcc19edf"
 
+[[d1_databases]]
+binding = "EXAM_DB"
+database_name = "exam-submissions-db"
+database_id = "9877bfdd-ee74-4fb9-b7d5-c84a9247ee93"
+migrations_dir = "migrations"
+
 [[queues.producers]]
 queue = "live-exam-queue"
 binding = "EXAM_QUEUE"
@@ -17,3 +23,6 @@ binding = "EXAM_QUEUE"
 queue = "live-exam-queue"
 max_batch_size = 50
 max_batch_timeout = 5
+
+[triggers]
+crons = ["* * * * *"]

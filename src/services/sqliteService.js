@@ -109,6 +109,42 @@ export const initDb = async () => {
     await dbInstance.execute(createIndexQuery);
     console.log('📈 SQLite Table & updated_at B-Tree Index Verified.');
 
+    // 3. Live Exam Tables (অফলাইন পরীক্ষা সাপোর্ট)
+    await dbInstance.execute(`
+      CREATE TABLE IF NOT EXISTS local_exams (
+        id TEXT PRIMARY KEY,
+        title TEXT, title_en TEXT,
+        duration INTEGER, total_questions INTEGER,
+        questions TEXT,
+        status TEXT, scheduled_at TEXT, created_at TEXT
+      );
+    `);
+    await dbInstance.execute(`
+      CREATE TABLE IF NOT EXISTS local_answers (
+        exam_id TEXT NOT NULL,
+        question_index INTEGER NOT NULL,
+        selected_option INTEGER NOT NULL,
+        answered_at TEXT NOT NULL,
+        PRIMARY KEY (exam_id, question_index)
+      );
+    `);
+    await dbInstance.execute(`
+      CREATE TABLE IF NOT EXISTS exam_results (
+        exam_id TEXT PRIMARY KEY,
+        score INTEGER, total INTEGER, scaled_score REAL,
+        rank INTEGER, time_taken TEXT, submitted_at TEXT
+      );
+    `);
+    await dbInstance.execute(`
+      CREATE TABLE IF NOT EXISTS leaderboard_cache (
+        exam_id TEXT NOT NULL, rank INTEGER NOT NULL,
+        user_name TEXT, user_photo TEXT,
+        score INTEGER, total INTEGER, scaled_score REAL, time_taken_sec INTEGER,
+        PRIMARY KEY (exam_id, rank)
+      );
+    `);
+    console.log('🏆 Live Exam SQLite Tables Verified.');
+
     return true;
   } catch (err) {
     console.error('❌ Failed to initialize native SQLite database:', err);
@@ -229,4 +265,196 @@ export const triggerDeltaSync = async () => {
     // Always release lock regardless of success or failure
     isDeltaSyncing = false;
   }
+};
+
+// ══════════════════════════════════════
+// Live Exam SQLite Functions
+// ══════════════════════════════════════
+
+/**
+ * Save exam data to SQLite for offline access (correctIndex already stripped by server).
+ */
+export const saveExamToSQLite = async (exam) => {
+  if (!exam?.id) return;
+  if (!isNative) {
+    try {
+      const key = `sqlite_exam_${exam.id}`;
+      localStorage.setItem(key, JSON.stringify(exam));
+    } catch (e) { console.warn('Mock saveExam:', e); }
+    return;
+  }
+  try {
+    if (!dbInstance) await initDb();
+    await dbInstance.run(
+      `INSERT OR REPLACE INTO local_exams (id, title, title_en, duration, total_questions, questions, status, scheduled_at, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [String(exam.id), exam.title || '', exam.titleEn || '', exam.duration || 0,
+       exam.totalQuestions || exam.questions?.length || 0,
+       JSON.stringify(exam.questions || []), exam.status || '',
+       exam.scheduledAt || '', exam.createdAt || '']
+    );
+  } catch (e) { console.error('saveExamToSQLite error:', e); }
+};
+
+/**
+ * Get exam from SQLite (offline).
+ */
+export const getExamFromSQLite = async (examId) => {
+  if (!isNative) {
+    try {
+      const data = localStorage.getItem(`sqlite_exam_${examId}`);
+      return data ? JSON.parse(data) : null;
+    } catch (e) { return null; }
+  }
+  try {
+    if (!dbInstance) await initDb();
+    const res = await dbInstance.query('SELECT * FROM local_exams WHERE id = ?', [String(examId)]);
+    const row = res?.values?.[0];
+    if (!row) return null;
+    return { ...row, questions: JSON.parse(row.questions || '[]') };
+  } catch (e) { console.error('getExamFromSQLite error:', e); return null; }
+};
+
+/**
+ * Save a single answer to SQLite in real-time (as student selects MCQ).
+ */
+export const saveLocalAnswer = async (examId, questionIndex, selectedOption) => {
+  if (!isNative) {
+    try {
+      const key = `sqlite_answers_${examId}`;
+      const answers = JSON.parse(localStorage.getItem(key) || '{}');
+      answers[questionIndex] = selectedOption;
+      localStorage.setItem(key, JSON.stringify(answers));
+    } catch (e) { console.warn('Mock saveAnswer:', e); }
+    return;
+  }
+  try {
+    if (!dbInstance) await initDb();
+    await dbInstance.run(
+      `INSERT OR REPLACE INTO local_answers (exam_id, question_index, selected_option, answered_at)
+       VALUES (?, ?, ?, ?)`,
+      [String(examId), questionIndex, selectedOption, new Date().toISOString()]
+    );
+  } catch (e) { console.error('saveLocalAnswer error:', e); }
+};
+
+/**
+ * Get all saved answers for an exam from SQLite.
+ */
+export const getAllLocalAnswers = async (examId) => {
+  if (!isNative) {
+    try {
+      return JSON.parse(localStorage.getItem(`sqlite_answers_${examId}`) || '{}');
+    } catch (e) { return {}; }
+  }
+  try {
+    if (!dbInstance) await initDb();
+    const res = await dbInstance.query(
+      'SELECT question_index, selected_option FROM local_answers WHERE exam_id = ?',
+      [String(examId)]
+    );
+    const answers = {};
+    (res?.values || []).forEach(r => { answers[r.question_index] = r.selected_option; });
+    return answers;
+  } catch (e) { console.error('getAllLocalAnswers error:', e); return {}; }
+};
+
+/**
+ * Clear local answers after successful submission.
+ */
+export const clearLocalAnswers = async (examId) => {
+  if (!isNative) {
+    localStorage.removeItem(`sqlite_answers_${examId}`);
+    return;
+  }
+  try {
+    if (!dbInstance) await initDb();
+    await dbInstance.run('DELETE FROM local_answers WHERE exam_id = ?', [String(examId)]);
+  } catch (e) { console.error('clearLocalAnswers error:', e); }
+};
+
+/**
+ * Save exam result from server (score, rank, etc.).
+ */
+export const saveExamResult = async (examId, result) => {
+  if (!isNative) {
+    try {
+      localStorage.setItem(`sqlite_result_${examId}`, JSON.stringify(result));
+    } catch (e) { console.warn('Mock saveResult:', e); }
+    return;
+  }
+  try {
+    if (!dbInstance) await initDb();
+    await dbInstance.run(
+      `INSERT OR REPLACE INTO exam_results (exam_id, score, total, scaled_score, rank, time_taken, submitted_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [String(examId), result.score || 0, result.total || 0, result.scaledScore || 0,
+       result.rank || 0, result.timeTaken || '', new Date().toISOString()]
+    );
+  } catch (e) { console.error('saveExamResult error:', e); }
+};
+
+/**
+ * Get exam result from SQLite (offline).
+ */
+export const getExamResult = async (examId) => {
+  if (!isNative) {
+    try {
+      const data = localStorage.getItem(`sqlite_result_${examId}`);
+      return data ? JSON.parse(data) : null;
+    } catch (e) { return null; }
+  }
+  try {
+    if (!dbInstance) await initDb();
+    const res = await dbInstance.query('SELECT * FROM exam_results WHERE exam_id = ?', [String(examId)]);
+    return res?.values?.[0] || null;
+  } catch (e) { console.error('getExamResult error:', e); return null; }
+};
+
+/**
+ * Save full leaderboard to SQLite (download once, offline forever).
+ */
+export const saveLeaderboard = async (examId, leaderboard) => {
+  if (!Array.isArray(leaderboard) || !leaderboard.length) return;
+  if (!isNative) {
+    try {
+      localStorage.setItem(`sqlite_lb_${examId}`, JSON.stringify(leaderboard));
+    } catch (e) { console.warn('Mock saveLeaderboard:', e); }
+    return;
+  }
+  try {
+    if (!dbInstance) await initDb();
+    // Clear old leaderboard for this exam
+    await dbInstance.run('DELETE FROM leaderboard_cache WHERE exam_id = ?', [String(examId)]);
+    // Insert all entries
+    const statements = leaderboard.map((entry, i) => ({
+      statement: `INSERT OR REPLACE INTO leaderboard_cache
+        (exam_id, rank, user_name, user_photo, score, total, scaled_score, time_taken_sec)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      values: [String(examId), entry.rank || i + 1, entry.userName || entry.user_name || '',
+               entry.userPhoto || entry.user_photo || '', entry.score || 0, entry.total || 0,
+               entry.scaledScore || entry.scaled_score || 0, entry.timeTakenSec || entry.time_taken_sec || 0]
+    }));
+    await dbInstance.executeTransaction(statements);
+  } catch (e) { console.error('saveLeaderboard error:', e); }
+};
+
+/**
+ * Get leaderboard from SQLite (offline — zero server requests!).
+ */
+export const getLeaderboard = async (examId) => {
+  if (!isNative) {
+    try {
+      const data = localStorage.getItem(`sqlite_lb_${examId}`);
+      return data ? JSON.parse(data) : null;
+    } catch (e) { return null; }
+  }
+  try {
+    if (!dbInstance) await initDb();
+    const res = await dbInstance.query(
+      'SELECT * FROM leaderboard_cache WHERE exam_id = ? ORDER BY rank ASC',
+      [String(examId)]
+    );
+    return res?.values?.length ? res.values : null;
+  } catch (e) { console.error('getLeaderboard error:', e); return null; }
 };

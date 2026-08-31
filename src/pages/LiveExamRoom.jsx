@@ -8,6 +8,7 @@ import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, CO
 import { supabase } from '../services/supabaseClient';
 import BottomNav from '../components/BottomNav';
 import ModernLoader from '../components/ModernLoader';
+import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult, getExamResult, saveLeaderboard, getLeaderboard, getExamFromSQLite, saveExamToSQLite } from '../services/sqliteService';
 
 export default function LiveExamRoom() {
   const { id } = useParams();
@@ -72,10 +73,12 @@ export default function LiveExamRoom() {
             ? match.questions
             : generate100Questions(1);
 
-          setExam({
+          const finalExam = {
             ...match,
             questions: finalQuestions
-          });
+          };
+          setExam(finalExam);
+          saveExamToSQLite(finalExam);
         } else {
           setExam(null);
         }
@@ -97,6 +100,13 @@ export default function LiveExamRoom() {
 
     const loadRealSubmissions = async () => {
       try {
+        // First check SQLite cache
+        const cachedLb = await getLeaderboard(targetId);
+        if (cachedLb && cachedLb.length > 0) {
+          if (isMounted) setRealSubmissions(cachedLb);
+          return;
+        }
+
         const { data: examSubs, error } = await supabase
           .from('activities')
           .select('*')
@@ -106,6 +116,7 @@ export default function LiveExamRoom() {
         if (error) throw error;
         if (Array.isArray(examSubs) && isMounted) {
           setRealSubmissions(examSubs);
+          await saveLeaderboard(targetId, examSubs);
         }
       } catch (err) {
         console.warn('Error fetching leaderboard submissions:', err);
@@ -367,20 +378,16 @@ export default function LiveExamRoom() {
       ...prev,
       [qIndex]: oIndex
     }));
+    saveLocalAnswer(id, qIndex, oIndex);
   };
 
   const handleSubmit = async () => {
     if (savedResult || submitted) return;
 
-    let correct = 0;
-    (exam.questions || []).forEach((q, index) => {
-      if (selectedAnswers[index] === q.correctIndex) {
-        correct += 1;
-      }
-    });
+    // Get all answers
+    const answersObj = { ...selectedAnswers };
 
-    const totalQuestions = exam.questions?.length || 100;
-    const scaledScore = Math.round((correct / totalQuestions) * 100);
+    // Calculate time taken
     const durationMins = typeof exam?.duration === 'number' ? exam.duration : (parseInt(exam?.duration) || 10);
     const totalDurationSec = durationMins * 60;
     
@@ -390,61 +397,104 @@ export default function LiveExamRoom() {
     } else {
       elapsedSec = Math.max(1, Math.floor((Date.now() - (roomEntryTime.current || Date.now())) / 1000));
     }
-    const mins = Math.floor(elapsedSec / 60);
-    const secs = elapsedSec % 60;
-    const timeStr = `${mins}m ${String(secs).padStart(2, '0')}s`;
 
-    const userName = state.user?.name || 'Suvo Roy';
-    const userPhoto = state.user?.avatar || state.user?.photoURL || '';
-
-    const resultData = {
-      score: correct,
-      total: totalQuestions,
-      scaledScore: scaledScore,
-      answers: selectedAnswers,
-      timeTaken: timeStr,
-      timeTakenSec: elapsedSec,
-      userName: userName,
-      userPhoto: userPhoto,
-      submittedAt: new Date().toISOString()
-    };
-
+    // Submit to Cloudflare Worker for server-side grading
+    const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
     try {
-      const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
-      results[id] = resultData;
-      localStorage.setItem('live_exam_results', JSON.stringify(results));
-    } catch (e) {
-      console.error(e);
-    }
-
-    // Persist real participant submission to Supabase
-    const submissionId = `exam-sub-${id}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
-    const submissionDoc = {
-      id: submissionId,
-      type: 'live_exam_submission',
-      examId: String(id).trim(),
-      userName: userName,
-      userPhoto: userPhoto,
-      score: correct,
-      total: totalQuestions,
-      scaledScore: scaledScore,
-      timeTaken: timeStr,
-      timeTakenSec: elapsedSec,
-      createdAt: new Date().toISOString()
-    };
-
-    // 1. Instant UI Score Display (< 100ms CPU Grading)
-    setSubmitted(true);
-
-    // 2. Silent Queueing: Push to Supabase with random delay (500ms - 3500ms) to prevent database connection spikes
-    setTimeout(async () => {
-      try {
-        await setDocument(COLLECTIONS.ACTIVITIES, submissionId, submissionDoc);
-        console.log('⚡ Silent Queueing: Live exam result synced to Supabase database.');
-      } catch (err) {
-        console.warn('Failed to sync live exam submission to Supabase:', err);
+      const response = await fetch(`${WORKER_URL}/exam-submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          examId: String(id).trim(),
+          userName: state?.user?.name || 'Anonymous',
+          userPhoto: state?.user?.avatar || state?.user?.photoURL || '',
+          answers: answersObj,
+          timeTakenSec: elapsedSec
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        // Save to localStorage for existing result display logic
+        const allResults = JSON.parse(localStorage.getItem('live_exam_results') || '{}');
+        allResults[id] = { score: result.score, total: result.total, scaledScore: result.scaledScore, rank: result.rank, timeTaken: result.timeTaken, answers: answersObj, timeTakenSec: elapsedSec, submittedAt: new Date().toISOString() };
+        localStorage.setItem('live_exam_results', JSON.stringify(allResults));
+        // Save to SQLite for offline access
+        await saveExamResult(id, result);
+        await clearLocalAnswers(id);
+        
+        setSubmitted(true);
+        return;
+      } else {
+        throw new Error(result.error || 'Server returned false success');
       }
-    }, Math.floor(Math.random() * 3000) + 500);
+    } catch (submitErr) {
+      console.error('Server submit failed, falling back to local grading:', submitErr);
+      
+      let correct = 0;
+      (exam.questions || []).forEach((q, index) => {
+        if (selectedAnswers[index] === q.correctIndex) {
+          correct += 1;
+        }
+      });
+
+      const totalQuestions = exam.questions?.length || 100;
+      const scaledScore = Math.round((correct / totalQuestions) * 100);
+      const mins = Math.floor(elapsedSec / 60);
+      const secs = elapsedSec % 60;
+      const timeStr = `${mins}m ${String(secs).padStart(2, '0')}s`;
+
+      const userName = state.user?.name || 'Suvo Roy';
+      const userPhoto = state.user?.avatar || state.user?.photoURL || '';
+
+      const resultData = {
+        score: correct,
+        total: totalQuestions,
+        scaledScore: scaledScore,
+        answers: selectedAnswers,
+        timeTaken: timeStr,
+        timeTakenSec: elapsedSec,
+        userName: userName,
+        userPhoto: userPhoto,
+        submittedAt: new Date().toISOString()
+      };
+
+      try {
+        const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
+        results[id] = resultData;
+        localStorage.setItem('live_exam_results', JSON.stringify(results));
+      } catch (e) {
+        console.error(e);
+      }
+
+      // Persist real participant submission to Supabase
+      const submissionId = `exam-sub-${id}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+      const submissionDoc = {
+        id: submissionId,
+        type: 'live_exam_submission',
+        examId: String(id).trim(),
+        userName: userName,
+        userPhoto: userPhoto,
+        score: correct,
+        total: totalQuestions,
+        scaledScore: scaledScore,
+        timeTaken: timeStr,
+        timeTakenSec: elapsedSec,
+        createdAt: new Date().toISOString()
+      };
+
+      // 1. Instant UI Score Display (< 100ms CPU Grading)
+      setSubmitted(true);
+
+      // 2. Silent Queueing: Push to Supabase with random delay (500ms - 3500ms) to prevent database connection spikes
+      setTimeout(async () => {
+        try {
+          await setDocument(COLLECTIONS.ACTIVITIES, submissionId, submissionDoc);
+          console.log('⚡ Silent Queueing: Live exam result synced to Supabase database.');
+        } catch (err) {
+          console.warn('Failed to sync live exam submission to Supabase:', err);
+        }
+      }, Math.floor(Math.random() * 3000) + 500);
+    }
   };
 
   const formatTimer = (totalSeconds) => {

@@ -488,31 +488,15 @@ export const deleteDocument = async (collectionName, docId) => {
  */
 export const incrementFeedLike = async (postId, delta = 1) => {
   try {
-    const { data: current } = await supabase
-      .from('feed_posts')
-      .select('likes, raw_data')
-      .eq('id', postId)
-      .single();
-
-    const currentLikes = Number(current?.likes) || 0;
-    const newLikes = Math.max(0, currentLikes + delta);
-
-    let rawDataObj = current?.raw_data || {};
-    if (typeof rawDataObj === 'string') {
-      try { rawDataObj = JSON.parse(rawDataObj); } catch(e) { rawDataObj = {}; }
-    }
-    const updatedRawData = { ...rawDataObj, likes: newLikes, updatedAt: new Date().toISOString() };
-
-    await supabase
-      .from('feed_posts')
-      .update({
-        likes: newLikes,
-        updatedAt: new Date().toISOString(),
-        raw_data: updatedRawData
-      })
-      .eq('id', postId);
-
-    return newLikes;
+    const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
+    const res = await fetch(`${WORKER_URL}/feed/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, delta })
+    });
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    const data = await res.json();
+    return data.likes;
   } catch (err) {
     console.error('incrementFeedLike error:', err);
     return null;
@@ -526,36 +510,15 @@ export const incrementFeedLike = async (postId, delta = 1) => {
  */
 export const addFeedComment = async (postId, commentObj) => {
   try {
-    const { data: current } = await supabase
-      .from('feed_posts')
-      .select('comments, raw_data')
-      .eq('id', postId)
-      .single();
-
-    let commentsList = current?.comments || [];
-    if (typeof commentsList === 'string') {
-      try { commentsList = JSON.parse(commentsList); } catch(e) { commentsList = []; }
-    }
-    if (!Array.isArray(commentsList)) commentsList = [];
-
-    const updatedComments = [...commentsList, commentObj];
-
-    let rawDataObj = current?.raw_data || {};
-    if (typeof rawDataObj === 'string') {
-      try { rawDataObj = JSON.parse(rawDataObj); } catch(e) { rawDataObj = {}; }
-    }
-    const updatedRawData = { ...rawDataObj, comments: updatedComments, updatedAt: new Date().toISOString() };
-
-    await supabase
-      .from('feed_posts')
-      .update({
-        comments: updatedComments,
-        updatedAt: new Date().toISOString(),
-        raw_data: updatedRawData
-      })
-      .eq('id', postId);
-
-    return updatedComments;
+    const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
+    const res = await fetch(`${WORKER_URL}/feed/comment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId, commentObj })
+    });
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    const data = await res.json();
+    return data.comments;
   } catch (err) {
     console.error('addFeedComment error:', err);
     return null;
