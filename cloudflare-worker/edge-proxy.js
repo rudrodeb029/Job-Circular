@@ -144,7 +144,8 @@ export default {
           success: true,
           score: correct, total, scaledScore, rank,
           timeTaken, timeTakenSec,
-          submissionId: subId
+          submissionId: subId,
+          answerKey: answerKey
         }), {
           status: 200,
           headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'X-Graded-By': 'server', 'X-Supabase-Queries': '0' }
@@ -152,6 +153,67 @@ export default {
       } catch (e) {
         console.error('Exam submit error:', e);
         return new Response(JSON.stringify({ error: 'Submission failed', details: e.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+      }
+    }
+
+    // ══════════════════════════════════════
+    // GET /exam-solutions -> Secure Answer Key retrieval
+    // ══════════════════════════════════════
+    if (url.pathname === '/exam-solutions' && request.method === 'GET') {
+      try {
+        const examId = url.searchParams.get('exam_id');
+        const submissionId = url.searchParams.get('submission_id');
+        if (!examId) {
+          return new Response(JSON.stringify({ error: 'Missing exam_id' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+        }
+
+        const answerKey = await env.CACHE_KV?.get(`answer_key_${examId}`, 'json').catch(() => null);
+        if (!answerKey) {
+          return new Response(JSON.stringify({ error: 'Solutions not found' }), { status: 404, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+        }
+
+        let authorized = false;
+
+        // 1. Check if submissionId exists in D1
+        if (submissionId) {
+          const subCheck = await env.EXAM_DB.prepare(
+            `SELECT id FROM exam_submissions WHERE exam_id = ? AND id = ? LIMIT 1`
+          ).bind(String(examId), String(submissionId)).first();
+          if (subCheck?.id) {
+            authorized = true;
+          }
+        }
+
+        // 2. Check if the exam has ended
+        if (!authorized) {
+          const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+          const exam = (kvData?.live_exams || []).find(e => String(e.id) === String(examId));
+          if (exam) {
+            const startStr = exam.startTime || exam.scheduledAt || exam.createdAt;
+            const duration = Number(exam.duration) || 60;
+            if (startStr) {
+              const startMs = new Date(startStr).getTime();
+              if (!isNaN(startMs) && Date.now() > (startMs + duration * 60 * 1000)) {
+                authorized = true;
+              }
+            }
+          }
+        }
+
+        if (!authorized) {
+          return new Response(JSON.stringify({ error: 'Solutions are locked until you submit or the exam ends.' }), {
+            status: 403,
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+          });
+        }
+
+        return new Response(JSON.stringify({ success: true, answerKey }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+        });
+      } catch (e) {
+        console.error('Exam solutions fetch error:', e);
+        return new Response(JSON.stringify({ error: 'Failed to fetch solutions', details: e.message }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
       }
     }
 

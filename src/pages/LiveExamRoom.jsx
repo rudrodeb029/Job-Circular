@@ -34,17 +34,31 @@ export default function LiveExamRoom() {
 
       const targetId = String(id).trim();
 
-      // Tier 1: Check adminState.liveExams from AdminContext
-      const adminExams = adminState.liveExams || [];
-      let match = adminExams.find(e => e && String(e.id).trim() === targetId);
+      let match = null;
 
-      // Tier 2: Check getLiveExams() module cache
+      // Tier 1: Check SQLite database first (highly likely to have questions with correct answers merged!)
+      try {
+        const sqMatch = await getExamFromSQLite(targetId);
+        if (sqMatch && Array.isArray(sqMatch.questions) && sqMatch.questions.length > 0) {
+          match = sqMatch;
+        }
+      } catch (e) {
+        console.warn('SQLite exam load failed:', e);
+      }
+
+      // Tier 2: Check adminState.liveExams from AdminContext
+      if (!match) {
+        const adminExams = adminState.liveExams || [];
+        match = adminExams.find(e => e && String(e.id).trim() === targetId);
+      }
+
+      // Tier 3: Check getLiveExams() module cache
       if (!match) {
         const cachedExams = getLiveExams();
         match = cachedExams.find(e => e && String(e.id).trim() === targetId);
       }
 
-      // Tier 3: Check LocalStorage cache directly
+      // Tier 4: Check LocalStorage cache directly
       if (!match) {
         try {
           const raw = localStorage.getItem('cache_data_live_exams') || localStorage.getItem('admin_live_exams');
@@ -337,6 +351,51 @@ export default function LiveExamRoom() {
     return false;
   }, [currentResult, savedResult, submitted]);
 
+  // Secure background fetch for exam correct answer keys (solutions)
+  useEffect(() => {
+    if (!exam || !id || !currentResult || currentResult.didNotAttend) return;
+
+    // Check if we already have correctIndex in questions to avoid duplicate calls
+    const alreadyHasAnswers = exam.questions?.some(q => q.correctIndex !== undefined);
+    if (alreadyHasAnswers) return;
+
+    const submissionId = currentResult.submissionId || currentResult.id;
+    const examEnded = exam.status === 'completed' || exam.status === 'ended';
+
+    if (submissionId || examEnded) {
+      const fetchSolutions = async () => {
+        try {
+          const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
+          let url = `${WORKER_URL}/exam-solutions?exam_id=${id}`;
+          if (submissionId) {
+            url += `&submission_id=${submissionId}`;
+          }
+          const res = await fetch(url);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.answerKey && Array.isArray(data.answerKey)) {
+              // Merge correct answers
+              const updatedQuestions = exam.questions.map((q, idx) => {
+                const ans = data.answerKey.find(a => a.index === idx);
+                return {
+                  ...q,
+                  correctIndex: ans ? ans.correctIndex : q.correctIndex,
+                  explanation: ans ? ans.explanation : q.explanation
+                };
+              });
+              const updatedExam = { ...exam, questions: updatedQuestions };
+              setExam(updatedExam);
+              await saveExamToSQLite(updatedExam);
+            }
+          }
+        } catch (err) {
+          console.warn('Failed to fetch secure solutions:', err);
+        }
+      };
+      fetchSolutions();
+    }
+  }, [exam, id, currentResult]);
+
   if (loadingExam) {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
@@ -423,8 +482,34 @@ export default function LiveExamRoom() {
       if (result.success) {
         // Save to localStorage for existing result display logic
         const allResults = JSON.parse(localStorage.getItem('live_exam_results') || '{}');
-        allResults[id] = { score: result.score, total: result.total, scaledScore: result.scaledScore, rank: result.rank, timeTaken: result.timeTaken, answers: answersObj, timeTakenSec: elapsedSec, submittedAt: new Date().toISOString() };
+        allResults[id] = { 
+          score: result.score, 
+          total: result.total, 
+          scaledScore: result.scaledScore, 
+          rank: result.rank, 
+          timeTaken: result.timeTaken, 
+          answers: answersObj, 
+          timeTakenSec: elapsedSec, 
+          submittedAt: new Date().toISOString(),
+          submissionId: result.submissionId
+        };
         localStorage.setItem('live_exam_results', JSON.stringify(allResults));
+        
+        // Merge correct answers immediately for real-time grading display
+        if (result.answerKey && exam?.questions) {
+          const updatedQuestions = exam.questions.map((q, idx) => {
+            const ans = result.answerKey.find(a => a.index === idx);
+            return {
+              ...q,
+              correctIndex: ans ? ans.correctIndex : q.correctIndex,
+              explanation: ans ? ans.explanation : q.explanation
+            };
+          });
+          const updatedExam = { ...exam, questions: updatedQuestions };
+          setExam(updatedExam);
+          await saveExamToSQLite(updatedExam);
+        }
+
         // Save to SQLite for offline access
         await saveExamResult(id, result);
         await clearLocalAnswers(id);
