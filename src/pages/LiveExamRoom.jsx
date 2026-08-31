@@ -154,6 +154,7 @@ export default function LiveExamRoom() {
 
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
   const [activeRoomTab, setActiveRoomTab] = useState('solutions'); // 'solutions' | 'leaderboard'
   const [tabLoading, setTabLoading] = useState(false);
@@ -421,6 +422,27 @@ export default function LiveExamRoom() {
     );
   }
 
+  if (submitting) {
+    return (
+      <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
+        <div className="page-header">
+          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, textAlign: 'center', margin: 0 }}>
+            {isEn ? 'Submitting Answers' : 'উত্তরপত্র জমা দেওয়া হচ্ছে'}
+          </h1>
+        </div>
+        <div style={{ textAlign: 'center', padding: '120px 20px' }}>
+          <ModernLoader
+            text={isEn ? "Grading Your Exam..." : "পরীক্ষার খাতা মূল্যায়ন করা হচ্ছে..."}
+            subtext={isEn ? "Calculating score, rank and solutions securely" : "আপনার স্কোর, র্যাংক এবং সঠিক উত্তরপত্র হিসাব করা হচ্ছে..."}
+            icon="📝"
+            size="lg"
+            isEn={isEn}
+          />
+        </div>
+      </div>
+    );
+  }
+
   if (!exam) {
     return (
       <div className="page" style={{ paddingBottom: '100px' }}>
@@ -448,7 +470,9 @@ export default function LiveExamRoom() {
   };
 
   const handleSubmit = async () => {
-    if (savedResult || submitted) return;
+    if (savedResult || submitted || submitting) return;
+
+    setSubmitting(true);
 
     // Get all answers
     const answersObj = { ...selectedAnswers };
@@ -586,6 +610,8 @@ export default function LiveExamRoom() {
           console.warn('Failed to sync live exam submission to Supabase:', err);
         }
       }, Math.floor(Math.random() * 3000) + 500);
+    } finally {
+      setSubmitting(false);
     }
   };
 
