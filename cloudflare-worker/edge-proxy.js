@@ -187,7 +187,22 @@ export default {
         // 2. Check if the exam has ended
         if (!authorized) {
           const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
-          const exam = (kvData?.live_exams || []).find(e => String(e.id) === String(examId));
+          let exam = (kvData?.live_exams || []).find(e => String(e.id) === String(examId));
+          
+          if (!exam) {
+            console.log('⚠️ Exam not found in KV cache, querying Supabase fallback...');
+            try {
+              const sbTarget = `${SUPABASE_ORIGIN}/rest/v1/live_exams?select=*&id=eq.${examId}&limit=1`;
+              const sbRes = await fetch(sbTarget, { headers: originHeaders });
+              if (sbRes.ok) {
+                const sbData = await sbRes.json();
+                exam = sbData?.[0];
+              }
+            } catch (err) {
+              console.error('Supabase fallback query error:', err);
+            }
+          }
+
           if (exam) {
             if (exam.status === 'completed' || exam.status === 'ended') {
               authorized = true;

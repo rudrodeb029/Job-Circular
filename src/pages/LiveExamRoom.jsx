@@ -361,7 +361,7 @@ export default function LiveExamRoom() {
     if (alreadyHasAnswers) return;
 
     const submissionId = currentResult.didNotAttend ? null : (currentResult.submissionId || currentResult.id);
-    const examEnded = exam.status === 'completed' || exam.status === 'ended';
+    const examEnded = isCompleted;
 
     if (submissionId || examEnded) {
       const fetchSolutions = async () => {
@@ -395,7 +395,7 @@ export default function LiveExamRoom() {
       };
       fetchSolutions();
     }
-  }, [exam, id, currentResult]);
+  }, [exam, id, currentResult, isCompleted]);
 
   if (loadingExam) {
     return (
