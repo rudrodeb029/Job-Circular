@@ -650,6 +650,40 @@ export default {
       body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
       redirect: 'follow',
     });
+    // Real-time KV Cache Cleanup on DELETE / POST / PATCH
+    if (originResponse.ok) {
+      ctx.waitUntil((async () => {
+        try {
+          if (request.method === 'DELETE') {
+            const idMatch = url.search.match(/id=eq\.([^&]+)/);
+            const deletedId = idMatch ? decodeURIComponent(idMatch[1]) : null;
+            if (targetTable && deletedId && env.CACHE_KV) {
+              const kvData = await env.CACHE_KV.get('sync_all_data', 'json').catch(() => null);
+              if (kvData && Array.isArray(kvData[targetTable])) {
+                kvData[targetTable] = kvData[targetTable].filter(item => String(item.id) !== String(deletedId));
+                const newTimestamp = new Date().toISOString();
+                kvData.masterLastUpdated = newTimestamp;
+                await Promise.all([
+                  env.CACHE_KV.put('sync_all_data', JSON.stringify(kvData)),
+                  env.CACHE_KV.put('last_sync_timestamp', newTimestamp),
+                  env.CACHE_KV.put('last_updated_by', 'admin-delete-action')
+                ]);
+                console.log(`🗑️ KV Sync: Removed deleted record "${deletedId}" from table "${targetTable}".`);
+              }
+            }
+          } else if (['POST', 'PATCH', 'PUT'].includes(request.method)) {
+            const newTimestamp = new Date().toISOString();
+            await Promise.all([
+              env.CACHE_KV?.put('last_sync_timestamp', newTimestamp),
+              env.CACHE_KV?.put('last_updated_by', 'admin-write-action')
+            ]);
+          }
+        } catch (e) {
+          console.error('Failed to sync KV on REST write/delete:', e);
+        }
+      })());
+    }
+
     const newHeaders = new Headers(originResponse.headers);
     newHeaders.set('Access-Control-Allow-Origin', '*');
     newHeaders.set('X-Edge-Cache', 'BYPASS');
