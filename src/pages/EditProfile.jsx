@@ -629,7 +629,7 @@ export default function EditProfile() {
             >
               {savedSuccess
                 ? (isEn ? '✓ Profile Updated!' : '✓ সফলভাবে আপডেট হয়েছে!')
-                : (isEn ? 'Save Profile Changes' : 'পরিবর্তন সংরক্ষণ করুন')}
+                : (isEn ? 'Save' : 'সংরক্ষণ করুন')}
             </button>
           </div>
         </form>

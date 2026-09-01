@@ -185,7 +185,7 @@ export default function LiveExams() {
             transition: 'all 0.2s'
           }}
         >
-          {isEn ? 'Live & Upcoming' : 'লাইভ ও আসন্ন'}
+          {isEn ? 'Live' : 'লাইভ'}
         </button>
         <button
           onClick={() => handleTabChange('history')}
@@ -202,7 +202,7 @@ export default function LiveExams() {
             transition: 'all 0.2s'
           }}
         >
-          {isEn ? 'Exam History & Results' : 'পরীক্ষার ইতিহাস ও ফলাফল'}
+          {isEn ? 'History' : 'ইতিহাস'}
         </button>
       </div>
 
@@ -572,14 +572,14 @@ export default function LiveExams() {
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
                               <polyline points="20 6 9 17 4 12"></polyline>
                             </svg>
-                            <span>{isEn ? 'Registered & Participating' : 'অংশগ্রহণ নিশ্চিত করা হয়েছে'}</span>
+                            <span>{isEn ? 'Participating' : 'অংশগ্রহণ করুন'}</span>
                           </>
                         ) : (
                           <>
                             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '2px' }}>
                               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
                             </svg>
-                            <span>{isEn ? 'Participate in Exam' : 'পরীক্ষায় অংশগ্রহণ করুন'}</span>
+                            <span>{isEn ? 'Participate' : 'অংশগ্রহণ করুন'}</span>
                           </>
                         )}
                       </button>
