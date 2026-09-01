@@ -187,14 +187,35 @@ export default function LiveExamRoom() {
 
   const parseExamDate = (dateVal) => {
     if (!dateVal) return null;
-    const d = new Date(dateVal);
-    return isNaN(d.getTime()) ? null : d.getTime();
+    if (typeof dateVal === 'number') return dateVal;
+    let str = String(dateVal).trim();
+    let d = new Date(str);
+    if (!isNaN(d.getTime())) return d.getTime();
+
+    // Replace space between date and time with T
+    str = str.replace(' ', 'T');
+    d = new Date(str);
+    if (!isNaN(d.getTime())) return d.getTime();
+
+    // Handle DD-MM-YYYY or DD/MM/YYYY formats
+    const match = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})(?:[T\s]+(.*))?$/);
+    if (match) {
+      const day = match[1].padStart(2, '0');
+      const month = match[2].padStart(2, '0');
+      const year = match[3];
+      const timePart = match[4] || '00:00:00';
+      d = new Date(`${year}-${month}-${day}T${timePart}`);
+      if (!isNaN(d.getTime())) return d.getTime();
+    }
+
+    return null;
   };
 
   // Is exam currently running?
   const isRunning = useMemo(() => {
     if (!exam) return false;
     if (savedResult || submitted) return false;
+    if (exam.status === 'completed' || exam.status === 'ended' || exam.status === 'expired' || exam.status === 'closed') return false;
 
     const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
     const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
@@ -207,7 +228,6 @@ export default function LiveExamRoom() {
       return true;
     }
 
-    if (exam.status === 'active' || exam.status === 'running') return true;
     return false;
   }, [exam, savedResult, submitted]);
 
@@ -215,11 +235,18 @@ export default function LiveExamRoom() {
   useEffect(() => {
     if (!exam || !isRunning || savedResult || submitted) return;
 
-    const startMs = new Date(exam.startTime || exam.scheduledAt || exam.createdAt).getTime();
-    const endMs = startMs + (exam.duration || 10) * 60 * 1000;
+    const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
+    if (!startMs) return;
+
+    const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 10);
+    const endMs = startMs + durationMins * 60 * 1000;
 
     const updateTimer = () => {
       const secondsLeft = Math.max(0, Math.floor((endMs - Date.now()) / 1000));
+      if (isNaN(secondsLeft)) {
+        setRemainingSeconds(0);
+        return;
+      }
       setRemainingSeconds(secondsLeft);
 
       if (secondsLeft <= 0) {
@@ -303,7 +330,7 @@ export default function LiveExamRoom() {
   const isCompleted = useMemo(() => {
     if (!exam) return false;
     if (savedResult || submitted) return true;
-    if (exam.status === 'completed' || exam.status === 'ended') return true;
+    if (exam.status === 'completed' || exam.status === 'ended' || exam.status === 'expired' || exam.status === 'closed') return true;
 
     const startMs = parseExamDate(exam.startTime) || parseExamDate(exam.scheduledAt) || parseExamDate(exam.createdAt);
     const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
@@ -313,7 +340,8 @@ export default function LiveExamRoom() {
       return Date.now() >= endMs;
     }
 
-    return false;
+    // Default to completed if date cannot be parsed and status is not explicitly active/running
+    return true;
   }, [exam, savedResult, submitted]);
 
   function getExamResultLocal() {
@@ -616,8 +644,11 @@ export default function LiveExamRoom() {
   };
 
   const formatTimer = (totalSeconds) => {
+    if (typeof totalSeconds !== 'number' || isNaN(totalSeconds) || totalSeconds < 0) {
+      return '00:00';
+    }
     const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
+    const secs = Math.floor(totalSeconds % 60);
     const pad = (num) => String(num).padStart(2, '0');
     return `${pad(mins)}:${pad(secs)}`;
   };
