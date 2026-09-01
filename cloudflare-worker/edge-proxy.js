@@ -481,8 +481,10 @@ export default {
 
     // Rule 10: /sync-all -> KV (0 Supabase!) + Answer Keys stripped
     if (url.pathname === '/sync-all' || url.pathname === '/rest/v1/sync-all') {
-      // 304 check
-      if (ifModifiedSince) {
+      const isBypass = url.searchParams.get('cache') === 'bypass' || url.searchParams.get('force') === 'true';
+
+      // 304 check (only if not bypassing cache)
+      if (!isBypass && ifModifiedSince) {
         const kvTs = await env.CACHE_KV?.get('last_sync_timestamp').catch(() => null);
         if (kvTs) {
           const serverTime = new Date(kvTs).getTime();
@@ -492,55 +494,73 @@ export default {
           }
         }
       }
-      const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
-      if (kvData) {
-        // ★ live_exams থেকে correctIndex বাদ দিয়ে পাঠাও (নিরাপত্তা)
+
+      const kvData = isBypass ? null : await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+      if (kvData && typeof kvData === 'object') {
         const safeData = { ...kvData };
-        if (safeData.live_exams) {
+        if (Array.isArray(safeData.live_exams)) {
           safeData.live_exams = stripAnswerKeys(safeData.live_exams);
         }
         return new Response(JSON.stringify(safeData), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Last-Modified': kvData.masterLastUpdated || new Date().toISOString(), 'X-Edge-Cache': 'KV-HIT', 'X-Supabase-Queries': '0' } });
       }
-      // KV empty — bootstrap from Supabase (first boot only)
+
+      // KV empty or bypass — fetch fresh data from Supabase
       const fetchAll = CORE_COLLECTIONS.map(col => {
         const q = col === 'questions'
           ? `${SUPABASE_ORIGIN}/rest/v1/questions?select=*&order=createdAt.desc&limit=1000`
           : `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*`;
-        return fetch(q, { headers: originHeaders }).then(r => r.ok ? r.json() : []).catch(() => []);
+        return fetch(q, { headers: originHeaders })
+          .then(r => r.ok ? r.json() : [])
+          .then(res => Array.isArray(res) ? res : [])
+          .catch(() => []);
       });
+
       const controlFetch = fetch(`${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated&id=eq.1`, { headers: originHeaders })
-        .then(r => r.ok ? r.json() : []).catch(() => []);
+        .then(r => r.ok ? r.json() : [])
+        .then(res => Array.isArray(res) ? res : [])
+        .catch(() => []);
+
       const results = await Promise.all([...fetchAll, controlFetch]);
       const controlData = results[results.length - 1];
       const masterLastUpdated = controlData?.[0]?.last_updated || new Date().toISOString();
       const bootstrapPayload = {};
-      CORE_COLLECTIONS.forEach((col, i) => { bootstrapPayload[col] = results[i]; });
+      CORE_COLLECTIONS.forEach((col, i) => {
+        bootstrapPayload[col] = Array.isArray(results[i]) ? results[i] : [];
+      });
 
-      // ★ Bootstrap-এ live_exams এর answer key আলাদা করে সেভ
-      if (bootstrapPayload.live_exams?.length) {
+      // Bootstrap live_exams answer key separation
+      if (Array.isArray(bootstrapPayload.live_exams) && bootstrapPayload.live_exams.length) {
         for (const exam of bootstrapPayload.live_exams) {
-          if (exam.questions?.length) {
+          if (Array.isArray(exam.questions) && exam.questions.length) {
             const answerKey = exam.questions.map((q, idx) => ({
               index: idx,
               correctIndex: q.correctIndex,
               explanation: q.explanation || ''
             }));
-            await env.CACHE_KV?.put(`answer_key_${exam.id}`, JSON.stringify(answerKey));
+            await env.CACHE_KV?.put(`answer_key_${exam.id}`, JSON.stringify(answerKey)).catch(() => {});
           }
         }
-        // KV-তে সেভ করার আগে correctIndex বাদ দাও
         bootstrapPayload.live_exams = stripAnswerKeys(bootstrapPayload.live_exams);
       }
 
       bootstrapPayload.masterLastUpdated = masterLastUpdated;
       bootstrapPayload.syncedAt = masterLastUpdated;
+      
       ctx.waitUntil(Promise.all([
         env.CACHE_KV?.put('sync_all_data', JSON.stringify(bootstrapPayload)),
-        env.CACHE_KV?.put('last_sync_timestamp', masterLastUpdated)
-      ]));
+        env.CACHE_KV?.put('last_sync_timestamp', masterLastUpdated),
+        env.CACHE_KV?.put('last_updated_by', isBypass ? 'admin-bypass-invalidation' : 'bootstrap')
+      ]).catch(e => console.error('KV put error:', e)));
 
-      // ★ Response-এও correctIndex বাদ দিয়ে পাঠাও
-      return new Response(JSON.stringify(bootstrapPayload), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Last-Modified': masterLastUpdated, 'X-Edge-Cache': 'KV-MISS-SUPABASE-BOOTSTRAP' } });
+      return new Response(JSON.stringify(bootstrapPayload), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Last-Modified': masterLastUpdated,
+          'X-Edge-Cache': isBypass ? 'KV-BYPASS-SUPABASE-REVALIDATED' : 'KV-MISS-SUPABASE-BOOTSTRAP'
+        }
+      });
     }
 
     // Rule 12: Leaderboard -> D1/KV (0 Supabase!)
