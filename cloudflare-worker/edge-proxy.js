@@ -632,8 +632,11 @@ export default {
       targetTable = restMatch[1];
     }
 
-    // STRICT GET CACHE LOCK
-    if (request.method === 'GET' && CORE_COLLECTIONS.includes(targetTable)) {
+    // STRICT GET CACHE LOCK (Candidate App only; Admin requests with no-cache or admin client header can bypass)
+    const isNoCache = request.headers.get('Cache-Control')?.includes('no-cache');
+    const isAdminClient = appClientHeader.includes('admin') || isNoCache;
+
+    if (request.method === 'GET' && CORE_COLLECTIONS.includes(targetTable) && !isAdminClient) {
       return new Response(JSON.stringify({
         error: `Strict GET Cache Lock: Direct GET queries to core table "${targetTable}" are blocked. Please use /sync-all endpoint.`,
         url: url.pathname + url.search

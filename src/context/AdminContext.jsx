@@ -74,8 +74,8 @@ const pendingDeletes = new Map(); // Map<id, timestamp>
 
 const registerPendingDelete = (id) => {
   pendingDeletes.set(id, Date.now());
-  // Auto-cleanup after 10 seconds (by then Firestore has confirmed the delete)
-  setTimeout(() => pendingDeletes.delete(id), 10000);
+  // Keep deleted IDs blocked for 5 minutes to prevent reappearance via race conditions
+  setTimeout(() => pendingDeletes.delete(id), 300000);
 };
 
 const logActivity = (type, text) => {
