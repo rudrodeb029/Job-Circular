@@ -4,7 +4,6 @@ import { ArrowLeft, Clock } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionById } from '../data/questionsData';
-import BottomNav from '../components/BottomNav';
 import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
 import { supabase } from '../services/supabaseClient';
 import { normalizeDoc } from '../services/supabaseService';
@@ -105,7 +104,6 @@ export default function QuestionDetails() {
         <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
           <ModernLoader size="lg" icon="📝" />
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -121,7 +119,6 @@ export default function QuestionDetails() {
             <h1 style={{ flex: 1 }}>{isEn ? 'Question Paper' : 'প্রশ্নপত্র'}</h1>
           </div>
           <ModernPageSkeleton type="details" icon="📝" />
-          <BottomNav />
         </div>
       );
     }
@@ -136,7 +133,6 @@ export default function QuestionDetails() {
         <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
           <p>{isEn ? 'Question paper not found' : 'প্রশ্নপত্র খুঁজে পাওয়া যায়নি'}</p>
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -481,8 +477,6 @@ export default function QuestionDetails() {
           </>
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

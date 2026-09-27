@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
-import BottomNav from '../components/BottomNav';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
 import { getOfflineFeed, triggerDeltaSync, isSyncInProgress } from '../services/sqliteService';
@@ -204,7 +203,6 @@ export default function OfflineFeed() {
           )}
         </div>
       </PullToRefresh>
-      <BottomNav />
     </div>
   );
 }

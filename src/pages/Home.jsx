@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Bell, Search, LayoutGrid, Download, FileText, Calendar, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
-import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import JobCard from '../components/JobCard';
 import SearchBar from '../components/SearchBar';
@@ -180,7 +179,6 @@ export default function Home() {
     return (
       <div className="page">
         <HomeSkeleton />
-        <BottomNav />
       </div>
     );
   }
@@ -501,7 +499,6 @@ export default function Home() {
         </div>
       </div>
       </PullToRefresh>
-      <BottomNav />
     </div>
   );
 }

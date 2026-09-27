@@ -6,7 +6,6 @@ import { useAdminContext } from '../context/AdminContext';
 import { getLiveExams, generate100Questions } from '../data/liveExams';
 import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, COLLECTIONS } from '../services/supabaseService';
 import { supabase } from '../services/supabaseClient';
-import BottomNav from '../components/BottomNav';
 import ModernLoader from '../components/ModernLoader';
 import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult, getExamResult, saveLeaderboard, getLeaderboard, getExamFromSQLite, saveExamToSQLite } from '../services/sqliteService';
 
@@ -445,7 +444,6 @@ export default function LiveExamRoom() {
             isEn={isEn}
           />
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -483,7 +481,6 @@ export default function LiveExamRoom() {
         <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
           <p>{isEn ? 'Exam not found' : 'পরীক্ষা খুঁজে পাওয়া যায়নি'}</p>
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -1223,7 +1220,6 @@ export default function LiveExamRoom() {
         )}
       </div>
 
-      <BottomNav />
     </div>
   );
 }

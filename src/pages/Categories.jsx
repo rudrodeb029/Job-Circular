@@ -2,7 +2,6 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, LayoutGrid } from '../components/Icons';
 import CategoryCard from '../components/CategoryCard';
-import BottomNav from '../components/BottomNav';
 import { categories } from '../data/categories';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
@@ -38,7 +37,6 @@ export default function Categories() {
         <div className="page-content" style={{ padding: '16px' }}>
           {[1, 2, 3, 4, 5, 6].map(i => <CategorySkeleton key={i} />)}
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -63,7 +61,6 @@ export default function Categories() {
         </div>
       </div>
 
-      <BottomNav />
     </div>
   );
 }

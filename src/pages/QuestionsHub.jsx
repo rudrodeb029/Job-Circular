@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, LayoutGrid, FileText, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
-import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader from '../components/ModernLoader';
@@ -207,7 +206,6 @@ export default function QuestionsHub() {
         </div>
       </div>
       </PullToRefresh>
-      <BottomNav />
     </div>
   );
 }

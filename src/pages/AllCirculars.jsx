@@ -4,7 +4,6 @@ import { ArrowLeft, Briefcase, Calendar, Download, FileText } from '../component
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import JobCard from '../components/JobCard';
-import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import { categories } from '../data/categories';
@@ -486,7 +485,6 @@ export default function AllCirculars() {
       </div>
       </PullToRefresh>
 
-      <BottomNav />
     </div>
   );
 }

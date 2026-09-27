@@ -88,6 +88,17 @@ export const initDb = async () => {
     );
 
     await dbInstance.open();
+
+    // ═══ HIGH-SPEED DB CONFIG (Phase 1A) ═══
+    // WAL = lag-free parallel reads during writes
+    // synchronous=NORMAL = 2x faster, safe with WAL
+    // cache_size=-8000 = 8MB page cache (reduces disk I/O)
+    // temp_store=MEMORY = temp tables in RAM
+    await dbInstance.execute('PRAGMA journal_mode=WAL;');
+    await dbInstance.execute('PRAGMA synchronous=NORMAL;');
+    await dbInstance.execute('PRAGMA cache_size=-8000;');
+    await dbInstance.execute('PRAGMA temp_store=MEMORY;');
+    console.log('🚀 SQLite WAL Mode + Performance PRAGMAs Applied.');
     console.log('💾 Native SQLite Connection Opened Successfully.');
 
     // 1. Create offline_feed Table
@@ -149,6 +160,91 @@ export const initDb = async () => {
   } catch (err) {
     console.error('❌ Failed to initialize native SQLite database:', err);
     return false;
+  }
+};
+
+// ══════════════════════════════════════
+// Phase 1B: Generic Bulk Upsert (Transactional)
+// ══════════════════════════════════════
+/**
+ * Bulk upsert rows into any SQLite table using explicit transaction.
+ * Uses executeTransaction() which wraps in BEGIN/COMMIT automatically.
+ * @param {string} tableName - Target table
+ * @param {Array} rows - Array of row objects
+ * @param {Array} columns - Column names to insert
+ * @returns {number} Number of rows upserted
+ */
+export const bulkUpsert = async (tableName, rows, columns) => {
+  if (!dbInstance || !Array.isArray(rows) || rows.length === 0) return 0;
+  try {
+    const placeholders = columns.map(() => '?').join(', ');
+    const statements = rows.map(row => ({
+      statement: `INSERT OR REPLACE INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders});`,
+      values: columns.map(col => row[col] ?? null)
+    }));
+    await dbInstance.executeTransaction(statements);
+    return rows.length;
+  } catch (e) {
+    console.error(`bulkUpsert(${tableName}) error:`, e);
+    return 0;
+  }
+};
+
+// ══════════════════════════════════════
+// Phase 1C: Generic Paginated Read
+// ══════════════════════════════════════
+/**
+ * Read paginated data from any SQLite table.
+ * @param {string} tableName - Table to query
+ * @param {number} limit - Max rows (default 20)
+ * @param {number} offset - Skip rows (default 0)
+ * @param {string} orderBy - ORDER BY clause (default 'rowid DESC')
+ */
+export const getPaginatedData = async (tableName, limit = 20, offset = 0, orderBy = 'rowid DESC') => {
+  if (!dbInstance) return [];
+  try {
+    const result = await dbInstance.query(
+      `SELECT * FROM ${tableName} ORDER BY ${orderBy} LIMIT ? OFFSET ?;`,
+      [limit, offset]
+    );
+    return result?.values || [];
+  } catch (e) {
+    console.error(`getPaginatedData(${tableName}) error:`, e);
+    return [];
+  }
+};
+
+// ══════════════════════════════════════
+// Phase 1D: HMAC-SHA256 Request Signing (Obfuscated Key)
+// Key is XOR-encoded — prevents simple APK string extraction
+// Uses Web Crypto API (native in Android WebView 60+)
+// ══════════════════════════════════════
+const _hk = [16, 57, 127, 56, 35, 63, 57, 127, 104, 126, 104, 124, 127, 15, 108, 52, 60, 44, 108, 43, 104, 42, 60, 51, 127, 19, 120, 21];
+const _hx = 0x4D;
+
+export const signRequest = async (body) => {
+  try {
+    const timestamp = Math.floor(Date.now() / 1000);
+    const payload = typeof body === 'string' ? body : JSON.stringify(body);
+    const message = `${timestamp}:${payload}`;
+    const secret = _hk.map(c => String.fromCharCode(c ^ _hx)).join('');
+
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw', encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+    );
+    const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
+    const hex = Array.from(new Uint8Array(sig))
+      .map(b => b.toString(16).padStart(2, '0')).join('');
+
+    return {
+      'X-App-Signature': hex,
+      'X-App-Timestamp': String(timestamp)
+    };
+  } catch (e) {
+    console.warn('HMAC signing failed:', e);
+    return {};
   }
 };
 

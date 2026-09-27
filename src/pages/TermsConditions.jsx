@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, FileText } from '../components/Icons';
-import BottomNav from '../components/BottomNav';
 import { useAppContext } from '../context/AppContext';
 
 export default function TermsConditions() {
@@ -143,7 +142,6 @@ export default function TermsConditions() {
           </div>
         )}
       </div>
-      <BottomNav />
     </div>
   );
 }

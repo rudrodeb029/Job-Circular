@@ -4,7 +4,6 @@ import { Heart, HeartFilled, Search, X } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { incrementFeedLike, addFeedComment } from '../services/supabaseService';
-import BottomNav from '../components/BottomNav';
 import AppHeader from '../components/AppHeader';
 import PullToRefresh from '../components/PullToRefresh';
 import SearchBar from '../components/SearchBar';
@@ -156,7 +155,6 @@ export default function Feed() {
         </div>
       </PullToRefresh>
 
-      <BottomNav />
     </div>
   );
 }

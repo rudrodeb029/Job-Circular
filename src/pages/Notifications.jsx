@@ -3,7 +3,6 @@ import { useAppContext } from '../context/AppContext';
 import { Bell } from '../components/Icons';
 import NotificationItem from '../components/NotificationItem';
 import EmptyState from '../components/EmptyState';
-import BottomNav from '../components/BottomNav';
 import { getNotifications } from '../data/notifications';
 import { useAdminContext } from '../context/AdminContext';
 import PullToRefresh from '../components/PullToRefresh';
@@ -71,7 +70,6 @@ export default function Notifications() {
         </div>
       </PullToRefresh>
 
-      <BottomNav />
     </div>
   );
 }

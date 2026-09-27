@@ -5,7 +5,6 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
 import { NotFoundPage } from '../components/ErrorState';
-import BottomNav from '../components/BottomNav';
 import ModernLoader, { ButtonSpinner, ModernPageSkeleton } from '../components/ModernLoader';
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '../utils/mediaUtils';
@@ -78,7 +77,6 @@ export default function ExamDetails() {
         <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '350px' }}>
           <ModernLoader size="lg" icon="📅" />
         </div>
-        <BottomNav />
       </div>
     );
   }
@@ -94,7 +92,6 @@ export default function ExamDetails() {
             <h1 style={{ flex: 1 }}>{state.language === 'en' ? 'Exam Details' : 'পরীক্ষার বিস্তারিত'}</h1>
           </div>
           <ModernPageSkeleton type="details" icon="📅" />
-          <BottomNav />
         </div>
       );
     }
@@ -550,7 +547,6 @@ export default function ExamDetails() {
         </div>
       </div>
 
-      <BottomNav />
       <PortalWarningModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

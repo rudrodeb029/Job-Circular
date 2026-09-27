@@ -2,8 +2,12 @@ name = "job-circular-proxy"
 main = "edge-proxy.js"
 compatibility_date = "2024-01-01"
 
+# Secrets are stored as encrypted Wrangler secrets (not in source code)
+# Set via: npx wrangler secret put WEBHOOK_SECRET
+#          npx wrangler secret put HMAC_SECRET
+#          npx wrangler secret put ONESIGNAL_REST_KEY
 [vars]
-WEBHOOK_SECRET = "sync-all-data-secret-2026"
+# No secrets here — all moved to `wrangler secret put`
 
 [[kv_namespaces]]
 binding = "CACHE_KV"

@@ -7,7 +7,6 @@ import JobCard from '../components/JobCard';
 import TabBar from '../components/TabBar';
 import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
-import BottomNav from '../components/BottomNav';
 import { jobs } from '../data/jobs';
 import { formatTimeAgo } from '../utils/timeUtils';
 
@@ -347,7 +346,6 @@ export default function SavedJobs() {
         )}
       </div>
 
-      <BottomNav />
     </div>
   );
 }

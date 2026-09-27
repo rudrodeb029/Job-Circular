@@ -4,7 +4,6 @@ import {
   ArrowLeft
 } from '../components/Icons';
 import Disclaimer from '../components/Disclaimer';
-import BottomNav from '../components/BottomNav';
 import { useAppContext } from '../context/AppContext';
 
 export default function AboutApp() {
@@ -278,7 +277,6 @@ export default function AboutApp() {
         <Disclaimer />
 
       </div>
-      <BottomNav />
     </div>
   );
 }

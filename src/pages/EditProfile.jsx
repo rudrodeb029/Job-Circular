@@ -4,7 +4,6 @@ import { ArrowLeft, User, Edit, FileText, MapPin } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { CLOUDINARY_CONFIG } from '../cloudinary';
 import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
-import BottomNav from '../components/BottomNav';
 
 const PhoneIcon = ({ size = 15, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -634,8 +633,6 @@ export default function EditProfile() {
           </div>
         </form>
       </div>
-
-      <BottomNav />
     </div>
   );
 }

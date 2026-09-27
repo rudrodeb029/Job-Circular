@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Shield } from '../components/Icons';
-import BottomNav from '../components/BottomNav';
 import { useAppContext } from '../context/AppContext';
 
 export default function PrivacyPolicy() {
@@ -190,7 +189,6 @@ export default function PrivacyPolicy() {
           </div>
         )}
       </div>
-      <BottomNav />
     </div>
   );
 }

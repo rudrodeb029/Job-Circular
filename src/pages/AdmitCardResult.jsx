@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, FileText } from '../components/Icons';
 import TabBar from '../components/TabBar';
-import BottomNav from '../components/BottomNav';
 import EmptyState from '../components/EmptyState';
 import SearchBar from '../components/SearchBar';
 import { useAppContext } from '../context/AppContext';
@@ -343,8 +342,6 @@ export default function AdmitCardResult() {
           />
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

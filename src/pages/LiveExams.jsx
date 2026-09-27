@@ -4,7 +4,6 @@ import { ArrowLeft, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getLiveExams } from '../data/liveExams';
-import BottomNav from '../components/BottomNav';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader from '../components/ModernLoader';
 
@@ -662,7 +661,6 @@ export default function LiveExams() {
       </div>
       </PullToRefresh>
 
-      <BottomNav />
     </div>
   );
 }

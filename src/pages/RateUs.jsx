@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, CheckCircle, Award, ExternalLink } from '../components/Icons';
-import BottomNav from '../components/BottomNav';
 import { useAppContext } from '../context/AppContext';
 import { getAppInfoConfig, DEFAULT_APP_INFO } from '../utils/appInfoService';
 import { addDocument, COLLECTIONS } from '../services/supabaseService';
@@ -241,7 +240,6 @@ export default function RateUs() {
         )}
 
       </div>
-      <BottomNav />
     </div>
   );
 }

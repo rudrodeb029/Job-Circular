@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { useAdminContext } from '../context/AdminContext';
 import SearchBar from '../components/SearchBar';
 import JobCard from '../components/JobCard';
-import BottomNav from '../components/BottomNav';
 import EmptyState from '../components/EmptyState';
 import { Search } from '../components/Icons';
 import { categories } from '../data/categories';
@@ -101,8 +100,6 @@ export default function SearchFilter() {
           />
         )}
       </div>
-
-      <BottomNav />
     </div>
   );
 }

@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Shield, FileText, Share2, Star, Mail, Info, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
-import BottomNav from '../components/BottomNav';
 
 const TrashIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -146,8 +145,6 @@ export default function Settings() {
           {isEn ? 'App Version' : 'অ্যাপ সংস্করণ'} 1.0.0
         </p>
       </div>
-
-      <BottomNav />
     </div>
   );
 }

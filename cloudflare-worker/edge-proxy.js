@@ -48,6 +48,75 @@ function stripAnswerKeys(exams) {
   });
 }
 
+// ══════════════════════════════════════
+// HMAC-SHA256 VERIFICATION (Phase 2C)
+// Verifies client request signatures with 5-minute replay window
+// ══════════════════════════════════════
+async function verifyHMAC(request, env) {
+  const sig = request.headers.get('X-App-Signature');
+  const ts = request.headers.get('X-App-Timestamp');
+  if (!sig || !ts) return false;
+
+  // 5-minute replay attack window
+  const now = Math.floor(Date.now() / 1000);
+  if (Math.abs(now - Number(ts)) > 300) return false;
+
+  const body = await request.clone().text();
+  const message = `${ts}:${body}`;
+  const secret = env.HMAC_SECRET;
+  if (!secret) return true; // Skip HMAC if secret not configured yet (graceful migration)
+
+  try {
+    const encoder = new TextEncoder();
+    const key = await crypto.subtle.importKey(
+      'raw', encoder.encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']
+    );
+    const sigBytes = new Uint8Array(sig.match(/.{2}/g).map(b => parseInt(b, 16)));
+    return crypto.subtle.verify('HMAC', key, sigBytes, encoder.encode(message));
+  } catch (e) {
+    console.error('HMAC verify error:', e);
+    return false;
+  }
+}
+
+// ══════════════════════════════════════
+// OneSignal Push from Worker (Phase 4)
+// ══════════════════════════════════════
+async function sendWorkerPush(env, { title, message, data }) {
+  const appId = '54decc7c-7653-48d2-bf9d-dc1bc0ff0307';
+  const apiKey = env.ONESIGNAL_REST_KEY;
+  if (!apiKey) { console.warn('⚠️ ONESIGNAL_REST_KEY not set, skipping push'); return; }
+
+  try {
+    await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${apiKey}`
+      },
+      body: JSON.stringify({
+        app_id: appId,
+        included_segments: ['Total Subscriptions'],
+        headings: { en: title, bn: title },
+        contents: { en: message, bn: message },
+        data: data || {},
+        small_icon: 'ic_stat_onesignal_default',
+        large_icon: 'https://job-circular-75dbb.web.app/app-icon.png',
+        android_accent_color: 'FF1A56DB',
+        priority: 10
+      })
+    });
+  } catch (e) {
+    console.error('OneSignal push failed:', e);
+  }
+}
+
+const corsHeaders = {
+  'Content-Type': 'application/json',
+  'Access-Control-Allow-Origin': '*'
+};
+
 export default {
 
   // ══════════════════════════════════════
@@ -74,6 +143,38 @@ export default {
         status: 204,
         headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS', 'Access-Control-Allow-Headers': '*', 'Access-Control-Max-Age': '86400' },
       });
+    }
+
+    // ══════════════════════════════════════
+    // IP RATE LIMITER (D1-based, 60 req/min/IP) — Phase 2B
+    // Uses D1 (5M writes/day free) instead of KV (1K writes/day)
+    // ══════════════════════════════════════
+    const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
+    if (!appClientHeader.includes('admin')) {
+      try {
+        const minuteKey = Math.floor(Date.now() / 60000);
+        const rateResult = await env.EXAM_DB.prepare(
+          'SELECT cnt FROM rate_limits WHERE ip = ? AND minute_key = ?'
+        ).bind(clientIP, minuteKey).first().catch(() => null);
+
+        if (rateResult?.cnt > 60) {
+          return new Response(JSON.stringify({
+            error: 'Rate limit exceeded. Please try again in 1 minute.'
+          }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Retry-After': '60' }
+          });
+        }
+
+        // Async increment (non-blocking — doesn't slow down the response)
+        ctx.waitUntil(
+          env.EXAM_DB.prepare(
+            'INSERT INTO rate_limits (ip, minute_key, cnt) VALUES (?, ?, 1) ON CONFLICT(ip, minute_key) DO UPDATE SET cnt = cnt + 1'
+          ).bind(clientIP, minuteKey).run().catch(() => {})
+        );
+      } catch (e) {
+        // Rate limiter failure should NEVER block requests
+      }
     }
 
     const apiKey = request.headers.get('apikey') || env.SUPABASE_ANON_KEY || 'sb_publishable_6U3mjliIxh7zfUdlBYp0aA_joaBHdPd';
@@ -501,7 +602,7 @@ export default {
         if (Array.isArray(safeData.live_exams)) {
           safeData.live_exams = stripAnswerKeys(safeData.live_exams);
         }
-        return new Response(JSON.stringify(safeData), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Last-Modified': kvData.masterLastUpdated || new Date().toISOString(), 'X-Edge-Cache': 'KV-HIT', 'X-Supabase-Queries': '0' } });
+        return new Response(JSON.stringify(safeData), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=60, s-maxage=60', 'Last-Modified': kvData.masterLastUpdated || new Date().toISOString(), 'X-Edge-Cache': 'KV-HIT-CDN-60s', 'X-Supabase-Queries': '0' } });
       }
 
       // KV empty or bypass — fetch fresh data from Supabase
@@ -557,6 +658,7 @@ export default {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
+          'Cache-Control': 'public, max-age=60, s-maxage=60',
           'Last-Modified': masterLastUpdated,
           'X-Edge-Cache': isBypass ? 'KV-BYPASS-SUPABASE-REVALIDATED' : 'KV-MISS-SUPABASE-BOOTSTRAP'
         }
@@ -1021,5 +1123,53 @@ export default {
     ]).catch(e => console.error('KV put error:', e));
 
     console.log('Cron: Incremental sync complete!');
+
+    // ══════════════════════════════════════
+    // Phase 2B: Clean old rate limit entries (older than 5 minutes)
+    // ══════════════════════════════════════
+    try {
+      const oldMinute = Math.floor(Date.now() / 60000) - 5;
+      await env.EXAM_DB.prepare('DELETE FROM rate_limits WHERE minute_key < ?').bind(oldMinute).run();
+    } catch (e) { /* rate_limits table may not exist yet */ }
+
+    // ══════════════════════════════════════
+    // Phase 4: DEADLINE REMINDER — 2 days before job deadline
+    // Sends OneSignal push to all users when a job's deadline is ~2 days away
+    // ══════════════════════════════════════
+    try {
+      const cached = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+      if (cached?.jobs?.length) {
+        const now = new Date();
+        const today = now.toISOString().slice(0, 10);
+        const sentKey = `deadline_sent_${today}`;
+        const alreadySent = JSON.parse(await env.CACHE_KV?.get(sentKey) || '[]');
+
+        for (const job of cached.jobs) {
+          const deadlineStr = job.deadline;
+          if (!deadlineStr || alreadySent.includes(job.id)) continue;
+
+          // Parse deadline (format: YYYY-MM-DD)
+          const deadline = new Date(`${deadlineStr}T23:59:59`);
+          if (isNaN(deadline.getTime())) continue;
+
+          const hoursLeft = (deadline - now) / (1000 * 60 * 60);
+
+          // Send if deadline is 44-52 hours away (≈2 days, window covers both cron runs)
+          if (hoursLeft >= 44 && hoursLeft <= 52) {
+            await sendWorkerPush(env, {
+              title: '⏰ আবেদনের সময়সীমা শেষ হচ্ছে!',
+              message: `"${job.title || job.titleEn || 'Job Circular'}" এর আবেদনের শেষ তারিখ আর মাত্র ২ দিন বাকি। এখনই আবেদন করুন!`,
+              data: { jobId: job.id, type: 'deadline' }
+            });
+            alreadySent.push(job.id);
+            console.log(`📬 Deadline reminder sent for job: ${job.id}`);
+          }
+        }
+
+        if (alreadySent.length > 0) {
+          await env.CACHE_KV?.put(sentKey, JSON.stringify(alreadySent), { expirationTtl: 259200 });
+        }
+      }
+    } catch (e) { console.error('Deadline reminder check failed:', e); }
   },
 };

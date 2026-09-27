@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Share2, CheckCircle, ExternalLink } from '../components/Icons';
-import BottomNav from '../components/BottomNav';
 import { useAppContext } from '../context/AppContext';
 import { getAppInfoConfig, DEFAULT_APP_INFO } from '../utils/appInfoService';
 
@@ -228,7 +227,6 @@ export default function ShareApp() {
         </div>
 
       </div>
-      <BottomNav />
     </div>
   );
 }

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, ChevronRight, Rss } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
-import BottomNav from '../components/BottomNav';
 import { useAdminContext } from '../context/AdminContext';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
 
@@ -340,7 +339,6 @@ export default function Profile() {
         </div>
       </div>
 
-      <BottomNav />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Routes, Route, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { App as CapacitorApp } from '@capacitor/app'
+import { Network } from '@capacitor/network'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import VersionUpdateModal from './components/VersionUpdateModal'
@@ -14,6 +15,7 @@ import { triggerDeltaSync } from './services/sqliteService'
 import { Capacitor } from '@capacitor/core'
 
 import NewDataIcon from './components/NewDataIcon'
+import BottomNav from './components/BottomNav'
 
 const CURRENT_VERSION = "1.0.9";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
@@ -73,6 +75,48 @@ function App() {
   const isAdminRoute = location.pathname.startsWith('/admin')
   const hasBootedRef = useRef(false)
   const isNotificationProcessingRef = useRef(false)
+
+  // ═══ Phase 3: Native Network Monitoring (Offline Guard) ═══
+  const [isOffline, setIsOffline] = useState(false)
+
+  useEffect(() => {
+    let networkHandler = null;
+    const setupNetwork = async () => {
+      try {
+        const status = await Network.getStatus();
+        setIsOffline(!status.connected);
+      } catch (e) {
+        setIsOffline(!navigator.onLine);
+      }
+      networkHandler = await Network.addListener('networkStatusChange', (status) => {
+        const wasOffline = isOffline;
+        setIsOffline(!status.connected);
+        // Auto-sync when connectivity RESTORES (offline → online)
+        if (status.connected && wasOffline) {
+          console.log('🌐 Network restored! Triggering auto-sync...');
+          syncCoreDataOnStartup(true).catch(console.error);
+          triggerDeltaSync().catch(console.error);
+        }
+      });
+    };
+    if (!isAdminRoute) setupNetwork();
+    return () => { networkHandler?.remove(); };
+  }, [isAdminRoute]);
+
+  // App Resume Sync — catches background → foreground transitions
+  useEffect(() => {
+    const resumeListener = CapacitorApp.addListener('appStateChange', async ({ isActive }) => {
+      if (isActive && !isAdminRoute) {
+        console.log('📱 App resumed! Checking for updates...');
+        const status = await Network.getStatus().catch(() => ({ connected: navigator.onLine }));
+        if (status.connected) {
+          syncCoreDataOnStartup().catch(console.error);
+          triggerDeltaSync().catch(console.error);
+        }
+      }
+    });
+    return () => { resumeListener.remove(); };
+  }, [isAdminRoute]);
 
   // STRICT ONCE-PER-BOOT INITIALIZATION (Protected against React 18 StrictMode Double-Mount)
   useEffect(() => {
@@ -310,6 +354,42 @@ function App() {
       >
         {!isAdminRoute && <ConnectivityBanner />}
         {!isAdminRoute && isHomeOrFeed && <NewDataIcon />}
+
+        {/* ═══ Phase 3: Selective Offline Overlay (AdMob Protected) ═══ */}
+        {/* Blocks new content browsing offline but allows cached personal pages */}
+        {isOffline && !isAdminRoute && (() => {
+          const OFFLINE_ALLOWED = ['/saved', '/profile', '/settings', '/about', '/privacy', '/terms', '/edit-profile'];
+          const isAllowed = OFFLINE_ALLOWED.some(r => location.pathname.startsWith(r));
+          if (!isAllowed) {
+            return (
+              <div style={{
+                position:'fixed',inset:0,zIndex:99999,
+                background:'var(--bg-primary, #0f172a)',
+                display:'flex',alignItems:'center',justifyContent:'center',
+                textAlign:'center',color:'var(--text-primary, white)',padding:'24px',
+                flexDirection:'column'
+              }}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                </svg>
+                <h2 style={{margin:'16px 0 8px',fontSize:'18px',fontWeight:700}}>ইন্টারনেট সংযোগ নেই</h2>
+                <p style={{margin:'0 0 20px',opacity:0.7,fontSize:'14px'}}>নতুন তথ্য দেখতে ইন্টারনেট সংযোগ প্রয়োজন</p>
+                <button
+                  onClick={() => navigate('/saved')}
+                  style={{
+                    padding:'12px 28px',borderRadius:'10px',
+                    background:'#1a56db',color:'white',border:'none',
+                    fontSize:'14px',fontWeight:600,cursor:'pointer'
+                  }}
+                >
+                  📌 সংরক্ষিত চাকরি দেখুন
+                </button>
+              </div>
+            );
+          }
+          return null;
+        })()}
+
         <Routes location={location}>
           <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />
@@ -342,6 +422,12 @@ function App() {
           <Route path="/offline-feed" element={<OfflineFeed />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+
+        {/* ═══ Phase 5: Centralized BottomNav — only on 4 main pages ═══ */}
+        {['/home', '/', '/feed', '/saved', '/profile'].includes(location.pathname) && !isOffline && (
+          <BottomNav />
+        )}
+
         <VersionUpdateModal 
           isOpen={showUpdateModal}
           updateInfo={updateInfo}

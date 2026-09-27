@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { getQuestionsByCategory } from '../data/questionsData';
-import BottomNav from '../components/BottomNav';
 import SearchBar from '../components/SearchBar';
 
 const categoryTitlesBn = {
@@ -278,8 +277,6 @@ export default function QuestionsList() {
           )}
         </div>
       </div>
-
-      <BottomNav />
     </div>
   );
 }
