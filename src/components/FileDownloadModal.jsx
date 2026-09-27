@@ -65,96 +65,104 @@ export default function FileDownloadModal({
   return (
     <div style={{
       position: 'fixed',
-      inset: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       zIndex: 99999,
-      background: 'rgba(15, 23, 42, 0.65)',
-      backdropFilter: 'blur(6px)',
+      background: 'var(--bg-primary, #f8fafc)',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '16px',
-      fontFamily: '"Hind Siliguri", sans-serif'
+      flexDirection: 'column',
+      fontFamily: '"Hind Siliguri", sans-serif',
+      overflowY: 'auto'
     }}>
-      {/* Modal Container */}
+      {/* Header Bar (Full-Width Sticky Header) */}
       <div style={{
-        width: '100%',
-        maxWidth: '440px',
-        background: '#ffffff',
-        borderRadius: '24px',
-        overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-        animation: 'modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+        background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
+        color: '#ffffff',
+        padding: '16px 20px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 10,
+        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
       }}>
+        <button
+          onClick={onClose}
+          style={{
+            background: 'rgba(255, 255, 255, 0.2)',
+            border: 'none',
+            color: '#ffffff',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer'
+          }}
+        >
+          <ArrowLeft size={20} />
+        </button>
+        <h2 style={{ flex: 1, fontSize: '18px', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+          File Download Info
+        </h2>
+        <button
+          onClick={onClose}
+          style={{
+            background: 'rgba(255, 255, 255, 0.2)',
+            border: 'none',
+            color: '#ffffff',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '18px',
+            fontWeight: 800,
+            cursor: 'pointer'
+          }}
+        >
+          ✕
+        </button>
+      </div>
 
-        {/* Dynamic Keyframes for smooth animation */}
-        <style>{`
-          @keyframes modalSlideUp {
-            from { opacity: 0; transform: translateY(24px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-          }
-          @keyframes fillProgress {
-            from { width: 0%; }
-            to { width: ${progress}%; }
-          }
-        `}</style>
-
-        {/* Header Bar */}
+      {/* Main Page Body Container */}
+      <div style={{
+        flex: 1,
+        maxWidth: '560px',
+        width: '100%',
+        margin: '0 auto',
+        padding: '24px 20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        boxSizing: 'border-box'
+      }}>
+        {/* Main Card Wrapper */}
         <div style={{
-          background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
-          color: '#ffffff',
-          padding: '16px 20px',
+          background: '#ffffff',
+          borderRadius: '20px',
+          border: '1px solid #e2e8f0',
+          padding: '24px',
+          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)',
           display: 'flex',
-          alignItems: 'center',
-          gap: '12px'
+          flexDirection: 'column',
+          gap: '20px'
         }}>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: 'none',
-              color: '#ffffff',
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }}
-          >
-            <ArrowLeft size={18} />
-          </button>
-          <h2 style={{ flex: 1, fontSize: '17px', fontWeight: 800, margin: 0, color: '#ffffff' }}>
-            File Download Info
-          </h2>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#ffffff',
-              fontSize: '18px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              padding: '4px'
-            }}
-          >
-            ✕
-          </button>
-        </div>
 
-        {/* Modal Body */}
-        <div style={{ padding: '24px 20px 20px 20px', display: 'flex', flexDirection: 'column', gap: '18px' }}>
-          
           {/* File Dimensions Info Pill Box */}
           <div style={{
             background: '#f3e8ff',
             border: '1px solid #e9d5ff',
             color: '#6b21a8',
             borderRadius: '16px',
-            padding: '12px 16px',
+            padding: '14px 18px',
             textAlign: 'center',
-            fontSize: '13px',
+            fontSize: '14px',
             fontWeight: 700,
             wordBreak: 'break-all'
           }}>
@@ -163,14 +171,14 @@ export default function FileDownloadModal({
 
           {/* File Name Header */}
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', margin: 0, wordBreak: 'break-all' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b', margin: 0, wordBreak: 'break-all' }}>
               {displayFileName}
             </h3>
           </div>
 
           {/* Progress Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '14px', fontWeight: 800, color: status === 'completed' ? '#059669' : '#2563eb' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '15px', fontWeight: 800, color: status === 'completed' ? '#059669' : '#2563eb' }}>
               {status === 'downloading' && 'Downloading...'}
               {status === 'completed' && '✓ Download Completed!'}
               {status === 'error' && '⚡ Opening File Directly...'}
@@ -179,9 +187,9 @@ export default function FileDownloadModal({
             {/* Progress Bar Track */}
             <div style={{
               width: '100%',
-              height: '42px',
+              height: '46px',
               background: '#e2e8f0',
-              borderRadius: '12px',
+              borderRadius: '14px',
               overflow: 'hidden',
               position: 'relative',
               display: 'flex',
@@ -200,14 +208,14 @@ export default function FileDownloadModal({
                   ? 'linear-gradient(90deg, #10b981, #059669)'
                   : 'linear-gradient(90deg, #3b82f6, #00d2ff)',
                 transition: 'width 0.2s linear',
-                borderRadius: '10px'
+                borderRadius: '12px'
               }} />
 
               {/* Percentage Counter Label */}
               <span style={{
                 position: 'relative',
                 zIndex: 10,
-                fontSize: '16px',
+                fontSize: '17px',
                 fontWeight: 900,
                 color: progress > 50 ? '#ffffff' : '#2563eb',
                 textShadow: progress > 50 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
@@ -222,12 +230,12 @@ export default function FileDownloadModal({
             background: '#f8fafc',
             border: '1px solid #e2e8f0',
             borderRadius: '16px',
-            padding: '14px 16px',
+            padding: '16px 18px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px',
-            fontSize: '12px',
-            lineHeight: 1.6,
+            gap: '10px',
+            fontSize: '13px',
+            lineHeight: 1.7,
             color: '#475569',
             fontWeight: 600
           }}>
@@ -240,34 +248,34 @@ export default function FileDownloadModal({
             <p style={{ margin: 0 }}>
               • উল্লেখ্য, এখান থেকে দেখতে চাইলে ফাইলটি সরাসরি ওপেন না হয়ে ডাউনলোডকৃত ফোল্ডার ওপেন হবে।
             </p>
-            <p style={{ margin: 0, color: '#94a3b8', fontSize: '11px' }}>
+            <p style={{ margin: 0, color: '#94a3b8', fontSize: '11.5px' }}>
               বিঃ দ্রঃ ডাউনলোড চলাকালীন আপনি চাইলে এই পেজ টি বন্ধ / Close করে ও দিতে পারেন। Background এ ডাউনলোড হতে থাকবে।
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
             {status === 'completed' && (
               <button
                 onClick={handleOpenFile}
                 style={{
                   flex: 1,
-                  padding: '12px 16px',
+                  padding: '14px 18px',
                   borderRadius: '14px',
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: '#ffffff',
                   border: 'none',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: 800,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '6px',
+                  gap: '8px',
                   boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)'
                 }}
               >
-                <Eye size={16} />
+                <Eye size={18} />
                 ওপেন ফাইল (Open)
               </button>
             )}
@@ -276,12 +284,12 @@ export default function FileDownloadModal({
               onClick={onClose}
               style={{
                 flex: status === 'completed' ? 1 : 2,
-                padding: '12px 16px',
+                padding: '14px 18px',
                 borderRadius: '14px',
                 background: status === 'completed' ? '#f1f5f9' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
                 color: status === 'completed' ? '#475569' : '#ffffff',
                 border: 'none',
-                fontSize: '13px',
+                fontSize: '14px',
                 fontWeight: 800,
                 cursor: 'pointer',
                 textAlign: 'center',
