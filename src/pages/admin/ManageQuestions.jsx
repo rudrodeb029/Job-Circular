@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { getDocument, COLLECTIONS } from '../../services/supabaseService';
+import RichTextEditor from '../../components/RichTextEditor';
 
 export default function ManageQuestions() {
   const { state, dispatch } = useAdminContext();
@@ -346,8 +347,13 @@ export default function ManageQuestions() {
 
                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', marginBottom: '20px' }}>
                           <div className="input-group">
-                             <label>Question Text (Bengali)</label>
-                             <input className="modern-input" value={qn.question} onChange={e => handleQuestionFieldChange(qIndex, 'question', e.target.value)} required />
+                             <label>Question Text (Bengali - Rich Text Editor)</label>
+                             <RichTextEditor
+                                value={qn.question}
+                                onChange={val => handleQuestionFieldChange(qIndex, 'question', val)}
+                                placeholder="প্রশ্নটির বিস্তারিত বর্ণনা বা ফরম্যাটিং লিখুন (Bold, Italics, Lists, Alignment)..."
+                                minHeight="120px"
+                             />
                           </div>
                        </div>
 
@@ -362,7 +368,8 @@ export default function ManageQuestions() {
                           </div>
                        </div>
 
-                       <div style={{ marginBottom: '20px' }}>
+                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                          <div>
                              <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Correct Choice (0-3)</label>
                              <select
                                 className="modern-input"
@@ -375,6 +382,16 @@ export default function ManageQuestions() {
                                 <option value="3">Option 4 / ঘ</option>
                              </select>
                           </div>
+                          <div>
+                             <label style={{ fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px', display: 'block' }}>Explanation (ব্যাখ্যা - Rich Text Editor)</label>
+                             <RichTextEditor
+                                value={qn.explanation || ''}
+                                onChange={val => handleQuestionFieldChange(qIndex, 'explanation', val)}
+                                placeholder="প্রশ্নটির সহজ সমাধান বা বিস্তারিত ব্যাখ্যা লিখুন (ঐচ্ছিক)..."
+                                minHeight="120px"
+                             />
+                          </div>
+                       </div>
                     </div>
                  ))}
               </div>

@@ -457,22 +457,13 @@ export default function ManageFeed() {
               {/* Text Content (English Optional) */}
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>
-                  Post Content (English - Optional)
+                  Post Content (English - Rich Text Editor - Optional)
                 </label>
-                <textarea
-                  rows={3}
+                <RichTextEditor
                   value={contentEn}
-                  onChange={(e) => setContentEn(e.target.value)}
-                  placeholder="Write post content in English (optional)..."
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '13px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'inherit'
-                  }}
+                  onChange={(val) => setContentEn(val)}
+                  placeholder="Write post content in English (Bold, Alignment, List, Colors)..."
+                  minHeight="140px"
                 />
               </div>
 

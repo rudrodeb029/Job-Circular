@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
+import RichTextEditor from '../../components/RichTextEditor';
 
 export default function ManageLiveExams() {
   const { state, dispatch } = useAdminContext();
@@ -283,8 +284,13 @@ export default function ManageLiveExams() {
                          <h4 style={{ margin: '0 0 16px 0', color: '#1a56db', fontSize: '14px', fontWeight: 800 }}>Question #{qIndex + 1}</h4>
                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', marginBottom: '16px' }}>
                             <div className="input-group">
-                               <label>Question (Bengali)</label>
-                               <input className="modern-input" value={qn.question} onChange={e => handleQuestionFieldChange(qIndex, 'question', e.target.value)} />
+                               <label>Question (Bengali - Rich Text Editor)</label>
+                               <RichTextEditor
+                                  value={qn.question}
+                                  onChange={val => handleQuestionFieldChange(qIndex, 'question', val)}
+                                  placeholder="প্রশ্নটি ফরম্যাটিং সহ লিখুন (Bold, Italics, Lists, Alignment)..."
+                                  minHeight="120px"
+                               />
                             </div>
                          </div>
 
@@ -308,8 +314,13 @@ export default function ManageLiveExams() {
                                </select>
                             </div>
                             <div className="input-group">
-                               <label>Explanation (Bengali)</label>
-                               <textarea className="modern-input" style={{ height: '50px', resize: 'none' }} value={qn.explanation} onChange={e => handleQuestionFieldChange(qIndex, 'explanation', e.target.value)} />
+                               <label>Explanation (Bengali - Rich Text Editor)</label>
+                               <RichTextEditor
+                                  value={qn.explanation}
+                                  onChange={val => handleQuestionFieldChange(qIndex, 'explanation', val)}
+                                  placeholder="প্রশ্নটির সমাধান বা ব্যাখ্যা লিখুন (ঐচ্ছিক)..."
+                                  minHeight="120px"
+                               />
                             </div>
                          </div>
                       </div>
