@@ -48,6 +48,7 @@ import LiveExamRoom from './pages/LiveExamRoom'
 import QuestionsHub from './pages/QuestionsHub'
 import Feed from './pages/Feed'
 import OfflineFeed from './pages/OfflineFeed'
+import SplashScreen from './pages/SplashScreen'
 
 // Admin Pages
 import AdminLogin from './pages/admin/AdminLogin'
@@ -391,7 +392,8 @@ function App() {
         })()}
 
         <Routes location={location}>
-          <Route path="/" element={state.hasSeenOnboarding ? <Home /> : <Onboarding />} />
+          <Route path="/" element={<SplashScreen />} />
+          <Route path="/splash" element={<SplashScreen />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/home" element={<Home />} />
           <Route path="/feed" element={<Feed />} />
