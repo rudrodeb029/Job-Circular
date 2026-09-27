@@ -79,7 +79,7 @@ export default function LiveExamCard({
               gap: '4px'
             }}>
               <span role="img" aria-label="calendar">🗓️</span>
-              <span>{isEn ? 'My Exam' : 'আমার পরীক্ষা'}</span>
+              <span>{isEn ? 'Upcoming Exam' : 'আসন্ন পরীক্ষা'}</span>
             </span>
           )}
 
