@@ -76,18 +76,18 @@ export default function FileDownloadModal({
       fontFamily: '"Hind Siliguri", sans-serif',
       overflowY: 'auto'
     }}>
-      {/* Header Bar (Full-Width Sticky Header) */}
+      {/* Header Bar (Compact & Sleek) */}
       <div style={{
         background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
         color: '#ffffff',
-        padding: '16px 20px',
+        padding: '10px 16px',
         display: 'flex',
         alignItems: 'center',
-        gap: '12px',
+        gap: '10px',
         position: 'sticky',
         top: 0,
         zIndex: 10,
-        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
+        boxShadow: '0 2px 8px rgba(37, 99, 235, 0.15)'
       }}>
         <button
           onClick={onClose}
@@ -95,8 +95,8 @@ export default function FileDownloadModal({
             background: 'rgba(255, 255, 255, 0.2)',
             border: 'none',
             color: '#ffffff',
-            width: '36px',
-            height: '36px',
+            width: '28px',
+            height: '28px',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
@@ -104,9 +104,9 @@ export default function FileDownloadModal({
             cursor: 'pointer'
           }}
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={16} />
         </button>
-        <h2 style={{ flex: 1, fontSize: '18px', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+        <h2 style={{ flex: 1, fontSize: '15px', fontWeight: 700, margin: 0, color: '#ffffff' }}>
           File Download Info
         </h2>
         <button
@@ -115,14 +115,14 @@ export default function FileDownloadModal({
             background: 'rgba(255, 255, 255, 0.2)',
             border: 'none',
             color: '#ffffff',
-            width: '36px',
-            height: '36px',
+            width: '28px',
+            height: '28px',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '18px',
-            fontWeight: 800,
+            fontSize: '14px',
+            fontWeight: 700,
             cursor: 'pointer'
           }}
         >
@@ -130,28 +130,28 @@ export default function FileDownloadModal({
         </button>
       </div>
 
-      {/* Main Page Body Container */}
+      {/* Main Page Body Container (Compact Width & Padding) */}
       <div style={{
         flex: 1,
-        maxWidth: '560px',
+        maxWidth: '440px',
         width: '100%',
         margin: '0 auto',
-        padding: '24px 20px',
+        padding: '16px 14px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '20px',
+        gap: '14px',
         boxSizing: 'border-box'
       }}>
         {/* Main Card Wrapper */}
         <div style={{
           background: '#ffffff',
-          borderRadius: '20px',
+          borderRadius: '16px',
           border: '1px solid #e2e8f0',
-          padding: '24px',
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.05)',
+          padding: '16px',
+          boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.04)',
           display: 'flex',
           flexDirection: 'column',
-          gap: '20px'
+          gap: '14px'
         }}>
 
           {/* File Dimensions Info Pill Box */}
@@ -159,10 +159,10 @@ export default function FileDownloadModal({
             background: '#f3e8ff',
             border: '1px solid #e9d5ff',
             color: '#6b21a8',
-            borderRadius: '16px',
-            padding: '14px 18px',
+            borderRadius: '10px',
+            padding: '8px 12px',
             textAlign: 'center',
-            fontSize: '14px',
+            fontSize: '11px',
             fontWeight: 700,
             wordBreak: 'break-all'
           }}>
@@ -171,14 +171,14 @@ export default function FileDownloadModal({
 
           {/* File Name Header */}
           <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#1e293b', margin: 0, wordBreak: 'break-all' }}>
+            <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', margin: 0, wordBreak: 'break-all', lineHeight: 1.4 }}>
               {displayFileName}
             </h3>
           </div>
 
           {/* Progress Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-            <span style={{ fontSize: '15px', fontWeight: 800, color: status === 'completed' ? '#059669' : '#2563eb' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: status === 'completed' ? '#059669' : '#2563eb' }}>
               {status === 'downloading' && 'Downloading...'}
               {status === 'completed' && '✓ Download Completed!'}
               {status === 'error' && '⚡ Opening File Directly...'}
@@ -187,15 +187,15 @@ export default function FileDownloadModal({
             {/* Progress Bar Track */}
             <div style={{
               width: '100%',
-              height: '46px',
+              height: '32px',
               background: '#e2e8f0',
-              borderRadius: '14px',
+              borderRadius: '8px',
               overflow: 'hidden',
               position: 'relative',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1.5px solid #cbd5e1'
+              border: '1px solid #cbd5e1'
             }}>
               {/* Animated Inner Fill */}
               <div style={{
@@ -208,15 +208,15 @@ export default function FileDownloadModal({
                   ? 'linear-gradient(90deg, #10b981, #059669)'
                   : 'linear-gradient(90deg, #3b82f6, #00d2ff)',
                 transition: 'width 0.2s linear',
-                borderRadius: '12px'
+                borderRadius: '7px'
               }} />
 
               {/* Percentage Counter Label */}
               <span style={{
                 position: 'relative',
                 zIndex: 10,
-                fontSize: '17px',
-                fontWeight: 900,
+                fontSize: '13px',
+                fontWeight: 800,
                 color: progress > 50 ? '#ffffff' : '#2563eb',
                 textShadow: progress > 50 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
               }}>
@@ -229,13 +229,13 @@ export default function FileDownloadModal({
           <div style={{
             background: '#f8fafc',
             border: '1px solid #e2e8f0',
-            borderRadius: '16px',
-            padding: '16px 18px',
+            borderRadius: '12px',
+            padding: '10px 12px',
             display: 'flex',
             flexDirection: 'column',
-            gap: '10px',
-            fontSize: '13px',
-            lineHeight: 1.7,
+            gap: '6px',
+            fontSize: '11px',
+            lineHeight: 1.5,
             color: '#475569',
             fontWeight: 600
           }}>
@@ -248,34 +248,34 @@ export default function FileDownloadModal({
             <p style={{ margin: 0 }}>
               • উল্লেখ্য, এখান থেকে দেখতে চাইলে ফাইলটি সরাসরি ওপেন না হয়ে ডাউনলোডকৃত ফোল্ডার ওপেন হবে।
             </p>
-            <p style={{ margin: 0, color: '#94a3b8', fontSize: '11.5px' }}>
+            <p style={{ margin: 0, color: '#94a3b8', fontSize: '10px' }}>
               বিঃ দ্রঃ ডাউনলোড চলাকালীন আপনি চাইলে এই পেজ টি বন্ধ / Close করে ও দিতে পারেন। Background এ ডাউনলোড হতে থাকবে।
             </p>
           </div>
 
           {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
             {status === 'completed' && (
               <button
                 onClick={handleOpenFile}
                 style={{
                   flex: 1,
-                  padding: '14px 18px',
-                  borderRadius: '14px',
+                  padding: '9px 12px',
+                  borderRadius: '10px',
                   background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: '#ffffff',
                   border: 'none',
-                  fontSize: '14px',
-                  fontWeight: 800,
+                  fontSize: '12px',
+                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
-                  boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)'
+                  gap: '6px',
+                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)'
                 }}
               >
-                <Eye size={18} />
+                <Eye size={14} />
                 ওপেন ফাইল (Open)
               </button>
             )}
@@ -284,19 +284,19 @@ export default function FileDownloadModal({
               onClick={onClose}
               style={{
                 flex: status === 'completed' ? 1 : 2,
-                padding: '14px 18px',
-                borderRadius: '14px',
+                padding: '9px 12px',
+                borderRadius: '10px',
                 background: status === 'completed' ? '#f1f5f9' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
                 color: status === 'completed' ? '#475569' : '#ffffff',
                 border: 'none',
-                fontSize: '14px',
-                fontWeight: 800,
+                fontSize: '12px',
+                fontWeight: 700,
                 cursor: 'pointer',
                 textAlign: 'center',
-                boxShadow: status === 'completed' ? 'none' : '0 4px 14px rgba(37, 99, 235, 0.25)'
+                boxShadow: status === 'completed' ? 'none' : '0 2px 8px rgba(37, 99, 235, 0.2)'
               }}
             >
-              {status === 'completed' ? '✕ বন্ধ করুন (Close)' : '✕ Close (Background Download)'}
+              {status === 'completed' ? '✕ বন্ধ করুন' : '✕ Close (Background Download)'}
             </button>
           </div>
 
