@@ -198,144 +198,188 @@ export default function ExamDetails() {
         </div>
       </div>
 
-      <div className="page-content animate-fade-in">
-        {/* Title Card */}
-        <div className="card" style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '16px 14px', maxWidth: '540px', margin: '0 auto' }}>
+        {/* Main Header Card (1:1 Pixel-Perfect Matching Reference Mockup) */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '24px',
+          padding: '24px 20px',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.04)',
+          border: '1px solid #f1f5f9',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          textAlign: 'center',
+          marginBottom: '16px'
+        }}>
+          {/* Category Icon Badge Container */}
           <div style={{
-            background: styleConfig.bg,
-            color: 'white',
-            margin: '0 auto 10px',
-            fontSize: '18px',
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
+            width: '52px',
+            height: '52px',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: `0 4px 14px ${styleConfig.shadow}`
+            fontSize: '24px',
+            boxShadow: '0 6px 18px rgba(37, 99, 235, 0.25)',
+            marginBottom: '14px',
+            color: '#ffffff'
           }}>
-            {displayIcon}
+            {displayIcon || '📅'}
           </div>
-          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0' }}>
-            {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
+
+          {/* Main Title Name */}
+          <h2 style={{
+            fontSize: '17px',
+            fontWeight: 800,
+            color: '#1e293b',
+            lineHeight: 1.4,
+            marginBottom: '14px',
+            fontFamily: '"Hind Siliguri", sans-serif'
+          }}>
+            {state.language === 'en' ? (job.titleEn || job.organizationEn || job.title) : (job.title || job.organization)}
           </h2>
+
+          {/* Exam Date Status Pill */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: '#eff6ff',
+            color: '#2563eb',
+            padding: '6px 16px',
+            borderRadius: '20px',
+            border: '1px solid #dbeafe',
+            fontSize: '13px',
+            fontWeight: 700
+          }}>
+            <Calendar size={14} />
+            <span>{state.language === 'en' ? 'Exam Date:' : 'পরীক্ষার তারিখ:'} {job.examDate || job.date || job.deadline || 'সন্নিকটে'}</span>
+          </div>
         </div>
 
-        {/* Job Description Section */}
-        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-            {state.language === 'en' ? 'Description' : 'পরীক্ষার বিবরণ'}
+        {/* Exam Description Card (1:1 Reference Mockup Style) */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '20px',
+          padding: '20px',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.04)',
+          border: '1px solid #f1f5f9',
+          marginBottom: '16px'
+        }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', marginBottom: '10px' }}>
+            {state.language === 'en' ? 'Exam Details' : 'পরীক্ষার বিবরণ'}
           </h3>
-          <p className="text-secondary" style={{
-            fontSize: '13px',
-            lineHeight: 1.6,
+          <p style={{
+            fontSize: '13.5px',
+            lineHeight: 1.65,
+            color: '#475569',
             display: '-webkit-box',
-            WebkitLineClamp: showFullDescription ? 'unset' : 2,
+            WebkitLineClamp: showFullDescription ? 'unset' : 3,
             WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            margin: 0
           }}>
             {job.description}
           </p>
           <button
             onClick={() => setShowFullDescription(!showFullDescription)}
             style={{
-              color: 'var(--primary)',
+              color: '#2563eb',
               fontWeight: 700,
-              fontSize: '12px',
-              marginTop: '8px',
+              fontSize: '13px',
+              marginTop: '10px',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              display: 'flex',
+              display: 'inline-flex',
               alignItems: 'center',
               gap: '4px',
               padding: 0
             }}
           >
-            {showFullDescription ? (state.language === 'en' ? 'View Less' : 'কম দেখুন') : (state.language === 'en' ? 'View More' : 'আরও দেখুন')}
-            <span style={{ transform: showFullDescription ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease', display: 'inline-block' }}>▼</span>
+            {showFullDescription ? (state.language === 'en' ? 'View Less ▲' : 'কম দেখুন ▲') : (state.language === 'en' ? 'View More ▼' : 'আরও দেখুন ▼')}
           </button>
         </div>
 
-        {/* Instructions */}
+        {/* Instructions Warning Card */}
         {job.examInstructions && (
-          <div className="card" style={{ 
-            marginBottom: 'var(--space-lg)', 
-            borderLeft: '4px solid var(--chip-warning-border)', 
-            background: 'var(--chip-warning-bg)' 
+          <div style={{
+            background: '#fffbebf0',
+            borderRadius: '20px',
+            padding: '18px 20px',
+            border: '1px solid #fef3c7',
+            marginBottom: '16px',
+            boxShadow: '0 4px 20px rgba(217, 119, 6, 0.05)'
           }}>
-            <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--chip-warning-color)' }}>
-              ⚠️ Instructions / সাধারণ নির্দেশনাবলী
+            <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#b45309', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              ⚠️ {state.language === 'en' ? 'Exam Instructions' : 'সাধারণ নির্দেশনাবলী'}
             </h3>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
+            <p style={{ fontSize: '13px', color: '#78350f', lineHeight: 1.6, margin: 0 }}>
               {job.examInstructions}
             </p>
           </div>
         )}
 
-        {/* Circular Notice Attachment Section */}
-        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+        {/* Official Exam Notice Section (1:1 Reference Mockup Style) */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '20px',
+          padding: '20px',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.04)',
+          border: '1px solid #f1f5f9',
+          marginBottom: '16px'
+        }}>
+          {/* Section Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', gap: '8px' }}>
             <div>
-              <h3 style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
-                {state.language === 'en' ? 'Exam Notice' : 'পরীক্ষার নোটিশ'}
+              <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1e293b', margin: 0 }}>
+                {state.language === 'en' ? 'Official Exam Notice' : 'পরীক্ষার নোটিশ'}
               </h3>
-              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+              <p style={{ fontSize: '12px', color: '#94a3b8', margin: '2px 0 0 0', fontWeight: 500 }}>
                 {state.language === 'en' 
-                  ? `Exam Notice (${circularImages.length} Page${circularImages.length > 1 ? 's' : ''})` 
-                  : `পরীক্ষার নোটিশ (${circularImages.length}টি পেজ)`}
+                  ? `Official Exam Notice (${circularImages.length || 1} Page${circularImages.length > 1 ? 's' : ''})` 
+                  : `পরীক্ষার নোটিশ (${circularImages.length || 1}টি পেজ)`}
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: '6px' }}>
+            {/* Action Badges */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{
-                fontSize: '10px',
-                fontWeight: 800,
-                background: 'var(--primary-bg)',
-                color: 'var(--primary)',
-                padding: '3px 8px',
-                borderRadius: '8px',
-                whiteSpace: 'nowrap'
+                fontSize: '12px',
+                fontWeight: 700,
+                background: '#eff6ff',
+                color: '#2563eb',
+                padding: '4px 12px',
+                borderRadius: '12px'
               }}>
-                {state.language === 'en' ? 'Page' : 'পেজ'} {activeImageIndex + 1} / {circularImages.length}
+                Page {activeImageIndex + 1} / {circularImages.length || 1}
               </span>
               <button
                 onClick={() => setShowFullImage(!showFullImage)}
                 style={{
-                  fontSize: '10px',
+                  fontSize: '12px',
                   fontWeight: 700,
-                  color: 'var(--text-secondary)',
-                  background: 'var(--bg-secondary)',
-                  padding: '3px 8px',
-                  borderRadius: '8px',
-                  border: 'none',
+                  color: '#475569',
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  padding: '4px 12px',
+                  borderRadius: '12px',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '3px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap'
+                  gap: '4px',
+                  cursor: 'pointer'
                 }}
               >
-                <Eye size={11} /> {showFullImage ? (state.language === 'en' ? 'Collapse' : 'ছোট করুন') : (state.language === 'en' ? 'Full' : 'বড় করুন')}
+                <Eye size={12} /> {showFullImage ? (state.language === 'en' ? 'Collapse' : 'ছোট করুন') : (state.language === 'en' ? 'Full' : 'বড় করুন')}
               </button>
             </div>
           </div>
 
-          {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
-          <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
-            {circularImages.length === 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center', gap: '12px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px dashed var(--border-light)' }}>
-                <div style={{ fontSize: '32px' }}>📄</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
-                    {state.language === 'en' ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
-                  </span>
-                  <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
-                    {state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
-                  </span>
-                </div>
-              </div>
-            ) : (
+          {/* Image Container */}
+          <div style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '1px solid #f1f5f9', background: '#f8fafc' }}>
+            {circularImages.length > 0 ? (
               <ProgressiveImage
                 src={circularImages[activeImageIndex]}
                 alt={`Exam Notice Page ${activeImageIndex + 1}`}
@@ -344,153 +388,34 @@ export default function ExamDetails() {
                 downloadUrl={rawImagesList[activeImageIndex] || circularImages[activeImageIndex]}
                 objectFit="contain"
                 style={{
-                  maxHeight: showFullImage ? 'none' : '420px'
+                  maxHeight: showFullImage ? 'none' : '400px'
                 }}
               />
-            )}
-
-            {/* Prev & Next Floating Navigation Arrow Buttons */}
-            {circularImages.length > 1 && (
-              <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImageIndex(prev => (prev > 0 ? prev - 1 : circularImages.length - 1));
-                  }}
-                  title="Previous Page"
-                  style={{
-                    position: 'absolute',
-                    left: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
-                  }}
-                >
-                  ‹
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveImageIndex(prev => (prev < circularImages.length - 1 ? prev + 1 : 0));
-                  }}
-                  title="Next Page"
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
-                  }}
-                >
-                  ›
-                </button>
-              </>
-            )}
-
-            {!showFullImage && (
+            ) : (
               <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '60px',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
-                pointerEvents: 'none',
-                zIndex: 6
-              }}></div>
-            )}
-
-            {/* Indicator Dots (Mark Options) */}
-            {circularImages.length > 1 && (
-              <div style={{
-                position: 'absolute',
-                bottom: '16px',
-                left: '50%',
-                transform: 'translateX(-50%)',
                 display: 'flex',
-                gap: '6px',
-                background: 'rgba(15, 23, 42, 0.45)',
-                padding: '6px 10px',
-                borderRadius: '20px',
-                backdropFilter: 'blur(4px)',
-                zIndex: 12
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '40px 20px',
+                textAlign: 'center',
+                gap: '12px'
               }}>
-                {circularImages.map((_, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => setActiveImageIndex(idx)}
-                    style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      background: activeImageIndex === idx ? 'var(--white)' : 'rgba(255, 255, 255, 0.5)',
-                      transition: 'all 0.2s',
-                      cursor: 'pointer'
-                    }}
-                  />
-                ))}
+                <div style={{ fontSize: '36px' }}>📄</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 800, color: '#1e293b' }}>
+                    {state.language === 'en' ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
+                  </span>
+                  <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>
+                    {state.language === 'en' ? 'Please click the button below to download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
+                  </span>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Thumbnail Strip / Page Selector Tabs */}
-          {circularImages.length > 1 && (
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
-              {circularImages.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  style={{
-                    flex: '0 0 auto',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '8px 14px',
-                    borderRadius: '10px',
-                    border: idx === activeImageIndex ? '2px solid var(--primary)' : '1px solid var(--border)',
-                    background: idx === activeImageIndex ? 'var(--primary-bg)' : 'var(--white)',
-                    color: idx === activeImageIndex ? 'var(--primary)' : 'var(--text-secondary)',
-                    fontWeight: idx === activeImageIndex ? 800 : 600,
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  <span>{state.language === 'en' ? 'Page' : 'পেজ'} {idx + 1}</span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div style={{ display: 'flex', gap: '8px', marginTop: '14px' }}>
+          {/* Action Buttons Row */}
+          <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
             <button
               type="button"
               disabled={downloading}
@@ -500,23 +425,19 @@ export default function ExamDetails() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '4px',
-                padding: '10px 6px',
-                borderRadius: '12px',
-                background: 'var(--primary-bg)',
-                color: 'var(--primary)',
+                gap: '6px',
+                padding: '12px 14px',
+                borderRadius: '14px',
+                background: '#eff6ff',
+                color: '#2563eb',
                 fontWeight: 700,
-                fontSize: '12px',
-                border: '1.5px solid #dbeafe',
-                boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
-                transition: 'all 0.2s ease',
-                textAlign: 'center',
-                whiteSpace: 'nowrap',
-                cursor: downloading ? 'wait' : 'pointer',
-                opacity: downloading ? 0.75 : 1
+                fontSize: '13px',
+                border: '1px solid #dbeafe',
+                cursor: downloading ? 'wait' : 'pointer'
               }}
             >
-              {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={14} />} <span>{downloading ? (state.language === 'en' ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') : `${state.language === 'en' ? 'Notice' : 'নোটিশ'} ${circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}`}</span>
+              {downloading ? <ButtonSpinner size={14} color="#2563eb" /> : <Download size={15} />}
+              <span>{downloading ? (state.language === 'en' ? 'Downloading...' : 'ডাউনলোড...') : (state.language === 'en' ? 'Notice' : 'নোটিশ')}</span>
             </button>
 
             <button
@@ -526,22 +447,20 @@ export default function ExamDetails() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '4px',
-                padding: '10px 6px',
-                borderRadius: '12px',
+                gap: '6px',
+                padding: '12px 14px',
+                borderRadius: '14px',
                 background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                color: '#fff',
+                color: '#ffffff',
                 fontWeight: 700,
-                fontSize: '12px',
+                fontSize: '13px',
                 border: 'none',
                 cursor: 'pointer',
-                boxShadow: '0 4px 14px rgba(16,185,129,0.3)',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
+                boxShadow: '0 4px 14px rgba(16, 185, 129, 0.25)'
               }}
             >
-              <Download size={14} color="#ffffff" />
-              {state.language === 'en' ? 'Admit Card' : 'প্রবেশপত্র'}
+              <Download size={15} color="#ffffff" />
+              <span>{state.language === 'en' ? 'Admit Card' : 'প্রবেশপত্র'}</span>
             </button>
           </div>
         </div>
