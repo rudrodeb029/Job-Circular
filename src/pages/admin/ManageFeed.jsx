@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { Plus, Trash2, Edit2, PlayCircle, Type, ImageIcon, Heart } from '../../components/Icons';
+import RichTextEditor from '../../components/RichTextEditor';
 
 // Extract YouTube video ID
 function getYouTubeId(url) {
@@ -443,22 +444,13 @@ export default function ManageFeed() {
               {/* Text Content (Bengali) */}
               <div>
                 <label style={{ fontSize: '12px', fontWeight: 700, color: '#475569', display: 'block', marginBottom: '6px' }}>
-                  পোস্ট কন্টেন্ট (বাংলা)
+                  পোস্ট কন্টেন্ট (বাংলা - Rich Text Editor)
                 </label>
-                <textarea
-                  rows={4}
+                <RichTextEditor
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="আপনার পোস্টের বিস্তারিত বর্ণনা লিখুন..."
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '13px',
-                    boxSizing: 'border-box',
-                    fontFamily: 'inherit'
-                  }}
+                  onChange={(val) => setContent(val)}
+                  placeholder="আপনার পোস্টের বিস্তারিত বর্ণনা লিখুন (Bold, Alignment, List, Colors)..."
+                  minHeight="160px"
                 />
               </div>
 

@@ -10,6 +10,8 @@ import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '.
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import ProgressiveImage from '../components/ProgressiveImage';
 import PortalWarningModal from '../components/PortalWarningModal';
+import FormattedText from '../components/FormattedText';
+import FileDownloadModal from '../components/FileDownloadModal';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -23,6 +25,11 @@ export default function JobDetails() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
   const [modalType, setModalType] = useState('new_job');
+
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState('');
+  const [downloadFileName, setDownloadFileName] = useState('');
+  const [downloadDetails, setDownloadDetails] = useState('');
 
   const { state: adminState } = useAdminContext();
   const localJobs = adminState.jobs || [];
@@ -89,7 +96,7 @@ export default function JobDetails() {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
 
-  const handleDownloadNotice = async (e) => {
+  const handleDownloadNotice = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     
     const rawFileUrl = rawImagesList[activeImageIndex] ||
@@ -111,25 +118,11 @@ export default function JobDetails() {
       return;
     }
 
-    setDownloading(true);
-    try {
-      const fileName = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
-      const success = await downloadSecurely(rawFileUrl, fileName);
-      if (!success) {
-        const link = normalizeMediaUrl(rawFileUrl) || job.applyLink || 'https://alljobs.teletalk.com.bd';
-        setModalUrl(link);
-        setModalType('new_job');
-        setIsModalOpen(true);
-      }
-    } catch (err) {
-      console.error('Job notice download error:', err);
-      const link = normalizeMediaUrl(rawFileUrl) || job.applyLink || 'https://alljobs.teletalk.com.bd';
-      setModalUrl(link);
-      setModalType('new_job');
-      setIsModalOpen(true);
-    } finally {
-      setDownloading(false);
-    }
+    const name = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
+    setDownloadUrl(rawFileUrl);
+    setDownloadFileName(name);
+    setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
+    setIsDownloadModalOpen(true);
   };
 
   const handleOfficialApply = (e) => {
@@ -271,22 +264,13 @@ export default function JobDetails() {
 
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px' }}>
             {state.language === 'en' ? 'Job Description' : 'চাকরির বিবরণ'}
           </h3>
-          <p className="text-secondary" style={{
-            fontSize: '13px',
-            lineHeight: 1.6,
-            display: '-webkit-box',
-            WebkitLineClamp: showMore ? 'unset' : 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
-          }}>
-            {job.description}
-          </p>
+          <FormattedText text={job.description} lineClamp={3} showMore={showMore} />
           <button
             onClick={() => setShowMore(!showMore)}
-            style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '11px', marginTop: '8px' }}
+            style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '11px', marginTop: '8px', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             {showMore ? 'View Less ▲' : 'View More ▼'}
           </button>
@@ -645,6 +629,13 @@ export default function JobDetails() {
         onClose={() => setIsModalOpen(false)}
         url={modalUrl}
         pageType={modalType}
+      />
+      <FileDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        fileUrl={downloadUrl}
+        fileName={downloadFileName}
+        fileDetails={downloadDetails}
       />
     </div>
   );

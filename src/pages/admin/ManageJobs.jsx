@@ -5,6 +5,7 @@ import { triggerLocalNotification } from '../../utils/notifications';
 import { CLOUDINARY_CONFIG } from '../../cloudinary';
 import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
 import { normalizeMediaUrl, getGoogleDriveFileId } from '../../utils/mediaUtils';
+import RichTextEditor from '../../components/RichTextEditor';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -473,8 +474,13 @@ export default function ManageJobs() {
             </div>
 
             <div style={{ gridColumn: 'span 2' }} className="input-group">
-               <label>Description</label>
-               <textarea name="description" rows="4" className="modern-input" value={formData.description} onChange={handleInputChange} style={{ resize: 'vertical' }}></textarea>
+               <label>Description (বিবরণ - Rich Text Formatting)</label>
+               <RichTextEditor
+                 value={formData.description}
+                 onChange={(htmlValue) => setFormData(prev => ({ ...prev, description: htmlValue }))}
+                 placeholder="এখানে আপনার বিজ্ঞপ্তির বিস্তারিত বিবরণ লিখুন (Bold, Italic, Alignment, Bullet list ব্যবহার করতে পারবেন)..."
+                 minHeight="220px"
+               />
             </div>
 
             <div style={{ gridColumn: 'span 2' }} className="input-group">

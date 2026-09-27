@@ -11,6 +11,8 @@ import { normalizeMediaUrls, getGoogleDriveFileId, extractJobMediaList } from '.
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import ProgressiveImage from '../components/ProgressiveImage';
 import PortalWarningModal from '../components/PortalWarningModal';
+import FormattedText from '../components/FormattedText';
+import FileDownloadModal from '../components/FileDownloadModal';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -47,6 +49,11 @@ export default function ExamDetails() {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
+
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState('');
+  const [downloadFileName, setDownloadFileName] = useState('');
+  const [downloadDetails, setDownloadDetails] = useState('');
 
   // Load jobs from AdminContext
   const { state: adminState } = useAdminContext();
@@ -110,7 +117,7 @@ export default function ExamDetails() {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
 
-  const handleDownloadNotice = async (e) => {
+  const handleDownloadNotice = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     
     const rawFileUrl = rawImagesList[activeImageIndex] ||
@@ -133,25 +140,11 @@ export default function ExamDetails() {
       return;
     }
 
-    setDownloading(true);
-    try {
-      const fileName = `${job.organization || orgName || 'Exam'}_Notice_Page_${activeImageIndex + 1}`;
-      const success = await downloadSecurely(rawFileUrl, fileName);
-      if (!success) {
-        const link = normalizeMediaUrl(rawFileUrl) || job.examLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
-        setModalUrl(link);
-        setModalType('admit_card');
-        setIsModalOpen(true);
-      }
-    } catch (err) {
-      console.error('Notice download error:', err);
-      const link = normalizeMediaUrl(rawFileUrl) || job.examLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
-      setModalUrl(link);
-      setModalType('admit_card');
-      setIsModalOpen(true);
-    } finally {
-      setDownloading(false);
-    }
+    const name = `${job.organization || 'Exam'}_Notice_Page_${activeImageIndex + 1}`;
+    setDownloadUrl(rawFileUrl);
+    setDownloadFileName(name);
+    setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
+    setIsDownloadModalOpen(true);
   };
 
   const handleDownloadAdmitCard = () => {
@@ -223,19 +216,10 @@ export default function ExamDetails() {
 
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px' }}>
             {state.language === 'en' ? 'Description' : 'পরীক্ষার বিবরণ'}
           </h3>
-          <p className="text-secondary" style={{
-            fontSize: '13px',
-            lineHeight: 1.6,
-            display: '-webkit-box',
-            WebkitLineClamp: showFullDescription ? 'unset' : 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
-          }}>
-            {job.description}
-          </p>
+          <FormattedText text={job.description} lineClamp={3} showMore={showFullDescription} />
           <button
             onClick={() => setShowFullDescription(!showFullDescription)}
             style={{
@@ -552,6 +536,13 @@ export default function ExamDetails() {
         onClose={() => setIsModalOpen(false)}
         url={modalUrl}
         pageType={modalType}
+      />
+      <FileDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+        fileUrl={downloadUrl}
+        fileName={downloadFileName}
+        fileDetails={downloadDetails}
       />
     </div>
   );
