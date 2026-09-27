@@ -328,7 +328,7 @@ export default function FileDownloadModal({
                 1
               </div>
               <p style={{ margin: 0, fontSize: '12px', color: '#334155', fontWeight: 600, lineHeight: 1.5 }}>
-                ডাউনলোডকৃত ফাইল দেখতে চাইলে সংশ্লিষ্ট ফাইলটি ওপেন করতে পারবেন।
+                ডাউনলোডকৃত ফাইলটি দেখতে চাইলে সরাসরি এখান থেকে ওপেন করতে পারেন।
               </p>
             </div>
 
@@ -350,7 +350,7 @@ export default function FileDownloadModal({
                 2
               </div>
               <p style={{ margin: 0, fontSize: '12px', color: '#334155', fontWeight: 600, lineHeight: 1.5 }}>
-                কীভাবে ডাউনলোড সম্পন্ন হলে নোটিফিকেশন বার থেকে ফাইলটি পাবেন।
+                অথবা ডাউনলোড সম্পন্ন হলে ডিভাইসের নোটিফিকেশন বার থেকেও ফাইলটি দেখতে পাবেন।
               </p>
             </div>
 
@@ -372,7 +372,7 @@ export default function FileDownloadModal({
                 3
               </div>
               <p style={{ margin: 0, fontSize: '12px', color: '#334155', fontWeight: 600, lineHeight: 1.5 }}>
-                ডিভাইসের ফাইল ম্যানেজার থেকে ফাইলটি সরাসরি ওপেন করা যাবে।
+                এছাড়াও ফাইল ম্যানেজার বা ডাউনলোড ফোল্ডার থেকেও সরাসরি ফাইলটি ওপেন করা যাবে।
               </p>
             </div>
           </div>
@@ -389,7 +389,7 @@ export default function FileDownloadModal({
           }}>
             <Folder size={18} color="#2563eb" style={{ marginTop: '2px', flexShrink: 0 }} />
             <p style={{ margin: 0, fontSize: '11px', color: '#1d4ed8', fontWeight: 600, lineHeight: 1.5 }}>
-              ফাইলটি ডাউনলোড সম্পন্ন হলে আপনি সহজেই এটি খুঁজে পাবেন / Close করে ৫ সেকেন্ড পরে ব্যাকগ্রাউন্ডে অটোমেটিক ফাইলটি সংরক্ষিত হবে।
+              বিঃ দ্রঃ ডাউনলোড চলাকালীন আপনি চাইলে এই পেজটি বন্ধ (Close) করে দিতে পারেন। ব্যাকগ্রাউন্ডে ফাইলটি স্বয়ংক্রিয়ভাবে ডাউনলোড ও সংরক্ষিত হতে থাকবে।
             </p>
           </div>
         </div>
