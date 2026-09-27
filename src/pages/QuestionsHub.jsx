@@ -6,6 +6,7 @@ import { useAdminContext } from '../context/AdminContext';
 import SearchBar from '../components/SearchBar';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader from '../components/ModernLoader';
+import QuestionCard from '../components/QuestionCard';
 import { getQuestionsData } from '../data/questionsData';
 
 const categoryConfig = {
@@ -171,34 +172,28 @@ export default function QuestionsHub() {
             <SearchBar value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={isEn ? "Search questions..." : "প্রশ্নব্যাংকে খুঁজুন..."} />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', minHeight: '180px' }}>
+          <div style={{
+            display: (isFiltering || filteredPapers.length === 0) ? 'flex' : 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            flexDirection: 'column',
+            gap: '12px',
+            minHeight: '180px'
+          }}>
             {isFiltering ? (
-              <div style={{ padding: '60px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ padding: '60px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gridColumn: '1 / -1' }}>
                 <ModernLoader size="md" icon={categoryConfig[activeCategory]?.icon || '📚'} />
               </div>
             ) : filteredPapers.length > 0 ? (
               filteredPapers.map(paper => (
-                <div
+                <QuestionCard
                   key={paper.id}
-                  className="job-card animate-fade-in"
+                  paper={paper}
+                  isEn={isEn}
                   onClick={() => navigate(`/question-details/${paper.id}`)}
-                  style={{ padding: '14px', border: '1px solid rgba(37, 99, 235, 0.12)' }}
-                >
-                  <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'var(--primary-lightest)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    {categoryConfig[paper.category]?.icon || '📚'}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ fontSize: '11px', lineHeight: '1.4', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>{isEn ? (paper.titleEn || paper.title) : paper.title}</h3>
-                    <div style={{ display: 'flex', gap: '10px', fontSize: '10px', color: 'var(--text-muted)' }}>
-                      <span>📅 {isEn ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn)}</span>
-                      <span>📝 {isEn ? `${paper.totalQuestions || paper.questions?.length || 0} Items` : `${paper.totalQuestions || paper.questions?.length || 0}টি প্রশ্ন`}</span>
-                    </div>
-                  </div>
-                  <ChevronRight size={18} color="var(--border)" style={{ flexShrink: 0, marginLeft: 'auto' }} />
-                </div>
+                />
               ))
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
+              <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
                 <p>{isEn ? 'No questions found' : 'কোন প্রশ্নপত্র পাওয়া যায়নি'}</p>
               </div>
             )}
