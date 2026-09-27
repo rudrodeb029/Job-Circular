@@ -423,8 +423,8 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
 
-        {/* ═══ Phase 5: Centralized BottomNav — only on 4 main pages ═══ */}
-        {['/home', '/', '/feed', '/saved', '/profile'].includes(location.pathname) && !isOffline && (
+        {/* ═══ Phase 5: Centralized BottomNav — on 5 main tab pages ═══ */}
+        {['/home', '/', '/feed', '/saved', '/profile', '/notifications'].includes(location.pathname) && !isOffline && (
           <BottomNav />
         )}
 
