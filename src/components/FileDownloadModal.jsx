@@ -234,7 +234,7 @@ export default function FileDownloadModal({
           </div>
         </div>
 
-        {/* 3. Card 1: File Info & Progress Bar */}
+        {/* 3. Card 1: Progress Bar */}
         <div style={{
           background: '#ffffff',
           borderRadius: '16px',
@@ -242,55 +242,6 @@ export default function FileDownloadModal({
           padding: '16px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
         }}>
-          {/* File Row Box */}
-          <div style={{
-            background: '#f0f4ff',
-            border: '1px solid #e0e7ff',
-            borderRadius: '12px',
-            padding: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            marginBottom: '14px'
-          }}>
-            <div style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '10px',
-              background: '#c7d2fe',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <ImageIcon size={22} color="#4f46e5" />
-            </div>
-
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{
-                fontSize: '13px',
-                fontWeight: 700,
-                color: '#1e293b',
-                lineHeight: 1.4,
-                wordBreak: 'break-all'
-              }}>
-                {displayFileName}
-              </div>
-              <div style={{
-                fontSize: '11px',
-                fontWeight: 600,
-                color: '#64748b',
-                marginTop: '3px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <ImageIcon size={12} color="#94a3b8" />
-                <span>{displayResolution}</span>
-              </div>
-            </div>
-          </div>
-
           {/* Progress Bar Track (Full Width Pill Track) */}
           <div style={{
             width: '100%',
@@ -443,50 +394,50 @@ export default function FileDownloadModal({
           </div>
         </div>
 
-        {/* 5. Bottom Action Buttons (Stacked Vertically!) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '4px' }}>
+        {/* 5. Bottom Action Buttons (Side-By-Side Flex Row) */}
+        <div style={{ display: 'flex', gap: '10px', width: '100%', marginTop: '4px' }}>
           <button
             onClick={handleOpenFile}
             style={{
-              width: '100%',
+              flex: 1,
               height: '44px',
               borderRadius: '24px',
               background: '#059669',
               color: '#ffffff',
               border: 'none',
-              fontSize: '14px',
+              fontSize: '13px',
               fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
+              gap: '6px',
               cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
+              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.2)'
             }}
           >
-            <ExternalLink size={18} color="#ffffff" />
+            <ExternalLink size={16} color="#ffffff" />
             ওপেন করুন (Open)
           </button>
 
           <button
             onClick={onClose}
             style={{
-              width: '100%',
+              flex: 1,
               height: '44px',
               borderRadius: '24px',
               background: '#e0e7ff',
               color: '#1d4ed8',
               border: 'none',
-              fontSize: '14px',
+              fontSize: '13px',
               fontWeight: 700,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '8px',
+              gap: '6px',
               cursor: 'pointer'
             }}
           >
-            <span style={{ fontSize: '16px', fontWeight: 800 }}>✕</span>
+            <span style={{ fontSize: '15px', fontWeight: 800 }}>✕</span>
             বন্ধ করুন
           </button>
         </div>
