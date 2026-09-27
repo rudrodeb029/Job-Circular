@@ -394,54 +394,6 @@ export default function FileDownloadModal({
           </div>
         </div>
 
-        {/* 5. Bottom Action Buttons (Side-By-Side Flex Row) */}
-        <div style={{ display: 'flex', gap: '10px', width: '100%', marginTop: '4px' }}>
-          <button
-            onClick={handleOpenFile}
-            style={{
-              flex: 1,
-              height: '44px',
-              borderRadius: '24px',
-              background: '#059669',
-              color: '#ffffff',
-              border: 'none',
-              fontSize: '13px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.2)'
-            }}
-          >
-            <ExternalLink size={16} color="#ffffff" />
-            ওপেন করুন (Open)
-          </button>
-
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1,
-              height: '44px',
-              borderRadius: '24px',
-              background: '#e0e7ff',
-              color: '#1d4ed8',
-              border: 'none',
-              fontSize: '13px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              cursor: 'pointer'
-            }}
-          >
-            <span style={{ fontSize: '15px', fontWeight: 800 }}>✕</span>
-            বন্ধ করুন
-          </button>
-        </div>
-
       </div>
     </div>
   );
