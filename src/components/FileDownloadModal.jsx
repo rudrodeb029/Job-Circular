@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Download, Eye, FileText, CheckCircle } from './Icons';
+import { ArrowLeft, ExternalLink, ImageIcon, Lightbulb, Folder, MoreVertical } from './Icons';
 import { downloadSecurely } from '../utils/downloadUtils';
 
 export default function FileDownloadModal({
@@ -11,14 +11,12 @@ export default function FileDownloadModal({
 }) {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('downloading'); // 'downloading' | 'completed' | 'error'
-  const [downloadedBlobUrl, setDownloadedBlobUrl] = useState(null);
 
   useEffect(() => {
     let progressTimer;
     if (isOpen && fileUrl) {
       setProgress(10);
       setStatus('downloading');
-      setDownloadedBlobUrl(null);
 
       // Simulate smooth percentage progress bar increment (0 -> 100%)
       progressTimer = setInterval(() => {
@@ -54,7 +52,7 @@ export default function FileDownloadModal({
   if (!isOpen) return null;
 
   const displayFileName = `${fileName.replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_')}.${fileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'}`;
-  const displayDetails = fileDetails || `${displayFileName} (1236×1600)`;
+  const displayResolution = fileDetails ? fileDetails.replace(/.*?\((.*?)\).*/, '$1') : '1236 × 1600';
 
   const handleOpenFile = () => {
     if (fileUrl) {
@@ -70,33 +68,33 @@ export default function FileDownloadModal({
       right: 0,
       bottom: 0,
       zIndex: 99999,
-      background: 'var(--bg-primary, #f8fafc)',
+      background: '#f4f8fc',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: '"Hind Siliguri", sans-serif',
       overflowY: 'auto'
     }}>
-      {/* Header Bar (Compact & Sleek) */}
+      {/* 1. Header Bar */}
       <div style={{
         background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
         color: '#ffffff',
-        padding: '10px 16px',
+        padding: '14px 16px',
         display: 'flex',
         alignItems: 'center',
-        gap: '10px',
+        gap: '12px',
         position: 'sticky',
         top: 0,
         zIndex: 10,
-        boxShadow: '0 2px 8px rgba(37, 99, 235, 0.15)'
+        boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)'
       }}>
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(255, 255, 255, 0.2)',
+            background: 'rgba(255, 255, 255, 0.22)',
             border: 'none',
             color: '#ffffff',
-            width: '28px',
-            height: '28px',
+            width: '34px',
+            height: '34px',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
@@ -104,203 +102,395 @@ export default function FileDownloadModal({
             cursor: 'pointer'
           }}
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={20} color="#ffffff" />
         </button>
-        <h2 style={{ flex: 1, fontSize: '15px', fontWeight: 700, margin: 0, color: '#ffffff' }}>
+        <h2 style={{ flex: 1, fontSize: '18px', fontWeight: 800, margin: 0, color: '#ffffff' }}>
           File Download Info
         </h2>
         <button
           onClick={onClose}
           style={{
-            background: 'rgba(255, 255, 255, 0.2)',
+            background: 'rgba(255, 255, 255, 0.22)',
             border: 'none',
             color: '#ffffff',
-            width: '28px',
-            height: '28px',
+            width: '34px',
+            height: '34px',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '14px',
-            fontWeight: 700,
             cursor: 'pointer'
           }}
         >
-          ✕
+          <MoreVertical size={20} color="#ffffff" />
         </button>
       </div>
 
-      {/* Main Page Body Container (Compact Width & Padding) */}
+      {/* Main Content Area */}
       <div style={{
         flex: 1,
-        maxWidth: '440px',
+        maxWidth: '460px',
         width: '100%',
         margin: '0 auto',
-        padding: '16px 14px',
+        padding: '20px 16px',
         display: 'flex',
         flexDirection: 'column',
-        gap: '14px',
+        gap: '16px',
         boxSizing: 'border-box'
       }}>
-        {/* Main Card Wrapper */}
+
+        {/* 2. Graphic Illustration & Status Badge */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: '8px 0 4px' }}>
+          {/* Blue File Graphic with Green Check Badge & Decorative Spark Rays */}
+          <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* Soft Radial Background Circle */}
+            <div style={{
+              position: 'absolute',
+              width: '90px',
+              height: '90px',
+              borderRadius: '50%',
+              background: '#e0f2fe',
+              opacity: 0.8
+            }} />
+
+            {/* Spark / Ray Accents */}
+            <svg style={{ position: 'absolute', width: '110px', height: '110px', top: -5 }} viewBox="0 0 100 100">
+              <line x1="15" y1="25" x2="22" y2="30" stroke="#10b981" strokeWidth="3" strokeLinecap="round" />
+              <line x1="30" y1="12" x2="33" y2="18" stroke="#10b981" strokeWidth="3" strokeLinecap="round" />
+              <line x1="70" y1="12" x2="67" y2="18" stroke="#10b981" strokeWidth="3" strokeLinecap="round" />
+              <line x1="85" y1="25" x2="78" y2="30" stroke="#10b981" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+
+            {/* Main File Icon Card */}
+            <div style={{
+              position: 'relative',
+              width: '56px',
+              height: '70px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 16px rgba(37, 99, 235, 0.25)'
+            }}>
+              <ImageIcon size={30} color="#ffffff" />
+            </div>
+
+            {/* Floating Green Check Circle Badge */}
+            <div style={{
+              position: 'absolute',
+              bottom: '10px',
+              right: '12px',
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: '#10b981',
+              border: '2.5px solid #ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 8px rgba(16, 185, 129, 0.3)'
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Status Pill Badge */}
+          <div style={{
+            marginTop: '8px',
+            background: status === 'completed' ? '#e6f4ea' : '#eff6ff',
+            border: status === 'completed' ? '1px solid #b7eb8f' : '1px solid #bfdbfe',
+            padding: '8px 20px',
+            borderRadius: '24px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.03)'
+          }}>
+            <div style={{
+              width: '22px',
+              height: '22px',
+              borderRadius: '50%',
+              background: status === 'completed' ? '#10b981' : '#2563eb',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span style={{
+              fontSize: '15px',
+              fontWeight: 800,
+              color: status === 'completed' ? '#047857' : '#1d4ed8'
+            }}>
+              {status === 'completed' && 'Download Completed!'}
+              {status === 'downloading' && 'Downloading File...'}
+              {status === 'error' && 'Download Ready!'}
+            </span>
+          </div>
+        </div>
+
+        {/* 3. Card 1: File Info & Progress Bar */}
         <div style={{
           background: '#ffffff',
           borderRadius: '16px',
           border: '1px solid #e2e8f0',
           padding: '16px',
-          boxShadow: '0 4px 12px -2px rgba(0, 0, 0, 0.04)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '14px'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
         }}>
-
-          {/* File Dimensions Info Pill Box */}
+          {/* File Row Box */}
           <div style={{
-            background: '#f3e8ff',
-            border: '1px solid #e9d5ff',
-            color: '#6b21a8',
-            borderRadius: '10px',
-            padding: '8px 12px',
-            textAlign: 'center',
-            fontSize: '11px',
-            fontWeight: 700,
-            wordBreak: 'break-all'
+            background: '#f0f4ff',
+            border: '1px solid #e0e7ff',
+            borderRadius: '12px',
+            padding: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '14px'
           }}>
-            {displayDetails}
-          </div>
-
-          {/* File Name Header */}
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ fontSize: '13px', fontWeight: 700, color: '#1e293b', margin: 0, wordBreak: 'break-all', lineHeight: 1.4 }}>
-              {displayFileName}
-            </h3>
-          </div>
-
-          {/* Progress Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: status === 'completed' ? '#059669' : '#2563eb' }}>
-              {status === 'downloading' && 'Downloading...'}
-              {status === 'completed' && '✓ Download Completed!'}
-              {status === 'error' && '⚡ Opening File Directly...'}
-            </span>
-
-            {/* Progress Bar Track */}
             <div style={{
-              width: '100%',
-              height: '32px',
-              background: '#e2e8f0',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              position: 'relative',
+              width: '42px',
+              height: '42px',
+              borderRadius: '10px',
+              background: '#c7d2fe',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: '1px solid #cbd5e1'
+              flexShrink: 0
             }}>
-              {/* Animated Inner Fill */}
+              <ImageIcon size={22} color="#4f46e5" />
+            </div>
+
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{
+                fontSize: '13px',
+                fontWeight: 700,
+                color: '#1e293b',
+                lineHeight: 1.4,
+                wordBreak: 'break-all'
+              }}>
+                {displayFileName}
+              </div>
+              <div style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                color: '#64748b',
+                marginTop: '3px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <ImageIcon size={12} color="#94a3b8" />
+                <span>{displayResolution}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Progress Bar Track (Full Width Pill Track) */}
+          <div style={{
+            width: '100%',
+            height: '38px',
+            background: status === 'completed' ? '#059669' : '#e2e8f0',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            {/* Animated Inner Fill for Downloading State */}
+            {status !== 'completed' && (
               <div style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 bottom: 0,
                 width: `${progress}%`,
-                background: status === 'completed'
-                  ? 'linear-gradient(90deg, #10b981, #059669)'
-                  : 'linear-gradient(90deg, #3b82f6, #00d2ff)',
+                background: 'linear-gradient(90deg, #10b981, #059669)',
                 transition: 'width 0.2s linear',
-                borderRadius: '7px'
+                borderRadius: '20px'
               }} />
+            )}
 
-              {/* Percentage Counter Label */}
-              <span style={{
-                position: 'relative',
-                zIndex: 10,
-                fontSize: '13px',
+            <span style={{
+              position: 'relative',
+              zIndex: 10,
+              fontSize: '15px',
+              fontWeight: 800,
+              color: '#ffffff'
+            }}>
+              {progress}%
+            </span>
+          </div>
+        </div>
+
+        {/* 4. Card 2: Tips & Guidelines Card ("কিছু গুরুত্বপূর্ণ টিপস") */}
+        <div style={{
+          background: '#ffffff',
+          borderRadius: '16px',
+          border: '1px solid #e2e8f0',
+          padding: '16px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+        }}>
+          {/* Section Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingBottom: '10px', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              background: '#2563eb',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0
+            }}>
+              <Lightbulb size={16} color="#ffffff" />
+            </div>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#1d4ed8', margin: 0 }}>
+              কিছু গুরুত্বপূর্ণ টিপস
+            </h3>
+          </div>
+
+          {/* Numbered Steps */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                background: '#dbeafe',
+                color: '#1d4ed8',
+                fontSize: '12px',
                 fontWeight: 800,
-                color: progress > 50 ? '#ffffff' : '#2563eb',
-                textShadow: progress > 50 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: '1px'
               }}>
-                {progress}%
-              </span>
+                1
+              </div>
+              <p style={{ margin: 0, fontSize: '12px', color: '#334155', fontWeight: 600, lineHeight: 1.5 }}>
+                ডাউনলোডকৃত ফাইল দেখতে চাইলে সংশ্লিষ্ট ফাইলটি ওপেন করতে পারবেন।
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                background: '#dbeafe',
+                color: '#1d4ed8',
+                fontSize: '12px',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: '1px'
+              }}>
+                2
+              </div>
+              <p style={{ margin: 0, fontSize: '12px', color: '#334155', fontWeight: 600, lineHeight: 1.5 }}>
+                কীভাবে ডাউনলোড সম্পন্ন হলে নোটিফিকেশন বার থেকে ফাইলটি পাবেন।
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{
+                width: '24px',
+                height: '24px',
+                borderRadius: '50%',
+                background: '#dbeafe',
+                color: '#1d4ed8',
+                fontSize: '12px',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                marginTop: '1px'
+              }}>
+                3
+              </div>
+              <p style={{ margin: 0, fontSize: '12px', color: '#334155', fontWeight: 600, lineHeight: 1.5 }}>
+                ডিভাইসের ফাইল ম্যানেজার থেকে ফাইলটি সরাসরি ওপেন করা যাবে।
+              </p>
             </div>
           </div>
 
-          {/* Bengali Guidelines Text Box */}
+          {/* Bottom Light-Blue Notice Box */}
           <div style={{
-            background: '#f8fafc',
-            border: '1px solid #e2e8f0',
+            background: '#eff6ff',
             borderRadius: '12px',
-            padding: '10px 12px',
+            padding: '12px',
+            marginTop: '14px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '6px',
-            fontSize: '11px',
-            lineHeight: 1.5,
-            color: '#475569',
-            fontWeight: 600
+            alignItems: 'flex-start',
+            gap: '10px'
           }}>
-            <p style={{ margin: 0 }}>
-              • ডাউনলোডকৃত ফাইল দেখতে চাইলে সরাসরি এখান থেকে ওপেন করতে পারেন।
-            </p>
-            <p style={{ margin: 0 }}>
-              • কিংবা ডাউনলোড সম্পন্ন হলে নোটিফিকেশন বার থেকেও দেখতে পারবেন।
-            </p>
-            <p style={{ margin: 0 }}>
-              • উল্লেখ্য, এখান থেকে দেখতে চাইলে ফাইলটি সরাসরি ওপেন না হয়ে ডাউনলোডকৃত ফোল্ডার ওপেন হবে।
-            </p>
-            <p style={{ margin: 0, color: '#94a3b8', fontSize: '10px' }}>
-              বিঃ দ্রঃ ডাউনলোড চলাকালীন আপনি চাইলে এই পেজ টি বন্ধ / Close করে ও দিতে পারেন। Background এ ডাউনলোড হতে থাকবে।
+            <Folder size={18} color="#2563eb" style={{ marginTop: '2px', flexShrink: 0 }} />
+            <p style={{ margin: 0, fontSize: '11px', color: '#1d4ed8', fontWeight: 600, lineHeight: 1.5 }}>
+              ফাইলটি ডাউনলোড সম্পন্ন হলে আপনি সহজেই এটি খুঁজে পাবেন / Close করে ৫ সেকেন্ড পরে ব্যাকগ্রাউন্ডে অটোমেটিক ফাইলটি সংরক্ষিত হবে।
             </p>
           </div>
-
-          {/* Action Buttons */}
-          <div style={{ display: 'flex', gap: '8px', marginTop: '2px' }}>
-            {status === 'completed' && (
-              <button
-                onClick={handleOpenFile}
-                style={{
-                  flex: 1,
-                  padding: '9px 12px',
-                  borderRadius: '10px',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                  color: '#ffffff',
-                  border: 'none',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: '0 2px 8px rgba(16, 185, 129, 0.2)'
-                }}
-              >
-                <Eye size={14} />
-                ওপেন ফাইল (Open)
-              </button>
-            )}
-
-            <button
-              onClick={onClose}
-              style={{
-                flex: status === 'completed' ? 1 : 2,
-                padding: '9px 12px',
-                borderRadius: '10px',
-                background: status === 'completed' ? '#f1f5f9' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-                color: status === 'completed' ? '#475569' : '#ffffff',
-                border: 'none',
-                fontSize: '12px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                textAlign: 'center',
-                boxShadow: status === 'completed' ? 'none' : '0 2px 8px rgba(37, 99, 235, 0.2)'
-              }}
-            >
-              {status === 'completed' ? '✕ বন্ধ করুন' : '✕ Close (Background Download)'}
-            </button>
-          </div>
-
         </div>
+
+        {/* 5. Bottom Action Buttons (Stacked Vertically!) */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%', marginTop: '4px' }}>
+          <button
+            onClick={handleOpenFile}
+            style={{
+              width: '100%',
+              height: '44px',
+              borderRadius: '24px',
+              background: '#059669',
+              color: '#ffffff',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)'
+            }}
+          >
+            <ExternalLink size={18} color="#ffffff" />
+            ওপেন করুন (Open)
+          </button>
+
+          <button
+            onClick={onClose}
+            style={{
+              width: '100%',
+              height: '44px',
+              borderRadius: '24px',
+              background: '#e0e7ff',
+              color: '#1d4ed8',
+              border: 'none',
+              fontSize: '14px',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer'
+            }}
+          >
+            <span style={{ fontSize: '16px', fontWeight: 800 }}>✕</span>
+            বন্ধ করুন
+          </button>
+        </div>
+
       </div>
     </div>
   );

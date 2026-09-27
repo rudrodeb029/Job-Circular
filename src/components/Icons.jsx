@@ -415,3 +415,25 @@ export const Plus = ({ size = 22, color = 'currentColor', className = '' }) => (
     <line x1="5" y1="12" x2="19" y2="12" />
   </svg>
 );
+
+export const MoreVertical = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="1.5" fill={color} />
+    <circle cx="12" cy="5" r="1.5" fill={color} />
+    <circle cx="12" cy="19" r="1.5" fill={color} />
+  </svg>
+);
+
+export const Folder = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+export const Lightbulb = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5" />
+    <path d="M9 18h6" />
+    <path d="M10 22h4" />
+  </svg>
+);
