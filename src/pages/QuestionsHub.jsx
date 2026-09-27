@@ -188,6 +188,7 @@ export default function QuestionsHub() {
                 <QuestionCard
                   key={paper.id}
                   paper={paper}
+                  categoryIcon={categoryConfig[paper.category]?.icon || paper.icon || paper.categoryIcon}
                   isEn={isEn}
                   onClick={() => navigate(`/question-details/${paper.id}`)}
                 />

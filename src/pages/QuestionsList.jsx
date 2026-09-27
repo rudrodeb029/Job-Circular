@@ -155,6 +155,7 @@ export default function QuestionsList() {
               <QuestionCard
                 key={paper.id}
                 paper={paper}
+                categoryIcon={renderCategoryIcon(category)}
                 isEn={isEn}
                 onClick={() => navigate(`/question-details/${paper.id}`)}
               />
