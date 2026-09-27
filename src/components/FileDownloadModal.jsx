@@ -104,7 +104,7 @@ export default function FileDownloadModal({
         >
           <ArrowLeft size={20} color="#ffffff" />
         </button>
-        <h2 style={{ flex: 1, fontSize: '18px', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+        <h2 style={{ flex: 1, fontSize: '14px', fontWeight: 700, margin: 0, color: '#ffffff' }}>
           File Download Info
         </h2>
         <button
@@ -227,9 +227,9 @@ export default function FileDownloadModal({
               fontWeight: 800,
               color: status === 'completed' ? '#047857' : '#1d4ed8'
             }}>
-              {status === 'completed' && 'Download Completed!'}
-              {status === 'downloading' && 'Downloading File...'}
-              {status === 'error' && 'Download Ready!'}
+              {status === 'completed' && 'Completed!'}
+              {status === 'downloading' && 'Downloading...'}
+              {status === 'error' && 'Ready!'}
             </span>
           </div>
         </div>
