@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 let lastFocusedTarget = null;
-let savedRange = null;
 
 if (typeof window !== 'undefined') {
   document.addEventListener('focusin', (e) => {
@@ -10,19 +9,6 @@ if (typeof window !== 'undefined') {
       lastFocusedTarget = el;
     }
   }, true);
-
-  document.addEventListener('selectionchange', () => {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      const range = sel.getRangeAt(0);
-      const container = range.commonAncestorContainer;
-      const el = container.nodeType === 1 ? container : container.parentElement;
-      if (el && (el.isContentEditable || el.closest?.('[contenteditable="true"]'))) {
-        savedRange = range.cloneRange();
-        lastFocusedTarget = el.isContentEditable ? el : el.closest('[contenteditable="true"]');
-      }
-    }
-  });
 }
 
 /**
@@ -32,32 +18,29 @@ if (typeof window !== 'undefined') {
  */
 export function RichTextToolbar() {
   const handleExecute = (command, valueArg = null) => {
-    let target = document.activeElement;
-    if (!target || target === document.body || target.tagName === 'BUTTON') {
-      target = lastFocusedTarget;
+    const sel = window.getSelection();
+    let target = null;
+
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      let container = range.commonAncestorContainer;
+      if (container.nodeType !== 1) container = container.parentElement;
+      if (container) {
+        target = container.isContentEditable ? container : container.closest?.('[contenteditable="true"]');
+      }
+    }
+
+    if (!target) {
+      target = document.activeElement;
+      if (!target || target === document.body || target.tagName === 'BUTTON') {
+        target = lastFocusedTarget;
+      }
     }
 
     if (!target || !document.body.contains(target)) return;
 
     if (target.isContentEditable || target.getAttribute?.('contenteditable') === 'true') {
-      const sel = window.getSelection();
-      let hasValidSelection = false;
-
-      if (sel && sel.rangeCount > 0) {
-        const anchorNode = sel.anchorNode;
-        if (anchorNode && target.contains(anchorNode)) {
-          hasValidSelection = true;
-        }
-      }
-
-      if (!hasValidSelection && savedRange) {
-        try {
-          target.focus();
-          sel.removeAllRanges();
-          sel.addRange(savedRange);
-          hasValidSelection = true;
-        } catch (e) {}
-      } else if (!hasValidSelection) {
+      if (document.activeElement !== target && !target.contains(document.activeElement)) {
         target.focus();
       }
 
@@ -72,10 +55,6 @@ export function RichTextToolbar() {
         document.execCommand('insertHTML', false, '<br><br>');
       } else {
         document.execCommand(command, false, valueArg);
-      }
-
-      if (sel && sel.rangeCount > 0) {
-        savedRange = sel.getRangeAt(0).cloneRange();
       }
 
       const event = new Event('input', { bubbles: true });
@@ -275,8 +254,11 @@ export function RichInput({ value = '', onChange, placeholder = '', className = 
   const ref = useRef(null);
 
   useEffect(() => {
-    if (ref.current && ref.current.innerHTML !== (value || '')) {
-      ref.current.innerHTML = value || '';
+    if (ref.current) {
+      const isFocused = document.activeElement === ref.current || ref.current.contains(document.activeElement);
+      if (!isFocused && ref.current.innerHTML !== (value || '')) {
+        ref.current.innerHTML = value || '';
+      }
     }
   }, [value]);
 
@@ -324,10 +306,10 @@ export default function RichTextEditor({
   const [isCodeView, setIsCodeView] = useState(false);
   const [codeValue, setCodeValue] = useState(value || '');
 
-  // Keep editor content in sync with external value if needed
   useEffect(() => {
     if (editorRef.current && !isCodeView) {
-      if (editorRef.current.innerHTML !== (value || '')) {
+      const isFocused = document.activeElement === editorRef.current || editorRef.current.contains(document.activeElement);
+      if (!isFocused && editorRef.current.innerHTML !== (value || '')) {
         editorRef.current.innerHTML = value || '';
       }
     }
