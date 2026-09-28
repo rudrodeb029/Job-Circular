@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { getDocument, COLLECTIONS } from '../../services/supabaseService';
-import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
+import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
 
 export default function ManageQuestions() {
   const { state, dispatch } = useAdminContext();
@@ -317,7 +317,7 @@ export default function ManageQuestions() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
               <div className="input-group">
                 <label>Title (Bengali)</label>
-                <input className="modern-input" value={title} onChange={e => setTitle(e.target.value)} required />
+                <RichInput value={title} onChange={setTitle} placeholder="প্রশ্নের শিরোনাম লিখুন..." />
               </div>
               <div className="input-group">
                 <label>Category</label>
@@ -364,7 +364,7 @@ export default function ManageQuestions() {
                              <label style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', marginBottom: '8px', display: 'block' }}>Options (Bengali)</label>
                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                                 {qn.options.map((opt, oIdx) => (
-                                   <input key={oIdx} className="modern-input" value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} placeholder={`বিকল্প ${oIdx + 1}`} required />
+                                   <RichInput key={oIdx} value={opt} onChange={val => handleOptionChange(qIndex, oIdx, false, val)} placeholder={`বিকল্প ${oIdx + 1}`} />
                                 ))}
                              </div>
                           </div>

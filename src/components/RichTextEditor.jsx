@@ -5,28 +5,16 @@ let lastFocusedTarget = null;
 if (typeof window !== 'undefined') {
   document.addEventListener('focusin', (e) => {
     const el = e.target;
-    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable || el.getAttribute?.('contenteditable') === 'true')) {
+    if (el && (el.isContentEditable || el.getAttribute?.('contenteditable') === 'true')) {
       lastFocusedTarget = el;
     }
   }, true);
 }
 
-function setNativeInputValue(element, value) {
-  const prototype = Object.getPrototypeOf(element);
-  const descriptor = Object.getOwnPropertyDescriptor(prototype, 'value');
-  if (descriptor && descriptor.set) {
-    descriptor.set.call(element, value);
-  } else {
-    element.value = value;
-  }
-  element.dispatchEvent(new Event('input', { bubbles: true }));
-  element.dispatchEvent(new Event('change', { bubbles: true }));
-}
-
 /**
  * Sticky Header Toolbar Component for Admin Pages
  * Placed at the top header position of admin pages to control formatting
- * for whichever text field (contentEditable, input, textarea) is currently focused or selected.
+ * for whichever contentEditable text field (RichTextEditor, RichInput) is currently focused or selected.
  */
 export function RichTextToolbar() {
   const handleExecute = (command, valueArg = null) => {
@@ -37,103 +25,11 @@ export function RichTextToolbar() {
 
     if (!target || !document.body.contains(target)) return;
 
-    // 1. ContentEditable elements (RichTextEditor)
     if (target.isContentEditable || target.getAttribute?.('contenteditable') === 'true') {
       target.focus();
       document.execCommand(command, false, valueArg);
       const event = new Event('input', { bubbles: true });
       target.dispatchEvent(event);
-      return;
-    }
-
-    // 2. Native HTML <input> and <textarea> elements
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-      target.focus();
-      const start = target.selectionStart ?? 0;
-      const end = target.selectionEnd ?? 0;
-      const currentVal = target.value || '';
-      const selectedText = currentVal.substring(start, end);
-
-      const wrapTag = (openTag, closeTag) => {
-        if (!selectedText) {
-          return openTag + closeTag;
-        }
-        const trimmed = selectedText.trim();
-        if (trimmed.startsWith(openTag) && trimmed.endsWith(closeTag)) {
-          return trimmed.substring(openTag.length, trimmed.length - closeTag.length);
-        }
-        return `${openTag}${selectedText}${closeTag}`;
-      };
-
-      let replacement = selectedText;
-
-      switch (command) {
-        case 'bold':
-          replacement = wrapTag('<b>', '</b>');
-          break;
-        case 'italic':
-          replacement = wrapTag('<i>', '</i>');
-          break;
-        case 'underline':
-          replacement = wrapTag('<u>', '</u>');
-          break;
-        case 'strikeThrough':
-          replacement = wrapTag('<s>', '</s>');
-          break;
-        case 'justifyLeft':
-          replacement = wrapTag('<div style="text-align:left">', '</div>');
-          break;
-        case 'justifyCenter':
-          replacement = wrapTag('<div style="text-align:center">', '</div>');
-          break;
-        case 'justifyRight':
-          replacement = wrapTag('<div style="text-align:right">', '</div>');
-          break;
-        case 'justifyFull':
-          replacement = wrapTag('<div style="text-align:justify">', '</div>');
-          break;
-        case 'insertUnorderedList':
-          if (selectedText) {
-            const lines = selectedText.split('\n');
-            replacement = '<ul>' + lines.map(l => `<li>${l}</li>`).join('') + '</ul>';
-          } else {
-            replacement = '<ul><li></li></ul>';
-          }
-          break;
-        case 'insertOrderedList':
-          if (selectedText) {
-            const lines = selectedText.split('\n');
-            replacement = '<ol>' + lines.map(l => `<li>${l}</li>`).join('') + '</ol>';
-          } else {
-            replacement = '<ol><li></li></ol>';
-          }
-          break;
-        case 'formatBlock':
-          if (valueArg === '<h3>') replacement = wrapTag('<h3>', '</h3>');
-          else if (valueArg === '<p>') replacement = wrapTag('<p>', '</p>');
-          break;
-        case 'insertParagraph':
-          replacement = selectedText ? `${selectedText}<br />` : '<br />';
-          break;
-        case 'removeFormat':
-          replacement = selectedText ? selectedText.replace(/<[^>]*>/g, '') : currentVal.replace(/<[^>]*>/g, '');
-          if (!selectedText) {
-            setNativeInputValue(target, replacement);
-            return;
-          }
-          break;
-        default:
-          break;
-      }
-
-      const newVal = currentVal.substring(0, start) + replacement + currentVal.substring(end);
-      setNativeInputValue(target, newVal);
-
-      try {
-        target.setSelectionRange(start, start + replacement.length);
-      } catch (e) {
-        // Selection range not supported on some input types
-      }
     }
   };
 
@@ -174,6 +70,15 @@ export function RichTextToolbar() {
       marginBottom: '24px',
       userSelect: 'none'
     }}>
+      <style>{`
+        div[contenteditable]:empty:before,
+        .modern-input[contenteditable]:empty:before {
+          content: attr(data-placeholder);
+          color: #94a3b8;
+          pointer-events: none;
+          display: block;
+        }
+      `}</style>
       <span style={{ fontSize: '12px', fontWeight: 800, color: '#1a56db', marginRight: '8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
         ⚡ Text Formatting Header Toolbar:
       </span>
@@ -311,6 +216,53 @@ export function RichTextToolbar() {
   );
 }
 
+/**
+ * Single-line or compact rich text input field
+ * Replaces standard HTML <input> elements so rich text styles (Bold, H3, Italic)
+ * apply INSTANTLY and VISUALLY without displaying raw HTML code tags.
+ */
+export function RichInput({ value = '', onChange, placeholder = '', className = '', style = {} }) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current && ref.current.innerHTML !== (value || '')) {
+      ref.current.innerHTML = value || '';
+    }
+  }, [value]);
+
+  const handleInput = () => {
+    if (ref.current) {
+      onChange(ref.current.innerHTML);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
+  return (
+    <div
+      ref={ref}
+      contentEditable
+      onInput={handleInput}
+      onKeyDown={handleKeyDown}
+      data-placeholder={placeholder}
+      className={`modern-input ${className}`}
+      style={{
+        minHeight: '42px',
+        lineHeight: '1.5',
+        outline: 'none',
+        wordBreak: 'break-word',
+        boxSizing: 'border-box',
+        background: '#ffffff',
+        ...style
+      }}
+    />
+  );
+}
+
 export default function RichTextEditor({
   value = '',
   onChange,
@@ -325,7 +277,7 @@ export default function RichTextEditor({
   // Keep editor content in sync with external value if needed
   useEffect(() => {
     if (editorRef.current && !isCodeView) {
-      if (editorRef.current.innerHTML !== value) {
+      if (editorRef.current.innerHTML !== (value || '')) {
         editorRef.current.innerHTML = value || '';
       }
     }
@@ -456,7 +408,7 @@ export default function RichTextEditor({
           ref={editorRef}
           contentEditable
           onInput={handleInput}
-          placeholder={placeholder}
+          data-placeholder={placeholder}
           style={{
             width: '100%',
             minHeight,

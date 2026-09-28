@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
-import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
+import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
 
 export default function ManageLiveExams() {
   const { state, dispatch } = useAdminContext();
@@ -236,7 +236,7 @@ export default function ManageLiveExams() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
                    <div className="input-group">
                       <label>Exam Title (Bengali)</label>
-                      <input className="modern-input" value={title} onChange={e => setTitle(e.target.value)} required />
+                      <RichInput value={title} onChange={setTitle} placeholder="পরীক্ষার শিরোনাম লিখুন..." />
                    </div>
                    <div className="input-group">
                       <label>Start Date & Time</label>
@@ -262,11 +262,11 @@ export default function ManageLiveExams() {
                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div className="input-group">
                                <label>Subject (Bengali)</label>
-                               <input className="modern-input" value={st.subject} onChange={e => handleSubjectTopicFieldChange(sIdx, 'subject', e.target.value)} />
+                               <RichInput value={st.subject} onChange={val => handleSubjectTopicFieldChange(sIdx, 'subject', val)} placeholder="বিষয়..." />
                             </div>
                             <div className="input-group">
                                <label>Topics (Bengali)</label>
-                               <input className="modern-input" value={st.topics} onChange={e => handleSubjectTopicFieldChange(sIdx, 'topics', e.target.value)} />
+                               <RichInput value={st.topics} onChange={val => handleSubjectTopicFieldChange(sIdx, 'topics', val)} placeholder="টপিকস..." />
                             </div>
                          </div>
                       </div>
@@ -300,7 +300,7 @@ export default function ManageLiveExams() {
                             {qn.options.map((opt, oIdx) => (
                                <div key={oIdx} className="input-group">
                                   <label>Option {oIdx + 1} ({['ক', 'খ', 'গ', 'ঘ'][oIdx]})</label>
-                                  <input className="modern-input" value={opt} onChange={e => handleOptionChange(qIndex, oIdx, false, e.target.value)} />
+                                  <RichInput value={opt} onChange={val => handleOptionChange(qIndex, oIdx, false, val)} placeholder={`অপশন ${oIdx + 1}...`} />
                                </div>
                             ))}
                          </div>

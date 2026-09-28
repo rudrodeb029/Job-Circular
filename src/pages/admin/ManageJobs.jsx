@@ -5,7 +5,7 @@ import { triggerLocalNotification } from '../../utils/notifications';
 import { CLOUDINARY_CONFIG } from '../../cloudinary';
 import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
 import { normalizeMediaUrl, getGoogleDriveFileId } from '../../utils/mediaUtils';
-import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
+import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -445,7 +445,7 @@ export default function ManageJobs() {
           <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
             <div className="input-group">
                <label>Organization (Bengali)</label>
-               <input name="organization" className="modern-input" value={formData.organization} onChange={handleInputChange} required placeholder="যেমন: বাংলাদেশ সেনাবাহিনী" />
+               <RichInput value={formData.organization} onChange={val => setFormData(prev => ({ ...prev, organization: val }))} placeholder="যেমন: বাংলাদেশ সেনাবাহিনী" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               <div className="input-group">
