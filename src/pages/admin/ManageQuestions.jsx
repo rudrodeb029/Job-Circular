@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { getDocument, COLLECTIONS } from '../../services/supabaseService';
-import RichTextEditor from '../../components/RichTextEditor';
+import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
 
 export default function ManageQuestions() {
   const { state, dispatch } = useAdminContext();
@@ -306,7 +306,9 @@ export default function ManageQuestions() {
       </div>
 
       {showForm ? (
-        <div className="admin-card animate-fade-in" style={{ padding: '40px' }}>
+        <>
+          <RichTextToolbar />
+          <div className="admin-card animate-fade-in" style={{ padding: '40px' }}>
           <div style={{ marginBottom: '32px' }}>
             <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0 }}>{currentPaper ? 'Edit Question Paper' : 'New Question Paper'}</h2>
           </div>
@@ -428,6 +430,7 @@ export default function ManageQuestions() {
             </div>
           </form>
         </div>
+        </>
       ) : (
         <>
           <div className="admin-card" style={{ padding: '24px', marginBottom: '2rem', display: 'flex', gap: '20px', alignItems: 'center' }}>

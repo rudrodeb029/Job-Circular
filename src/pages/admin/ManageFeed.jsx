@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { Plus, Trash2, Edit2, PlayCircle, Type, ImageIcon, Heart } from '../../components/Icons';
-import RichTextEditor from '../../components/RichTextEditor';
+import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
 
 // Extract YouTube video ID
 function getYouTubeId(url) {
@@ -307,6 +307,8 @@ export default function ManageFeed() {
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a', margin: '0 0 16px 0' }}>
               {editingPost ? 'পোস্ট সম্পাদনা করুন' : 'নতুন ফিড পোস্ট তৈরি করুন'}
             </h3>
+
+            <RichTextToolbar />
 
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {/* Media Type Selector */}

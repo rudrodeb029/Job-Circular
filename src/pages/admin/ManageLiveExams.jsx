@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
-import RichTextEditor from '../../components/RichTextEditor';
+import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
 
 export default function ManageLiveExams() {
   const { state, dispatch } = useAdminContext();
@@ -227,8 +227,10 @@ export default function ManageLiveExams() {
       </div>
 
       {showAddForm ? (
-        <div className="admin-card" style={{ padding: '40px' }}>
-          <form onSubmit={handleSaveExam}>
+        <>
+          <RichTextToolbar />
+          <div className="admin-card" style={{ padding: '40px' }}>
+            <form onSubmit={handleSaveExam}>
              <div className="form-section">
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>1. Basic Information</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
@@ -358,6 +360,7 @@ export default function ManageLiveExams() {
              </div>
           </form>
         </div>
+        </>
       ) : (
         <div className="admin-card" style={{ overflow: 'hidden' }}>
           <table className="exam-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
