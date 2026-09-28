@@ -73,7 +73,7 @@ export default function SplashScreen() {
         {/* ==================== BACKGROUND & SKY ATMOSPHERE ==================== */}
         <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
           {/* Top Left Organic Waves */}
-          <svg style={{ position: 'absolute', top: '-48px', left: '-56px', width: '340px', height: '260px', opacity: 0.9 }} viewBox="0 0 340 260" fill="none">
+          <svg style={{ position: 'absolute', top: '-24px', left: '-40px', width: '360px', height: '280px', opacity: 0.95 }} viewBox="0 0 340 260" fill="none">
             <path d="M-20 -10 C90 10 180 80 190 160 C195 200 160 220 120 230 C40 250 -10 210 -20 210 Z" fill="url(#topWaveGrad)" />
             <defs>
               <linearGradient id="topWaveGrad" x1="0" y1="0" x2="220" y2="220" gradientUnits="userSpaceOnUse">
@@ -83,12 +83,12 @@ export default function SplashScreen() {
               </linearGradient>
             </defs>
           </svg>
-          <svg style={{ position: 'absolute', top: '-80px', left: '-24px', width: '280px', height: '210px', color: '#ffffff', opacity: 0.25 }} viewBox="0 0 280 210" fill="currentColor">
+          <svg style={{ position: 'absolute', top: '-60px', left: '-16px', width: '300px', height: '230px', color: '#ffffff', opacity: 0.25 }} viewBox="0 0 280 210" fill="currentColor">
             <path d="M0 0 C120 20 220 90 230 190 C180 160 80 140 0 160 Z" />
           </svg>
 
           {/* National Parliament / University Silhouettes */}
-          <div style={{ position: 'absolute', top: '40px', right: 0, width: '240px', height: '190px', opacity: 0.35 }}>
+          <div style={{ position: 'absolute', top: '56px', right: 0, width: '240px', height: '190px', opacity: 0.35 }}>
             <svg style={{ width: '100%', height: '100%', color: '#5b8ec2' }} fill="currentColor" viewBox="0 0 260 200">
               <polygon opacity="0.6" points="120,40 140,40 150,55 110,55" />
               <rect x="112" y="55" width="36" height="50" opacity="0.75" />
@@ -125,11 +125,11 @@ export default function SplashScreen() {
         </div>
 
         {/* ==================== MAIN CONTENT ==================== */}
-        <main style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '24px 16px 8px 16px' }}>
+        <main style={{ position: 'relative', zIndex: 10, flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: 'max(env(safe-area-inset-top, 0px), 46px) 16px 8px 16px' }}>
           
           {/* Top Left Bengali Tagline */}
-          <div style={{ width: '100%', position: 'relative', height: '48px', userSelect: 'none', pointerEvents: 'none' }}>
-            <div style={{ position: 'absolute', left: '8px', top: '-4px', transform: 'rotate(-10deg)' }}>
+          <div style={{ width: '100%', position: 'relative', height: '54px', userSelect: 'none', pointerEvents: 'none' }}>
+            <div style={{ position: 'absolute', left: '16px', top: '2px', transform: 'rotate(-10deg)' }}>
               <p style={{ fontFamily: '"Kalam", "Hind Siliguri", cursive, sans-serif', color: '#0055d4', fontWeight: 700, fontSize: '15px', lineHeight: '18px', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))' }}>
                 স্বপ্ন দেখুন<br />
                 <span style={{ marginLeft: '8px' }}>প্রস্তুত হন</span><br />
@@ -283,7 +283,7 @@ export default function SplashScreen() {
         </main>
 
         {/* ==================== BOTTOM LAYERED WAVES & LOADING FOOTER ==================== */}
-        <footer style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 30, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: '12px', pointerEvents: 'none' }}>
+        <footer style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 30, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)', pointerEvents: 'none' }}>
           
           {/* Sweeping Multi-Layered Bottom Wave Accent SVGs */}
           <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'hidden' }}>
