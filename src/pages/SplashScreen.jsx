@@ -24,12 +24,13 @@ export default function SplashScreen() {
       position: 'fixed',
       inset: 0,
       zIndex: 999999,
-      backgroundColor: '#0b1120',
+      background: 'linear-gradient(180deg, #e8f3ff 0%, #f4f9ff 45%, #ffffff 100%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       fontFamily: '"Hind Siliguri", sans-serif',
-      WebkitFontSmoothing: 'antialiased'
+      WebkitFontSmoothing: 'antialiased',
+      overflow: 'hidden'
     }}>
       {/* Dynamic Keyframes for Spinner & Animations */}
       <style>{`
@@ -66,8 +67,7 @@ export default function SplashScreen() {
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-between',
-        boxShadow: '0 25px 65px -12px rgba(0, 0, 0, 0.55)'
+        justifyContent: 'space-between'
       }}>
 
         {/* ==================== BACKGROUND & SKY ATMOSPHERE ==================== */}
