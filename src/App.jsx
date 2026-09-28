@@ -14,7 +14,6 @@ import { syncCoreDataOnStartup } from './services/supabaseService'
 import { triggerDeltaSync } from './services/sqliteService'
 import { Capacitor } from '@capacitor/core'
 
-import NewDataIcon from './components/NewDataIcon'
 import BottomNav from './components/BottomNav'
 
 const CURRENT_VERSION = "1.0.9";
@@ -354,7 +353,6 @@ function App() {
         data-nav-direction={isBackNavigation ? 'back' : 'forward'}
       >
         {!isAdminRoute && <ConnectivityBanner />}
-        {!isAdminRoute && isHomeOrFeed && <NewDataIcon />}
 
         {/* ═══ Phase 3: Selective Offline Overlay (AdMob Protected) ═══ */}
         {/* Blocks new content browsing offline but allows cached personal pages */}

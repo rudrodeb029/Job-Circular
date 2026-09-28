@@ -11,7 +11,6 @@ import { HomeSkeleton } from '../components/SkeletonLoader';
 import { categories } from '../data/categories';
 import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import PullToRefresh from '../components/PullToRefresh';
-import NewDataIcon from '../components/NewDataIcon';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
