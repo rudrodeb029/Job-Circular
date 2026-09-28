@@ -74,7 +74,10 @@ export default function FileDownloadModal({
       <div style={{
         background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
         color: '#ffffff',
-        padding: '14px 16px',
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 32px)',
+        paddingBottom: '14px',
+        paddingLeft: '16px',
+        paddingRight: '16px',
         display: 'flex',
         alignItems: 'center',
         gap: '12px',
