@@ -21,10 +21,10 @@
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <!-- Android 12+ SplashScreen API settings -->
         <item name="windowSplashScreenBackground">#e8f3ff</item>
-        <item name="windowSplashScreenAnimatedIcon">@android:color/transparent</item>
-        <item name="windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash</item>
+        <item name="windowSplashScreenIconBackgroundColor">#e8f3ff</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
-        <!-- Android 6-11 legacy fallback: seamless background matching web splash -->
+        <!-- Android 6-11 legacy fallback: full detailed design splash -->
         <item name="android:windowBackground">@drawable/launch_splash</item>
     </style>
 </resources>

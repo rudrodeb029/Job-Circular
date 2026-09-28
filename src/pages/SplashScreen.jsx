@@ -7,14 +7,14 @@ export default function SplashScreen() {
   const { state } = useAppContext();
 
   useEffect(() => {
-    // Smooth auto-transition after 2.2 seconds
+    // Smooth auto-transition after 1.2 seconds
     const timer = setTimeout(() => {
       if (state.hasSeenOnboarding) {
         navigate('/home', { replace: true });
       } else {
         navigate('/onboarding', { replace: true });
       }
-    }, 2200);
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, [navigate, state.hasSeenOnboarding]);
