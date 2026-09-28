@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { useAdminContext } from '../../context/AdminContext';
 import { categories } from '../../data/categories';
+import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
 
 export default function AiManager() {
   const { dispatch } = useAdminContext();
@@ -241,15 +242,19 @@ export default function AiManager() {
         </div>
       </div>
 
+      <RichTextToolbar />
+
       <div className="admin-chart-card" style={{ background: '#ffffff', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0' }}>
         <h3 style={{ marginBottom: '15px' }}>Job Circular Information</h3>
         <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px' }}>Describe the job or paste raw text from a website. AI will analyze and create a professional post.</p>
-        <textarea
-          placeholder="Example: 'Create circular for Bank Asia PO post, vacancy 50, location all over Bangladesh, salary 50000, deadline June 2025'"
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          style={{ width: '100%', height: '180px', padding: '20px', border: '1px solid #e2e8f0', borderRadius: '15px', marginBottom: '25px', resize: 'vertical', fontSize: '15px', lineHeight: '1.7', background: '#fcfcfc' }}
-        />
+        <div style={{ marginBottom: '25px' }}>
+          <RichTextEditor
+            value={prompt}
+            onChange={setPrompt}
+            placeholder="Example: 'Create circular for Bank Asia PO post, vacancy 50, location all over Bangladesh, salary 50000, deadline June 2025'"
+            minHeight="160px"
+          />
+        </div>
 
         <button
           onClick={generatePost}

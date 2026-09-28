@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { formatTimeAgo } from '../../utils/timeUtils';
+import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
 
 export default function ManageNotifications() {
   const { state, dispatch } = useAdminContext();
@@ -189,18 +190,19 @@ export default function ManageNotifications() {
                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
             </div>
+            <RichTextToolbar />
             <form onSubmit={handleSaveNotif} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Alert Title</label>
-                <input required value={notifFormData.title} onChange={e => setNotifFormData({...notifFormData, title: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. New Circular Published" />
+                <RichInput value={notifFormData.title} onChange={val => setNotifFormData(prev => ({...prev, title: val}))} placeholder="e.g. New Circular Published" />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Organization</label>
-                <input required value={notifFormData.organization} onChange={e => setNotifFormData({...notifFormData, organization: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none' }} placeholder="e.g. Bangladesh Bank" />
+                <RichInput value={notifFormData.organization} onChange={val => setNotifFormData(prev => ({...prev, organization: val}))} placeholder="e.g. Bangladesh Bank" />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: '13px', fontWeight: 700, color: '#475569', marginBottom: '8px' }}>Message Body</label>
-                <textarea required rows="3" value={notifFormData.message} onChange={e => setNotifFormData({...notifFormData, message: e.target.value})} style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', outline: 'none', resize: 'none' }} placeholder="Enter the content of your notification..." />
+                <RichTextEditor value={notifFormData.message} onChange={val => setNotifFormData(prev => ({...prev, message: val}))} placeholder="Enter the content of your notification..." minHeight="100px" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
