@@ -426,7 +426,7 @@ function App() {
         </Routes>
 
         {/* ═══ Phase 5: Centralized BottomNav — on 5 main tab pages ═══ */}
-        {['/home', '/', '/feed', '/saved', '/profile', '/notifications'].includes(location.pathname) && !isOffline && (
+        {['/home', '/feed', '/saved', '/profile', '/notifications'].includes(location.pathname) && !isOffline && (
           <BottomNav />
         )}
 
