@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 let lastFocusedTarget = null;
+let savedRange = null;
 
 if (typeof window !== 'undefined') {
   document.addEventListener('focusin', (e) => {
@@ -9,6 +10,19 @@ if (typeof window !== 'undefined') {
       lastFocusedTarget = el;
     }
   }, true);
+
+  document.addEventListener('selectionchange', () => {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0) {
+      const range = sel.getRangeAt(0);
+      const container = range.commonAncestorContainer;
+      const el = container.nodeType === 1 ? container : container.parentElement;
+      if (el && (el.isContentEditable || el.closest?.('[contenteditable="true"]'))) {
+        savedRange = range.cloneRange();
+        lastFocusedTarget = el.isContentEditable ? el : el.closest('[contenteditable="true"]');
+      }
+    }
+  });
 }
 
 /**
@@ -26,8 +40,44 @@ export function RichTextToolbar() {
     if (!target || !document.body.contains(target)) return;
 
     if (target.isContentEditable || target.getAttribute?.('contenteditable') === 'true') {
-      target.focus();
-      document.execCommand(command, false, valueArg);
+      const sel = window.getSelection();
+      let hasValidSelection = false;
+
+      if (sel && sel.rangeCount > 0) {
+        const anchorNode = sel.anchorNode;
+        if (anchorNode && target.contains(anchorNode)) {
+          hasValidSelection = true;
+        }
+      }
+
+      if (!hasValidSelection && savedRange) {
+        try {
+          target.focus();
+          sel.removeAllRanges();
+          sel.addRange(savedRange);
+          hasValidSelection = true;
+        } catch (e) {}
+      } else if (!hasValidSelection) {
+        target.focus();
+      }
+
+      try {
+        document.execCommand('styleWithCSS', false, false);
+      } catch (e) {}
+
+      if (command === 'removeFormat') {
+        document.execCommand('removeFormat', false, null);
+        document.execCommand('formatBlock', false, '<p>');
+      } else if (command === 'insertLineGap') {
+        document.execCommand('insertHTML', false, '<br><br>');
+      } else {
+        document.execCommand(command, false, valueArg);
+      }
+
+      if (sel && sel.rangeCount > 0) {
+        savedRange = sel.getRangeAt(0).cloneRange();
+      }
+
       const event = new Event('input', { bubbles: true });
       target.dispatchEvent(event);
     }
@@ -194,7 +244,7 @@ export function RichTextToolbar() {
       </button>
       <button
         type="button"
-        onMouseDown={(e) => { e.preventDefault(); handleExecute('insertParagraph'); }}
+        onMouseDown={(e) => { e.preventDefault(); handleExecute('insertLineGap'); }}
         title="New Line / Gap"
         style={{ padding: '6px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#ffffff', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
       >
