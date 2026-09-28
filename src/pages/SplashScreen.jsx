@@ -7,14 +7,14 @@ export default function SplashScreen() {
   const { state } = useAppContext();
 
   useEffect(() => {
-    // Smooth auto-transition after 1.2 seconds
+    // Smooth auto-transition after 1.8 seconds
     const timer = setTimeout(() => {
       if (state.hasSeenOnboarding) {
         navigate('/home', { replace: true });
       } else {
         navigate('/onboarding', { replace: true });
       }
-    }, 1200);
+    }, 1800);
 
     return () => clearTimeout(timer);
   }, [navigate, state.hasSeenOnboarding]);
@@ -31,7 +31,7 @@ export default function SplashScreen() {
       fontFamily: '"Hind Siliguri", sans-serif',
       WebkitFontSmoothing: 'antialiased'
     }}>
-      {/* Dynamic Keyframes for Spinner & Animations */}
+      {/* Keyframes for Spinner & Shadow Styles */}
       <style>{`
         @keyframes splashSpin {
           0% { transform: rotate(0deg); }
@@ -58,9 +58,9 @@ export default function SplashScreen() {
       {/* Frame Container */}
       <div style={{
         width: '100%',
-        maxWidth: '430px',
+        maxWidth: '412px',
         height: '100vh',
-        maxHeight: '920px',
+        maxHeight: '890px',
         background: 'linear-gradient(180deg, #e8f3ff 0%, #f4f9ff 45%, #ffffff 100%)',
         position: 'relative',
         overflow: 'hidden',
@@ -87,7 +87,7 @@ export default function SplashScreen() {
             <path d="M0 0 C120 20 220 90 230 190 C180 160 80 140 0 160 Z" />
           </svg>
 
-          {/* National Parliament / University Silhouettes (Top Right Pastel Blue) */}
+          {/* National Parliament / University Silhouettes */}
           <div style={{ position: 'absolute', top: '40px', right: 0, width: '240px', height: '190px', opacity: 0.35 }}>
             <svg style={{ width: '100%', height: '100%', color: '#5b8ec2' }} fill="currentColor" viewBox="0 0 260 200">
               <polygon opacity="0.6" points="120,40 140,40 150,55 110,55" />
@@ -109,7 +109,7 @@ export default function SplashScreen() {
             </svg>
           </div>
 
-          {/* Campus Clock Tower Silhouettes (Right Midground) */}
+          {/* Campus Clock Tower Silhouettes */}
           <div style={{ position: 'absolute', top: '320px', right: '8px', width: '160px', height: '280px', opacity: 0.25 }}>
             <svg style={{ width: '100%', height: '100%', color: '#4b7cb0' }} fill="currentColor" viewBox="0 0 160 280">
               <rect x="110" y="40" width="22" height="180" opacity="0.7" />
@@ -130,7 +130,7 @@ export default function SplashScreen() {
           {/* Top Left Bengali Tagline */}
           <div style={{ width: '100%', position: 'relative', height: '48px', userSelect: 'none', pointerEvents: 'none' }}>
             <div style={{ position: 'absolute', left: '8px', top: '-4px', transform: 'rotate(-10deg)' }}>
-              <p style={{ fontFamily: '"Kalam", "Hind Siliguri", cursive, sans-serif', color: '#0055d4', fontWeight: 700, fontSize: '15px', lineHeight: '18px', textShadow: '0 1px 2px rgba(0,0,0,0.1)' }}>
+              <p style={{ fontFamily: '"Kalam", "Hind Siliguri", cursive, sans-serif', color: '#0055d4', fontWeight: 700, fontSize: '15px', lineHeight: '18px', filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))' }}>
                 স্বপ্ন দেখুন<br />
                 <span style={{ marginLeft: '8px' }}>প্রস্তুত হন</span><br />
                 <span style={{ marginLeft: '4px', color: '#003da8' }}>সফল হোন</span>
@@ -145,7 +145,7 @@ export default function SplashScreen() {
           {/* BRANDING SECTION: Glossy Rainbow LC Monogram & Brand Name */}
           <section style={{ margin: 'auto 0', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', userSelect: 'none', transform: 'translateY(4px)' }}>
             
-            {/* High-End Rainbow Vector 'LC' Logo matching Image */}
+            {/* High-End Rainbow Vector 'LC' Logo */}
             <div className="rainbow-logo-shadow" style={{ position: 'relative', width: '144px', height: '128px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg style={{ width: '128px', height: '128px' }} viewBox="0 0 140 130" fill="none">
                 <defs>
@@ -194,10 +194,10 @@ export default function SplashScreen() {
           </section>
 
           {/* ==================== 3D CAREER, BOOKS & DESK COMPOSITION ==================== */}
-          <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: '70px', overflow: 'visible' }}>
+          <div style={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', paddingBottom: '80px', overflow: 'visible' }}>
             
             {/* Smooth Oak Wood Desk Surface Arc */}
-            <div className="desk-surface-arc" style={{ position: 'absolute', bottom: 0, left: '-48px', right: '-48px', height: '140px', borderTopLeftRadius: '54%', borderTopRightRadius: '54%', borderTop: '3px solid #ffe8cc', zIndex: 0 }} />
+            <div className="desk-surface-arc" style={{ position: 'absolute', bottom: 0, left: '-48px', right: '-48px', height: '144px', borderTopLeftRadius: '54%', borderTopRightRadius: '54%', borderTop: '3px solid #ffe8cc', zIndex: 0 }} />
 
             {/* DESK OBJECTS COMPOSITION */}
             <div style={{ position: 'relative', zIndex: 10, width: '100%', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingLeft: '8px', marginBottom: '-8px' }}>
@@ -283,7 +283,7 @@ export default function SplashScreen() {
         </main>
 
         {/* ==================== BOTTOM LAYERED WAVES & LOADING FOOTER ==================== */}
-        <footer style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 30, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: '16px', pointerEvents: 'none' }}>
+        <footer style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 30, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-end', paddingBottom: '12px', pointerEvents: 'none' }}>
           
           {/* Sweeping Multi-Layered Bottom Wave Accent SVGs */}
           <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', overflow: 'hidden' }}>
@@ -306,12 +306,15 @@ export default function SplashScreen() {
           </div>
 
           {/* Spinner & Bengali Loading Status */}
-          <div style={{ position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '8px', pointerEvents: 'auto' }}>
+          <div style={{ position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '4px', pointerEvents: 'auto' }}>
             <div className="splash-loader-ring" />
-            <p style={{ fontFamily: '"Hind Siliguri", sans-serif', fontSize: '13px', fontWeight: 700, color: '#1e293b', letterSpacing: '0.02em', textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>
+            <p style={{ fontFamily: '"Hind Siliguri", sans-serif', fontSize: '13px', fontWeight: 700, color: '#1e293b', letterSpacing: '0.02em', textShadow: '0 1px 2px rgba(255,255,255,0.8)', margin: 0 }}>
               অ্যাপটি লোড হচ্ছে...
             </p>
           </div>
+
+          {/* Bottom Home Indicator Bar */}
+          <div style={{ position: 'relative', zIndex: 20, width: '144px', height: '4px', backgroundColor: 'rgba(148, 163, 184, 0.7)', borderRadius: '9999px', marginTop: '4px' }} />
         </footer>
       </div>
     </div>
