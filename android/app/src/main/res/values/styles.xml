@@ -7,6 +7,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@drawable/launch_splash</item>
+        <item name="android:background">#e8f3ff</item>
     </style>
 
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
@@ -18,11 +20,11 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <!-- Splash Screen Theme: Works seamlessly across ALL Android versions (6 to 15+) -->
+    <!-- Splash Screen Theme: Instant App Logo launch on ALL Android versions (6 to 15+) -->
     <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
         <!-- Android 12+ SplashScreen API settings -->
         <item name="windowSplashScreenBackground">#e8f3ff</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/launch_splash</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="windowSplashScreenIconBackgroundColor">#e8f3ff</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
         <!-- Android 6-11 legacy fallback -->
