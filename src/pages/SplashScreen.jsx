@@ -312,9 +312,6 @@ export default function SplashScreen() {
               অ্যাপটি লোড হচ্ছে...
             </p>
           </div>
-
-          {/* Bottom Home Indicator Bar */}
-          <div style={{ position: 'relative', zIndex: 20, width: '144px', height: '4px', backgroundColor: 'rgba(148, 163, 184, 0.7)', borderRadius: '9999px', marginTop: '4px' }} />
         </footer>
       </div>
     </div>
