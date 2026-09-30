@@ -7,14 +7,15 @@ export default function SplashScreen() {
   const { state } = useAppContext();
 
   useEffect(() => {
-    // Smooth auto-transition after 1.8 seconds
+    // Smooth auto-transition: 1st time -> /onboarding, 2nd or other times -> /home
+    const isReturning = state.hasSeenOnboarding || JSON.parse(localStorage.getItem('hasSeenOnboarding') || 'false');
     const timer = setTimeout(() => {
-      if (state.hasSeenOnboarding) {
+      if (isReturning) {
         navigate('/home', { replace: true });
       } else {
         navigate('/onboarding', { replace: true });
       }
-    }, 1800);
+    }, 1200);
 
     return () => clearTimeout(timer);
   }, [navigate, state.hasSeenOnboarding]);
@@ -31,21 +32,8 @@ export default function SplashScreen() {
       fontFamily: '"Hind Siliguri", sans-serif',
       WebkitFontSmoothing: 'antialiased'
     }}>
-      {/* Keyframes for Spinner & Shadow Styles */}
+      {/* Styles for Shadows */}
       <style>{`
-        @keyframes splashSpin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        .splash-loader-ring {
-          width: 38px;
-          height: 38px;
-          border-radius: 50%;
-          background: conic-gradient(from 0deg, #00d2ff, #0066ff, #0044cc, transparent 75%);
-          mask: radial-gradient(farthest-side, transparent calc(100% - 4.5px), #000 calc(100% - 4px));
-          -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4.5px), #000 calc(100% - 4px));
-          animation: splashSpin 0.9s linear infinite;
-        }
         .rainbow-logo-shadow {
           filter: drop-shadow(0 14px 24px rgba(0, 110, 255, 0.28)) drop-shadow(0 4px 8px rgba(255, 80, 0, 0.2));
         }
@@ -305,16 +293,6 @@ export default function SplashScreen() {
             </svg>
           </div>
 
-          {/* Spinner & Bengali Loading Status */}
-          <div style={{ position: 'relative', zIndex: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', marginBottom: '4px', pointerEvents: 'auto' }}>
-            <div className="splash-loader-ring" />
-            <p style={{ fontFamily: '"Hind Siliguri", sans-serif', fontSize: '13px', fontWeight: 700, color: '#1e293b', letterSpacing: '0.02em', textShadow: '0 1px 2px rgba(255,255,255,0.8)', margin: 0 }}>
-              অ্যাপটি লোড হচ্ছে...
-            </p>
-          </div>
-
-          {/* Bottom Home Indicator Bar */}
-          <div style={{ position: 'relative', zIndex: 20, width: '144px', height: '4px', backgroundColor: 'rgba(148, 163, 184, 0.7)', borderRadius: '9999px', marginTop: '4px' }} />
         </footer>
       </div>
     </div>
