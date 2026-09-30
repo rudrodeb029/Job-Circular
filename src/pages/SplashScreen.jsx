@@ -7,14 +7,17 @@ export default function SplashScreen() {
   const { state } = useAppContext();
 
   useEffect(() => {
-    // Smooth auto-transition: 1st time -> /onboarding, 2nd or other times -> /home
     const isReturning = state.hasSeenOnboarding || JSON.parse(localStorage.getItem('hasSeenOnboarding') || 'false');
+    
+    // Returning users: ZERO splash wait, immediate redirect to Homepage (/home)
+    if (isReturning) {
+      navigate('/home', { replace: true });
+      return;
+    }
+
+    // First time users: show clean splash design for 1.2s, then transition into /onboarding
     const timer = setTimeout(() => {
-      if (isReturning) {
-        navigate('/home', { replace: true });
-      } else {
-        navigate('/onboarding', { replace: true });
-      }
+      navigate('/onboarding', { replace: true });
     }, 1200);
 
     return () => clearTimeout(timer);

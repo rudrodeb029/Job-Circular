@@ -390,7 +390,9 @@ function App() {
         })()}
 
         <Routes location={location}>
-          <Route path="/" element={<SplashScreen />} />
+          <Route path="/" element={
+            JSON.parse(localStorage.getItem('hasSeenOnboarding') || 'false') ? <Home /> : <SplashScreen />
+          } />
           <Route path="/splash" element={<SplashScreen />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/home" element={<Home />} />
