@@ -7,6 +7,8 @@ import { incrementFeedLike, addFeedComment } from '../services/supabaseService';
 import AppHeader from '../components/AppHeader';
 import PullToRefresh from '../components/PullToRefresh';
 import SearchBar from '../components/SearchBar';
+import FacebookCircularsSection from '../components/FacebookCircularsSection';
+import { getItemTimestamp } from '../utils/timeUtils';
 
 // Background presets for Facebook-style banner text posts
 export const BANNER_GRADIENTS = {
@@ -69,6 +71,13 @@ export default function Feed() {
     );
   }, [adminState.feedPosts, state.feedPosts, searchQuery]);
 
+  const recentCirculars = useMemo(() => {
+    const jobs = adminState.jobs || [];
+    return [...jobs]
+      .sort((a, b) => getItemTimestamp(b) - getItemTimestamp(a))
+      .slice(0, 20);
+  }, [adminState.jobs]);
+
   return (
     <div className="page" style={{ paddingBottom: '80px' }}>
       <AppHeader />
@@ -112,6 +121,9 @@ export default function Feed() {
             />
           </div>
         </div>
+
+        {/* Facebook-style Recent Circulars Section */}
+        <FacebookCircularsSection jobs={recentCirculars} isEn={isEn} />
 
         {/* Feed Posts */}
         {feedPosts.length === 0 ? (
