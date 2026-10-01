@@ -3,108 +3,28 @@ const path = require('path');
 const sharp = require('sharp');
 
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const SOURCE_IMAGE = 'C:/Users/Suvro/.gemini/antigravity/brain/9b6c9ad4-0b79-4ffc-9298-03cbf24e4d29/.user_uploaded/media_1790833627103.png';
+const SOURCE_IMAGE = 'C:/Users/Suvro/Downloads/Untitled design (23).png';
 
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
 const ASSETS_DIR = path.join(PROJECT_ROOT, 'src', 'assets');
 const RES_DIR = path.join(PROJECT_ROOT, 'android', 'app', 'src', 'main', 'res');
 
-async function createTransparentMaster(sourcePath) {
-  console.log('🔄 Creating 100% transparent version of the master logo...');
-  const { data, info } = await sharp(sourcePath).raw().toBuffer({ resolveWithObject: true });
-  const { width, height } = info;
-  const visited = new Uint8Array(width * height);
-  const queue = [];
-
-  function isBgColor(x, y) {
-    const idx = (y * width + x) * 4;
-    const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-    const minVal = Math.min(r, g, b);
-    const diff = Math.max(r, g, b) - minVal;
-    return (minVal >= 235 && diff <= 22);
-  }
-
-  function addPixel(x, y) {
-    if (x < 0 || x >= width || y < 0 || y >= height) return;
-    const p = y * width + x;
-    if (!visited[p] && isBgColor(x, y)) {
-      visited[p] = 1;
-      queue.push(p);
+function safeWriteFileSync(filePath, buffer) {
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    try {
+      fs.writeFileSync(filePath, buffer);
+      return;
+    } catch (err) {
+      if (attempt === 5) throw err;
+      const start = Date.now();
+      while (Date.now() - start < 150) {} // 150ms synchronous pause
     }
   }
-
-  // Seed flood fill from image perimeter
-  for (let x = 0; x < width; x++) {
-    addPixel(x, 0);
-    addPixel(x, height - 1);
-  }
-  for (let y = 0; y < height; y++) {
-    addPixel(0, y);
-    addPixel(width - 1, y);
-  }
-
-  // Seed flood fill from inside the "C" letter loop
-  addPixel(650, 480);
-  addPixel(620, 500);
-
-  let head = 0;
-  while (head < queue.length) {
-    const curr = queue[head++];
-    const cx = curr % width;
-    const cy = Math.floor(curr / width);
-    addPixel(cx + 1, cy);
-    addPixel(cx - 1, cy);
-    addPixel(cx, cy + 1);
-    addPixel(cx, cy - 1);
-  }
-
-  const out = Buffer.alloc(width * height * 4);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4;
-      const p = y * width + x;
-      const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-
-      if (visited[p]) {
-        // Fully transparent background pixel
-        out[idx] = 0;
-        out[idx + 1] = 0;
-        out[idx + 2] = 0;
-        out[idx + 3] = 0;
-      } else {
-        // Check if neighboring pixel is background to smooth/anti-alias the edge
-        let neighborIsBg = false;
-        if (x > 0 && visited[p - 1]) neighborIsBg = true;
-        else if (x < width - 1 && visited[p + 1]) neighborIsBg = true;
-        else if (y > 0 && visited[p - width]) neighborIsBg = true;
-        else if (y < height - 1 && visited[p + width]) neighborIsBg = true;
-
-        const minVal = Math.min(r, g, b);
-        if (neighborIsBg && minVal > 220) {
-          const t = (minVal - 220) / (255 - 220);
-          const a = Math.max(0, Math.min(255, Math.round(255 * (1 - t))));
-          out[idx] = r;
-          out[idx + 1] = g;
-          out[idx + 2] = b;
-          out[idx + 3] = a;
-        } else {
-          out[idx] = r;
-          out[idx + 1] = g;
-          out[idx + 2] = b;
-          out[idx + 3] = 255;
-        }
-      }
-    }
-  }
-
-  const transBuffer = await sharp(out, { raw: { width, height, channels: 4 } }).png().toBuffer();
-  console.log('✔ Transparent master buffer created successfully.');
-  return transBuffer;
 }
 
 async function run() {
   console.log('========================================================');
-  console.log('🚀 GENERATING ALL APP ICONS & LOGOS FROM 1024x1024 MASTER');
+  console.log('🚀 GENERATING ALL APP ICONS & LOGOS FROM 2048x2048 MASTER');
   console.log(`   Source: ${SOURCE_IMAGE}`);
   console.log('========================================================\n');
 
@@ -112,36 +32,124 @@ async function run() {
     throw new Error('Master image not found: ' + SOURCE_IMAGE);
   }
 
-  // 1. Save copies to root
+  // Verify source image metadata
+  const meta = await sharp(SOURCE_IMAGE).metadata();
+  console.log(`ℹ Master image loaded: ${meta.width}x${meta.height}, format: ${meta.format}, alpha: ${meta.hasAlpha}`);
+
+  // 1. Transparent master buffer
+  const transparentMasterBuffer = await sharp(SOURCE_IMAGE).png().toBuffer();
+  
+  // 2. Trimmed master buffer (tight bounding box of the logo artwork)
+  const trimmedInfo = await sharp(SOURCE_IMAGE).trim().toBuffer({ resolveWithObject: true });
+  const trimmedMasterBuffer = trimmedInfo.data;
+  console.log(`ℹ Trimmed logo bounding box: ${trimmedInfo.info.width}x${trimmedInfo.info.height}`);
+
+  // Helper: creates a transparent canvas of [targetSize x targetSize] with the trimmed logo scaled & centered
+  async function makeCenteredTransparentLogo(targetSize, scaleRatio = 0.84) {
+    const innerSize = Math.round(targetSize * scaleRatio);
+    const scaledLogo = await sharp(trimmedMasterBuffer)
+      .resize(innerSize, innerSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .toBuffer();
+
+    return await sharp({
+      create: {
+        width: targetSize,
+        height: targetSize,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      }
+    })
+      .composite([{ input: scaledLogo, gravity: 'center' }])
+      .png()
+      .toBuffer();
+  }
+
+  // Helper: creates a solid white background canvas with the trimmed logo centered
+  async function makeCenteredSolidLogo(targetSize, scaleRatio = 0.82) {
+    const innerSize = Math.round(targetSize * scaleRatio);
+    const scaledLogo = await sharp(trimmedMasterBuffer)
+      .resize(innerSize, innerSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .toBuffer();
+
+    return await sharp({
+      create: {
+        width: targetSize,
+        height: targetSize,
+        channels: 4,
+        background: { r: 255, g: 255, b: 255, alpha: 1 }
+      }
+    })
+      .composite([{ input: scaledLogo, gravity: 'center' }])
+      .png()
+      .toBuffer();
+  }
+
+  // Helper: creates a circular masked solid white icon with trimmed logo centered
+  async function makeCenteredRoundLogo(targetSize, scaleRatio = 0.72) {
+    const solidBuffer = await makeCenteredSolidLogo(targetSize, scaleRatio);
+    const circleSvg = Buffer.from(
+      `<svg width="${targetSize}" height="${targetSize}"><circle cx="${targetSize / 2}" cy="${targetSize / 2}" r="${targetSize / 2}" fill="white"/></svg>`
+    );
+    return await sharp(solidBuffer)
+      .composite([{ input: circleSvg, blend: 'dest-in' }])
+      .png()
+      .toBuffer();
+  }
+
+  // --- SECTION 1: Root Project Assets ---
+  console.log('\n📁 1. Updating Root Assets (2048x2048)...');
   const rootIconPng = path.join(PROJECT_ROOT, 'icon.png');
   const rootIconTransPng = path.join(PROJECT_ROOT, 'icon-transparent.png');
-  fs.copyFileSync(SOURCE_IMAGE, rootIconPng);
-  console.log('✔ Saved root icon.png (1024x1024)');
 
-  const transparentBuffer = await createTransparentMaster(SOURCE_IMAGE);
-  fs.writeFileSync(rootIconTransPng, transparentBuffer);
-  console.log('✔ Saved root icon-transparent.png (1024x1024, RGBA transparent)');
+  // Solid root icon (2048x2048)
+  const rootSolid2048 = await makeCenteredSolidLogo(2048, 0.75);
+  safeWriteFileSync(rootIconPng, rootSolid2048);
+  console.log('✔ Saved root icon.png (2048x2048 solid white)');
 
-  // 2. Web & PWA Assets
+  // Transparent root icon (2048x2048)
+  safeWriteFileSync(rootIconTransPng, transparentMasterBuffer);
+  console.log('✔ Saved root icon-transparent.png (2048x2048 RGBA transparent)');
+
+  // --- SECTION 2: Web & PWA Assets ---
   console.log('\n📦 2. Generating Web & PWA assets...');
-  // Transparent in-app logo (USED FOR REEL CARDS, FEED AVATARS, HEADER)
-  await sharp(transparentBuffer).resize(512, 512).png().toFile(path.join(PUBLIC_DIR, 'app-logo.png'));
-  await sharp(transparentBuffer).resize(512, 512).png().toFile(path.join(ASSETS_DIR, 'app-logo.png'));
-  console.log('✔ Generated public/app-logo.png & src/assets/app-logo.png (512x512, 100% TRANSPARENT)');
+  // Transparent app logo (512x512) for in-app reels, feed avatars, header, modals
+  const appLogoTrans512 = await makeCenteredTransparentLogo(512, 0.84);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'app-logo.png'), appLogoTrans512);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'app-logo-transparent.png'), appLogoTrans512);
+  safeWriteFileSync(path.join(ASSETS_DIR, 'app-logo.png'), appLogoTrans512);
+  console.log('✔ Saved public/app-logo.png, public/app-logo-transparent.png, src/assets/app-logo.png (512x512 transparent)');
 
-  // Solid app-icon for PWA launcher / Homescreen
-  await sharp(SOURCE_IMAGE).resize(512, 512).png().toFile(path.join(PUBLIC_DIR, 'app-icon.png'));
-  await sharp(SOURCE_IMAGE).resize(512, 512).png().toFile(path.join(ASSETS_DIR, 'app-icon.png'));
-  await sharp(SOURCE_IMAGE).resize(512, 512).png().toFile(path.join(PUBLIC_DIR, 'logo512.png'));
-  await sharp(SOURCE_IMAGE).resize(192, 192).png().toFile(path.join(PUBLIC_DIR, 'logo192.png'));
-  await sharp(SOURCE_IMAGE).resize(180, 180).png().toFile(path.join(PUBLIC_DIR, 'apple-touch-icon.png'));
-  await sharp(SOURCE_IMAGE).resize(64, 64).png().toFile(path.join(PUBLIC_DIR, 'favicon.png'));
-  await sharp(SOURCE_IMAGE).resize(32, 32).png().toFile(path.join(PUBLIC_DIR, 'favicon-32x32.png'));
-  await sharp(SOURCE_IMAGE).resize(16, 16).png().toFile(path.join(PUBLIC_DIR, 'favicon-16x16.png'));
-  console.log('✔ Generated all PWA & Favicon assets (512, 192, 180, 64, 32, 16).');
+  // Solid app icon (512x512) for PWA homescreen and notifications
+  const appIconSolid512 = await makeCenteredSolidLogo(512, 0.78);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'app-icon.png'), appIconSolid512);
+  safeWriteFileSync(path.join(ASSETS_DIR, 'app-icon.png'), appIconSolid512);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'logo512.png'), appIconSolid512);
+  console.log('✔ Saved public/app-icon.png, src/assets/app-icon.png, public/logo512.png (512x512 solid)');
 
-  // 3. Android Mipmap densities
-  console.log('\n📱 3. Generating Android Mipmap densities...');
+  // Scaled Web Icons
+  const appIconSolid192 = await makeCenteredSolidLogo(192, 0.78);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'logo192.png'), appIconSolid192);
+
+  const appleTouchIcon180 = await makeCenteredSolidLogo(180, 0.78);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'apple-touch-icon.png'), appleTouchIcon180);
+
+  const favicon64 = await makeCenteredSolidLogo(64, 0.80);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'favicon.png'), favicon64);
+
+  const favicon32 = await makeCenteredSolidLogo(32, 0.82);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'favicon-32x32.png'), favicon32);
+
+  const favicon16 = await makeCenteredSolidLogo(16, 0.85);
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'favicon-16x16.png'), favicon16);
+
+  // Generate public/favicon.svg containing the logo as well
+  const favB64 = favicon64.toString('base64');
+  const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><image href="data:image/png;base64,${favB64}" width="64" height="64" /></svg>`;
+  safeWriteFileSync(path.join(PUBLIC_DIR, 'favicon.svg'), Buffer.from(faviconSvg, 'utf-8'));
+  console.log('✔ Saved logo192, apple-touch-icon (180), favicon (64, 32, 16, svg)');
+
+  // --- SECTION 3: Android Mipmap densities ---
+  console.log('\n📱 3. Generating Android Mipmap Densities...');
   const MIPMAP_CONFIGS = [
     { folder: 'mipmap-ldpi', launcherSize: 36, foregroundSize: 81 },
     { folder: 'mipmap-mdpi', launcherSize: 48, foregroundSize: 108 },
@@ -155,80 +163,45 @@ async function run() {
     const targetDir = path.join(RES_DIR, cfg.folder);
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
 
-    // A. ic_launcher.png (1:1 square)
-    await sharp(SOURCE_IMAGE)
-      .resize(cfg.launcherSize, cfg.launcherSize)
-      .png()
-      .toFile(path.join(targetDir, 'ic_launcher.png'));
+    // A. ic_launcher.png (Legacy square launcher icon with solid white background)
+    const icLauncherBuf = await makeCenteredSolidLogo(cfg.launcherSize, 0.80);
+    safeWriteFileSync(path.join(targetDir, 'ic_launcher.png'), icLauncherBuf);
 
-    // B. ic_launcher_round.png (Circular masked launcher)
-    const circleSvg = Buffer.from(
-      `<svg width="${cfg.launcherSize}" height="${cfg.launcherSize}"><circle cx="${cfg.launcherSize / 2}" cy="${cfg.launcherSize / 2}" r="${cfg.launcherSize / 2}" fill="white"/></svg>`
-    );
-    await sharp(SOURCE_IMAGE)
-      .resize(cfg.launcherSize, cfg.launcherSize)
-      .composite([{ input: circleSvg, blend: 'dest-in' }])
-      .png()
-      .toFile(path.join(targetDir, 'ic_launcher_round.png'));
+    // B. ic_launcher_round.png (Circular masked launcher icon)
+    const icLauncherRoundBuf = await makeCenteredRoundLogo(cfg.launcherSize, 0.72);
+    safeWriteFileSync(path.join(targetDir, 'ic_launcher_round.png'), icLauncherRoundBuf);
 
-    // C. ic_launcher_background.png (Solid clean white background)
-    await sharp({
+    // C. ic_launcher_background.png (Solid white background layer for adaptive icon)
+    const bgBuf = await sharp({
       create: {
         width: cfg.foregroundSize,
         height: cfg.foregroundSize,
         channels: 4,
         background: { r: 255, g: 255, b: 255, alpha: 1 }
       }
-    })
-      .png()
-      .toFile(path.join(targetDir, 'ic_launcher_background.png'));
+    }).png().toBuffer();
+    safeWriteFileSync(path.join(targetDir, 'ic_launcher_background.png'), bgBuf);
 
-    // D. ic_launcher_foreground.png (Adaptive foreground with safe zone using transparent logo)
-    const iconScaledSize = Math.round(cfg.foregroundSize * 0.72);
-    const scaledIconBuffer = await sharp(transparentBuffer)
-      .resize(iconScaledSize, iconScaledSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      .toBuffer();
-
-    await sharp({
-      create: {
-        width: cfg.foregroundSize,
-        height: cfg.foregroundSize,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 0 }
-      }
-    })
-      .composite([{ input: scaledIconBuffer, gravity: 'center' }])
-      .png()
-      .toFile(path.join(targetDir, 'ic_launcher_foreground.png'));
+    // D. ic_launcher_foreground.png (Adaptive foreground with safe zone: 66% scale)
+    const fgBuf = await makeCenteredTransparentLogo(cfg.foregroundSize, 0.66);
+    safeWriteFileSync(path.join(targetDir, 'ic_launcher_foreground.png'), fgBuf);
 
     console.log(`✔ ${cfg.folder}: launcher (${cfg.launcherSize}x${cfg.launcherSize}), adaptive (${cfg.foregroundSize}x${cfg.foregroundSize})`);
   }
 
-  // 4. Android Drawables & Splash Assets
-  console.log('\n🎨 4. Generating Android Drawables & Native Splash Assets...');
+  // --- SECTION 4: Android Drawables & Native Splash Assets ---
+  console.log('\n🎨 4. Generating Android Drawables & Splash Assets...');
   const drawableDir = path.join(RES_DIR, 'drawable');
   if (fs.existsSync(drawableDir)) {
-    const iconScaledSize = Math.round(432 * 0.72);
-    const scaledIconBuffer = await sharp(transparentBuffer)
-      .resize(iconScaledSize, iconScaledSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
-      .toBuffer();
+    // Adaptive foreground in drawable (432x432)
+    const drawableFgBuf = await makeCenteredTransparentLogo(432, 0.66);
+    safeWriteFileSync(path.join(drawableDir, 'ic_launcher_foreground.png'), drawableFgBuf);
 
-    await sharp({
-      create: {
-        width: 432,
-        height: 432,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 0 }
-      }
-    })
-      .composite([{ input: scaledIconBuffer, gravity: 'center' }])
-      .png()
-      .toFile(path.join(drawableDir, 'ic_launcher_foreground.png'));
-
-    // Splash screen icons
-    await sharp(transparentBuffer).resize(512, 512).png().toFile(path.join(drawableDir, 'app_logo_splash.png'));
-    await sharp(transparentBuffer).resize(512, 512).png().toFile(path.join(drawableDir, 'splash_icon.png'));
-    console.log('✔ drawable/ic_launcher_foreground.png, app_logo_splash.png & splash_icon.png generated.');
+    // Native Splash Screen transparent logos (512x512)
+    const splashLogo512 = await makeCenteredTransparentLogo(512, 0.84);
+    safeWriteFileSync(path.join(drawableDir, 'app_logo_splash.png'), splashLogo512);
+    safeWriteFileSync(path.join(drawableDir, 'splash_icon.png'), splashLogo512);
+    console.log('✔ drawable/ic_launcher_foreground.png, app_logo_splash.png, splash_icon.png generated.');
   }
 
   // Multi-density splash_logo.png
@@ -242,16 +215,29 @@ async function run() {
   for (const s of splashSizes) {
     const targetDir = path.join(RES_DIR, s.folder);
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-    await sharp(transparentBuffer).resize(s.size, s.size).png().toFile(path.join(targetDir, 'splash_logo.png'));
+    const splashBuf = await makeCenteredTransparentLogo(s.size, 0.84);
+    safeWriteFileSync(path.join(targetDir, 'splash_logo.png'), splashBuf);
     console.log(`✔ ${s.folder}/splash_logo.png (${s.size}x${s.size})`);
   }
 
-  // 5. Clean up temporary test files
-  const testFile = path.join(PUBLIC_DIR, 'test-new-transparent.png');
-  if (fs.existsSync(testFile)) fs.unlinkSync(testFile);
+  // --- SECTION 5: Delete Old Unused Icon Files ---
+  console.log('\n🧹 5. Cleaning up old unused icon files...');
+  const obsoleteFiles = [
+    path.join(ASSETS_DIR, 'finalicon.png'),
+    path.join(ASSETS_DIR, 'finallastone.png'),
+    path.join(PROJECT_ROOT, 'scripts', 'test_icon.png'),
+    path.join(PUBLIC_DIR, 'test-new-transparent.png')
+  ];
+
+  for (const file of obsoleteFiles) {
+    if (fs.existsSync(file)) {
+      fs.unlinkSync(file);
+      console.log(`✔ Deleted obsolete file: ${path.relative(PROJECT_ROOT, file)}`);
+    }
+  }
 
   console.log('\n========================================================');
-  console.log('🎉 COMPLETED! All icons and logos updated with the new 1024x1024 master!');
+  console.log('🎉 ALL APP ICONS & LOGOS SUCCESSFULLY GENERATED & UPDATED!');
   console.log('========================================================\n');
 }
 
