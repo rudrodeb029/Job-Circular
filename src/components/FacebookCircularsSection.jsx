@@ -275,68 +275,10 @@ export default function FacebookCircularsSection({ jobs = [], isEn = false }) {
         borderBottom: '1px solid var(--border-light, #e2e8f0)',
         borderTop: '1px solid var(--border-light, #e2e8f0)',
         marginBottom: '8px',
-        padding: '8px 0 12px 0',
+        padding: '10px 0',
         boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
       }}
     >
-      {/* Header Row */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '2px 14px 8px 14px'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <div
-            style={{
-              width: '20px',
-              height: '20px',
-              borderRadius: '6px',
-              background: 'linear-gradient(135deg, #1877f2, #0284c7)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#ffffff',
-              fontSize: '10px',
-              fontWeight: '800'
-            }}
-          >
-            LC
-          </div>
-          <span
-            style={{
-              fontWeight: '700',
-              fontSize: '13px',
-              color: 'var(--text-primary, #0f172a)',
-              letterSpacing: '-0.2px'
-            }}
-          >
-            {isEn ? 'Recent Circulars' : 'সাম্প্রতিক সার্কুলার'}
-          </span>
-        </div>
-
-        <button
-          onClick={() => navigate('/all-circulars')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: 'var(--primary, #1877f2)',
-            fontSize: '12px',
-            fontWeight: '600',
-            cursor: 'pointer',
-            padding: '4px 6px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '2px'
-          }}
-        >
-          <span>{isEn ? 'See all' : 'সব দেখুন'}</span>
-          <span style={{ fontSize: '13px' }}>›</span>
-        </button>
-      </div>
-
       {/* Horizontal Story Cards Carousel */}
       <div
         style={{
