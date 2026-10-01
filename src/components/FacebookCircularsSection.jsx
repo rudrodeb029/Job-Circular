@@ -206,7 +206,7 @@ function StoryCard({ job, index, isEn, onClick }) {
                 width: '52px',
                 height: '52px',
                 objectFit: 'contain',
-                mixBlendMode: 'multiply'
+                filter: 'drop-shadow(0 3px 8px rgba(0, 0, 0, 0.08))'
               }}
               onError={(e) => {
                 e.target.onerror = null;
