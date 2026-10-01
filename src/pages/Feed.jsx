@@ -103,9 +103,11 @@ export default function Feed() {
               width: '38px',
               height: '38px',
               borderRadius: '50%',
-              objectFit: 'cover',
+              objectFit: 'contain',
+              padding: '4px',
+              background: '#ffffff',
               border: '1.5px solid var(--primary, #1877f2)',
-              boxShadow: '0 2px 8px rgba(24, 119, 242, 0.2)',
+              boxShadow: '0 2px 8px rgba(24, 119, 242, 0.15)',
               flexShrink: 0
             }}
             onError={(e) => {
@@ -341,10 +343,9 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
             src="/app-logo.png"
             alt="Live Circular Logo"
             style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              objectFit: 'cover',
+              width: '38px',
+              height: '38px',
+              objectFit: 'contain',
               flexShrink: 0
             }}
             onError={(e) => {
