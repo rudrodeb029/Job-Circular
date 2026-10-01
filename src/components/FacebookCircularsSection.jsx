@@ -4,98 +4,111 @@ import { normalizeMediaUrl } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import { getItemTimestamp } from '../utils/timeUtils';
 
-// Curated Luxury Color Palettes for High-End Aesthetic
-const LUXURY_PALETTES = {
-  bank: {
-    bg: 'linear-gradient(155deg, #021a14 0%, #064e3b 45%, #010d0a 100%)',
-    spotlight: 'rgba(16, 185, 129, 0.32)',
-    borderColor: 'rgba(52, 211, 153, 0.55)',
-    borderGlow: '0 0 14px rgba(16, 185, 129, 0.25)',
-    accent: '#34d399',
-    accentText: '#a7f3d0',
-    avatarRing: '#10b981',
-    ringGlow: '0 0 8px rgba(16, 185, 129, 0.6)',
-    tagBg: 'linear-gradient(135deg, #059669, #047857)',
-    tagBorder: 'rgba(52, 211, 153, 0.7)'
+// Soft, Modern Color Palettes matching the App's Design System
+const SOFT_PALETTES = {
+  blue: {
+    bg: 'linear-gradient(165deg, #eff6ff 0%, #e0edff 50%, #dbeafe 100%)',
+    borderColor: '#93c5fd',
+    borderGlow: '0 4px 16px rgba(37, 99, 235, 0.1)',
+    accent: '#1a56db',
+    titleColor: '#0f172a',
+    subText: '#334155',
+    emblemBg: '#ffffff',
+    emblemBorder: '#bfdbfe',
+    emblemShadow: '0 4px 12px rgba(26, 86, 219, 0.12)',
+    avatarRing: '#2563eb',
+    tagBg: 'linear-gradient(135deg, #1a56db, #2563eb)',
+    playColor: '#1a56db'
   },
-  gov: {
-    bg: 'linear-gradient(155deg, #031427 0%, #0a3a60 45%, #010a14 100%)',
-    spotlight: 'rgba(56, 189, 248, 0.32)',
-    borderColor: 'rgba(56, 189, 248, 0.55)',
-    borderGlow: '0 0 14px rgba(56, 189, 248, 0.25)',
-    accent: '#38bdf8',
-    accentText: '#bae6fd',
-    avatarRing: '#0284c7',
-    ringGlow: '0 0 8px rgba(56, 189, 248, 0.6)',
-    tagBg: 'linear-gradient(135deg, #0284c7, #0369a1)',
-    tagBorder: 'rgba(56, 189, 248, 0.7)'
+  emerald: {
+    bg: 'linear-gradient(165deg, #ecfdf5 0%, #e0fbf0 50%, #d1fae5 100%)',
+    borderColor: '#6ee7b7',
+    borderGlow: '0 4px 16px rgba(5, 150, 105, 0.1)',
+    accent: '#059669',
+    titleColor: '#064e3b',
+    subText: '#334155',
+    emblemBg: '#ffffff',
+    emblemBorder: '#a7f3d0',
+    emblemShadow: '0 4px 12px rgba(5, 150, 105, 0.12)',
+    avatarRing: '#059669',
+    tagBg: 'linear-gradient(135deg, #059669, #10b981)',
+    playColor: '#059669'
   },
-  defense: {
-    bg: 'linear-gradient(155deg, #280407 0%, #560812 45%, #140103 100%)',
-    spotlight: 'rgba(244, 63, 94, 0.32)',
-    borderColor: 'rgba(251, 113, 133, 0.55)',
-    borderGlow: '0 0 14px rgba(244, 63, 94, 0.25)',
-    accent: '#fb7185',
-    accentText: '#fecdd3',
+  amber: {
+    bg: 'linear-gradient(165deg, #fffbeb 0%, #fef7db 50%, #fef3c7 100%)',
+    borderColor: '#fcd34d',
+    borderGlow: '0 4px 16px rgba(217, 119, 6, 0.1)',
+    accent: '#d97706',
+    titleColor: '#78350f',
+    subText: '#334155',
+    emblemBg: '#ffffff',
+    emblemBorder: '#fde68a',
+    emblemShadow: '0 4px 12px rgba(217, 119, 6, 0.12)',
+    avatarRing: '#d97706',
+    tagBg: 'linear-gradient(135deg, #d97706, #f59e0b)',
+    playColor: '#d97706'
+  },
+  purple: {
+    bg: 'linear-gradient(165deg, #f5f3ff 0%, #ede6ff 50%, #ede9fe 100%)',
+    borderColor: '#c4b5fd',
+    borderGlow: '0 4px 16px rgba(124, 58, 237, 0.1)',
+    accent: '#7c3aed',
+    titleColor: '#4c1d95',
+    subText: '#334155',
+    emblemBg: '#ffffff',
+    emblemBorder: '#ddd6fe',
+    emblemShadow: '0 4px 12px rgba(124, 58, 237, 0.12)',
+    avatarRing: '#7c3aed',
+    tagBg: 'linear-gradient(135deg, #7c3aed, #8b5cf6)',
+    playColor: '#7c3aed'
+  },
+  rose: {
+    bg: 'linear-gradient(165deg, #fff1f2 0%, #ffe7ea 50%, #ffe4e6 100%)',
+    borderColor: '#fda4af',
+    borderGlow: '0 4px 16px rgba(225, 29, 72, 0.1)',
+    accent: '#e11d48',
+    titleColor: '#881337',
+    subText: '#334155',
+    emblemBg: '#ffffff',
+    emblemBorder: '#fecdd3',
+    emblemShadow: '0 4px 12px rgba(225, 29, 72, 0.12)',
     avatarRing: '#e11d48',
-    ringGlow: '0 0 8px rgba(244, 63, 94, 0.6)',
-    tagBg: 'linear-gradient(135deg, #e11d48, #9f1239)',
-    tagBorder: 'rgba(251, 113, 133, 0.7)'
+    tagBg: 'linear-gradient(135deg, #e11d48, #f43f5e)',
+    playColor: '#e11d48'
   },
-  teaching: {
-    bg: 'linear-gradient(155deg, #1d072e 0%, #48126b 45%, #0e0217 100%)',
-    spotlight: 'rgba(192, 132, 252, 0.32)',
-    borderColor: 'rgba(192, 132, 252, 0.55)',
-    borderGlow: '0 0 14px rgba(192, 132, 252, 0.25)',
-    accent: '#c084fc',
-    accentText: '#e9d5ff',
-    avatarRing: '#9333ea',
-    ringGlow: '0 0 8px rgba(192, 132, 252, 0.6)',
-    tagBg: 'linear-gradient(135deg, #9333ea, #6b21a8)',
-    tagBorder: 'rgba(192, 132, 252, 0.7)'
-  },
-  gold: {
-    bg: 'linear-gradient(155deg, #221502 0%, #462e05 45%, #110a01 100%)',
-    spotlight: 'rgba(251, 191, 36, 0.35)',
-    borderColor: 'rgba(251, 191, 36, 0.65)',
-    borderGlow: '0 0 14px rgba(251, 191, 36, 0.3)',
-    accent: '#fbbf24',
-    accentText: '#fef08a',
-    avatarRing: '#f59e0b',
-    ringGlow: '0 0 8px rgba(245, 158, 11, 0.7)',
-    tagBg: 'linear-gradient(135deg, #d97706, #b45309)',
-    tagBorder: 'rgba(254, 240, 138, 0.75)'
-  },
-  sapphire: {
-    bg: 'linear-gradient(155deg, #071e3d 0%, #10375c 45%, #030d1c 100%)',
-    spotlight: 'rgba(96, 165, 250, 0.3)',
-    borderColor: 'rgba(96, 165, 250, 0.55)',
-    borderGlow: '0 0 14px rgba(96, 165, 250, 0.25)',
-    accent: '#60a5fa',
-    accentText: '#bfdbfe',
-    avatarRing: '#3b82f6',
-    ringGlow: '0 0 8px rgba(59, 130, 246, 0.6)',
-    tagBg: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-    tagBorder: 'rgba(96, 165, 250, 0.7)'
+  cyan: {
+    bg: 'linear-gradient(165deg, #f0fdfa 0%, #e0faf5 50%, #ccfbf1 100%)',
+    borderColor: '#5eead4',
+    borderGlow: '0 4px 16px rgba(13, 148, 136, 0.1)',
+    accent: '#0d9488',
+    titleColor: '#134e4a',
+    subText: '#334155',
+    emblemBg: '#ffffff',
+    emblemBorder: '#99f6e4',
+    emblemShadow: '0 4px 12px rgba(13, 148, 136, 0.12)',
+    avatarRing: '#0d9488',
+    tagBg: 'linear-gradient(135deg, #0d9488, #14b8a6)',
+    playColor: '#0d9488'
   }
 };
 
-function resolveLuxuryTheme(job, index) {
+function resolveSoftPalette(job, index) {
   const cat = (job?.category || job?.categoryId || '').toLowerCase();
-  if (cat.includes('bank')) return LUXURY_PALETTES.bank;
-  if (cat.includes('defense') || cat.includes('police')) return LUXURY_PALETTES.defense;
-  if (cat.includes('teach') || cat.includes('education') || cat.includes('school')) return LUXURY_PALETTES.teaching;
-  if (cat.includes('gov')) return (index % 2 === 0) ? LUXURY_PALETTES.gov : LUXURY_PALETTES.gold;
-  
-  // Cycle through palettes for aesthetic diversity
-  const fallbackKeys = ['gold', 'sapphire', 'bank', 'gov', 'teaching', 'defense'];
-  return LUXURY_PALETTES[fallbackKeys[index % fallbackKeys.length]];
+  if (cat.includes('bank')) return SOFT_PALETTES.emerald;
+  if (cat.includes('defense') || cat.includes('police')) return SOFT_PALETTES.rose;
+  if (cat.includes('teach') || cat.includes('education') || cat.includes('school')) return SOFT_PALETTES.purple;
+  if (cat.includes('ngo') || cat.includes('private')) return SOFT_PALETTES.amber;
+  if (cat.includes('it') || cat.includes('tech') || cat.includes('engineer')) return SOFT_PALETTES.cyan;
+  if (cat.includes('gov')) return (index % 2 === 0) ? SOFT_PALETTES.blue : SOFT_PALETTES.cyan;
+
+  const keys = ['blue', 'emerald', 'amber', 'purple', 'rose', 'cyan'];
+  return SOFT_PALETTES[keys[index % keys.length]];
 }
 
 function StoryCard({ job, index, isEn, onClick }) {
   const [imgFailed, setImgFailed] = useState(false);
   const { icon: displayIcon } = getJobIconAndStyle(job);
-  const theme = resolveLuxuryTheme(job, index);
+  const theme = resolveSoftPalette(job, index);
 
   const rawOrg = isEn ? (job.organizationEn || job.organization) : job.organization;
   const orgName = typeof rawOrg === 'string' ? rawOrg : (rawOrg?.bn || rawOrg?.en || rawOrg?.name || '');
@@ -125,19 +138,19 @@ function StoryCard({ job, index, isEn, onClick }) {
         overflow: 'hidden',
         cursor: 'pointer',
         border: `1.5px solid ${theme.borderColor}`,
-        boxShadow: `0 8px 24px rgba(0, 0, 0, 0.3), ${theme.borderGlow}, inset 0 1px 1px rgba(255, 255, 255, 0.25)`,
+        boxShadow: `0 4px 16px rgba(0, 0, 0, 0.05), ${theme.borderGlow}`,
         flexShrink: 0,
         userSelect: 'none',
-        transition: 'transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.2s ease',
+        transition: 'transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease',
         background: theme.bg
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.boxShadow = `0 12px 28px rgba(0, 0, 0, 0.45), ${theme.borderGlow}`;
+        e.currentTarget.style.boxShadow = `0 8px 24px rgba(0, 0, 0, 0.1), ${theme.borderGlow}`;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = `0 8px 24px rgba(0, 0, 0, 0.3), ${theme.borderGlow}, inset 0 1px 1px rgba(255, 255, 255, 0.25)`;
+        e.currentTarget.style.boxShadow = `0 4px 16px rgba(0, 0, 0, 0.05), ${theme.borderGlow}`;
       }}
       onMouseDown={(e) => {
         e.currentTarget.style.transform = 'scale(0.96)';
@@ -146,22 +159,7 @@ function StoryCard({ job, index, isEn, onClick }) {
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
-      {/* ── Luxury Diagonal Glass Reflection / Gloss ── */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-45%',
-          left: '-45%',
-          width: '190%',
-          height: '110%',
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.03) 35%, transparent 65%)',
-          transform: 'rotate(-20deg)',
-          pointerEvents: 'none',
-          zIndex: 4
-        }}
-      />
-
-      {/* ── Background: Media Image OR Luxury 3D Glass Emblem ── */}
+      {/* ── Background Content ── */}
       {hasImage ? (
         <img
           src={mediaUrl}
@@ -188,70 +186,54 @@ function StoryCard({ job, index, isEn, onClick }) {
             justifyContent: 'center'
           }}
         >
-          {/* Ambient Spotlight Hotspot */}
+          {/* Soft Ambient Radial Tint */}
           <div
             style={{
               position: 'absolute',
-              top: '38%',
+              top: '36%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '110px',
-              height: '110px',
+              width: '90px',
+              height: '90px',
               borderRadius: '50%',
-              background: `radial-gradient(circle, ${theme.spotlight} 0%, transparent 70%)`,
+              background: `radial-gradient(circle, ${theme.borderColor} 0%, transparent 70%)`,
+              opacity: 0.5,
               pointerEvents: 'none'
             }}
           />
 
-          {/* Luxury 3D Glass Emblem with Outer Halo */}
+          {/* Crisp 3D Floating Squircle Emblem Tile */}
           <div
             style={{
               position: 'absolute',
               top: '38%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '64px',
-              height: '64px',
-              borderRadius: '50%',
-              border: `1px solid ${theme.borderColor}`,
-              background: 'rgba(255, 255, 255, 0.04)',
+              width: '48px',
+              height: '48px',
+              borderRadius: '13px',
+              background: theme.emblemBg,
+              border: `1.5px solid ${theme.emblemBorder}`,
+              boxShadow: theme.emblemShadow,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: `0 0 16px ${theme.spotlight}`
+              justifyContent: 'center'
             }}
           >
-            {/* Inner Frosted Glass Medallion */}
-            <div
+            <span
               style={{
-                width: '50px',
-                height: '50px',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 100%)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '1.5px solid rgba(255, 255, 255, 0.45)',
-                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.5), inset 0 1.5px 2px rgba(255, 255, 255, 0.6)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                fontSize: '24px',
+                filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08))',
+                transform: 'translateY(-1px)'
               }}
             >
-              <span
-                style={{
-                  fontSize: '25px',
-                  filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.65))',
-                  transform: 'translateY(-1px)'
-                }}
-              >
-                {displayIcon}
-              </span>
-            </div>
+              {displayIcon}
+            </span>
           </div>
         </div>
       )}
 
-      {/* ── Luxury Top-Left Play Badge ── */}
+      {/* ── Top-Left Frosted Play Badge ── */}
       <div
         style={{
           position: 'absolute',
@@ -260,23 +242,23 @@ function StoryCard({ job, index, isEn, onClick }) {
           width: '24px',
           height: '24px',
           borderRadius: '7px',
-          background: 'rgba(10, 15, 29, 0.65)',
+          background: 'rgba(255, 255, 255, 0.92)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
-          border: `1px solid ${theme.borderColor}`,
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+          border: '1px solid rgba(255, 255, 255, 0.95)',
+          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           zIndex: 5
         }}
       >
-        <svg width="10" height="10" viewBox="0 0 24 24" fill={theme.accent}>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill={theme.playColor}>
           <polygon points="6 4 20 12 6 20 6 4" />
         </svg>
       </div>
 
-      {/* ── Luxury Top-Right "NEW" Gemstone Tag ── */}
+      {/* ── Top-Right "NEW" Pill Tag ── */}
       {isNew && (
         <div
           style={{
@@ -290,8 +272,7 @@ function StoryCard({ job, index, isEn, onClick }) {
             fontSize: '8px',
             fontWeight: '800',
             letterSpacing: '0.4px',
-            border: `1px solid ${theme.tagBorder}`,
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4)',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.15)',
             zIndex: 5
           }}
         >
@@ -299,12 +280,14 @@ function StoryCard({ job, index, isEn, onClick }) {
         </div>
       )}
 
-      {/* ── Dark Vignette Gradient Overlay for High-Contrast Text Legibility ── */}
+      {/* ── Bottom Gradient Overlay ── */}
       <div
         style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.05) 30%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.96) 100%)',
+          background: hasImage
+            ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.05) 30%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.96) 100%)'
+            : 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 35%, rgba(255, 255, 255, 0.85) 65%, rgba(255, 255, 255, 0.98) 100%)',
           zIndex: 2
         }}
       />
@@ -326,7 +309,7 @@ function StoryCard({ job, index, isEn, onClick }) {
         {/* Circular Title (Post Name) */}
         <div
           style={{
-            color: '#ffffff',
+            color: hasImage ? '#ffffff' : theme.titleColor,
             fontSize: '10.5px',
             fontWeight: '700',
             lineHeight: '1.25',
@@ -335,7 +318,7 @@ function StoryCard({ job, index, isEn, onClick }) {
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            textShadow: '0 1px 3px rgba(0, 0, 0, 0.95)',
+            textShadow: hasImage ? '0 1px 3px rgba(0, 0, 0, 0.95)' : 'none',
             minHeight: '26px'
           }}
         >
@@ -350,20 +333,20 @@ function StoryCard({ job, index, isEn, onClick }) {
             gap: '5px'
           }}
         >
-          {/* Circular Avatar with Glowing Luxury Ring */}
+          {/* Circular Avatar with Accent Ring */}
           <div
             style={{
               width: '24px',
               height: '24px',
               borderRadius: '50%',
               border: `2px solid ${theme.avatarRing}`,
-              boxShadow: `${theme.ringGlow}, 0 0 0 1px rgba(255, 255, 255, 0.85)`,
+              boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
               overflow: 'hidden',
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: theme.bg
+              background: '#ffffff'
             }}
           >
             {hasImage ? (
@@ -380,14 +363,14 @@ function StoryCard({ job, index, isEn, onClick }) {
           {/* Organization Name */}
           <span
             style={{
-              color: '#ffffff',
+              color: hasImage ? '#ffffff' : theme.subText,
               fontSize: '10px',
               fontWeight: '600',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               maxWidth: '56px',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.95)'
+              textShadow: hasImage ? '0 1px 2px rgba(0, 0, 0, 0.95)' : 'none'
             }}
           >
             {orgName}
@@ -399,7 +382,7 @@ function StoryCard({ job, index, isEn, onClick }) {
             height="12"
             viewBox="0 0 24 24"
             fill="none"
-            style={{ flexShrink: 0, filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))' }}
+            style={{ flexShrink: 0 }}
           >
             <circle cx="12" cy="12" r="10" fill="#1877f2" />
             <path
