@@ -70,7 +70,10 @@ const BottomNav = () => {
         </svg>
       </div>
 
-      <NavLink to="/home" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+      <NavLink 
+        to="/home" 
+        className={({ isActive }) => `bottom-nav-item ${(isActive || location.pathname === '/') ? 'active' : ''}`}
+      >
         <Home size={24} />
       </NavLink>
 

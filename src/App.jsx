@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Routes, Route, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation, useNavigate, useNavigationType } from 'react-router-dom'
 import { App as CapacitorApp } from '@capacitor/app'
 import { Network } from '@capacitor/network'
 import { StatusBar, Style } from '@capacitor/status-bar'
@@ -343,7 +343,13 @@ function App() {
     prevPathRef.current = location.pathname;
   }, [location.pathname]);
 
+  const hasSeenOnboarding = state.hasSeenOnboarding || JSON.parse(localStorage.getItem('hasSeenOnboarding') || 'false');
   const isHomeOrFeed = location.pathname === '/' || location.pathname === '/home' || location.pathname === '/feed';
+
+  const isTabRoute = (
+    (location.pathname === '/' && hasSeenOnboarding) ||
+    ['/home', '/feed', '/saved', '/profile', '/notifications'].includes(location.pathname)
+  );
 
   return (
     <ErrorBoundary>
@@ -391,7 +397,7 @@ function App() {
 
         <Routes location={location}>
           <Route path="/" element={
-            JSON.parse(localStorage.getItem('hasSeenOnboarding') || 'false') ? <Home /> : <SplashScreen />
+            hasSeenOnboarding ? <Home /> : <SplashScreen />
           } />
           <Route path="/splash" element={<SplashScreen />} />
           <Route path="/onboarding" element={<Onboarding />} />
@@ -426,7 +432,7 @@ function App() {
         </Routes>
 
         {/* ═══ Phase 5: Centralized BottomNav — on 5 main tab pages ═══ */}
-        {['/home', '/feed', '/saved', '/profile', '/notifications'].includes(location.pathname) && !isOffline && (
+        {isTabRoute && (
           <BottomNav />
         )}
 
