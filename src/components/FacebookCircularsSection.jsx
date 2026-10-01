@@ -186,23 +186,7 @@ function StoryCard({ job, index, isEn, onClick }) {
             justifyContent: 'center'
           }}
         >
-          {/* Soft Ambient Radial Tint */}
-          <div
-            style={{
-              position: 'absolute',
-              top: '36%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '90px',
-              height: '90px',
-              borderRadius: '50%',
-              background: `radial-gradient(circle, ${theme.borderColor} 0%, transparent 70%)`,
-              opacity: 0.5,
-              pointerEvents: 'none'
-            }}
-          />
-
-          {/* App Transparent Icon in the Card's Middle */}
+          {/* App Transparent Icon in the Card's Middle (Seamless Multiply Blend) */}
           <div
             style={{
               position: 'absolute',
@@ -219,11 +203,10 @@ function StoryCard({ job, index, isEn, onClick }) {
               src="/app-logo.png"
               alt="Live Circular Logo"
               style={{
-                width: '54px',
-                height: '54px',
+                width: '52px',
+                height: '52px',
                 objectFit: 'contain',
-                opacity: 0.82,
-                filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08))'
+                mixBlendMode: 'multiply'
               }}
               onError={(e) => {
                 e.target.onerror = null;
