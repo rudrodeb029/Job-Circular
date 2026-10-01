@@ -202,33 +202,34 @@ function StoryCard({ job, index, isEn, onClick }) {
             }}
           />
 
-          {/* Crisp 3D Floating Squircle Emblem Tile */}
+          {/* App Transparent Icon in the Card's Middle */}
           <div
             style={{
               position: 'absolute',
               top: '38%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '48px',
-              height: '48px',
-              borderRadius: '13px',
-              background: theme.emblemBg,
-              border: `1.5px solid ${theme.emblemBorder}`,
-              boxShadow: theme.emblemShadow,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              pointerEvents: 'none'
             }}
           >
-            <span
+            <img
+              src="/app-logo.png"
+              alt="Live Circular Logo"
               style={{
-                fontSize: '24px',
-                filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.08))',
-                transform: 'translateY(-1px)'
+                width: '54px',
+                height: '54px',
+                objectFit: 'contain',
+                opacity: 0.82,
+                filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08))'
               }}
-            >
-              {displayIcon}
-            </span>
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+              }}
+            />
           </div>
         </div>
       )}
