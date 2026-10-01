@@ -404,7 +404,16 @@ export default function FacebookCircularsSection({ jobs = [], isEn = false }) {
       }}
     >
       {/* Horizontal Story Cards Carousel */}
+      <style>{`
+        .story-scroll-container::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
+          background: transparent !important;
+        }
+      `}</style>
       <div
+        className="no-scrollbar story-scroll-container"
         style={{
           display: 'flex',
           gap: '10px',

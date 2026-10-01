@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ExternalLink, ImageIcon, Lightbulb, Folder, MoreVertical } from './Icons';
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrl } from '../utils/mediaUtils';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 export default function FileDownloadModal({
   isOpen = false,
@@ -50,6 +52,24 @@ export default function FileDownloadModal({
     };
   }, [isOpen, fileUrl, fileName]);
 
+  useEffect(() => {
+    if (isOpen && Capacitor.isNativePlatform()) {
+      try {
+        StatusBar.setBackgroundColor({ color: '#1d4ed8' }).catch(() => {});
+        StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
+      } catch (e) {}
+    }
+    return () => {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+          StatusBar.setBackgroundColor({ color: isDark ? '#0f172a' : '#ffffff' }).catch(() => {});
+          StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light }).catch(() => {});
+        } catch (e) {}
+      }
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const displayFileName = `${fileName.replace(/[^a-zA-Z0-9_\u0980-\u09FF-]/g, '_')}.${fileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'}`;
@@ -67,13 +87,20 @@ export default function FileDownloadModal({
       display: 'flex',
       flexDirection: 'column',
       fontFamily: '"Hind Siliguri", sans-serif',
-      overflowY: 'auto'
+      overflowY: 'auto',
+      paddingBottom: 'calc(var(--safe-area-bottom, 0px) + 24px)',
+      boxSizing: 'border-box'
     }}>
       {/* 1. Header Bar */}
       <div style={{
         background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
         color: '#ffffff',
-        padding: '14px 16px',
+        paddingTop: 'calc(var(--safe-area-top, 24px) + 10px)',
+        paddingBottom: '14px',
+        paddingLeft: '16px',
+        paddingRight: '16px',
+        minHeight: 'calc(56px + var(--safe-area-top, 24px))',
+        boxSizing: 'border-box',
         display: 'flex',
         alignItems: 'center',
         gap: '12px',

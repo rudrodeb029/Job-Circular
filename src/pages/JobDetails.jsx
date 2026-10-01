@@ -158,7 +158,7 @@ export default function JobDetails() {
           }}
         >
           {/* Header for Zoom Viewer */}
-          <div style={{ position: 'absolute', top: '20px', left: '0', right: 0, display: 'flex', justifyContent: 'space-between', padding: '0 20px', alignItems: 'center' }}>
+          <div style={{ position: 'absolute', top: 'calc(var(--safe-area-top, 24px) + 12px)', left: '0', right: 0, display: 'flex', justifyContent: 'space-between', padding: '0 20px', alignItems: 'center' }}>
             <span style={{ color: 'white', fontSize: '14px', fontWeight: 800 }}>Page {activeImageIndex + 1} / {circularImages.length}</span>
             <button
               onClick={() => setShowFullImage(false)}
@@ -456,7 +456,7 @@ export default function JobDetails() {
 
             {/* Thumbnail Strip / Page Selector Tabs */}
             {circularImages.length > 1 && (
-              <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
+              <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
                 {circularImages.map((img, idx) => (
                   <button
                     key={idx}

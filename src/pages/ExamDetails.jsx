@@ -449,7 +449,7 @@ export default function ExamDetails() {
 
           {/* Thumbnail Strip / Page Selector Tabs */}
           {circularImages.length > 1 && (
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px' }}>
+            <div className="no-scrollbar" style={{ display: 'flex', gap: '8px', marginTop: '12px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none' }}>
               {circularImages.map((img, idx) => (
                 <button
                   key={idx}

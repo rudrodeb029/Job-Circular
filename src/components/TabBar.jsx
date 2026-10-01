@@ -2,7 +2,7 @@ import React from 'react';
 
 const TabBar = ({ tabs, activeTab, onTabChange }) => {
   return (
-    <div className="tabs" style={{ display: 'flex', overflowX: 'auto', paddingBottom: '8px', borderBottom: '1px solid #eee', scrollbarWidth: 'none' }}>
+    <div className="tabs no-scrollbar" style={{ display: 'flex', overflowX: 'auto', paddingBottom: '8px', borderBottom: '1px solid #eee', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
       {tabs.map(tab => (
         <button
           key={tab.id}
