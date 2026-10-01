@@ -120,17 +120,17 @@ async function run() {
   console.log('✔ Saved public/app-logo.png, public/app-logo-transparent.png, src/assets/app-logo.png (512x512 transparent)');
 
   // Solid app icon (512x512) for PWA homescreen and notifications
-  const appIconSolid512 = await makeCenteredSolidLogo(512, 0.78);
+  const appIconSolid512 = await makeCenteredSolidLogo(512, 0.70);
   safeWriteFileSync(path.join(PUBLIC_DIR, 'app-icon.png'), appIconSolid512);
   safeWriteFileSync(path.join(ASSETS_DIR, 'app-icon.png'), appIconSolid512);
   safeWriteFileSync(path.join(PUBLIC_DIR, 'logo512.png'), appIconSolid512);
   console.log('✔ Saved public/app-icon.png, src/assets/app-icon.png, public/logo512.png (512x512 solid)');
 
   // Scaled Web Icons
-  const appIconSolid192 = await makeCenteredSolidLogo(192, 0.78);
+  const appIconSolid192 = await makeCenteredSolidLogo(192, 0.70);
   safeWriteFileSync(path.join(PUBLIC_DIR, 'logo192.png'), appIconSolid192);
 
-  const appleTouchIcon180 = await makeCenteredSolidLogo(180, 0.78);
+  const appleTouchIcon180 = await makeCenteredSolidLogo(180, 0.70);
   safeWriteFileSync(path.join(PUBLIC_DIR, 'apple-touch-icon.png'), appleTouchIcon180);
 
   const favicon64 = await makeCenteredSolidLogo(64, 0.80);
@@ -164,11 +164,11 @@ async function run() {
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
 
     // A. ic_launcher.png (Legacy square launcher icon with solid white background)
-    const icLauncherBuf = await makeCenteredSolidLogo(cfg.launcherSize, 0.80);
+    const icLauncherBuf = await makeCenteredSolidLogo(cfg.launcherSize, 0.70);
     safeWriteFileSync(path.join(targetDir, 'ic_launcher.png'), icLauncherBuf);
 
     // B. ic_launcher_round.png (Circular masked launcher icon)
-    const icLauncherRoundBuf = await makeCenteredRoundLogo(cfg.launcherSize, 0.72);
+    const icLauncherRoundBuf = await makeCenteredRoundLogo(cfg.launcherSize, 0.64);
     safeWriteFileSync(path.join(targetDir, 'ic_launcher_round.png'), icLauncherRoundBuf);
 
     // C. ic_launcher_background.png (Solid white background layer for adaptive icon)
@@ -182,8 +182,8 @@ async function run() {
     }).png().toBuffer();
     safeWriteFileSync(path.join(targetDir, 'ic_launcher_background.png'), bgBuf);
 
-    // D. ic_launcher_foreground.png (Adaptive foreground with safe zone: 66% scale)
-    const fgBuf = await makeCenteredTransparentLogo(cfg.foregroundSize, 0.66);
+    // D. ic_launcher_foreground.png (Adaptive foreground: 48% scale of 108dp canvas = ~52dp inside 72dp squircle viewport)
+    const fgBuf = await makeCenteredTransparentLogo(cfg.foregroundSize, 0.48);
     safeWriteFileSync(path.join(targetDir, 'ic_launcher_foreground.png'), fgBuf);
 
     console.log(`✔ ${cfg.folder}: launcher (${cfg.launcherSize}x${cfg.launcherSize}), adaptive (${cfg.foregroundSize}x${cfg.foregroundSize})`);
@@ -193,8 +193,8 @@ async function run() {
   console.log('\n🎨 4. Generating Android Drawables & Splash Assets...');
   const drawableDir = path.join(RES_DIR, 'drawable');
   if (fs.existsSync(drawableDir)) {
-    // Adaptive foreground in drawable (432x432)
-    const drawableFgBuf = await makeCenteredTransparentLogo(432, 0.66);
+    // Adaptive foreground in drawable (432x432, 48% scale)
+    const drawableFgBuf = await makeCenteredTransparentLogo(432, 0.48);
     safeWriteFileSync(path.join(drawableDir, 'ic_launcher_foreground.png'), drawableFgBuf);
 
     // Native Splash Screen transparent logos (512x512)
