@@ -1,8 +1,7 @@
 import { getGoogleDriveFileId, isGoogleDriveUrl, normalizeMediaUrl } from './mediaUtils';
 
 /**
- * Triggers in-memory download via Blob URL or Data URL.
- * NEVER navigates the webview or opens external browser.
+ * Triggers in-memory download via Blob URL, Data URL, or direct URL.
  */
 function triggerBlobOrDataDownload(dataOrBlobUrl, fileName) {
   try {
@@ -26,7 +25,32 @@ function triggerBlobOrDataDownload(dataOrBlobUrl, fileName) {
 }
 
 /**
- * Loads an image via Canvas and downloads it as an in-memory PNG blob/dataUrl.
+ * Converts a Blob to a base64 Data URL and triggers download.
+ * In Android Capacitor, data URLs are caught by MainActivity to write directly to Downloads folder.
+ */
+function triggerBase64Download(blob, fileName) {
+  return new Promise((resolve) => {
+    try {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const dataUrl = reader.result;
+        if (typeof dataUrl === 'string' && dataUrl.startsWith('data:')) {
+          triggerBlobOrDataDownload(dataUrl, fileName);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      };
+      reader.onerror = () => resolve(false);
+      reader.readAsDataURL(blob);
+    } catch (e) {
+      resolve(false);
+    }
+  });
+}
+
+/**
+ * Loads an image via Canvas and downloads it as an in-memory PNG dataUrl/blob.
  */
 function canvasDownloadImage(imageUrl, fileName) {
   return new Promise((resolve) => {
@@ -41,19 +65,23 @@ function canvasDownloadImage(imageUrl, fileName) {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0);
 
+          try {
+            const dataUrl = canvas.toDataURL('image/png');
+            triggerBlobOrDataDownload(dataUrl, fileName);
+            resolve(true);
+            return;
+          } catch (dataUrlErr) {
+            // fallback to blob
+          }
+
           canvas.toBlob((blob) => {
             if (blob) {
+              triggerBase64Download(blob, fileName);
               const blobUrl = URL.createObjectURL(blob);
               triggerBlobOrDataDownload(blobUrl, fileName);
               resolve(true);
             } else {
-              try {
-                const dataUrl = canvas.toDataURL('image/png');
-                triggerBlobOrDataDownload(dataUrl, fileName);
-                resolve(true);
-              } catch (e2) {
-                resolve(false);
-              }
+              resolve(false);
             }
           }, 'image/png');
         } catch (e) {
@@ -73,7 +101,7 @@ function canvasDownloadImage(imageUrl, fileName) {
 
 /**
  * High-speed secure file downloader for notice images and PDFs.
- * 100% in-app execution — NEVER redirects or kicks user out to an external browser.
+ * Works natively on Android via DownloadManager & Base64 storage, and on Web via direct stream.
  * 
  * @param {string} fileUrl - The source URL of the image or PDF
  * @param {string} baseFileName - Desired file name without extension
@@ -91,7 +119,12 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
 
   // 1. Handle Google Drive URLs
   if (driveId) {
-    // For images, Google's lh3 CDN supports direct cross-origin image streams
+    const driveDownloadUrl = `https://drive.usercontent.google.com/download?id=${driveId}&export=download`;
+    const driveAltUrl = `https://drive.google.com/uc?export=download&id=${driveId}`;
+
+    // On Native Android, trigger the direct download URL so Android DownloadManager queues it
+    triggerBlobOrDataDownload(driveDownloadUrl, `${sanitizedFileName}.${isExplicitPdf ? 'pdf' : 'png'}`);
+
     if (!isExplicitPdf) {
       const lh3Url = `https://lh3.googleusercontent.com/d/${driveId}`;
       const canvasSuccess = await canvasDownloadImage(lh3Url, `${sanitizedFileName}.png`);
@@ -102,14 +135,13 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
       if (thumbSuccess) return true;
     }
 
-    // Try direct in-memory fetch for Google Drive original stream
     try {
-      const driveDownloadUrl = `https://drive.usercontent.google.com/download?id=${driveId}&export=download`;
       const response = await fetch(driveDownloadUrl, { method: 'GET', mode: 'cors', cache: 'no-cache' });
       if (response.ok) {
         const blob = await response.blob();
         const mimeType = (blob.type || '').toLowerCase();
         let ext = isExplicitPdf || mimeType.includes('pdf') ? 'pdf' : (mimeType.includes('jpeg') || mimeType.includes('jpg') ? 'jpg' : 'png');
+        await triggerBase64Download(blob, `${sanitizedFileName}.${ext}`);
         const blobUrl = URL.createObjectURL(blob);
         triggerBlobOrDataDownload(blobUrl, `${sanitizedFileName}.${ext}`);
         return true;
@@ -118,14 +150,22 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
       console.warn('Google Drive direct fetch error:', gErr);
     }
 
-    // If fetch had CORS on Drive, do NOT open browser; complete gracefully in-app
     return true;
   }
 
   // 2. Standard direct / Cloudinary / CDN download
   const normalizedUrl = normalizeMediaUrl(fileUrl);
+  let ext = isExplicitPdf || normalizedUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png';
+  if (normalizedUrl.toLowerCase().includes('.jpg') || normalizedUrl.toLowerCase().includes('.jpeg')) {
+    ext = 'jpg';
+  } else if (normalizedUrl.toLowerCase().includes('.webp')) {
+    ext = 'webp';
+  }
 
-  // Try direct in-memory blob fetch first
+  // Trigger direct download via DownloadManager / browser
+  triggerBlobOrDataDownload(normalizedUrl, `${sanitizedFileName}.${ext}`);
+
+  // Also fetch and trigger base64 / blob download for complete guarantee
   try {
     const response = await fetch(normalizedUrl, {
       method: 'GET',
@@ -136,30 +176,24 @@ export async function downloadSecurely(fileUrl, baseFileName = 'Job_Circular_Not
     if (response.ok) {
       const blob = await response.blob();
       const mimeType = (blob.type || '').toLowerCase();
-      let extension = 'png';
-      if (mimeType.includes('pdf') || normalizedUrl.toLowerCase().includes('.pdf') || isExplicitPdf) {
-        extension = 'pdf';
-      } else if (mimeType.includes('jpeg') || mimeType.includes('jpg') || normalizedUrl.toLowerCase().includes('.jpg')) {
-        extension = 'jpg';
-      } else if (mimeType.includes('webp')) {
-        extension = 'webp';
-      }
+      if (mimeType.includes('pdf')) ext = 'pdf';
+      else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = 'jpg';
+      else if (mimeType.includes('webp')) ext = 'webp';
 
+      await triggerBase64Download(blob, `${sanitizedFileName}.${ext}`);
       const blobUrl = URL.createObjectURL(blob);
-      triggerBlobOrDataDownload(blobUrl, `${sanitizedFileName}.${extension}`);
+      triggerBlobOrDataDownload(blobUrl, `${sanitizedFileName}.${ext}`);
       return true;
     }
   } catch (fetchErr) {
-    console.warn('Direct fetch failed, falling back to Canvas rendering:', fetchErr);
+    console.warn('Direct fetch failed, falling back to Canvas:', fetchErr);
   }
 
-  // 3. Fallback: Canvas to PNG for images
+  // Fallback: Canvas to PNG for images
   if (!isExplicitPdf) {
     const canvasSuccess = await canvasDownloadImage(normalizedUrl, `${sanitizedFileName}.png`);
     if (canvasSuccess) return true;
   }
 
-  // Note: We deliberately avoid setting anchor.href to external URL or window.open
-  // to ensure user stays 100% inside the app.
   return true;
 }

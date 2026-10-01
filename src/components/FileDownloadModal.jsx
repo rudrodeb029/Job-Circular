@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, ExternalLink, ImageIcon, Lightbulb, Folder, MoreVertical, Eye, X } from './Icons';
+import { ArrowLeft, ExternalLink, ImageIcon, Lightbulb, Folder, MoreVertical } from './Icons';
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrl } from '../utils/mediaUtils';
 
@@ -12,7 +12,6 @@ export default function FileDownloadModal({
 }) {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('downloading'); // 'downloading' | 'completed' | 'error'
-  const [showFullPreview, setShowFullPreview] = useState(false);
 
   useEffect(() => {
     let progressTimer;
@@ -276,30 +275,6 @@ export default function FileDownloadModal({
           </div>
         </div>
 
-        {/* In-App Notice View Button (Stays 100% inside app) */}
-        {previewImageUrl && (
-          <button
-            onClick={() => setShowFullPreview(true)}
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              borderRadius: '12px',
-              background: '#eff6ff',
-              border: '1.5px solid #bfdbfe',
-              color: '#1d4ed8',
-              fontSize: '13px',
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              cursor: 'pointer'
-            }}
-          >
-            <Eye size={18} color="#1d4ed8" />
-            <span>অ্যাপে সরাসরি সার্কুলার / ফাইলটি দেখুন</span>
-          </button>
-        )}
 
         {/* 4. Card 2: Tips & Guidelines Card ("কিছু গুরুত্বপূর্ণ টিপস") */}
         <div style={{
@@ -349,7 +324,7 @@ export default function FileDownloadModal({
                 1
               </div>
               <p style={{ margin: 0, fontSize: '11px', color: '#334155', fontWeight: 600, lineHeight: 1.4 }}>
-                ডাউনলোডকৃত ফাইলটি দেখতে চাইলে সরাসরি এখান থেকে ওপেন করতে পারেন।
+                ডাউনলোড সম্পন্ন হলে ডিভাইসের ডাউনলোড ফোল্ডারে ফাইলটি দেখতে পাবেন।
               </p>
             </div>
 
@@ -393,7 +368,7 @@ export default function FileDownloadModal({
                 3
               </div>
               <p style={{ margin: 0, fontSize: '11px', color: '#334155', fontWeight: 600, lineHeight: 1.4 }}>
-                এছাড়াও ফাইল ম্যানেজার বা ডাউনলোড ফোল্ডার থেকেও সরাসরি ফাইলটি ওপেন করা যাবে।
+                এছাড়াও ফাইল ম্যানেজার বা গ্যালারি থেকেও সরাসরি ফাইলটি ওপেন করা যাবে।
               </p>
             </div>
           </div>
@@ -416,67 +391,6 @@ export default function FileDownloadModal({
         </div>
 
       </div>
-
-      {/* FULL SCREEN IN-APP ZOOM PREVIEW (Never opens browser) */}
-      {showFullPreview && (
-        <div
-          onClick={() => setShowFullPreview(false)}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(0,0,0,0.95)',
-            zIndex: 100000,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '16px'
-          }}
-        >
-          <div style={{
-            position: 'absolute',
-            top: '16px',
-            right: '16px',
-            zIndex: 100001
-          }}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowFullPreview(false);
-              }}
-              style={{
-                background: 'rgba(255, 255, 255, 0.25)',
-                border: 'none',
-                color: '#ffffff',
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer'
-              }}
-            >
-              <X size={22} color="#ffffff" />
-            </button>
-          </div>
-          <img
-            src={previewImageUrl}
-            alt={displayFileName}
-            style={{
-              maxWidth: '100%',
-              maxHeight: '90vh',
-              objectFit: 'contain',
-              borderRadius: '8px',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.5)'
-            }}
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
     </div>
   );
 }
