@@ -7,6 +7,7 @@ import SearchBar from '../components/SearchBar';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { formatTimeAgo } from '../utils/timeUtils';
+import { stripHtmlTags } from '../utils/textUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -140,8 +141,8 @@ export default function AdmitCardResult() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {searchedItems.map(item => {
               const displayIcon = orgIconsMap[item.organization] || '🏛️';
-              const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
-              const examName = isEn ? (item.examNameEn || item.examName) : item.examName;
+              const orgName = stripHtmlTags(isEn ? (item.organizationEn || item.organization) : item.organization);
+              const examName = stripHtmlTags(isEn ? (item.examNameEn || item.examName) : item.examName);
               const itemDate = isEn ? (item.dateEn || item.date) : item.date;
 
               if (activeTab === 'admit_card') {

@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { formatTimeAgo } from '../utils/timeUtils';
 import { normalizeMediaUrl, getGoogleDriveFileId } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
+import { stripHtmlTags } from '../utils/textUtils';
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
   const engNum = String(num);
@@ -33,17 +34,17 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
 
   const isEn = state.language === 'en';
   const rawOrg = isEn ? (job.organizationEn || job.organization) : job.organization;
-  const orgName = typeof rawOrg === 'string' ? rawOrg : (rawOrg && typeof rawOrg === 'object' ? (rawOrg.bn || rawOrg.en || rawOrg.name || '') : String(rawOrg || ''));
+  const orgName = stripHtmlTags(rawOrg);
 
   const rawTitle = isEn ? (job.titleEn || job.title) : job.title;
-  const titleName = typeof rawTitle === 'string' ? rawTitle : (rawTitle && typeof rawTitle === 'object' ? (rawTitle.bn || rawTitle.en || rawTitle.title || '') : String(rawTitle || ''));
+  const titleName = stripHtmlTags(rawTitle);
   
   const descriptionSentence = isEn
     ? `Recruitment notice published for the post of ${titleName}${job.vacancy ? ` (${job.vacancy} vacancies)` : ''}. Apply today!`
     : `${titleName} পদে ${job.vacancy ? `${toBengaliNumber(job.vacancy)} জনের ` : ''}নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে। আজই আবেদন করুন।`;
 
-  const rawDesc = job.description || descriptionSentence;
-  const displayDesc = typeof rawDesc === 'string' ? rawDesc : (rawDesc && typeof rawDesc === 'object' ? (rawDesc.bn || rawDesc.en || '') : String(rawDesc || ''));
+  const cleanDescription = job.description ? stripHtmlTags(job.description) : '';
+  const displayDesc = cleanDescription || descriptionSentence;
 
   const handleBookmark = (e) => {
     e.stopPropagation();

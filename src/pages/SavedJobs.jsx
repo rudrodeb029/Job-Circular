@@ -9,6 +9,7 @@ import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
 import { jobs } from '../data/jobs';
 import { formatTimeAgo } from '../utils/timeUtils';
+import { stripHtmlTags } from '../utils/textUtils';
 
 const categoryStyles = {
   gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.3)', defaultIcon: '🏛️' },
@@ -159,8 +160,8 @@ export default function SavedJobs() {
                 const isSaved = state.savedJobs.includes(job.id);
 
                 const isEn = state.language === 'en';
-                const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
-                const titleName = isEn ? (job.titleEn || job.title) : job.title;
+                const orgName = stripHtmlTags(isEn ? (job.organizationEn || job.organization) : job.organization);
+                const titleName = stripHtmlTags(isEn ? (job.titleEn || job.title) : job.title);
                 
                 const descriptionSentence = isEn
                   ? `Written/Viva exam result published for the post of ${titleName}. View result now!`
@@ -247,8 +248,8 @@ export default function SavedJobs() {
                 const isSaved = state.savedJobs.includes(job.id);
 
                 const isEn = state.language === 'en';
-                const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
-                const titleName = isEn ? (job.titleEn || job.title) : job.title;
+                const orgName = stripHtmlTags(isEn ? (job.organizationEn || job.organization) : job.organization);
+                const titleName = stripHtmlTags(isEn ? (job.titleEn || job.title) : job.title);
                 
                 const descriptionSentence = isEn
                   ? `Exam date published for the post of ${titleName}.`

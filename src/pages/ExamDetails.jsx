@@ -13,6 +13,7 @@ import ProgressiveImage from '../components/ProgressiveImage';
 import PortalWarningModal from '../components/PortalWarningModal';
 import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
+import { stripHtmlTags } from '../utils/textUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -140,7 +141,8 @@ export default function ExamDetails() {
       return;
     }
 
-    const name = `${job.organization || 'Exam'}_Notice_Page_${activeImageIndex + 1}`;
+    const cleanOrg = stripHtmlTags(job.organization || 'Exam');
+    const name = `${cleanOrg}_Notice_Page_${activeImageIndex + 1}`;
     setDownloadUrl(rawFileUrl);
     setDownloadFileName(name);
     setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
@@ -210,7 +212,7 @@ export default function ExamDetails() {
             {displayIcon}
           </div>
           <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0' }}>
-            {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
+            {stripHtmlTags(state.language === 'en' ? (job.organizationEn || job.organization) : job.organization)}
           </h2>
         </div>
 

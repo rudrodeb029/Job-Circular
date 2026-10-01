@@ -6,6 +6,7 @@ import { CLOUDINARY_CONFIG } from '../../cloudinary';
 import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
 import { normalizeMediaUrl, getGoogleDriveFileId } from '../../utils/mediaUtils';
 import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
+import { stripHtmlTags, sanitizeRichHtml } from '../../utils/textUtils';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -206,6 +207,8 @@ export default function ManageJobs() {
       setEditingJob(job);
       setFormData({
         ...job,
+        organization: stripHtmlTags(job.organization || ''),
+        organizationEn: stripHtmlTags(job.organizationEn || ''),
         showInExamDate: job.showInExamDate ?? !!job.examDate,
         showInResult: job.showInResult ?? !!job.examResult,
         linkedCircularId: job.linkedCircularId || '',
@@ -247,12 +250,20 @@ export default function ManageJobs() {
       ? editingJob.id 
       : (formData.linkedCircularId ? formData.linkedCircularId : `job_${Date.now()}`);
 
-    const jobTitle = formData.organization || 'নিয়োগ বিজ্ঞপ্তি';
+    const cleanOrg = stripHtmlTags(formData.organization).trim();
+    const cleanOrgEn = stripHtmlTags(formData.organizationEn).trim();
+    const cleanDesc = sanitizeRichHtml(formData.description);
+    const jobTitle = cleanOrg || 'নিয়োগ বিজ্ঞপ্তি';
+    const jobTitleEn = cleanOrgEn || jobTitle;
+
     const jobData = {
       ...formData,
       id: targetId,
+      organization: cleanOrg,
+      organizationEn: cleanOrgEn,
       title: jobTitle,
-      titleEn: formData.organizationEn || jobTitle,
+      titleEn: jobTitleEn,
+      description: cleanDesc,
       showInExamDate: !!formData.showInExamDate,
       showInResult: !!formData.showInResult,
       examDate: finalExamDate,
@@ -288,10 +299,10 @@ export default function ManageJobs() {
       const admitData = {
         id: admitId,
         jobId: targetId,
-        examName: `${formData.organization} পরীক্ষার তারিখ`,
-        examNameEn: `${formData.organizationEn || formData.organization} Exam Date`,
-        organization: formData.organization,
-        organizationEn: formData.organizationEn || formData.organization,
+        examName: `${cleanOrg} পরীক্ষার তারিখ`,
+        examNameEn: `${cleanOrgEn || cleanOrg} Exam Date`,
+        organization: cleanOrg,
+        organizationEn: cleanOrgEn || cleanOrg,
         category: formData.categoryId,
         type: 'admit_card',
         status: 'পরীক্ষার তারিখ প্রকাশিত',
@@ -312,10 +323,10 @@ export default function ManageJobs() {
       const resultData = {
         id: resultId,
         jobId: targetId,
-        examName: `${formData.organization} পরীক্ষার ফলাফল`,
-        examNameEn: `${formData.organizationEn || formData.organization} Exam Result`,
-        organization: formData.organization,
-        organizationEn: formData.organizationEn || formData.organization,
+        examName: `${cleanOrg} পরীক্ষার ফলাফল`,
+        examNameEn: `${cleanOrgEn || cleanOrg} Exam Result`,
+        organization: cleanOrg,
+        organizationEn: cleanOrgEn || cleanOrg,
         category: formData.categoryId,
         type: 'result',
         status: 'ফলাফল প্রকাশিত',
@@ -443,9 +454,30 @@ export default function ManageJobs() {
           </div>
 
           <form onSubmit={handleSaveJob} style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
-            <div className="input-group">
-               <label>Organization (Bengali)</label>
-               <RichInput value={formData.organization} onChange={val => setFormData(prev => ({ ...prev, organization: val }))} placeholder="যেমন: বাংলাদেশ সেনাবাহিনী" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              <div className="input-group">
+                 <label>Organization (Bengali)</label>
+                 <input
+                   type="text"
+                   name="organization"
+                   className="modern-input"
+                   value={formData.organization}
+                   onChange={handleInputChange}
+                   placeholder="যেমন: বাংলাদেশ পল্লী বিদ্যুতায়ন বোর্ড"
+                   required
+                 />
+              </div>
+              <div className="input-group">
+                 <label>Organization (English - Optional)</label>
+                 <input
+                   type="text"
+                   name="organizationEn"
+                   className="modern-input"
+                   value={formData.organizationEn}
+                   onChange={handleInputChange}
+                   placeholder="e.g. Bangladesh Rural Electrification Board"
+                 />
+              </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
               <div className="input-group">

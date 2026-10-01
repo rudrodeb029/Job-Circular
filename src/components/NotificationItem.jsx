@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Clock, Calendar } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { formatTimeAgo } from '../utils/timeUtils';
+import { stripHtmlTags } from '../utils/textUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -88,10 +89,10 @@ function NotificationItem({ notification }) {
     ? (notification.organizationEn || notification.organization || notification.titleEn || notification.title) 
     : (notification.organization || notification.title || notification.organizationEn || notification.titleEn);
 
-  const orgName = typeof rawOrg === 'string' ? rawOrg : (rawOrg && typeof rawOrg === 'object' ? (rawOrg.bn || rawOrg.en || rawOrg.name || '') : String(rawOrg || ''));
+  const orgName = stripHtmlTags(rawOrg);
 
   const rawMsg = isEn ? (notification.messageEn || notification.message) : notification.message;
-  const notifMessage = typeof rawMsg === 'string' ? rawMsg : (rawMsg && typeof rawMsg === 'object' ? (rawMsg.bn || rawMsg.en || '') : String(rawMsg || ''));
+  const notifMessage = stripHtmlTags(rawMsg);
 
   const getNotifIcon = () => {
     if (orgName && orgIconsMap[orgName]) return orgIconsMap[orgName];

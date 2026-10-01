@@ -13,6 +13,7 @@ import ProgressiveImage from '../components/ProgressiveImage';
 import PortalWarningModal from '../components/PortalWarningModal';
 import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
+import { stripHtmlTags } from '../utils/textUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -128,7 +129,8 @@ export default function ResultDetails() {
       handleViewResult();
       return;
     }
-    const name = `${job.organization || 'Result'}_Notice_Page_${activeImageIndex + 1}`;
+    const cleanOrg = stripHtmlTags(job.organization || 'Result');
+    const name = `${cleanOrg}_Notice_Page_${activeImageIndex + 1}`;
     setDownloadUrl(rawFileUrl);
     setDownloadFileName(name);
     setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
@@ -140,8 +142,8 @@ export default function ResultDetails() {
   };
 
   // Build bilingual strings
-  const orgName = isEn ? (job.organizationEn || job.organization) : job.organization;
-  const postName = isEn ? (job.titleEn || job.title) : job.title;
+  const orgName = stripHtmlTags(isEn ? (job.organizationEn || job.organization) : job.organization);
+  const postName = stripHtmlTags(isEn ? (job.titleEn || job.title) : job.title);
 
   return (
     <div className="page" style={{ paddingBottom: '100px' }}>

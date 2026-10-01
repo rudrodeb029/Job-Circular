@@ -274,12 +274,19 @@ export function RichInput({ value = '', onChange, placeholder = '', className = 
     }
   };
 
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData)?.getData('text/plain') || '';
+    document.execCommand('insertText', false, text);
+  };
+
   return (
     <div
       ref={ref}
       contentEditable
       onInput={handleInput}
       onKeyDown={handleKeyDown}
+      onPaste={handlePaste}
       data-placeholder={placeholder}
       className={`modern-input ${className}`}
       style={{

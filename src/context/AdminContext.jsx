@@ -13,6 +13,7 @@ import {
 } from '../services/supabaseService';
 
 import { getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
+import { stripHtmlTags } from '../utils/textUtils';
 import { auth } from '../firebase';
 
 const AdminContext = createContext();
@@ -139,16 +140,18 @@ const adminReducer = (state, action) => {
               type = 'admit_card';
           }
 
-          // Push Notification Title: Organization name strictly
-          const pushTitle = job.organization || 'নিয়োগ বিজ্ঞপ্তি';
-          // Push Notification Body: Description strictly (or clean fallback if description is empty)
-          const pushMsg = (job.description && job.description.trim())
-            ? job.description.trim()
+          // Push Notification Title: Clean organization name strictly
+          const cleanOrg = stripHtmlTags(job.organization);
+          const pushTitle = cleanOrg || 'নিয়োগ বিজ্ঞপ্তি';
+          // Push Notification Body: Clean description strictly (or clean fallback if description is empty)
+          const cleanDesc = stripHtmlTags(job.description);
+          const pushMsg = cleanDesc
+            ? cleanDesc
             : (type === 'result'
-                ? `${job.organization} -এর পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`
+                ? `${pushTitle} -এর পরীক্ষার ফলাফল প্রকাশিত হয়েছে।`
                 : type === 'admit_card'
-                ? `${job.organization} -এর পরীক্ষার তারিখ প্রকাশিত হয়েছে।`
-                : `${job.organization} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে।`);
+                ? `${pushTitle} -এর পরীক্ষার তারিখ প্রকাশিত হয়েছে।`
+                : `${pushTitle} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে।`);
 
           broadcastPush(pushTitle, pushMsg, { jobId: job.id, type: type })
               .then(res => {
@@ -165,7 +168,7 @@ const adminReducer = (state, action) => {
           const notifObj = {
             id: notifId,
             title: pushTitle,
-            organization: job.organization || '',
+            organization: cleanOrg || '',
             message: pushMsg,
             type: type,
             jobId: job.id,

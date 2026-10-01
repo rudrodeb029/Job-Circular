@@ -12,6 +12,7 @@ import ProgressiveImage from '../components/ProgressiveImage';
 import PortalWarningModal from '../components/PortalWarningModal';
 import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
+import { stripHtmlTags } from '../utils/textUtils';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -87,8 +88,10 @@ export default function JobDetails() {
   const isSaved = state.savedJobs.includes(job.id);
   const isApplied = state.appliedJobs.includes(job.id);
   const isEn = state.language === 'en';
-  const orgName = isEn ? (job.organizationEn || job.organization) : (job.organization || job.title);
-  const titleName = isEn ? (job.titleEn || job.title) : (job.title || job.organization);
+  const rawOrg = isEn ? (job.organizationEn || job.organization) : (job.organization || job.title);
+  const rawTitle = isEn ? (job.titleEn || job.title) : (job.title || job.organization);
+  const orgName = stripHtmlTags(rawOrg);
+  const titleName = stripHtmlTags(rawTitle);
 
   const { icon: displayIcon, style: styleConfig } = getJobIconAndStyle(job);
 
@@ -237,7 +240,7 @@ export default function JobDetails() {
             {displayIcon}
           </div>
           <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>
-            {state.language === 'en' ? (job.organizationEn || job.organization) : job.organization}
+            {orgName}
           </h2>
 
           {/* Chips Row: Job Type + Deadline Badge */}

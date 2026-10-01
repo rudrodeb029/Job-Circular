@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { normalizeMediaUrl } from '../utils/mediaUtils';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import { getItemTimestamp } from '../utils/timeUtils';
+import { stripHtmlTags } from '../utils/textUtils';
 
 // Soft, Modern Color Palettes matching the App's Design System
 const SOFT_PALETTES = {
@@ -111,10 +112,10 @@ function StoryCard({ job, index, isEn, onClick }) {
   const theme = resolveSoftPalette(job, index);
 
   const rawOrg = isEn ? (job.organizationEn || job.organization) : job.organization;
-  const orgName = typeof rawOrg === 'string' ? rawOrg : (rawOrg?.bn || rawOrg?.en || rawOrg?.name || '');
+  const orgName = stripHtmlTags(rawOrg);
 
   const rawTitle = isEn ? (job.titleEn || job.title) : job.title;
-  const titleName = typeof rawTitle === 'string' ? rawTitle : (rawTitle?.bn || rawTitle?.en || rawTitle?.title || '');
+  const titleName = stripHtmlTags(rawTitle);
 
   // Check if job was posted in the last 3 days
   const jobTime = getItemTimestamp(job);
