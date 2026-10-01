@@ -143,6 +143,7 @@ async function run() {
   // 3. Android Mipmap densities
   console.log('\n📱 3. Generating Android Mipmap densities...');
   const MIPMAP_CONFIGS = [
+    { folder: 'mipmap-ldpi', launcherSize: 36, foregroundSize: 81 },
     { folder: 'mipmap-mdpi', launcherSize: 48, foregroundSize: 108 },
     { folder: 'mipmap-hdpi', launcherSize: 72, foregroundSize: 162 },
     { folder: 'mipmap-xhdpi', launcherSize: 96, foregroundSize: 216 },
