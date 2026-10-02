@@ -26,7 +26,7 @@ export default function Donate() {
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const config = await getDonationConfig();
+        const config = await getDonationConfig(true);
         if (config?.bkashNumber) setBkashNumber(config.bkashNumber);
         if (config?.nagadNumber) setNagadNumber(config.nagadNumber);
       } catch (err) {

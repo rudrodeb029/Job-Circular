@@ -1,4 +1,4 @@
-import { getDocument, setDocument, addDocument, COLLECTIONS } from '../services/firestoreService';
+import { getDocument, setDocument, addDocument, COLLECTIONS } from '../services/supabaseService';
 
 export const DEFAULT_DONATION_CONFIG = {
   bkashNumber: '01750-123456',
@@ -10,13 +10,13 @@ export const DEFAULT_DONATION_CONFIG = {
 let _donationConfigCache = null;
 
 /**
- * Fetch dynamic donation gateway numbers (bKash & Nagad) from Firestore/appConfig
+ * Fetch dynamic donation gateway numbers (bKash & Nagad) from Supabase/app_config
  */
 export const getDonationConfig = async (forceRefresh = false) => {
   if (_donationConfigCache && !forceRefresh) return _donationConfigCache;
 
   try {
-    const doc = await getDocument(COLLECTIONS.APP_CONFIG, 'donationSettings');
+    const doc = await getDocument(COLLECTIONS.APP_CONFIG, 'donationSettings', forceRefresh);
     if (doc) {
       _donationConfigCache = {
         ...DEFAULT_DONATION_CONFIG,
