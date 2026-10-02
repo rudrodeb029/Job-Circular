@@ -10,11 +10,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
-import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.URLUtil;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
@@ -42,6 +42,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.facebook.ads.AdSettings;
 
 import java.util.Collections;
+import java.util.Locale;
+import java.util.Objects;
 
 public class MainActivity extends BridgeActivity {
     private static final String TAG = "AdMobMetaMediation";
@@ -156,20 +158,21 @@ public class MainActivity extends BridgeActivity {
         }
 
         String bId = remoteConfig.getString(REMOTE_CONFIG_KEY_BANNER_ID);
-        if (bId != null && !bId.trim().isEmpty()) {
+        if (!bId.trim().isEmpty()) {
             bannerAdUnitId = bId.trim();
         } else {
             bannerAdUnitId = DEFAULT_BANNER_AD_UNIT_ID;
         }
 
         String iId = remoteConfig.getString(REMOTE_CONFIG_KEY_INTERSTITIAL_ID);
-        if (iId != null && !iId.trim().isEmpty()) {
+        if (!iId.trim().isEmpty()) {
             interstitialAdUnitId = iId.trim();
         } else {
             interstitialAdUnitId = DEFAULT_INTERSTITIAL_AD_UNIT_ID;
         }
 
         Log.d(TAG, String.format(
+            Locale.US,
             "Remote Config Applied -> show_ads: %b, banner: %b, interstitial: %b, cooldown: %ds, bannerId: %s, interstitialId: %s",
             isAdsEnabled, isBannerAdsEnabled, isInterstitialAdsEnabled, interstitialCooldownSec, bannerAdUnitId, interstitialAdUnitId
         ));
@@ -203,6 +206,7 @@ public class MainActivity extends BridgeActivity {
         try {
             if (this.bridge != null && this.bridge.getWebView() != null) {
                 String js = String.format(
+                    Locale.US,
                     "window.dispatchEvent(new CustomEvent('remote_config_ads_updated', { detail: { " +
                     "show_ads: %b, show_banner_ads: %b, show_interstitial_ads: %b, " +
                     "interstitial_cooldown_sec: %d, admob_banner_id: '%s', admob_interstitial_id: '%s' } }));",
@@ -220,38 +224,49 @@ public class MainActivity extends BridgeActivity {
     // 2. Google Mobile Ads & Meta Mediation Initialization
     // ══════════════════════════════════════════════════════════════════
     private void initializeMobileAdsAndMediation() {
-        if (isMobileAdsInitialized) {
-            if (isBannerAdsEnabled && isBannerRequestedVisible && bannerAdView == null) {
-                loadBannerAd();
-            }
-            if (isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
-                loadInterstitialAd();
-            }
-            return;
-        }
-
-        // Meta Audience Network Test Mode
-        AdSettings.setTestMode(true);
-        // AdSettings.addTestDevice("YOUR_META_HASHED_DEVICE_ID_HERE");
-
-        // AdMob Test Device configuration
-        RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
-            .setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR))
-            .build();
-        MobileAds.setRequestConfiguration(requestConfiguration);
-
-        MobileAds.initialize(this, initializationStatus -> {
-            isMobileAdsInitialized = true;
-            Log.d(TAG, "Mobile Ads Initialized: " + initializationStatus);
-            runOnUiThread(() -> {
-                if (isBannerAdsEnabled && isBannerRequestedVisible) {
+        try {
+            if (isMobileAdsInitialized) {
+                if (isBannerAdsEnabled && isBannerRequestedVisible && bannerAdView == null) {
                     loadBannerAd();
                 }
-                if (isInterstitialAdsEnabled) {
+                if (isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
                     loadInterstitialAd();
                 }
+                return;
+            }
+
+            // Meta Audience Network Test Mode
+            try {
+                AdSettings.setTestMode(true);
+            } catch (Throwable t) {
+                Log.w(TAG, "Meta AdSettings setTestMode warning: " + t.getMessage());
+            }
+
+            // AdMob Test Device configuration
+            try {
+                RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
+                    .setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR))
+                    .build();
+                MobileAds.setRequestConfiguration(requestConfiguration);
+            } catch (Throwable t) {
+                Log.w(TAG, "MobileAds setRequestConfiguration warning: " + t.getMessage());
+            }
+
+            MobileAds.initialize(this, initializationStatus -> {
+                isMobileAdsInitialized = true;
+                Log.d(TAG, "Mobile Ads Initialized: " + initializationStatus);
+                runOnUiThread(() -> {
+                    if (isBannerAdsEnabled && isBannerRequestedVisible) {
+                        loadBannerAd();
+                    }
+                    if (isInterstitialAdsEnabled) {
+                        loadInterstitialAd();
+                    }
+                });
             });
-        });
+        } catch (Throwable e) {
+            Log.e(TAG, "Error initializing MobileAds safely: " + e.getMessage(), e);
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -283,106 +298,110 @@ public class MainActivity extends BridgeActivity {
         }
 
         runOnUiThread(() -> {
-            ViewGroup rootView = findViewById(android.R.id.content);
-            if (rootView == null) return;
+            try {
+                ViewGroup rootView = findViewById(android.R.id.content);
+                if (rootView == null) return;
 
-            if (bannerContainer == null) {
-                bannerContainer = new FrameLayout(this);
-                FrameLayout.LayoutParams containerParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.BOTTOM
-                );
-                bannerContainer.setLayoutParams(containerParams);
-                bannerContainer.setBackgroundColor(isCurrentThemeDark ? Color.parseColor("#0b0f19") : Color.WHITE);
-                bannerContainer.setElevation(16f);
-                bannerContainer.setVisibility(isBannerRequestedVisible ? View.VISIBLE : View.GONE);
+                if (bannerContainer == null) {
+                    bannerContainer = new FrameLayout(this);
+                    FrameLayout.LayoutParams containerParams = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        Gravity.BOTTOM
+                    );
+                    bannerContainer.setLayoutParams(containerParams);
+                    bannerContainer.setElevation(16f);
+                    bannerContainer.setVisibility(isBannerRequestedVisible ? View.VISIBLE : View.GONE);
 
-                // Top divider line matching bottom navbar border-top
-                bannerTopDivider = new View(this);
-                float density = getResources().getDisplayMetrics().density;
-                FrameLayout.LayoutParams dividerParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    Math.max(1, (int) (1 * density))
-                );
-                dividerParams.gravity = Gravity.TOP;
-                bannerTopDivider.setLayoutParams(dividerParams);
-                bannerContainer.addView(bannerTopDivider);
+                    // Top divider line matching bottom navbar border-top
+                    bannerTopDivider = new View(this);
+                    float density = getResources().getDisplayMetrics().density;
+                    FrameLayout.LayoutParams dividerParams = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        Math.max(1, (int) (1 * density))
+                    );
+                    dividerParams.gravity = Gravity.TOP;
+                    bannerTopDivider.setLayoutParams(dividerParams);
+                    bannerContainer.addView(bannerTopDivider);
 
-                updateBannerColors(isCurrentThemeDark);
-                rootView.addView(bannerContainer);
-            }
+                    updateBannerColors(isCurrentThemeDark);
+                    rootView.addView(bannerContainer);
+                }
 
-            // If bannerAdView exists but adUnitId differs, recreate AdView
-            if (bannerAdView != null && !bannerAdUnitId.equals(bannerAdView.getAdUnitId())) {
-                bannerContainer.removeView(bannerAdView);
-                bannerAdView.destroy();
-                bannerAdView = null;
-            }
+                // If bannerAdView exists but adUnitId differs, recreate AdView
+                if (bannerAdView != null && !Objects.equals(bannerAdUnitId, bannerAdView.getAdUnitId())) {
+                    bannerContainer.removeView(bannerAdView);
+                    bannerAdView.destroy();
+                    bannerAdView = null;
+                }
 
-            if (bannerAdView == null) {
-                bannerAdView = new AdView(this);
-                bannerAdView.setAdSize(AdSize.BANNER);
-                bannerAdView.setAdSize(getAdaptiveAdSize());
-                bannerAdView.setAdUnitId(bannerAdUnitId);
+                if (bannerAdView == null) {
+                    bannerAdView = new AdView(this);
+                    bannerAdView.setAdSize(getAdaptiveAdSize());
+                    bannerAdUnitId = (bannerAdUnitId != null && !bannerAdUnitId.trim().isEmpty()) ? bannerAdUnitId.trim() : DEFAULT_BANNER_AD_UNIT_ID;
+                    bannerAdView.setAdUnitId(bannerAdUnitId);
 
-                FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM
-                );
-                bannerContainer.addView(bannerAdView, adParams);
+                    FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM
+                    );
+                    bannerContainer.addView(bannerAdView, adParams);
 
-                bannerAdView.setAdListener(new AdListener() {
-                    @Override
-                    public void onAdLoaded() {
-                        super.onAdLoaded();
-                        Log.d(TAG, "Banner Ad loaded successfully (" + bannerAdUnitId + ").");
-                        Log.d(TAG, "Adaptive Banner Ad loaded successfully (" + bannerAdUnitId + ").");
-                        if (isAdsEnabled && isBannerAdsEnabled && isBannerRequestedVisible && bannerContainer != null) {
-                            bannerContainer.setVisibility(View.VISIBLE);
-                        } else if (bannerContainer != null) {
-                            bannerContainer.setVisibility(View.GONE);
+                    bannerAdView.setAdListener(new AdListener() {
+                        @Override
+                        public void onAdLoaded() {
+                            super.onAdLoaded();
+                            Log.d(TAG, "Adaptive Banner Ad loaded successfully (" + bannerAdUnitId + ").");
+                            if (isAdsEnabled && isBannerAdsEnabled && isBannerRequestedVisible && bannerContainer != null) {
+                                bannerContainer.setVisibility(View.VISIBLE);
+                            } else if (bannerContainer != null) {
+                                bannerContainer.setVisibility(View.GONE);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        super.onAdFailedToLoad(loadAdError);
-                        Log.e(TAG, "Banner Ad failed to load: " + loadAdError.getMessage());
-                        if (bannerContainer != null) {
-                            bannerContainer.setVisibility(View.GONE);
+                        @Override
+                        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                            super.onAdFailedToLoad(loadAdError);
+                            Log.e(TAG, "Banner Ad failed to load: " + loadAdError.getMessage());
+                            if (bannerContainer != null) {
+                                bannerContainer.setVisibility(View.GONE);
+                            }
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-            AdRequest adRequest = new AdRequest.Builder().build();
-            bannerAdView.loadAd(adRequest);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                bannerAdView.loadAd(adRequest);
+            } catch (Throwable t) {
+                Log.e(TAG, "Error in loadBannerAd: " + t.getMessage(), t);
+            }
         });
     }
 
     /**
      * Controls banner ad visibility based on the active page route.
      * Hidden on Home, Feed, Saved, Notifications, Profile so it doesn't cover the BottomNav.
-     * Shown at the bottom on all other pages.
      * Shown at the bottom on all other pages with full edge-to-edge navbar style.
      */
     public void setBannerVisibility(boolean visible, boolean isDark) {
         this.isBannerRequestedVisible = visible;
         this.isCurrentThemeDark = isDark;
         runOnUiThread(() -> {
-            if (bannerContainer != null) {
-                if (visible && isAdsEnabled && isBannerAdsEnabled && bannerAdView != null) {
-                    bannerContainer.setBackgroundColor(isDark ? Color.parseColor("#0b0f19") : Color.WHITE);
-                    updateBannerColors(isDark);
-                    bannerContainer.setVisibility(View.VISIBLE);
-                } else {
-                    bannerContainer.setVisibility(View.GONE);
+            try {
+                if (bannerContainer != null) {
+                    if (visible && isAdsEnabled && isBannerAdsEnabled && bannerAdView != null) {
+                        bannerContainer.setBackgroundColor(isDark ? Color.parseColor("#0b0f19") : Color.WHITE);
+                        updateBannerColors(isDark);
+                        bannerContainer.setVisibility(View.VISIBLE);
+                    } else {
+                        bannerContainer.setVisibility(View.GONE);
+                    }
+                } else if (visible && isAdsEnabled && isBannerAdsEnabled) {
+                    loadBannerAd();
                 }
-            } else if (visible && isAdsEnabled && isBannerAdsEnabled) {
-                loadBannerAd();
+            } catch (Throwable t) {
+                Log.e(TAG, "Error in setBannerVisibility: " + t.getMessage(), t);
             }
         });
     }
@@ -391,77 +410,77 @@ public class MainActivity extends BridgeActivity {
     // 4. Interstitial Ad (Strict Single-Show & Immediate Dismissal)
     // ══════════════════════════════════════════════════════════════════
     private void loadInterstitialAd() {
-        if (!isAdsEnabled || !isInterstitialAdsEnabled || isInterstitialLoading || interstitialAd != null) {
-            return;
-        }
-
-        isInterstitialLoading = true;
-        AdRequest adRequest = new AdRequest.Builder().build();
-
-        InterstitialAd.load(this, interstitialAdUnitId, adRequest,
-            new InterstitialAdLoadCallback() {
-                @Override
-                public void onAdLoaded(@NonNull InterstitialAd ad) {
-                    interstitialAd = ad;
-                    isInterstitialLoading = false;
-                    Log.d(TAG, "Interstitial Ad successfully loaded into memory cache (" + interstitialAdUnitId + ").");
-
-                    // Attach strict lifecycle callbacks
-                    ad.setFullScreenContentCallback(new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            super.onAdDismissedFullScreenContent();
-                            Log.d(TAG, "Interstitial ad dismissed by user.");
-
-                            // 1. Properly set the current interstitial ad object to null
-                            interstitialAd = null;
-
-                            // 2. Return user to normal app flow seamlessly (NO second ad immediately)
-
-                            // 3. Pre-cache next ad in background memory (DOES NOT AUTO SHOW)
-                            if (isAdsEnabled && isInterstitialAdsEnabled) {
-                                loadInterstitialAd();
-                            }
-                        }
-
-                        @Override
-                        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
-                            super.onAdFailedToShowFullScreenContent(adError);
-                            Log.e(TAG, "Interstitial ad failed to show: " + adError.getMessage());
-                            interstitialAd = null;
-                            if (isAdsEnabled && isInterstitialAdsEnabled) {
-                                loadInterstitialAd();
-                            }
-                        }
-
-                        @Override
-                        public void onAdShowedFullScreenContent() {
-                            super.onAdShowedFullScreenContent();
-                            Log.d(TAG, "Interstitial ad displayed on screen.");
-                        }
-
-                        @Override
-                        public void onAdImpression() {
-                            super.onAdImpression();
-                            Log.d(TAG, "Interstitial ad impression recorded.");
-                        }
-
-                        @Override
-                        public void onAdClicked() {
-                            super.onAdClicked();
-                            Log.d(TAG, "Interstitial ad clicked by user.");
-                        }
-                    });
-                }
-
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    interstitialAd = null;
-                    isInterstitialLoading = false;
-                    Log.e(TAG, "Interstitial Ad failed to load: " + loadAdError.getMessage());
-                }
+        try {
+            if (!isAdsEnabled || !isInterstitialAdsEnabled || isInterstitialLoading || interstitialAd != null) {
+                return;
             }
-        );
+
+            isInterstitialLoading = true;
+            AdRequest adRequest = new AdRequest.Builder().build();
+
+            InterstitialAd.load(this, interstitialAdUnitId, adRequest,
+                new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd ad) {
+                        interstitialAd = ad;
+                        isInterstitialLoading = false;
+                        Log.d(TAG, "Interstitial Ad successfully loaded into memory cache (" + interstitialAdUnitId + ").");
+
+                        // Attach strict lifecycle callbacks
+                        ad.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                super.onAdDismissedFullScreenContent();
+                                Log.d(TAG, "Interstitial ad dismissed by user.");
+                                interstitialAd = null;
+                                if (isAdsEnabled && isInterstitialAdsEnabled) {
+                                    loadInterstitialAd();
+                                }
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                                super.onAdFailedToShowFullScreenContent(adError);
+                                Log.e(TAG, "Interstitial ad failed to show: " + adError.getMessage());
+                                interstitialAd = null;
+                                if (isAdsEnabled && isInterstitialAdsEnabled) {
+                                    loadInterstitialAd();
+                                }
+                            }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                                super.onAdShowedFullScreenContent();
+                                Log.d(TAG, "Interstitial ad displayed on screen.");
+                            }
+
+                            @Override
+                            public void onAdImpression() {
+                                super.onAdImpression();
+                                Log.d(TAG, "Interstitial ad impression recorded.");
+                            }
+
+                            @Override
+                            public void onAdClicked() {
+                                super.onAdClicked();
+                                Log.d(TAG, "Interstitial ad clicked by user.");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        interstitialAd = null;
+                        isInterstitialLoading = false;
+                        Log.e(TAG, "Interstitial Ad failed to load: " + loadAdError.getMessage());
+                    }
+                }
+            );
+        } catch (Throwable t) {
+            Log.e(TAG, "Error in loadInterstitialAd: " + t.getMessage(), t);
+            interstitialAd = null;
+            isInterstitialLoading = false;
+        }
     }
 
     /**
@@ -487,63 +506,85 @@ public class MainActivity extends BridgeActivity {
             if (this.bridge != null && this.bridge.getWebView() != null) {
                 this.bridge.getWebView().addJavascriptInterface(new Object() {
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public void showInterstitial() {
-                        runOnUiThread(() -> MainActivity.this.showInterstitialAd());
+                        runOnUiThread(MainActivity.this::showInterstitialAd);
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public void showBanner() {
                         runOnUiThread(() -> MainActivity.this.setBannerVisibility(true, false));
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public void showBannerWithTheme(boolean isDark) {
                         runOnUiThread(() -> MainActivity.this.setBannerVisibility(true, isDark));
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public void hideBanner() {
                         runOnUiThread(() -> MainActivity.this.setBannerVisibility(false, false));
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public void setBannerVisibility(boolean visible) {
                         runOnUiThread(() -> MainActivity.this.setBannerVisibility(visible, false));
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public boolean isAdsEnabled() {
                         return isAdsEnabled;
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public boolean isBannerAdsEnabled() {
                         return isAdsEnabled && isBannerAdsEnabled;
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public boolean isInterstitialAdsEnabled() {
                         return isAdsEnabled && isInterstitialAdsEnabled;
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public long getInterstitialCooldownSec() {
                         return interstitialCooldownSec;
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public String getBannerAdUnitId() {
                         return bannerAdUnitId;
                     }
 
                     @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public String getInterstitialAdUnitId() {
                         return interstitialAdUnitId;
                     }
                 }, "AndroidAds");
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error setting up JavaScript interface", e);
         }
     }
 
@@ -553,64 +594,61 @@ public class MainActivity extends BridgeActivity {
     private void setupDownloadListener() {
         try {
             if (this.bridge != null && this.bridge.getWebView() != null) {
-                this.bridge.getWebView().setDownloadListener(new DownloadListener() {
-                    @Override
-                    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
-                        try {
-                            if (url == null || url.isEmpty()) return;
+                this.bridge.getWebView().setDownloadListener((url, userAgent, contentDisposition, mimeType, contentLength) -> {
+                    try {
+                        if (url == null || url.isEmpty()) return;
 
-                            // 1. Handle in-app base64 data URLs directly by saving to Android Downloads
-                            if (url.startsWith("data:")) {
-                                saveBase64ToDownloads(url, mimeType);
-                                return;
-                            }
-
-                            if (url.startsWith("blob:")) {
-                                return;
-                            }
-
-                            // 2. Handle HTTP/HTTPS URLs via Android DownloadManager
-                            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                            if (mimeType != null && !mimeType.isEmpty()) {
-                                request.setMimeType(mimeType);
-                            }
-                            String cookies = CookieManager.getInstance().getCookie(url);
-                            if (cookies != null) {
-                                request.addRequestHeader("cookie", cookies);
-                            }
-                            if (userAgent != null) {
-                                request.addRequestHeader("User-Agent", userAgent);
-                            }
-                            request.setDescription("Live Circular ফাইল ডাউনলোড হচ্ছে...");
-
-                            String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
-                            if (fileName == null || fileName.equals("downloadfile.bin") || !fileName.contains(".")) {
-                                String ext = "png";
-                                if (mimeType != null && mimeType.contains("pdf")) ext = "pdf";
-                                else if (mimeType != null && (mimeType.contains("jpeg") || mimeType.contains("jpg"))) ext = "jpg";
-                                else if (url.toLowerCase().contains(".pdf")) ext = "pdf";
-                                else if (url.toLowerCase().contains(".jpg") || url.toLowerCase().contains(".jpeg")) ext = "jpg";
-                                fileName = "Notice_" + System.currentTimeMillis() + "." + ext;
-                            }
-
-                            request.setTitle(fileName);
-                            request.allowScanningByMediaScanner();
-                            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-
-                            DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                            if (dm != null) {
-                                dm.enqueue(request);
-                                Toast.makeText(getApplicationContext(), "ডাউনলোড শুরু হয়েছে", Toast.LENGTH_SHORT).show();
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
+                        // 1. Handle in-app base64 data URLs directly by saving to Android Downloads
+                        if (url.startsWith("data:")) {
+                            saveBase64ToDownloads(url, mimeType);
+                            return;
                         }
+
+                        if (url.startsWith("blob:")) {
+                            return;
+                        }
+
+                        // 2. Handle HTTP/HTTPS URLs via Android DownloadManager
+                        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+                        if (mimeType != null && !mimeType.isEmpty()) {
+                            request.setMimeType(mimeType);
+                        }
+                        String cookies = CookieManager.getInstance().getCookie(url);
+                        if (cookies != null) {
+                            request.addRequestHeader("cookie", cookies);
+                        }
+                        if (userAgent != null) {
+                            request.addRequestHeader("User-Agent", userAgent);
+                        }
+                        request.setDescription("Live Circular ফাইল ডাউনলোড হচ্ছে...");
+
+                        String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
+                        if (fileName == null || Objects.equals(fileName, "downloadfile.bin") || !fileName.contains(".")) {
+                            String ext = "png";
+                            if (mimeType != null && mimeType.contains("pdf")) ext = "pdf";
+                            else if (mimeType != null && (mimeType.contains("jpeg") || mimeType.contains("jpg"))) ext = "jpg";
+                            else if (url.toLowerCase(Locale.ROOT).contains(".pdf")) ext = "pdf";
+                            else if (url.toLowerCase(Locale.ROOT).contains(".jpg") || url.toLowerCase(Locale.ROOT).contains(".jpeg")) ext = "jpg";
+                            fileName = "Notice_" + System.currentTimeMillis() + "." + ext;
+                        }
+
+                        request.setTitle(fileName);
+                        request.allowScanningByMediaScanner();
+                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
+
+                        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+                        if (dm != null) {
+                            dm.enqueue(request);
+                            Toast.makeText(getApplicationContext(), "ডাউনলোড শুরু হয়েছে", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error processing download", e);
                     }
                 });
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error setting up download listener", e);
         }
     }
 
@@ -655,7 +693,9 @@ public class MainActivity extends BridgeActivity {
                     }
                 } else {
                     java.io.File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                    if (!downloadDir.exists()) downloadDir.mkdirs();
+                    if (!downloadDir.exists() && !downloadDir.mkdirs()) {
+                        Log.w(TAG, "Could not create directory for download");
+                    }
                     java.io.File outFile = new java.io.File(downloadDir, fileName);
                     try (java.io.FileOutputStream fos = new java.io.FileOutputStream(outFile)) {
                         fos.write(decodedBytes);
@@ -669,11 +709,9 @@ public class MainActivity extends BridgeActivity {
                     );
                 }
 
-                runOnUiThread(() -> {
-                    Toast.makeText(getApplicationContext(), "ফাইলটি ডাউনলোড ফোল্ডারে সংরক্ষিত হয়েছে", Toast.LENGTH_LONG).show();
-                });
+                runOnUiThread(() -> Toast.makeText(getApplicationContext(), "ফাইলটি ডাউনলোড ফোল্ডারে সংরক্ষিত হয়েছে", Toast.LENGTH_LONG).show());
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "Error saving base64 to downloads", e);
             }
         }).start();
     }
@@ -688,7 +726,7 @@ public class MainActivity extends BridgeActivity {
         try {
             OneSignal.getNotifications().requestPermission(true, Continue.none());
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error requesting notification permission", e);
         }
     }
 
