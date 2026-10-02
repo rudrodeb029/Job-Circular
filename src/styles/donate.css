@@ -218,18 +218,17 @@
   font-family: inherit;
 }
 
-.pixel-currency-selector {
+.pixel-currency-badge-static {
   display: flex;
   align-items: center;
-  gap: 3px;
+  justify-content: center;
   background: var(--donate-card-bg);
-  border: 1px solid var(--donate-border);
+  border: 1.5px solid var(--donate-border);
   border-radius: 8px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   font-size: 11.5px;
   font-weight: 800;
-  color: var(--donate-text-primary);
-  cursor: pointer;
+  color: var(--donate-green);
   user-select: none;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
@@ -428,26 +427,31 @@
 .pixel-gateway-badge {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 10px;
   font-weight: 700;
   font-size: 13px;
 }
 
-.pixel-gateway-logo-pill {
-  padding: 3px 7px;
+.pixel-gateway-logo-wrap {
+  width: 46px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
   border-radius: 6px;
-  color: white;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.3px;
+  padding: 2px 4px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
-.pixel-gateway-logo-pill.bkash {
-  background: #e11d48;
-}
-
-.pixel-gateway-logo-pill.nagad {
-  background: #ea580c;
+.pixel-gateway-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .pixel-number-copy-box {

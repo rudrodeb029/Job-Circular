@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, HandHeart, CheckCircle2, Copy } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { hideNativeBannerAd } from '../utils/admobUtils';
+import bkashLogo from '../assets/logos/bkash.png';
+import nagadLogo from '../assets/logos/nagad.png';
 import '../styles/donate.css';
 
 export default function Donate() {
@@ -18,10 +20,10 @@ export default function Donate() {
   // ═══ STEP 1: Choose Amount State ═══
   const [step, setStep] = useState(1); // 1: Choose Amount, 2: Payment (bKash/Nagad), 3: Thank You
   const [isMonthly, setIsMonthly] = useState(false);
-  const [amount, setAmount] = useState('550');
-  const [currency, setCurrency] = useState('USD'); // 'USD' or 'BDT'
+  const [amount, setAmount] = useState('250');
+  const currency = 'BDT'; // Always BDT as requested
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [donorName, setDonorName] = useState(state.user?.name || 'Adam Cooper Jr.');
+  const [donorName, setDonorName] = useState(state.user?.name || '');
   const [agreeTerms, setAgreeTerms] = useState(true);
 
   // ═══ STEP 2: Payment Method & TrxID State ═══
@@ -35,10 +37,8 @@ export default function Donate() {
   const BKASH_NUMBER = '01750-123456';
   const NAGAD_NUMBER = '01850-654321';
 
-  // Presets depending on currency
-  const presetsUSD = ['10', '25', '50', '100'];
-  const presetsBDT = ['100', '250', '500', '1000'];
-  const currentPresets = currency === 'USD' ? presetsUSD : presetsBDT;
+  // Presets in BDT
+  const presets = ['100', '250', '500', '1000'];
 
   const handleCopyNumber = (num) => {
     if (navigator.clipboard) {
@@ -143,7 +143,7 @@ export default function Donate() {
                 </span>
               </div>
 
-              {/* Amount Input with Currency Dropdown */}
+              {/* Amount Input with Static BDT Badge */}
               <div className="pixel-amount-input-box">
                 <input
                   type="number"
@@ -152,25 +152,21 @@ export default function Donate() {
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="0"
                 />
-                <div 
-                  className="pixel-currency-selector"
-                  onClick={() => setCurrency(prev => prev === 'USD' ? 'BDT' : 'USD')}
-                >
-                  <span>{currency}</span>
-                  <span style={{ fontSize: '9px' }}>▼</span>
+                <div className="pixel-currency-badge-static">
+                  <span>BDT</span>
                 </div>
               </div>
 
               {/* 4 Preset Amount Chips Row */}
               <div className="pixel-presets-row">
-                {currentPresets.map((preset) => (
+                {presets.map((preset) => (
                   <button
                     key={preset}
                     type="button"
                     className={`pixel-preset-chip ${amount === preset ? 'active' : ''}`}
                     onClick={() => setAmount(preset)}
                   >
-                    <span className="dollar-sign">{currency === 'USD' ? '$' : '৳'}</span>
+                    <span className="dollar-sign">৳</span>
                     <span>{preset}</span>
                   </button>
                 ))}
@@ -250,7 +246,7 @@ export default function Donate() {
                   Total Support
                 </div>
                 <div className="pixel-step2-summary-amount">
-                  {currency === 'USD' ? '$' : '৳'} {amount} {currency}
+                  ৳ {amount} BDT
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
@@ -258,12 +254,12 @@ export default function Donate() {
                   {isMonthly ? 'Monthly 💚' : 'One-Time'}
                 </div>
                 <div style={{ fontSize: '10.5px', color: 'var(--donate-text-muted)' }}>
-                  {isAnonymous ? 'Anonymous Donor' : donorName}
+                  {isAnonymous ? (isEn ? 'Anonymous Donor' : 'বেনামী শুভাকাঙ্ক্ষী') : (donorName.trim() || (isEn ? 'Donor' : 'দাতা'))}
                 </div>
               </div>
             </div>
 
-            {/* Payment Methods: bKash & Nagad (Modern polished architecture colors) */}
+            {/* Payment Methods: bKash & Nagad (Real official logos) */}
             <div className="pixel-payment-options-grid">
               {/* bKash Card */}
               <div 
@@ -272,8 +268,10 @@ export default function Donate() {
               >
                 <div className="pixel-payment-badge-row">
                   <div className="pixel-gateway-badge">
-                    <span className="pixel-gateway-logo-pill bkash">bKash</span>
-                    <span>bKash Personal / Send Money</span>
+                    <div className="pixel-gateway-logo-wrap">
+                      <img src={bkashLogo} alt="bKash" className="pixel-gateway-logo-img" />
+                    </div>
+                    <span>bKash Personal</span>
                   </div>
                   <div className={`pixel-checkbox-box ${selectedGateway === 'bkash' ? 'checked' : ''}`} style={{ width: '16px', height: '16px' }}>
                     {selectedGateway === 'bkash' && <span style={{ color: 'white', fontSize: '10px' }}>✓</span>}
@@ -301,8 +299,10 @@ export default function Donate() {
               >
                 <div className="pixel-payment-badge-row">
                   <div className="pixel-gateway-badge">
-                    <span className="pixel-gateway-logo-pill nagad">Nagad</span>
-                    <span>Nagad Personal / Send Money</span>
+                    <div className="pixel-gateway-logo-wrap">
+                      <img src={nagadLogo} alt="Nagad" className="pixel-gateway-logo-img" />
+                    </div>
+                    <span>Nagad Personal</span>
                   </div>
                   <div className={`pixel-checkbox-box ${selectedGateway === 'nagad' ? 'checked' : ''}`} style={{ width: '16px', height: '16px' }}>
                     {selectedGateway === 'nagad' && <span style={{ color: 'white', fontSize: '10px' }}>✓</span>}
@@ -330,10 +330,10 @@ export default function Donate() {
               ২. সফল ট্রানজেকশনের পর <strong>Transaction ID (TrxID)</strong> কপি করে নিচের বক্সে লিখুন।
             </div>
 
-            {/* Sender Mobile Input */}
+            {/* Mobile Number Input */}
             <div style={{ marginBottom: '10px' }}>
               <label className="pixel-input-label">
-                Sender Mobile Number (প্রেরকের নম্বর)
+                Mobile Number
               </label>
               <input
                 type="text"
@@ -396,7 +396,9 @@ export default function Donate() {
             <div className="pixel-receipt-summary">
               <div className="pixel-receipt-line">
                 <span>Donor</span>
-                <strong style={{ color: 'var(--donate-text-primary)' }}>{isAnonymous ? 'Anonymous Donor' : donorName}</strong>
+                <strong style={{ color: 'var(--donate-text-primary)' }}>
+                  {isAnonymous ? (isEn ? 'Anonymous Donor' : 'বেনামী শুভাকাঙ্ক্ষী') : (donorName.trim() || (isEn ? 'Donor' : 'দাতা'))}
+                </strong>
               </div>
               <div className="pixel-receipt-line">
                 <span>Payment Method</span>
@@ -412,7 +414,7 @@ export default function Donate() {
               </div>
               <div className="pixel-receipt-line total">
                 <span>Total Support</span>
-                <span>{currency === 'USD' ? '$' : '৳'} {amount} {currency}</span>
+                <span>৳ {amount} BDT</span>
               </div>
             </div>
 
