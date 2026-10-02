@@ -226,20 +226,6 @@ export default function Donate() {
       {step === 2 && (
         <div className="pixel-donate-card-wrapper" style={{ marginTop: '8px' }}>
           <div className="pixel-donate-card animate-slide-up">
-            {/* Header: Compact Step Bar */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--donate-text-primary)' }}>
-                Select Payment Method
-              </span>
-              <button
-                type="button"
-                onClick={() => setStep(1)}
-                style={{ background: 'none', border: 'none', color: 'var(--donate-green)', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer', padding: 0 }}
-              >
-                ← Change Amount
-              </button>
-            </div>
-
             {/* Compact Donation Summary Bar */}
             <div className="pixel-step2-summary-card">
               <div>
