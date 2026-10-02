@@ -319,7 +319,8 @@ const TABLE_COLUMNS = {
   [COLLECTIONS.ACTIVITIES]: [
     'id', 'action', 'description', 'type', 'examId', 'userName',
     'userPhoto', 'score', 'total', 'scaledScore', 'timeTaken',
-    'timeTakenSec', 'createdAt'
+    'timeTakenSec', 'senderPhone', 'trxId', 'amount', 'currency',
+    'gateway', 'isMonthly', 'isAnonymous', 'createdAt'
   ],
   [COLLECTIONS.USERS]: [
     'id', 'name', 'phone', 'qualification', 'category', 'location',
@@ -332,7 +333,8 @@ const TABLE_COLUMNS = {
   [COLLECTIONS.APP_CONFIG]: [
     'id', 'contactEmail', 'contactPhone', 'whatsappNumber',
     'playStoreUrl', 'shareAppUrl', 'facebookPageUrl',
-    'telegramChannelUrl', 'supportHours', 'updatedAt'
+    'telegramChannelUrl', 'supportHours', 'bkashNumber',
+    'nagadNumber', 'bkashActive', 'nagadActive', 'updatedAt'
   ]
 };
 

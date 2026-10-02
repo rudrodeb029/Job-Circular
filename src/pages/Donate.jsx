@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, HandHeart, CheckCircle2, Copy, Donate as DonateIcon, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { hideNativeBannerAd } from '../utils/admobUtils';
+import { getDonationConfig, recordDonationSubmission } from '../utils/donationService';
 import bkashLogo from '../assets/logos/bkash.png';
 import nagadLogo from '../assets/logos/nagad.png';
 import '../styles/donate.css';
@@ -15,6 +16,24 @@ export default function Donate() {
   // 100% guarantee that banner ads NEVER show on Donate page
   useEffect(() => {
     hideNativeBannerAd();
+  }, []);
+
+  // ═══ Payment Gateway Account Numbers (Dynamic from Admin) ═══
+  const [bkashNumber, setBkashNumber] = useState('01750-123456');
+  const [nagadNumber, setNagadNumber] = useState('01850-654321');
+
+  // Load gateway numbers dynamically from Supabase config
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const config = await getDonationConfig();
+        if (config?.bkashNumber) setBkashNumber(config.bkashNumber);
+        if (config?.nagadNumber) setNagadNumber(config.nagadNumber);
+      } catch (err) {
+        console.warn('Failed to load dynamic donation config:', err);
+      }
+    };
+    loadConfig();
   }, []);
 
   // ═══ STEP 1: Choose Amount State ═══
@@ -32,10 +51,6 @@ export default function Donate() {
   const [transactionId, setTransactionId] = useState('');
   const [copiedNumber, setCopiedNumber] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // ═══ Payment Gateway Account Numbers ═══
-  const BKASH_NUMBER = '01750-123456';
-  const NAGAD_NUMBER = '01850-654321';
 
   // Presets in BDT
   const presets = ['100', '250', '500', '1000'];
@@ -61,18 +76,31 @@ export default function Donate() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleConfirmDonation = () => {
+  const handleConfirmDonation = async () => {
     if (!transactionId.trim()) {
       alert(isEn ? 'Please enter your Transaction ID (TrxID)' : 'অনুগ্রহ করে ট্রানজেকশন আইডি (TrxID) লিখুন');
       return;
     }
     setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      await recordDonationSubmission({
+        donorName: donorName.trim(),
+        senderPhone: senderNumber.trim(),
+        trxId: transactionId.trim().toUpperCase(),
+        amount,
+        currency,
+        gateway: selectedGateway,
+        isMonthly,
+        isAnonymous
+      });
+    } catch (err) {
+      console.warn('recordDonationSubmission err:', err);
+    } finally {
       setIsSubmitting(false);
       setStep(3);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 1000);
+    }
   };
 
   const handleReset = () => {
@@ -197,7 +225,7 @@ export default function Donate() {
               <div className="pixel-terms-box">
                 <div className="pixel-terms-header">
                   <FileText size={12} color="var(--donate-green)" />
-                  <span>Donation Terms & Conditions</span>
+                  <span>Terms & Conditions</span>
                 </div>
                 <div className="pixel-terms-item">
                   <span className="pixel-terms-bullet">•</span>
@@ -209,7 +237,7 @@ export default function Donate() {
                 </div>
               </div>
 
-              {/* Agree To Terms Checkbox (Always English as requested) */}
+              {/* Agree To Terms Checkbox (Only first word capitalized as requested) */}
               <div 
                 className="pixel-checkbox-row"
                 onClick={() => setAgreeTerms(prev => !prev)}
@@ -218,7 +246,7 @@ export default function Donate() {
                   {agreeTerms && <span style={{ color: 'white', fontSize: '11px', fontWeight: 900 }}>✓</span>}
                 </div>
                 <span className="pixel-checkbox-label">
-                  I Agree to the Terms & Conditions
+                  I agree to the terms & conditions
                 </span>
               </div>
 
@@ -283,11 +311,11 @@ export default function Donate() {
 
                 {selectedGateway === 'bkash' && (
                   <div className="pixel-number-copy-box">
-                    <span>Number: <strong>{BKASH_NUMBER}</strong></span>
+                    <span>Number: <strong>{bkashNumber}</strong></span>
                     <button 
                       type="button" 
                       className="pixel-copy-btn"
-                      onClick={(e) => { e.stopPropagation(); handleCopyNumber(BKASH_NUMBER); }}
+                      onClick={(e) => { e.stopPropagation(); handleCopyNumber(bkashNumber); }}
                     >
                       {copiedNumber ? 'Copied!' : 'Copy'}
                     </button>
@@ -314,11 +342,11 @@ export default function Donate() {
 
                 {selectedGateway === 'nagad' && (
                   <div className="pixel-number-copy-box">
-                    <span>Number: <strong>{NAGAD_NUMBER}</strong></span>
+                    <span>Number: <strong>{nagadNumber}</strong></span>
                     <button 
                       type="button" 
                       className="pixel-copy-btn"
-                      onClick={(e) => { e.stopPropagation(); handleCopyNumber(NAGAD_NUMBER); }}
+                      onClick={(e) => { e.stopPropagation(); handleCopyNumber(nagadNumber); }}
                     >
                       {copiedNumber ? 'Copied!' : 'Copy'}
                     </button>

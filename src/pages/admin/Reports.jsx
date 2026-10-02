@@ -72,7 +72,8 @@ const Reports = () => {
       const isValidDate = !isNaN(dateObj.getTime());
       
       let normType = item.type || 'system';
-      if (item.type === 'live_exam_submission' || item.examId) normType = 'submission';
+      if (item.type === 'donation') normType = 'donation';
+      else if (item.type === 'live_exam_submission' || item.examId) normType = 'submission';
       else if (item.type === 'contact_message') normType = 'message';
       else if (item.type === 'app_rating_review') normType = 'rating';
       else if ((item.action || '').toLowerCase().includes('job') || (item.target || '').toLowerCase().includes('job')) normType = 'job';
@@ -86,12 +87,18 @@ const Reports = () => {
       return {
         id: item.id || `act-${Math.random()}`,
         type: normType,
-        action: item.action || (normType === 'submission' ? 'Exam Submission' : 'System Event'),
+        action: item.action || (normType === 'submission' ? 'Exam Submission' : (normType === 'donation' ? 'Donation Received' : 'System Event')),
         text: descText,
         user: actor,
         score: item.score,
         total: item.total,
         timeTaken: item.timeTaken,
+        // Donation fields
+        senderPhone: item.senderPhone || item.phone || '',
+        trxId: item.trxId || '',
+        amount: item.amount || '',
+        currency: item.currency || 'BDT',
+        gateway: item.gateway || '',
         createdAt: isValidDate ? dateObj.toISOString() : new Date().toISOString(),
         formattedDate: isValidDate ? dateObj.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Recently'
       };
@@ -140,6 +147,7 @@ const Reports = () => {
   const totalEvents = allEvents.length;
   const totalJobs = allEvents.filter(e => e.type === 'job').length;
   const totalExams = allEvents.filter(e => e.type === 'exam' || e.type === 'submission').length;
+  const totalDonations = allEvents.filter(e => e.type === 'donation').length;
   const totalNotifs = allEvents.filter(e => e.type === 'notification').length;
 
   // Pagination
@@ -151,6 +159,8 @@ const Reports = () => {
   // Type Badges Styling
   const getTypeBadge = (type) => {
     switch (type) {
+      case 'donation':
+        return { bg: '#ecfdf5', color: '#059669', label: 'Donation 💚' };
       case 'job':
         return { bg: '#eff6ff', color: '#1a56db', label: 'Circular' };
       case 'exam':
@@ -177,7 +187,7 @@ const Reports = () => {
       return;
     }
 
-    const headers = ['Event ID', 'Type', 'Action', 'Description', 'User/Actor', 'Score/Result', 'Timestamp'];
+    const headers = ['Event ID', 'Type', 'Action', 'Description', 'User/Actor', 'Score/Result', 'Sender Phone', 'TrxID', 'Amount', 'Gateway', 'Timestamp'];
     const rows = filteredEvents.map(e => [
       `"${e.id}"`,
       `"${e.type}"`,
@@ -185,6 +195,10 @@ const Reports = () => {
       `"${(e.text || '').replace(/"/g, '""')}"`,
       `"${(e.user || '').replace(/"/g, '""')}"`,
       `"${e.score !== undefined ? `${e.score}/${e.total || 100} (${e.timeTaken || ''})` : 'N/A'}"`,
+      `"${e.senderPhone || ''}"`,
+      `"${e.trxId || ''}"`,
+      `"${e.amount ? `${e.amount} ${e.currency || 'BDT'}` : ''}"`,
+      `"${e.gateway || ''}"`,
       `"${e.formattedDate}"`
     ]);
 
@@ -232,6 +246,7 @@ const Reports = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '18px' }}>
         {[
           { label: 'Total Events', val: totalEvents, color: '#2563eb', bg: '#eff6ff', icon: '⚡' },
+          { label: 'Donations Received', val: totalDonations, color: '#059669', bg: '#ecfdf5', icon: '💚' },
           { label: 'Circular Posts', val: totalJobs, color: '#059669', bg: '#ecfdf5', icon: '📄' },
           { label: 'Exams & Submissions', val: totalExams, color: '#d97706', bg: '#fffbeb', icon: '📝' },
           { label: 'Push Notifications', val: totalNotifs, color: '#7c3aed', bg: '#f5f3ff', icon: '🔔' }
@@ -269,6 +284,7 @@ const Reports = () => {
               onChange={e => { setSelectedType(e.target.value); setCurrentPage(1); }}
             >
               <option value="all">All Event Types</option>
+              <option value="donation">Donations (bKash/Nagad)</option>
               <option value="job">Circulars</option>
               <option value="exam">Live Exams</option>
               <option value="submission">Student Submissions</option>
@@ -335,9 +351,34 @@ const Reports = () => {
                     <td>
                       <div style={{ fontWeight: 700, color: '#1e293b', marginBottom: '2px', fontSize: '12.5px' }}>
                         {item.action}
+                        {item.type === 'donation' && item.amount && (
+                          <span style={{ marginLeft: '6px', padding: '2px 7px', background: '#ecfdf5', color: '#059669', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                            ৳{item.amount} {item.currency || 'BDT'}
+                          </span>
+                        )}
+                        {item.type === 'donation' && item.gateway && (
+                          <span style={{ marginLeft: '4px', padding: '2px 6px', background: item.gateway === 'bkash' ? '#fdf2f8' : '#fff7ed', color: item.gateway === 'bkash' ? '#e11d48' : '#ea580c', borderRadius: '4px', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>
+                            {item.gateway}
+                          </span>
+                        )}
                       </div>
                       <div style={{ color: '#64748b', fontSize: '11.5px', lineHeight: '1.4' }}>
-                        {item.text}
+                        {item.type === 'donation' ? (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '3px', alignItems: 'center' }}>
+                            {item.senderPhone && (
+                              <span style={{ background: '#f8fafc', padding: '2px 6px', borderRadius: '4px', border: '1px solid #e2e8f0', color: '#1e293b' }}>
+                                📱 Donor Mobile: <strong style={{ color: '#0f172a' }}>{item.senderPhone}</strong>
+                              </span>
+                            )}
+                            {item.trxId && (
+                              <span style={{ background: '#f8fafc', padding: '2px 6px', borderRadius: '4px', border: '1px solid #e2e8f0', color: '#1e293b' }}>
+                                🔑 TrxID: <strong style={{ color: '#059669', letterSpacing: '0.5px' }}>{item.trxId}</strong>
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          item.text
+                        )}
                         {item.score !== undefined && (
                           <span style={{ marginLeft: '6px', fontWeight: 700, color: '#059669' }}>
                             (Score: {item.score}/{item.total || 100}{item.timeTaken ? ` in ${item.timeTaken}` : ''})
@@ -347,7 +388,7 @@ const Reports = () => {
                     </td>
                     <td style={{ color: '#475569', fontSize: '11.5px', fontWeight: 600 }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
-                        <span>👤</span>
+                        <span>{item.type === 'donation' ? '💚' : '👤'}</span>
                         {item.user}
                       </span>
                     </td>
