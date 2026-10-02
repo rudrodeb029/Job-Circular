@@ -246,7 +246,6 @@ const Reports = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', marginBottom: '18px' }}>
         {[
           { label: 'Total Events', val: totalEvents, color: '#2563eb', bg: '#eff6ff', icon: '⚡' },
-          { label: 'Donations Received', val: totalDonations, color: '#059669', bg: '#ecfdf5', icon: '💚' },
           { label: 'Circular Posts', val: totalJobs, color: '#059669', bg: '#ecfdf5', icon: '📄' },
           { label: 'Exams & Submissions', val: totalExams, color: '#d97706', bg: '#fffbeb', icon: '📝' },
           { label: 'Push Notifications', val: totalNotifs, color: '#7c3aed', bg: '#f5f3ff', icon: '🔔' }
@@ -284,7 +283,6 @@ const Reports = () => {
               onChange={e => { setSelectedType(e.target.value); setCurrentPage(1); }}
             >
               <option value="all">All Event Types</option>
-              <option value="donation">Donations (bKash/Nagad)</option>
               <option value="job">Circulars</option>
               <option value="exam">Live Exams</option>
               <option value="submission">Student Submissions</option>

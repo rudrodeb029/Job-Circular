@@ -47,7 +47,6 @@ import LiveExamsPage from './pages/LiveExamsPage'
 import LiveExamRoom from './pages/LiveExamRoom'
 import QuestionsHub from './pages/QuestionsHub'
 import Feed from './pages/Feed'
-import Donate from './pages/Donate'
 import OfflineFeed from './pages/OfflineFeed'
 import SplashScreen from './pages/SplashScreen'
 
@@ -64,7 +63,6 @@ import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
 import AiManager from './pages/admin/AiManager'
 import ManageFeed from './pages/admin/ManageFeed'
-import ManageDonations from './pages/admin/ManageDonations'
 
 function App() {
   const { state } = useAppContext()
@@ -305,7 +303,6 @@ function App() {
           <Route path="settings" element={<AdminSettings />} />
           <Route path="ai-manager" element={<AiManager />} />
           <Route path="feed" element={<ManageFeed />} />
-          <Route path="donations" element={<ManageDonations />} />
         </Route>
       </Routes>
     )
@@ -432,7 +429,6 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/search" element={<SearchFilter />} />
           <Route path="/saved" element={<SavedJobs />} />
-          <Route path="/donate" element={<Donate />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/admit-card" element={<AdmitCardResult />} />
           <Route path="/profile" element={<Profile />} />

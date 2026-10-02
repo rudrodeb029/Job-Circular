@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { getDocument, COLLECTIONS } from '../../services/supabaseService';
 import { saveOneSignalConfig, broadcastPush } from '../../utils/oneSignalWrapper';
 import { getAppInfoConfig, saveAppInfoConfig, DEFAULT_APP_INFO } from '../../utils/appInfoService';
-import { getDonationConfig, saveDonationConfig, DEFAULT_DONATION_CONFIG } from '../../utils/donationService';
 
 const AdminSettings = () => {
   const { state, dispatch } = useAdminContext();
@@ -26,10 +25,6 @@ const AdminSettings = () => {
   const [appInfo, setAppInfo] = useState(DEFAULT_APP_INFO);
   const [appInfoSaving, setAppInfoSaving] = useState(false);
 
-  // Dynamic Donation Gateways (bKash & Nagad) Config State
-  const [donationConfig, setDonationConfig] = useState(DEFAULT_DONATION_CONFIG);
-  const [donationSaving, setDonationSaving] = useState(false);
-
   // Load Configs from Firestore on mount
   useEffect(() => {
     const loadConfig = async () => {
@@ -43,10 +38,6 @@ const AdminSettings = () => {
         // Load App Info (Contact Us, Rate Us, Share App)
         const info = await getAppInfoConfig(true);
         if (info) setAppInfo(info);
-
-        // Load Donation Settings (bKash & Nagad)
-        const donConfig = await getDonationConfig(true);
-        if (donConfig) setDonationConfig(donConfig);
       } catch (err) {
         console.error('Failed to load Configs from Firestore:', err);
       } finally {
@@ -90,19 +81,6 @@ const AdminSettings = () => {
       alert('❌ Failed to save App Info: ' + err.message);
     } finally {
       setAppInfoSaving(false);
-    }
-  };
-
-  const handleSaveDonationConfig = async (e) => {
-    e.preventDefault();
-    setDonationSaving(true);
-    try {
-      await saveDonationConfig(donationConfig);
-      alert('✅ Donation Gateway numbers (bKash & Nagad) saved successfully!');
-    } catch (err) {
-      alert('❌ Failed to save Donation config: ' + err.message);
-    } finally {
-      setDonationSaving(false);
     }
   };
 
@@ -381,87 +359,6 @@ const AdminSettings = () => {
               <button type="submit" disabled={appInfoSaving} style={{ padding: '14px 28px', background: '#4338ca', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(67, 56, 202, 0.2)' }}>
                 {appInfoSaving ? 'Saving Info...' : '💾 Save Contact, Rate & Share Config'}
               </button>
-            </div>
-          </form>
-        </div>
-
-        {/* Donation Gateways (bKash & Nagad) Configuration Card */}
-        <div className="settings-card" style={{ gridColumn: '1 / -1' }}>
-          <div className="section-header">
-            <div style={{ width: '36px', height: '36px', background: '#ecfdf5', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#059669' }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-              </svg>
-            </div>
-            <h3>Donation Gateway Settings</h3>
-          </div>
-          <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px', lineHeight: 1.5 }}>
-            Update the bKash Personal and Nagad Personal phone numbers where supporters send donations. Users will see these numbers directly on the Donate page with one-tap copy.
-          </p>
-
-          <form onSubmit={handleSaveDonationConfig} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-            <div style={{ background: '#fdf2f8', padding: '16px', borderRadius: '14px', border: '1px solid #fbcfe8' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#e11d48' }}></span>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#9f1239' }}>BKASH PERSONAL NUMBER</label>
-              </div>
-              <input 
-                className="modern-input" 
-                type="text" 
-                placeholder="e.g. 01750-123456" 
-                value={donationConfig.bkashNumber || ''} 
-                onChange={e => setDonationConfig({ ...donationConfig, bkashNumber: e.target.value })} 
-                style={{ background: '#ffffff', borderColor: '#f472b6', fontWeight: 700, letterSpacing: '0.5px' }}
-              />
-              <span style={{ fontSize: '11px', color: '#9f1239', marginTop: '6px', display: 'block' }}>
-                Displayed to donors selecting bKash Personal
-              </span>
-            </div>
-
-            <div style={{ background: '#fff7ed', padding: '16px', borderRadius: '14px', border: '1px solid #fed7aa' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ea580c' }}></span>
-                <label style={{ fontSize: '12px', fontWeight: 800, color: '#9a3412' }}>NAGAD PERSONAL NUMBER</label>
-              </div>
-              <input 
-                className="modern-input" 
-                type="text" 
-                placeholder="e.g. 01850-654321" 
-                value={donationConfig.nagadNumber || ''} 
-                onChange={e => setDonationConfig({ ...donationConfig, nagadNumber: e.target.value })} 
-                style={{ background: '#ffffff', borderColor: '#fb923c', fontWeight: 700, letterSpacing: '0.5px' }}
-              />
-              <span style={{ fontSize: '11px', color: '#9a3412', marginTop: '6px', display: 'block' }}>
-                Displayed to donors selecting Nagad Personal
-              </span>
-            </div>
-
-            <div style={{ gridColumn: '1 / -1', marginTop: '8px', display: 'flex', gap: '12px', alignItems: 'center' }}>
-              <button 
-                type="submit" 
-                disabled={donationSaving} 
-                style={{ 
-                  padding: '14px 28px', 
-                  background: '#059669', 
-                  color: 'white', 
-                  border: 'none', 
-                  borderRadius: '12px', 
-                  fontWeight: 700, 
-                  cursor: 'pointer', 
-                  boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <span>💾</span>
-                {donationSaving ? 'Saving Numbers...' : 'Save Donation Numbers'}
-              </button>
-              {donationConfig.updatedAt && (
-                <span style={{ fontSize: '11.5px', color: '#64748b' }}>
-                  Last updated: {new Date(donationConfig.updatedAt).toLocaleDateString()}
-                </span>
-              )}
             </div>
           </form>
         </div>
