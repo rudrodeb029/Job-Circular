@@ -442,12 +442,20 @@ export const Lightbulb = ({ size = 22, color = 'currentColor', className = '' })
 
 export const Donate = ({ size = 24, color = 'currentColor', className = '' }) => (
   <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
-    {/* Modern Hand holding a Heart with Coin / Patron Sparkle */}
-    <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L6 14H2v7h16a3 3 0 0 0 3-3v-2c0-.6-.4-1-1-1h-9" />
-    <path d="M16 4a2.5 2.5 0 0 0-2.5 2.5c0 .7.3 1.4.8 1.9l1.7 1.6 1.7-1.6c.5-.5.8-1.2.8-1.9A2.5 2.5 0 0 0 16 4z" fill="currentColor" fillOpacity="0.2" />
-    <path d="M16 4a2.5 2.5 0 0 0-2.5 2.5c0 .7.3 1.4.8 1.9l1.7 1.6 1.7-1.6c.5-.5.8-1.2.8-1.9A2.5 2.5 0 0 0 16 4z" />
+    {/* Modern Donation Box with Top Slot and Heart Emblem */}
+    <path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" />
+    <path d="M2 9h20" />
+    <path d="M9 5.5h6" />
+    <path 
+      d="M12 16.5c-2-1.5-4-3-3-4.5.7-1 2-.5 3 .5 1-1 2.3-1.5 3-.5 1 1.5-1 3-3 4.5" 
+      fill="currentColor" 
+      fillOpacity="0.2" 
+    />
+    <path d="M12 16.5c-2-1.5-4-3-3-4.5.7-1 2-.5 3 .5 1-1 2.3-1.5 3-.5 1 1.5-1 3-3 4.5" />
   </svg>
 );
+
+export const DonateBox = Donate;
 
 export const HeartHandshake = ({ size = 22, color = 'currentColor', className = '' }) => (
   <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">

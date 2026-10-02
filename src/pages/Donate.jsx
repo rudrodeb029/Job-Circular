@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, HandHeart, CheckCircle2, Copy } from '../components/Icons';
+import { ArrowLeft, HandHeart, CheckCircle2, Copy, Donate as DonateIcon } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { hideNativeBannerAd } from '../utils/admobUtils';
 import bkashLogo from '../assets/logos/bkash.png';
@@ -102,7 +102,7 @@ export default function Donate() {
           {/* Hero: Proper icon badge + Support related title (very small refined size) */}
           <div className="pixel-donate-hero animate-slide-up">
             <div className="pixel-icon-badge">
-              <HandHeart size={20} color="var(--donate-green)" />
+              <DonateIcon size={22} color="var(--donate-green)" />
             </div>
             <h1 className="pixel-impact-title">
               {isEn ? 'Support Live Circular' : 'আমাদের সাপোর্ট করুন'}
