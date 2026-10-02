@@ -106,12 +106,10 @@ export default function Donate() {
               <DonateIcon size={22} color="var(--donate-green)" />
             </div>
             <h1 className="pixel-impact-title">
-              {isEn ? 'Support Live Circular' : 'আমাদের সাপোর্ট করুন'}
+              Support Live Circular
             </h1>
             <p className="pixel-impact-sub">
-              {isEn 
-                ? 'Help us keep job notices & exam tools free and accessible for all' 
-                : 'সকলের জন্য উন্মুক্ত চাকরির তথ্য ও সেবা চালু রাখতে সহায়তা করুন'}
+              Help us keep job notices & exam tools free and accessible for all
             </p>
           </div>
 
@@ -195,23 +193,23 @@ export default function Donate() {
                 />
               )}
 
-              {/* Proper Donation Terms Notice (Before the tick box) */}
+              {/* Proper Donation Terms Notice (Always English as requested) */}
               <div className="pixel-terms-box">
                 <div className="pixel-terms-header">
                   <FileText size={12} color="var(--donate-green)" />
-                  <span>{isEn ? 'Donation Terms & Conditions' : 'অনুদানের শর্তাবলী ও নিয়মাবলী'}</span>
+                  <span>Donation Terms & Conditions</span>
                 </div>
                 <div className="pixel-terms-item">
                   <span className="pixel-terms-bullet">•</span>
-                  <span>{isEn ? 'Voluntary contribution to keep circulars, servers & prep tools free for all.' : 'সার্ভার সচল রাখা ও চাকরির তথ্য উন্মুক্ত রাখতে এটি একটি স্বেচ্ছাসেবী অবদান।'}</span>
+                  <span>Voluntary contribution to keep circulars, servers & prep tools free for all.</span>
                 </div>
                 <div className="pixel-terms-item">
                   <span className="pixel-terms-bullet">•</span>
-                  <span>{isEn ? 'Contributions are non-refundable and do not guarantee any employment.' : 'অনুদানের অর্থ অফেরতযোগ্য এবং কোনো চাকরির নিশ্চয়তা বহন করে না।'}</span>
+                  <span>Contributions are non-refundable and do not guarantee any employment.</span>
                 </div>
               </div>
 
-              {/* Agree To Terms Checkbox */}
+              {/* Agree To Terms Checkbox (Always English as requested) */}
               <div 
                 className="pixel-checkbox-row"
                 onClick={() => setAgreeTerms(prev => !prev)}
@@ -220,7 +218,7 @@ export default function Donate() {
                   {agreeTerms && <span style={{ color: 'white', fontSize: '11px', fontWeight: 900 }}>✓</span>}
                 </div>
                 <span className="pixel-checkbox-label">
-                  {isEn ? 'I Agree to the Terms & Conditions' : 'আমি অনুদানের শর্তাবলীতে সম্মত আছি'}
+                  I Agree to the Terms & Conditions
                 </span>
               </div>
 
