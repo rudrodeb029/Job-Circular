@@ -111,16 +111,29 @@ export default function Donate() {
 
   return (
     <div className="pixel-donate-page animate-fade-in">
-      {/* ═══ Top Minimal Header ═══ */}
-      <div className="pixel-donate-top-nav">
+      {/* ═══ Fixed White Modern Header (Matching Saved Jobs Page Header) ═══ */}
+      <div className="page-header" style={{ position: 'sticky', top: 0, zIndex: 100 }}>
         <button 
           onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)} 
-          className="pixel-back-btn"
+          className="back-btn"
           aria-label="Back"
+          style={{
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'var(--text-secondary)'
+          }}
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={20} />
         </button>
-        <div style={{ width: '36px' }} />
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, flex: 1 }}>
+          <DonateIcon size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+          <span>{isEn ? 'Support Us' : 'অনুদান ও সহায়তা'}</span>
+        </h1>
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
