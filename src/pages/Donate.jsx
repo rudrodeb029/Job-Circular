@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, Copy } from '../components/Icons';
+import { ArrowLeft, HandHeart, CheckCircle2, Copy } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { hideNativeBannerAd } from '../utils/admobUtils';
 import '../styles/donate.css';
@@ -83,31 +83,35 @@ export default function Donate() {
   return (
     <div className="pixel-donate-page animate-fade-in">
       {/* ═══ Top Minimal Header ═══ */}
-      {/* Notice: Red-marked sections (Hope Rise logo and hamburger icon) are completely removed as instructed */}
       <div className="pixel-donate-top-nav">
         <button 
           onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)} 
           className="pixel-back-btn"
           aria-label="Back"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
         </button>
-        <div style={{ width: '40px' }} />
+        <div style={{ width: '36px' }} />
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════
-          STEP 1: Choose Amount (Pixel-Perfect match to uploaded screenshot)
+          STEP 1: Choose Amount (Pixel-Perfect match with modern architecture)
           ══════════════════════════════════════════════════════════════════ */}
       {step === 1 && (
         <>
-          {/* Hero Titles */}
+          {/* Hero: Proper icon badge + Support related title (very small refined size) */}
           <div className="pixel-donate-hero animate-slide-up">
-            <div className="pixel-impact-badge">
-              Our Impact
+            <div className="pixel-icon-badge">
+              <HandHeart size={20} color="var(--donate-green)" />
             </div>
             <h1 className="pixel-impact-title">
-              Together, We're Making A Difference
+              {isEn ? 'Support Live Circular' : 'আমাদের সাপোর্ট করুন'}
             </h1>
+            <p className="pixel-impact-sub">
+              {isEn 
+                ? 'Help us keep job notices & exam tools free and accessible for all' 
+                : 'সকলের জন্য উন্মুক্ত চাকরির তথ্য ও সেবা চালু রাখতে সহায়তা করুন'}
+            </p>
           </div>
 
           {/* White Main Card Container */}
@@ -153,7 +157,7 @@ export default function Donate() {
                   onClick={() => setCurrency(prev => prev === 'USD' ? 'BDT' : 'USD')}
                 >
                   <span>{currency}</span>
-                  <span style={{ fontSize: '10px' }}>▼</span>
+                  <span style={{ fontSize: '9px' }}>▼</span>
                 </div>
               </div>
 
@@ -178,7 +182,7 @@ export default function Donate() {
                 onClick={() => setIsAnonymous(prev => !prev)}
               >
                 <div className={`pixel-checkbox-box ${isAnonymous ? 'checked' : ''}`}>
-                  {isAnonymous && <span style={{ color: 'white', fontSize: '13px', fontWeight: 900 }}>✓</span>}
+                  {isAnonymous && <span style={{ color: 'white', fontSize: '11px', fontWeight: 900 }}>✓</span>}
                 </div>
                 <span className="pixel-checkbox-label">Donate Anonymously</span>
               </div>
@@ -200,12 +204,12 @@ export default function Donate() {
                 onClick={() => setAgreeTerms(prev => !prev)}
               >
                 <div className={`pixel-checkbox-box ${agreeTerms ? 'checked' : ''}`}>
-                  {agreeTerms && <span style={{ color: 'white', fontSize: '13px', fontWeight: 900 }}>✓</span>}
+                  {agreeTerms && <span style={{ color: 'white', fontSize: '11px', fontWeight: 900 }}>✓</span>}
                 </div>
                 <span className="pixel-checkbox-label">I Agree To The Terms</span>
               </div>
 
-              {/* Big Vibrant Green Action Button */}
+              {/* Action Button */}
               <button 
                 type="button" 
                 className="pixel-donate-btn"
@@ -220,189 +224,161 @@ export default function Donate() {
 
       {/* ══════════════════════════════════════════════════════════════════
           STEP 2: Payment Method (bKash & Nagad) + Transaction ID (TrxID)
+          (Removed "Payment Gateway" badge & "Complete Your Donation" text as instructed)
           ══════════════════════════════════════════════════════════════════ */}
       {step === 2 && (
-        <>
-          <div className="pixel-donate-hero animate-slide-up">
-            <div className="pixel-impact-badge">
-              Payment Gateway
-            </div>
-            <h1 className="pixel-impact-title">
-              Complete Your Donation
-            </h1>
-          </div>
-
-          <div className="pixel-donate-card-wrapper">
-            <div className="pixel-donate-card animate-slide-up">
-              {/* Summary Pill */}
-              <div style={{
-                background: 'var(--donate-input-bg)',
-                borderRadius: '16px',
-                padding: '12px 16px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '18px',
-                border: '1px solid var(--donate-border)'
-              }}>
-                <div>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--donate-text-muted)', textTransform: 'uppercase' }}>
-                    Donation Amount
-                  </div>
-                  <div style={{ fontSize: '18px', fontWeight: 900, color: 'var(--donate-green)' }}>
-                    {currency === 'USD' ? '$' : '৳'} {amount} {currency}
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700 }}>
-                    {isMonthly ? 'Monthly 💚' : 'One-Time'}
-                  </div>
-                  <div style={{ fontSize: '11.5px', color: 'var(--donate-text-muted)' }}>
-                    {isAnonymous ? 'Anonymous' : donorName}
-                  </div>
-                </div>
-              </div>
-
-              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 12px 0' }}>
+        <div className="pixel-donate-card-wrapper" style={{ marginTop: '8px' }}>
+          <div className="pixel-donate-card animate-slide-up">
+            {/* Header: Compact Step Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--donate-text-primary)' }}>
                 Select Payment Method
-              </h3>
-
-              {/* Payment Methods: bKash & Nagad */}
-              <div className="pixel-payment-options-grid">
-                {/* bKash Card */}
-                <div 
-                  className={`pixel-payment-option-card bkash ${selectedGateway === 'bkash' ? 'selected' : ''}`}
-                  onClick={() => setSelectedGateway('bkash')}
-                >
-                  <div className="pixel-payment-badge-row">
-                    <div className="pixel-gateway-badge">
-                      <span className="pixel-gateway-logo-pill bkash">bKash</span>
-                      <span>bKash Personal / Send Money</span>
-                    </div>
-                    <div className={`pixel-checkbox-box ${selectedGateway === 'bkash' ? 'checked' : ''}`} style={{ width: '18px', height: '18px' }}>
-                      {selectedGateway === 'bkash' && <span style={{ color: 'white', fontSize: '11px' }}>✓</span>}
-                    </div>
-                  </div>
-
-                  {selectedGateway === 'bkash' && (
-                    <div className="pixel-number-copy-box">
-                      <span>bKash Number: <strong>{BKASH_NUMBER}</strong></span>
-                      <button 
-                        type="button" 
-                        className="pixel-copy-btn"
-                        onClick={(e) => { e.stopPropagation(); handleCopyNumber(BKASH_NUMBER); }}
-                      >
-                        {copiedNumber ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Nagad Card */}
-                <div 
-                  className={`pixel-payment-option-card nagad ${selectedGateway === 'nagad' ? 'selected' : ''}`}
-                  onClick={() => setSelectedGateway('nagad')}
-                >
-                  <div className="pixel-payment-badge-row">
-                    <div className="pixel-gateway-badge">
-                      <span className="pixel-gateway-logo-pill nagad">Nagad</span>
-                      <span>Nagad Personal / Send Money</span>
-                    </div>
-                    <div className={`pixel-checkbox-box ${selectedGateway === 'nagad' ? 'checked' : ''}`} style={{ width: '18px', height: '18px' }}>
-                      {selectedGateway === 'nagad' && <span style={{ color: 'white', fontSize: '11px' }}>✓</span>}
-                    </div>
-                  </div>
-
-                  {selectedGateway === 'nagad' && (
-                    <div className="pixel-number-copy-box">
-                      <span>Nagad Number: <strong>{NAGAD_NUMBER}</strong></span>
-                      <button 
-                        type="button" 
-                        className="pixel-copy-btn"
-                        onClick={(e) => { e.stopPropagation(); handleCopyNumber(NAGAD_NUMBER); }}
-                      >
-                        {copiedNumber ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Instructions */}
-              <div style={{
-                fontSize: '12px',
-                color: 'var(--donate-text-muted)',
-                lineHeight: 1.5,
-                background: 'var(--donate-input-bg)',
-                padding: '10px 14px',
-                borderRadius: '12px',
-                marginBottom: '16px',
-                borderLeft: '3px solid var(--donate-green)'
-              }}>
-                ১. আপনার {selectedGateway === 'bkash' ? 'বিকাশ' : 'নগদ'} অ্যাপ থেকে উপরে দেওয়া নম্বরে <strong>Send Money</strong> করুন।<br />
-                ২. সফল ট্রানজেকশনের পর <strong>Transaction ID (TrxID)</strong> কপি করে নিচের বক্সে লিখুন।
-              </div>
-
-              {/* Sender Phone Number Input */}
-              <div style={{ marginBottom: '12px' }}>
-                <label style={{ fontSize: '12.5px', fontWeight: 700, display: 'block', marginBottom: '6px' }}>
-                  Sender Mobile Number (প্রেরকের নম্বর)
-                </label>
-                <input
-                  type="text"
-                  className="pixel-donor-name-input"
-                  style={{ marginBottom: '0' }}
-                  placeholder="01XXXXXXXXX"
-                  value={senderNumber}
-                  onChange={(e) => setSenderNumber(e.target.value)}
-                />
-              </div>
-
-              {/* Transaction ID Input */}
-              <div style={{ marginBottom: '18px' }}>
-                <label style={{ fontSize: '12.5px', fontWeight: 700, display: 'block', marginBottom: '6px' }}>
-                  Transaction ID (TrxID) *
-                </label>
-                <input
-                  type="text"
-                  className="pixel-donor-name-input"
-                  style={{ marginBottom: '0', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 800 }}
-                  placeholder="e.g. 9KA71BX29"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                />
-              </div>
-
-              {/* Send Donation Button */}
+              </span>
               <button
                 type="button"
-                className="pixel-donate-btn"
-                onClick={handleConfirmDonation}
-                disabled={isSubmitting}
-                style={isSubmitting ? { opacity: 0.8, pointerEvents: 'none' } : {}}
+                onClick={() => setStep(1)}
+                style={{ background: 'none', border: 'none', color: 'var(--donate-green)', fontSize: '11.5px', fontWeight: 700, cursor: 'pointer', padding: 0 }}
               >
-                {isSubmitting ? 'VERIFYING...' : 'SEND DONATION'}
+                ← Change Amount
               </button>
+            </div>
 
-              <div style={{ textAlign: 'center', marginTop: '14px' }}>
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  style={{ background: 'none', border: 'none', color: 'var(--donate-text-muted)', fontSize: '13px', fontWeight: 700, cursor: 'pointer' }}
-                >
-                  ← Change Amount
-                </button>
+            {/* Compact Donation Summary Bar */}
+            <div className="pixel-step2-summary-card">
+              <div>
+                <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--donate-text-muted)', textTransform: 'uppercase' }}>
+                  Total Support
+                </div>
+                <div className="pixel-step2-summary-amount">
+                  {currency === 'USD' ? '$' : '৳'} {amount} {currency}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700 }}>
+                  {isMonthly ? 'Monthly 💚' : 'One-Time'}
+                </div>
+                <div style={{ fontSize: '10.5px', color: 'var(--donate-text-muted)' }}>
+                  {isAnonymous ? 'Anonymous Donor' : donorName}
+                </div>
               </div>
             </div>
+
+            {/* Payment Methods: bKash & Nagad (Modern polished architecture colors) */}
+            <div className="pixel-payment-options-grid">
+              {/* bKash Card */}
+              <div 
+                className={`pixel-payment-option-card bkash ${selectedGateway === 'bkash' ? 'selected' : ''}`}
+                onClick={() => setSelectedGateway('bkash')}
+              >
+                <div className="pixel-payment-badge-row">
+                  <div className="pixel-gateway-badge">
+                    <span className="pixel-gateway-logo-pill bkash">bKash</span>
+                    <span>bKash Personal / Send Money</span>
+                  </div>
+                  <div className={`pixel-checkbox-box ${selectedGateway === 'bkash' ? 'checked' : ''}`} style={{ width: '16px', height: '16px' }}>
+                    {selectedGateway === 'bkash' && <span style={{ color: 'white', fontSize: '10px' }}>✓</span>}
+                  </div>
+                </div>
+
+                {selectedGateway === 'bkash' && (
+                  <div className="pixel-number-copy-box">
+                    <span>Number: <strong>{BKASH_NUMBER}</strong></span>
+                    <button 
+                      type="button" 
+                      className="pixel-copy-btn"
+                      onClick={(e) => { e.stopPropagation(); handleCopyNumber(BKASH_NUMBER); }}
+                    >
+                      {copiedNumber ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Nagad Card */}
+              <div 
+                className={`pixel-payment-option-card nagad ${selectedGateway === 'nagad' ? 'selected' : ''}`}
+                onClick={() => setSelectedGateway('nagad')}
+              >
+                <div className="pixel-payment-badge-row">
+                  <div className="pixel-gateway-badge">
+                    <span className="pixel-gateway-logo-pill nagad">Nagad</span>
+                    <span>Nagad Personal / Send Money</span>
+                  </div>
+                  <div className={`pixel-checkbox-box ${selectedGateway === 'nagad' ? 'checked' : ''}`} style={{ width: '16px', height: '16px' }}>
+                    {selectedGateway === 'nagad' && <span style={{ color: 'white', fontSize: '10px' }}>✓</span>}
+                  </div>
+                </div>
+
+                {selectedGateway === 'nagad' && (
+                  <div className="pixel-number-copy-box">
+                    <span>Number: <strong>{NAGAD_NUMBER}</strong></span>
+                    <button 
+                      type="button" 
+                      className="pixel-copy-btn"
+                      onClick={(e) => { e.stopPropagation(); handleCopyNumber(NAGAD_NUMBER); }}
+                    >
+                      {copiedNumber ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Instruction box */}
+            <div className="pixel-instruction-box">
+              ১. আপনার {selectedGateway === 'bkash' ? 'বিকাশ' : 'নগদ'} থেকে উপরে দেওয়া নম্বরে <strong>Send Money</strong> করুন।<br />
+              ২. সফল ট্রানজেকশনের পর <strong>Transaction ID (TrxID)</strong> কপি করে নিচের বক্সে লিখুন।
+            </div>
+
+            {/* Sender Mobile Input */}
+            <div style={{ marginBottom: '10px' }}>
+              <label className="pixel-input-label">
+                Sender Mobile Number (প্রেরকের নম্বর)
+              </label>
+              <input
+                type="text"
+                className="pixel-donor-name-input"
+                style={{ marginBottom: '0' }}
+                placeholder="01XXXXXXXXX"
+                value={senderNumber}
+                onChange={(e) => setSenderNumber(e.target.value)}
+              />
+            </div>
+
+            {/* Transaction ID Input */}
+            <div style={{ marginBottom: '14px' }}>
+              <label className="pixel-input-label">
+                Transaction ID (TrxID) *
+              </label>
+              <input
+                type="text"
+                className="pixel-donor-name-input"
+                style={{ marginBottom: '0', textTransform: 'uppercase', letterSpacing: '0.8px', fontWeight: 800 }}
+                placeholder="e.g. 9KA71BX29"
+                value={transactionId}
+                onChange={(e) => setTransactionId(e.target.value)}
+              />
+            </div>
+
+            {/* Send Donation Button */}
+            <button
+              type="button"
+              className="pixel-donate-btn"
+              onClick={handleConfirmDonation}
+              disabled={isSubmitting}
+              style={isSubmitting ? { opacity: 0.8, pointerEvents: 'none' } : {}}
+            >
+              {isSubmitting ? 'VERIFYING...' : 'SEND DONATION'}
+            </button>
           </div>
-        </>
+        </div>
       )}
 
       {/* ══════════════════════════════════════════════════════════════════
           STEP 3: Celebratory "Thank You" Screen
           ══════════════════════════════════════════════════════════════════ */}
       {step === 3 && (
-        <div className="pixel-donate-card-wrapper" style={{ marginTop: '20px' }}>
+        <div className="pixel-donate-card-wrapper" style={{ marginTop: '12px' }}>
           <div className="pixel-donate-card pixel-thankyou-screen animate-slide-up">
             <div className="pixel-thankyou-circle animate-scale-up">
               ✓
@@ -413,7 +389,7 @@ export default function Donate() {
             </h1>
             <p className="pixel-thankyou-sub">
               Together, We're Making A Difference.<br />
-              Your contribution has been received for review.
+              Your support keeps Live Circular growing for everyone.
             </p>
 
             {/* Receipt Summary Card */}
@@ -423,8 +399,8 @@ export default function Donate() {
                 <strong style={{ color: 'var(--donate-text-primary)' }}>{isAnonymous ? 'Anonymous Donor' : donorName}</strong>
               </div>
               <div className="pixel-receipt-line">
-                <span>Method</span>
-                <span style={{ textTransform: 'capitalize' }}>{selectedGateway}</span>
+                <span>Payment Method</span>
+                <span style={{ textTransform: 'capitalize', fontWeight: 700 }}>{selectedGateway}</span>
               </div>
               <div className="pixel-receipt-line">
                 <span>Transaction ID</span>
@@ -432,10 +408,10 @@ export default function Donate() {
               </div>
               <div className="pixel-receipt-line">
                 <span>Frequency</span>
-                <span>{isMonthly ? 'Monthly' : 'One-Time'}</span>
+                <span>{isMonthly ? 'Monthly 💚' : 'One-Time'}</span>
               </div>
               <div className="pixel-receipt-line total">
-                <span>Total Amount</span>
+                <span>Total Support</span>
                 <span>{currency === 'USD' ? '$' : '৳'} {amount} {currency}</span>
               </div>
             </div>
@@ -444,7 +420,7 @@ export default function Donate() {
               type="button"
               className="pixel-donate-btn"
               onClick={() => navigate('/home')}
-              style={{ marginBottom: '12px' }}
+              style={{ marginBottom: '8px' }}
             >
               BACK TO HOME
             </button>
@@ -456,10 +432,10 @@ export default function Donate() {
                 background: 'transparent',
                 border: 'none',
                 color: 'var(--donate-text-muted)',
-                fontSize: '13px',
+                fontSize: '12px',
                 fontWeight: 700,
                 cursor: 'pointer',
-                padding: '8px'
+                padding: '6px'
               }}
             >
               Make Another Donation
