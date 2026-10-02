@@ -64,6 +64,7 @@ import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
 import AiManager from './pages/admin/AiManager'
 import ManageFeed from './pages/admin/ManageFeed'
+import ManageDonations from './pages/admin/ManageDonations'
 
 function App() {
   const { state } = useAppContext()
@@ -304,6 +305,7 @@ function App() {
           <Route path="settings" element={<AdminSettings />} />
           <Route path="ai-manager" element={<AiManager />} />
           <Route path="feed" element={<ManageFeed />} />
+          <Route path="donations" element={<ManageDonations />} />
         </Route>
       </Routes>
     )

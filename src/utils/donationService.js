@@ -1,4 +1,4 @@
-import { getDocument, setDocument, addDocument, COLLECTIONS } from '../services/supabaseService';
+import { getDocument, setDocument, addDocument, getCollection, deleteDocument, COLLECTIONS } from '../services/supabaseService';
 
 export const DEFAULT_DONATION_CONFIG = {
   bkashNumber: '01750-123456',
@@ -33,7 +33,7 @@ export const getDonationConfig = async (forceRefresh = false) => {
 };
 
 /**
- * Save dynamic donation gateway numbers from Admin Panel to Firestore
+ * Save dynamic donation gateway numbers from Admin Panel to Supabase
  */
 export const saveDonationConfig = async (config) => {
   const payload = {
@@ -48,7 +48,7 @@ export const saveDonationConfig = async (config) => {
 
 /**
  * Record a donor submission (sender number, TrxID, amount, gateway, donor name)
- * Stores in Firestore 'activities' collection so Admin can see it in real-time
+ * Stores in Supabase 'activities' collection so Admin can see it in real-time
  */
 export const recordDonationSubmission = async (donationData) => {
   try {
@@ -72,5 +72,32 @@ export const recordDonationSubmission = async (donationData) => {
   } catch (err) {
     console.error('recordDonationSubmission error:', err);
     return { success: false, error: err.message };
+  }
+};
+
+/**
+ * Fetch all donation submissions from Supabase activities collection
+ */
+export const getDonations = async (forceServer = false) => {
+  try {
+    const list = await getCollection(COLLECTIONS.ACTIVITIES, forceServer);
+    return (list || [])
+      .filter(item => item && (item.type === 'donation' || item.trxId || (item.action || '').toLowerCase().includes('donation')))
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  } catch (err) {
+    console.error('getDonations error:', err);
+    return [];
+  }
+};
+
+/**
+ * Delete a donation submission by ID
+ */
+export const deleteDonation = async (donationId) => {
+  try {
+    return await deleteDocument(COLLECTIONS.ACTIVITIES, donationId);
+  } catch (err) {
+    console.error('deleteDonation error:', err);
+    throw err;
   }
 };
