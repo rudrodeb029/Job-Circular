@@ -23,12 +23,12 @@ export default function Donate() {
   const [amount, setAmount] = useState('250');
   const currency = 'BDT'; // Always BDT as requested
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [donorName, setDonorName] = useState(state.user?.name || '');
+  const [donorName, setDonorName] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(true);
 
   // ═══ STEP 2: Payment Method & TrxID State ═══
   const [selectedGateway, setSelectedGateway] = useState('bkash'); // 'bkash' | 'nagad'
-  const [senderNumber, setSenderNumber] = useState(state.user?.phone || '');
+  const [senderNumber, setSenderNumber] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [copiedNumber, setCopiedNumber] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,6 +78,7 @@ export default function Donate() {
   const handleReset = () => {
     setStep(1);
     setTransactionId('');
+    setSenderNumber('');
   };
 
   return (
@@ -339,7 +340,7 @@ export default function Donate() {
                 type="text"
                 className="pixel-donor-name-input"
                 style={{ marginBottom: '0' }}
-                placeholder="01XXXXXXXXX"
+                placeholder=""
                 value={senderNumber}
                 onChange={(e) => setSenderNumber(e.target.value)}
               />
