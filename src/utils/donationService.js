@@ -1,4 +1,5 @@
-import { getDocument, setDocument, addDocument, getCollection, deleteDocument, COLLECTIONS } from '../services/supabaseService';
+import { getDocument, setDocument, addDocument, getCollection, deleteDocument, normalizeDoc, COLLECTIONS } from '../services/supabaseService';
+import { supabase } from '../services/supabaseClient';
 
 export const DEFAULT_DONATION_CONFIG = {
   bkashNumber: '01750-123456',
@@ -58,16 +59,19 @@ export const recordDonationSubmission = async (donationData) => {
       userName: donationData.donorName || (donationData.isAnonymous ? 'Anonymous Donor' : 'Donor'),
       senderPhone: donationData.senderPhone || '',
       trxId: donationData.trxId || '',
-      amount: donationData.amount || '0',
+      amount: String(donationData.amount || '0'),
       currency: donationData.currency || 'BDT',
       gateway: donationData.gateway || 'bkash',
       isMonthly: Boolean(donationData.isMonthly),
       isAnonymous: Boolean(donationData.isAnonymous),
-      description: `Donation of ৳${donationData.amount} via ${donationData.gateway.toUpperCase()} (TrxID: ${donationData.trxId}, Sender: ${donationData.senderPhone || 'N/A'})`,
+      description: `Donation of ৳${donationData.amount} via ${(donationData.gateway || 'bkash').toUpperCase()} (TrxID: ${donationData.trxId}, Sender: ${donationData.senderPhone || 'N/A'})`,
       createdAt: new Date().toISOString()
     };
 
     const saved = await addDocument(COLLECTIONS.ACTIVITIES, activityPayload);
+    try {
+      window.dispatchEvent(new CustomEvent('donation_received', { detail: saved }));
+    } catch (e) {}
     return { success: true, data: saved };
   } catch (err) {
     console.error('recordDonationSubmission error:', err);
@@ -80,8 +84,23 @@ export const recordDonationSubmission = async (donationData) => {
  */
 export const getDonations = async (forceServer = false) => {
   try {
-    const list = await getCollection(COLLECTIONS.ACTIVITIES, forceServer);
+    // 1. Direct query with orderBy
+    const { data, error } = await supabase
+      .from(COLLECTIONS.ACTIVITIES)
+      .select('*')
+      .order('createdAt', { ascending: false });
+
+    if (!error && Array.isArray(data)) {
+      return data
+        .map(normalizeDoc)
+        .filter(item => item && (item.type === 'donation' || item.trxId || (item.action || '').toLowerCase().includes('donation')))
+        .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    }
+
+    // 2. Fallback via getCollection
+    const list = await getCollection(COLLECTIONS.ACTIVITIES, true);
     return (list || [])
+      .map(normalizeDoc)
       .filter(item => item && (item.type === 'donation' || item.trxId || (item.action || '').toLowerCase().includes('donation')))
       .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
   } catch (err) {

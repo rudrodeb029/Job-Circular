@@ -23,7 +23,7 @@ const BLOCKED_USER_AGENTS = [
 const CORE_COLLECTIONS = [
   'jobs', 'notifications', 'admits',
   'questions', 'live_exams', 'feed_posts', 'app_config',
-  'offline_feed', 'activities'
+  'offline_feed'
 ];
 
 // Helper: সময় ফরম্যাট (সেকেন্ড → "Xm Ys")
@@ -726,7 +726,7 @@ export default {
 
     // Legacy: /live-exam-submit -> redirect to /exam-submit
     if (url.pathname === '/live-exam-submit' ||
-       ((url.pathname.includes('user_exam_submissions') || url.pathname.includes('activities')) &&
+       (url.pathname.includes('user_exam_submissions') &&
         (request.method === 'POST' || request.method === 'PUT' || request.method === 'PATCH'))) {
       try {
         const body = await request.json().catch(() => null);
@@ -756,7 +756,7 @@ export default {
 
     // STRICT GET CACHE LOCK (Candidate App only; Admin requests with no-cache or admin client header can bypass)
     const isNoCache = request.headers.get('Cache-Control')?.includes('no-cache');
-    const isAdminClient = appClientHeader.includes('admin') || isNoCache;
+    const isAdminClient = appClientHeader.includes('admin') || request.headers.get('referer')?.includes('/admin') || isNoCache;
 
     if (request.method === 'GET' && CORE_COLLECTIONS.includes(targetTable) && !isAdminClient) {
       return new Response(JSON.stringify({

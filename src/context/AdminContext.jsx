@@ -520,13 +520,14 @@ export const AdminProvider = ({ children }) => {
         setLoading(true);
       }
 
-      const [jobsData, notifsData, admitsData, questionsData, liveExamsData, feedPostsData] = await Promise.all([
+      const [jobsData, notifsData, admitsData, questionsData, liveExamsData, feedPostsData, activitiesData] = await Promise.all([
         getCollectionCached(COLLECTIONS.JOBS, forceServer),
         getCollectionCached(COLLECTIONS.NOTIFICATIONS, forceServer),
         getCollectionCached(COLLECTIONS.ADMITS, forceServer),
         getCollectionCached(COLLECTIONS.QUESTIONS, forceServer),
         getCollectionCached(COLLECTIONS.LIVE_EXAMS, forceServer),
-        getCollectionCached(COLLECTIONS.FEED_POSTS, forceServer)
+        getCollectionCached(COLLECTIONS.FEED_POSTS, forceServer),
+        getCollection(COLLECTIONS.ACTIVITIES, forceServer)
       ]);
 
       dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(jobsData) });
@@ -535,6 +536,10 @@ export const AdminProvider = ({ children }) => {
       dispatch({ type: 'SET_QUESTIONS', payload: mapWithTimestamps(questionsData) });
       dispatch({ type: 'SET_LIVE_EXAMS', payload: mapWithTimestamps(liveExamsData) });
       dispatch({ type: 'SET_FEED_POSTS', payload: mapWithTimestamps(feedPostsData) });
+      if (Array.isArray(activitiesData)) {
+        dispatch({ type: 'SET_ACTIVITIES', payload: mapWithTimestamps(activitiesData) });
+        saveLocalCache(COLLECTIONS.ACTIVITIES, mapWithTimestamps(activitiesData));
+      }
       dispatch({ type: 'SET_FIRESTORE_READY' });
     } catch (err) {
       console.error('Error fetching cached data:', err);

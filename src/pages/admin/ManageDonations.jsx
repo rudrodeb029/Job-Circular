@@ -52,7 +52,13 @@ export default function ManageDonations() {
   };
 
   useEffect(() => {
-    loadData(false);
+    loadData(true);
+
+    const handleDonationReceived = () => {
+      loadData(true);
+    };
+    window.addEventListener('donation_received', handleDonationReceived);
+    return () => window.removeEventListener('donation_received', handleDonationReceived);
   }, []);
 
   // Sync reactively with adminState activities if updated in realtime
