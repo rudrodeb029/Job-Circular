@@ -70,6 +70,7 @@ public class MainActivity extends BridgeActivity {
     private boolean isMobileAdsInitialized = false;
 
     private FrameLayout bannerContainer;
+    private View bannerTopDivider;
     private AdView bannerAdView;
     private boolean isBannerRequestedVisible = false;
     private boolean isCurrentThemeDark = false;
@@ -256,6 +257,23 @@ public class MainActivity extends BridgeActivity {
     // ══════════════════════════════════════════════════════════════════
     // 3. Banner Ad (Pinned Bottom of Screen - Controlled Per Route)
     // ══════════════════════════════════════════════════════════════════
+    private AdSize getAdaptiveAdSize() {
+        android.util.DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int widthPixels = displayMetrics.widthPixels;
+        float density = displayMetrics.density;
+        int adWidth = (int) (widthPixels / density);
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(this, adWidth);
+    }
+
+    private void updateBannerColors(boolean isDark) {
+        if (bannerContainer != null) {
+            bannerContainer.setBackgroundColor(isDark ? Color.parseColor("#0b0f19") : Color.WHITE);
+        }
+        if (bannerTopDivider != null) {
+            bannerTopDivider.setBackgroundColor(isDark ? Color.parseColor("#1e293b") : Color.parseColor("#e2e8f0"));
+        }
+    }
+
     private void loadBannerAd() {
         if (!isAdsEnabled || !isBannerAdsEnabled) {
             if (bannerContainer != null) {
@@ -277,7 +295,21 @@ public class MainActivity extends BridgeActivity {
                 );
                 bannerContainer.setLayoutParams(containerParams);
                 bannerContainer.setBackgroundColor(isCurrentThemeDark ? Color.parseColor("#0b0f19") : Color.WHITE);
+                bannerContainer.setElevation(16f);
                 bannerContainer.setVisibility(isBannerRequestedVisible ? View.VISIBLE : View.GONE);
+
+                // Top divider line matching bottom navbar border-top
+                bannerTopDivider = new View(this);
+                float density = getResources().getDisplayMetrics().density;
+                FrameLayout.LayoutParams dividerParams = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    Math.max(1, (int) (1 * density))
+                );
+                dividerParams.gravity = Gravity.TOP;
+                bannerTopDivider.setLayoutParams(dividerParams);
+                bannerContainer.addView(bannerTopDivider);
+
+                updateBannerColors(isCurrentThemeDark);
                 rootView.addView(bannerContainer);
             }
 
@@ -291,9 +323,11 @@ public class MainActivity extends BridgeActivity {
             if (bannerAdView == null) {
                 bannerAdView = new AdView(this);
                 bannerAdView.setAdSize(AdSize.BANNER);
+                bannerAdView.setAdSize(getAdaptiveAdSize());
                 bannerAdView.setAdUnitId(bannerAdUnitId);
 
                 FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM
@@ -305,6 +339,7 @@ public class MainActivity extends BridgeActivity {
                     public void onAdLoaded() {
                         super.onAdLoaded();
                         Log.d(TAG, "Banner Ad loaded successfully (" + bannerAdUnitId + ").");
+                        Log.d(TAG, "Adaptive Banner Ad loaded successfully (" + bannerAdUnitId + ").");
                         if (isAdsEnabled && isBannerAdsEnabled && isBannerRequestedVisible && bannerContainer != null) {
                             bannerContainer.setVisibility(View.VISIBLE);
                         } else if (bannerContainer != null) {
@@ -332,6 +367,7 @@ public class MainActivity extends BridgeActivity {
      * Controls banner ad visibility based on the active page route.
      * Hidden on Home, Feed, Saved, Notifications, Profile so it doesn't cover the BottomNav.
      * Shown at the bottom on all other pages.
+     * Shown at the bottom on all other pages with full edge-to-edge navbar style.
      */
     public void setBannerVisibility(boolean visible, boolean isDark) {
         this.isBannerRequestedVisible = visible;
@@ -340,6 +376,7 @@ public class MainActivity extends BridgeActivity {
             if (bannerContainer != null) {
                 if (visible && isAdsEnabled && isBannerAdsEnabled && bannerAdView != null) {
                     bannerContainer.setBackgroundColor(isDark ? Color.parseColor("#0b0f19") : Color.WHITE);
+                    updateBannerColors(isDark);
                     bannerContainer.setVisibility(View.VISIBLE);
                 } else {
                     bannerContainer.setVisibility(View.GONE);
@@ -680,6 +717,7 @@ public class MainActivity extends BridgeActivity {
         if (bannerContainer != null) {
             bannerContainer.removeAllViews();
             bannerContainer = null;
+            bannerTopDivider = null;
         }
         super.onDestroy();
     }
