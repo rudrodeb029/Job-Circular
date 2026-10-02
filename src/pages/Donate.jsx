@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, HandHeart, CheckCircle2, Copy, Donate as DonateIcon } from '../components/Icons';
+import { ArrowLeft, HandHeart, CheckCircle2, Copy, Donate as DonateIcon, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { hideNativeBannerAd } from '../utils/admobUtils';
 import bkashLogo from '../assets/logos/bkash.png';
@@ -195,6 +195,22 @@ export default function Donate() {
                 />
               )}
 
+              {/* Proper Donation Terms Notice (Before the tick box) */}
+              <div className="pixel-terms-box">
+                <div className="pixel-terms-header">
+                  <FileText size={12} color="var(--donate-green)" />
+                  <span>{isEn ? 'Donation Terms & Conditions' : 'অনুদানের শর্তাবলী ও নিয়মাবলী'}</span>
+                </div>
+                <div className="pixel-terms-item">
+                  <span className="pixel-terms-bullet">•</span>
+                  <span>{isEn ? 'Voluntary contribution to keep circulars, servers & prep tools free for all.' : 'সার্ভার সচল রাখা ও চাকরির তথ্য উন্মুক্ত রাখতে এটি একটি স্বেচ্ছাসেবী অবদান।'}</span>
+                </div>
+                <div className="pixel-terms-item">
+                  <span className="pixel-terms-bullet">•</span>
+                  <span>{isEn ? 'Contributions are non-refundable and do not guarantee any employment.' : 'অনুদানের অর্থ অফেরতযোগ্য এবং কোনো চাকরির নিশ্চয়তা বহন করে না।'}</span>
+                </div>
+              </div>
+
               {/* Agree To Terms Checkbox */}
               <div 
                 className="pixel-checkbox-row"
@@ -203,7 +219,9 @@ export default function Donate() {
                 <div className={`pixel-checkbox-box ${agreeTerms ? 'checked' : ''}`}>
                   {agreeTerms && <span style={{ color: 'white', fontSize: '11px', fontWeight: 900 }}>✓</span>}
                 </div>
-                <span className="pixel-checkbox-label">I Agree To The Terms</span>
+                <span className="pixel-checkbox-label">
+                  {isEn ? 'I Agree to the Terms & Conditions' : 'আমি অনুদানের শর্তাবলীতে সম্মত আছি'}
+                </span>
               </div>
 
               {/* Action Button */}
