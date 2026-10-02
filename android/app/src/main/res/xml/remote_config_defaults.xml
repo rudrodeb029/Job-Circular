@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <defaultsMap>
-    <!-- Master Ad Switch (Safe Default: false) -->
+    <!-- Master Ad Switch (Default: true for testing and immediate ad delivery) -->
     <entry>
         <key>show_ads</key>
-        <value>false</value>
+        <value>true</value>
     </entry>
 
     <!-- Granular Format Toggles -->

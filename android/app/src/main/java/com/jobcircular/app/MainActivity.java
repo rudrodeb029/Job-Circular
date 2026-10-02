@@ -61,7 +61,7 @@ public class MainActivity extends BridgeActivity {
 
     // ═══ Ad State & Remote Config Configured Values ═══
     private FirebaseRemoteConfig remoteConfig;
-    private boolean isAdsEnabled = false;
+    private boolean isAdsEnabled = true;
     private boolean isBannerAdsEnabled = true;
     private boolean isInterstitialAdsEnabled = true;
     private long interstitialCooldownSec = 50;
@@ -93,6 +93,9 @@ public class MainActivity extends BridgeActivity {
         // Set up JavaScript interface for React app to trigger ads
         setupAdJavascriptInterface();
 
+        // Initialize Mobile Ads and Meta test engine early
+        initializeMobileAdsAndMediation();
+
         // Initialize Firebase Remote Config to determine ad display
         setupRemoteConfig();
     }
@@ -104,9 +107,8 @@ public class MainActivity extends BridgeActivity {
         remoteConfig = FirebaseRemoteConfig.getInstance();
 
         FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
-            // PRODUCTION: 1 hour fetch cache interval to protect quota & battery
-            .setMinimumFetchIntervalInSeconds(3600L)
-            // .setMinimumFetchIntervalInSeconds(0L) // UNCOMMENT FOR INSTANT LOCAL DEV TESTING
+            // 0s fetch interval for immediate dev/test synchronization
+            .setMinimumFetchIntervalInSeconds(0L)
             .build();
         remoteConfig.setConfigSettingsAsync(configSettings);
 

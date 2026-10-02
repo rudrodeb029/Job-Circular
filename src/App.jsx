@@ -315,13 +315,13 @@ function App() {
   const prevPathRef = useRef(location.pathname);
 
   // Smart Tab Index Mapping:
-  // Home (0) -> Feed (1) -> Saved (2) -> Donate (3) -> Profile (4)
+  // Home (0) -> Feed (1) -> Saved (2) -> Notifications (3) -> Profile (4)
   const TAB_ORDER = {
     '/': 0,
     '/home': 0,
     '/feed': 1,
     '/saved': 2,
-    '/donate': 3,
+    '/notifications': 3,
     '/profile': 4
   };
 
@@ -352,7 +352,7 @@ function App() {
 
   const isTabRoute = (
     (location.pathname === '/' && hasSeenOnboarding) ||
-    ['/home', '/feed', '/saved', '/profile', '/donate'].includes(location.pathname)
+    ['/home', '/feed', '/saved', '/profile', '/notifications'].includes(location.pathname)
   );
 
   // ═══ Native Banner Ad Visibility Controller ═══
