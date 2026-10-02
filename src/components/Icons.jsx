@@ -437,3 +437,81 @@ export const Lightbulb = ({ size = 22, color = 'currentColor', className = '' })
     <path d="M10 22h4" />
   </svg>
 );
+
+// ═══ Modern Donation & Patron Icons ═══
+
+export const Donate = ({ size = 24, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    {/* Modern Hand holding a Heart with Coin / Patron Sparkle */}
+    <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L6 14H2v7h16a3 3 0 0 0 3-3v-2c0-.6-.4-1-1-1h-9" />
+    <path d="M16 4a2.5 2.5 0 0 0-2.5 2.5c0 .7.3 1.4.8 1.9l1.7 1.6 1.7-1.6c.5-.5.8-1.2.8-1.9A2.5 2.5 0 0 0 16 4z" fill="currentColor" fillOpacity="0.2" />
+    <path d="M16 4a2.5 2.5 0 0 0-2.5 2.5c0 .7.3 1.4.8 1.9l1.7 1.6 1.7-1.6c.5-.5.8-1.2.8-1.9A2.5 2.5 0 0 0 16 4z" />
+  </svg>
+);
+
+export const HeartHandshake = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+    <path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.86.86 2.24.86 3.1 0L15 8.2" />
+    <path d="m14 10 1.2 1.2a2 2 0 0 0 2.8 0l1.5-1.5" />
+    <path d="m8.5 12.5 1 1a2 2 0 0 0 2.8 0l1.2-1.2" />
+  </svg>
+);
+
+export const HandHeart = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M11 14h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L6 14H2v7h16a3 3 0 0 0 3-3v-2c0-.6-.4-1-1-1h-9" />
+    <path d="M16 4a2.5 2.5 0 0 0-2.5 2.5c0 .7.3 1.4.8 1.9l1.7 1.6 1.7-1.6c.5-.5.8-1.2.8-1.9A2.5 2.5 0 0 0 16 4z" />
+  </svg>
+);
+
+export const Coins = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <circle cx="8" cy="8" r="6" />
+    <path d="M18.09 10.37A6 6 0 1 1 10.34 18" />
+    <path d="M7 6h1v4" />
+    <path d="m16.71 13.88.7.71-2.82 2.82" />
+  </svg>
+);
+
+export const CheckCircle2 = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10" />
+    <path d="m9 12 2 2 4-4" />
+  </svg>
+);
+
+export const CreditCard = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <rect width="20" height="14" x="2" y="5" rx="2" />
+    <line x1="2" x2="22" y1="10" y2="10" />
+  </svg>
+);
+
+export const Gift = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <polyline points="20 12 20 22 4 22 4 12" />
+    <rect width="20" height="5" x="2" y="7" />
+    <line x1="12" x2="12" y1="22" y2="7" />
+    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+  </svg>
+);
+
+export const Sparkles = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    <path d="M5 3v4" />
+    <path d="M19 17v4" />
+    <path d="M3 5h4" />
+    <path d="M17 19h4" />
+  </svg>
+);
+
+export const Copy = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+  </svg>
+);
+

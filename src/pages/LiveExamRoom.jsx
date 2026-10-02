@@ -8,6 +8,7 @@ import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, CO
 import { supabase } from '../services/supabaseClient';
 import ModernLoader from '../components/ModernLoader';
 import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult, getExamResult, saveLeaderboard, getLeaderboard, getExamFromSQLite, saveExamToSQLite } from '../services/sqliteService';
+import { showNativeInterstitialAd } from '../utils/admobUtils';
 
 export default function LiveExamRoom() {
   const { id } = useParams();
@@ -496,6 +497,9 @@ export default function LiveExamRoom() {
 
   const handleSubmit = async () => {
     if (savedResult || submitted || submitting) return;
+
+    // Trigger Interstitial Ad when clicking Submit in Live Exam section
+    showNativeInterstitialAd(true);
 
     setSubmitting(true);
 

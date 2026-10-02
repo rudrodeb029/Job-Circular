@@ -14,6 +14,7 @@ import PortalWarningModal from '../components/PortalWarningModal';
 import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
+import { showNativeInterstitialAd } from '../utils/admobUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -121,6 +122,9 @@ export default function ExamDetails() {
   const handleDownloadNotice = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     
+    // Trigger Interstitial Ad on Notice download
+    showNativeInterstitialAd();
+
     const rawFileUrl = rawImagesList[activeImageIndex] ||
                        circularImages[activeImageIndex] ||
                        job.imageUrl ||

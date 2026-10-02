@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { useAppContext } from '../context/AppContext';
+import { showNativeInterstitialAd } from '../utils/admobUtils';
 
 // Smart URL Formatter: BD Govt / Teletalk subdomains fail on HTTPS with ERR_CERT_AUTHORITY_INVALID, but work on HTTP
 export function sanitizePortalUrl(inputUrl) {
@@ -62,6 +63,9 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
   };
 
   const proceedToPortal = async () => {
+    // Trigger Interstitial Ad when confirming external portal navigation
+    showNativeInterstitialAd(true);
+    
     setLoading(true);
     if (Capacitor.isNativePlatform()) {
       try {

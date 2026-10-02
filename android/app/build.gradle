@@ -64,6 +64,17 @@ dependencies {
     implementation "androidx.core:core-splashscreen:$rootProject.ext.coreSplashScreenVersion"
     implementation "androidx.browser:browser:$rootProject.ext.androidxBrowserVersion"
     implementation 'com.onesignal:OneSignal:5.1.21'
+
+    // Firebase BoM & Remote Config
+    implementation platform('com.google.firebase:firebase-bom:33.9.0')
+    implementation 'com.google.firebase:firebase-config'
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // Google Mobile Ads (AdMob) SDK
+    implementation 'com.google.android.gms:play-services-ads:23.6.0'
+
+    // Meta Audience Network Mediation Adapter (Official Google Certified)
+    implementation 'com.google.ads.mediation:facebook:6.18.0.0'
 }
 
 apply from: 'capacitor.build.gradle'

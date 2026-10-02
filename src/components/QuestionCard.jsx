@@ -1,4 +1,5 @@
 import React from 'react';
+import { showNativeInterstitialAd } from '../utils/admobUtils';
 
 /**
  * Pixel-Perfect Question Grid Card Component
@@ -26,9 +27,15 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
 
   const activeIcon = categoryIcon || categoryIconMap[paper.category] || paper.icon || paper.categoryIcon;
 
+  const handleCardClick = (e) => {
+    // Trigger Interstitial Ad when clicking question card
+    showNativeInterstitialAd();
+    if (onClick) onClick(e);
+  };
+
   return (
     <div
-      onClick={onClick}
+      onClick={handleCardClick}
       style={{
         background: '#ffffff',
         borderRadius: '16px',

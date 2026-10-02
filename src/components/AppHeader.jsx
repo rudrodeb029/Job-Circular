@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight, Briefcase, Calendar, Rss } from './Icons';
+import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight, Briefcase, Calendar, Rss, Donate } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsData } from '../data/questionsData';
@@ -510,6 +510,11 @@ const AppHeader = React.memo(function AppHeader() {
               <Link to="/admit-card" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
                 <div className="menu-item-icon"><Calendar size={20} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
+              </Link>
+
+              <Link to="/donate" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
+                <div className="menu-item-icon"><Donate size={20} /></div>
+                <span className="menu-item-label">{state.language === 'en' ? 'Donate / Causes' : 'অনুদান / তহবিল'}</span>
               </Link>
 
               <Link to="/notifications" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>

@@ -1,21 +1,80 @@
 package com.jobcircular.app;
 
 import android.app.DownloadManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.JavascriptInterface;
 import android.webkit.URLUtil;
+import android.widget.FrameLayout;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.core.splashscreen.SplashScreen;
 import com.getcapacitor.BridgeActivity;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
 import com.onesignal.debug.LogLevel;
 
+// ═══ AdMob, Meta Mediation & Firebase Remote Config Imports ═══
+import com.google.firebase.remoteconfig.ConfigUpdate;
+import com.google.firebase.remoteconfig.ConfigUpdateListener;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigException;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.FullScreenContentCallback;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.RequestConfiguration;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.facebook.ads.AdSettings;
+
+import java.util.Collections;
+
 public class MainActivity extends BridgeActivity {
+    private static final String TAG = "AdMobMetaMediation";
     private static final String ONESIGNAL_APP_ID = "54decc7c-7653-48d2-bf9d-dc1bc0ff0307";
+
+    // ═══ Remote Config Parameter Keys ═══
+    private static final String REMOTE_CONFIG_KEY_SHOW_ADS = "show_ads";
+    private static final String REMOTE_CONFIG_KEY_SHOW_BANNER = "show_banner_ads";
+    private static final String REMOTE_CONFIG_KEY_SHOW_INTERSTITIAL = "show_interstitial_ads";
+    private static final String REMOTE_CONFIG_KEY_COOLDOWN_SEC = "interstitial_cooldown_sec";
+    private static final String REMOTE_CONFIG_KEY_BANNER_ID = "admob_banner_id";
+    private static final String REMOTE_CONFIG_KEY_INTERSTITIAL_ID = "admob_interstitial_id";
+
+    // ═══ Default Official Test Ad Unit IDs ═══
+    private static final String DEFAULT_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111";
+    private static final String DEFAULT_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
+
+    // ═══ Ad State & Remote Config Configured Values ═══
+    private FirebaseRemoteConfig remoteConfig;
+    private boolean isAdsEnabled = false;
+    private boolean isBannerAdsEnabled = true;
+    private boolean isInterstitialAdsEnabled = true;
+    private long interstitialCooldownSec = 50;
+    private String bannerAdUnitId = DEFAULT_BANNER_AD_UNIT_ID;
+    private String interstitialAdUnitId = DEFAULT_INTERSTITIAL_AD_UNIT_ID;
+    private boolean isMobileAdsInitialized = false;
+
+    private FrameLayout bannerContainer;
+    private AdView bannerAdView;
+    private boolean isBannerRequestedVisible = false;
+    private boolean isCurrentThemeDark = false;
+    private InterstitialAd interstitialAd;
+    private boolean isInterstitialLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +89,428 @@ public class MainActivity extends BridgeActivity {
 
         // Set up in-app DownloadListener to handle file downloads via Android DownloadManager without leaving the app
         setupDownloadListener();
+
+        // Set up JavaScript interface for React app to trigger ads
+        setupAdJavascriptInterface();
+
+        // Initialize Firebase Remote Config to determine ad display
+        setupRemoteConfig();
     }
 
+    // ══════════════════════════════════════════════════════════════════
+    // 1. Firebase Remote Config Setup & Real-Time Listener
+    // ══════════════════════════════════════════════════════════════════
+    private void setupRemoteConfig() {
+        remoteConfig = FirebaseRemoteConfig.getInstance();
+
+        FirebaseRemoteConfigSettings configSettings = new FirebaseRemoteConfigSettings.Builder()
+            // PRODUCTION: 1 hour fetch cache interval to protect quota & battery
+            .setMinimumFetchIntervalInSeconds(3600L)
+            // .setMinimumFetchIntervalInSeconds(0L) // UNCOMMENT FOR INSTANT LOCAL DEV TESTING
+            .build();
+        remoteConfig.setConfigSettingsAsync(configSettings);
+
+        // Set XML Defaults (includes show_ads=false, toggles, cooldown, test IDs)
+        remoteConfig.setDefaultsAsync(R.xml.remote_config_defaults);
+
+        // Initial fetch and activate
+        remoteConfig.fetchAndActivate().addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                Log.d(TAG, "Remote Config fetch and activate succeeded.");
+            } else {
+                Log.w(TAG, "Remote Config fetch failed. Falling back to defaults/cache.");
+            }
+            applyRemoteConfigParameters();
+        });
+
+        // Real-time Remote Config updates listener (Firebase BoM 33+)
+        remoteConfig.addOnConfigUpdateListener(new ConfigUpdateListener() {
+            @Override
+            public void onUpdate(@NonNull ConfigUpdate configUpdate) {
+                Log.d(TAG, "Remote Config real-time update received: " + configUpdate.getUpdatedKeys());
+                remoteConfig.activate().addOnCompleteListener(MainActivity.this, task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "Remote Config activated after real-time update.");
+                        applyRemoteConfigParameters();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(@NonNull FirebaseRemoteConfigException error) {
+                Log.e(TAG, "Remote Config real-time update error: " + error.getMessage(), error);
+            }
+        });
+    }
+
+    private void applyRemoteConfigParameters() {
+        isAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_ADS);
+        isBannerAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_BANNER);
+        isInterstitialAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_INTERSTITIAL);
+        interstitialCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_COOLDOWN_SEC);
+        if (interstitialCooldownSec <= 0) {
+            interstitialCooldownSec = 50;
+        }
+
+        String bId = remoteConfig.getString(REMOTE_CONFIG_KEY_BANNER_ID);
+        if (bId != null && !bId.trim().isEmpty()) {
+            bannerAdUnitId = bId.trim();
+        } else {
+            bannerAdUnitId = DEFAULT_BANNER_AD_UNIT_ID;
+        }
+
+        String iId = remoteConfig.getString(REMOTE_CONFIG_KEY_INTERSTITIAL_ID);
+        if (iId != null && !iId.trim().isEmpty()) {
+            interstitialAdUnitId = iId.trim();
+        } else {
+            interstitialAdUnitId = DEFAULT_INTERSTITIAL_AD_UNIT_ID;
+        }
+
+        Log.d(TAG, String.format(
+            "Remote Config Applied -> show_ads: %b, banner: %b, interstitial: %b, cooldown: %ds, bannerId: %s, interstitialId: %s",
+            isAdsEnabled, isBannerAdsEnabled, isInterstitialAdsEnabled, interstitialCooldownSec, bannerAdUnitId, interstitialAdUnitId
+        ));
+
+        runOnUiThread(() -> {
+            if (isAdsEnabled) {
+                initializeMobileAdsAndMediation();
+                if (isBannerAdsEnabled && isBannerRequestedVisible) {
+                    if (bannerAdView != null) {
+                        bannerContainer.setVisibility(View.VISIBLE);
+                    } else {
+                        loadBannerAd();
+                    }
+                } else if (bannerContainer != null) {
+                    bannerContainer.setVisibility(View.GONE);
+                }
+            } else {
+                Log.d(TAG, "Ads are disabled via Remote Config master switch.");
+                if (bannerContainer != null) {
+                    bannerContainer.setVisibility(View.GONE);
+                }
+                interstitialAd = null;
+            }
+
+            // Notify web frontend of the updated remote config parameters
+            notifyWebviewConfigUpdated();
+        });
+    }
+
+    private void notifyWebviewConfigUpdated() {
+        try {
+            if (this.bridge != null && this.bridge.getWebView() != null) {
+                String js = String.format(
+                    "window.dispatchEvent(new CustomEvent('remote_config_ads_updated', { detail: { " +
+                    "show_ads: %b, show_banner_ads: %b, show_interstitial_ads: %b, " +
+                    "interstitial_cooldown_sec: %d, admob_banner_id: '%s', admob_interstitial_id: '%s' } }));",
+                    isAdsEnabled, isBannerAdsEnabled, isInterstitialAdsEnabled,
+                    interstitialCooldownSec, bannerAdUnitId, interstitialAdUnitId
+                );
+                this.bridge.getWebView().evaluateJavascript(js, null);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error notifying WebView about Remote Config update: " + e.getMessage());
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 2. Google Mobile Ads & Meta Mediation Initialization
+    // ══════════════════════════════════════════════════════════════════
+    private void initializeMobileAdsAndMediation() {
+        if (isMobileAdsInitialized) {
+            if (isBannerAdsEnabled && isBannerRequestedVisible && bannerAdView == null) {
+                loadBannerAd();
+            }
+            if (isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
+                loadInterstitialAd();
+            }
+            return;
+        }
+
+        // Meta Audience Network Test Mode
+        AdSettings.setTestMode(true);
+        // AdSettings.addTestDevice("YOUR_META_HASHED_DEVICE_ID_HERE");
+
+        // AdMob Test Device configuration
+        RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
+            .setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR))
+            .build();
+        MobileAds.setRequestConfiguration(requestConfiguration);
+
+        MobileAds.initialize(this, initializationStatus -> {
+            isMobileAdsInitialized = true;
+            Log.d(TAG, "Mobile Ads Initialized: " + initializationStatus);
+            runOnUiThread(() -> {
+                if (isBannerAdsEnabled && isBannerRequestedVisible) {
+                    loadBannerAd();
+                }
+                if (isInterstitialAdsEnabled) {
+                    loadInterstitialAd();
+                }
+            });
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 3. Banner Ad (Pinned Bottom of Screen - Controlled Per Route)
+    // ══════════════════════════════════════════════════════════════════
+    private void loadBannerAd() {
+        if (!isAdsEnabled || !isBannerAdsEnabled) {
+            if (bannerContainer != null) {
+                bannerContainer.setVisibility(View.GONE);
+            }
+            return;
+        }
+
+        runOnUiThread(() -> {
+            ViewGroup rootView = findViewById(android.R.id.content);
+            if (rootView == null) return;
+
+            if (bannerContainer == null) {
+                bannerContainer = new FrameLayout(this);
+                FrameLayout.LayoutParams containerParams = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.BOTTOM
+                );
+                bannerContainer.setLayoutParams(containerParams);
+                bannerContainer.setBackgroundColor(isCurrentThemeDark ? Color.parseColor("#0b0f19") : Color.WHITE);
+                bannerContainer.setVisibility(isBannerRequestedVisible ? View.VISIBLE : View.GONE);
+                rootView.addView(bannerContainer);
+            }
+
+            // If bannerAdView exists but adUnitId differs, recreate AdView
+            if (bannerAdView != null && !bannerAdUnitId.equals(bannerAdView.getAdUnitId())) {
+                bannerContainer.removeView(bannerAdView);
+                bannerAdView.destroy();
+                bannerAdView = null;
+            }
+
+            if (bannerAdView == null) {
+                bannerAdView = new AdView(this);
+                bannerAdView.setAdSize(AdSize.BANNER);
+                bannerAdView.setAdUnitId(bannerAdUnitId);
+
+                FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM
+                );
+                bannerContainer.addView(bannerAdView, adParams);
+
+                bannerAdView.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                        Log.d(TAG, "Banner Ad loaded successfully (" + bannerAdUnitId + ").");
+                        if (isAdsEnabled && isBannerAdsEnabled && isBannerRequestedVisible && bannerContainer != null) {
+                            bannerContainer.setVisibility(View.VISIBLE);
+                        } else if (bannerContainer != null) {
+                            bannerContainer.setVisibility(View.GONE);
+                        }
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.e(TAG, "Banner Ad failed to load: " + loadAdError.getMessage());
+                        if (bannerContainer != null) {
+                            bannerContainer.setVisibility(View.GONE);
+                        }
+                    }
+                });
+            }
+
+            AdRequest adRequest = new AdRequest.Builder().build();
+            bannerAdView.loadAd(adRequest);
+        });
+    }
+
+    /**
+     * Controls banner ad visibility based on the active page route.
+     * Hidden on Home, Feed, Saved, Notifications, Profile so it doesn't cover the BottomNav.
+     * Shown at the bottom on all other pages.
+     */
+    public void setBannerVisibility(boolean visible, boolean isDark) {
+        this.isBannerRequestedVisible = visible;
+        this.isCurrentThemeDark = isDark;
+        runOnUiThread(() -> {
+            if (bannerContainer != null) {
+                if (visible && isAdsEnabled && isBannerAdsEnabled && bannerAdView != null) {
+                    bannerContainer.setBackgroundColor(isDark ? Color.parseColor("#0b0f19") : Color.WHITE);
+                    bannerContainer.setVisibility(View.VISIBLE);
+                } else {
+                    bannerContainer.setVisibility(View.GONE);
+                }
+            } else if (visible && isAdsEnabled && isBannerAdsEnabled) {
+                loadBannerAd();
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 4. Interstitial Ad (Strict Single-Show & Immediate Dismissal)
+    // ══════════════════════════════════════════════════════════════════
+    private void loadInterstitialAd() {
+        if (!isAdsEnabled || !isInterstitialAdsEnabled || isInterstitialLoading || interstitialAd != null) {
+            return;
+        }
+
+        isInterstitialLoading = true;
+        AdRequest adRequest = new AdRequest.Builder().build();
+
+        InterstitialAd.load(this, interstitialAdUnitId, adRequest,
+            new InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull InterstitialAd ad) {
+                    interstitialAd = ad;
+                    isInterstitialLoading = false;
+                    Log.d(TAG, "Interstitial Ad successfully loaded into memory cache (" + interstitialAdUnitId + ").");
+
+                    // Attach strict lifecycle callbacks
+                    ad.setFullScreenContentCallback(new FullScreenContentCallback() {
+                        @Override
+                        public void onAdDismissedFullScreenContent() {
+                            super.onAdDismissedFullScreenContent();
+                            Log.d(TAG, "Interstitial ad dismissed by user.");
+
+                            // 1. Properly set the current interstitial ad object to null
+                            interstitialAd = null;
+
+                            // 2. Return user to normal app flow seamlessly (NO second ad immediately)
+
+                            // 3. Pre-cache next ad in background memory (DOES NOT AUTO SHOW)
+                            if (isAdsEnabled && isInterstitialAdsEnabled) {
+                                loadInterstitialAd();
+                            }
+                        }
+
+                        @Override
+                        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                            super.onAdFailedToShowFullScreenContent(adError);
+                            Log.e(TAG, "Interstitial ad failed to show: " + adError.getMessage());
+                            interstitialAd = null;
+                            if (isAdsEnabled && isInterstitialAdsEnabled) {
+                                loadInterstitialAd();
+                            }
+                        }
+
+                        @Override
+                        public void onAdShowedFullScreenContent() {
+                            super.onAdShowedFullScreenContent();
+                            Log.d(TAG, "Interstitial ad displayed on screen.");
+                        }
+
+                        @Override
+                        public void onAdImpression() {
+                            super.onAdImpression();
+                            Log.d(TAG, "Interstitial ad impression recorded.");
+                        }
+
+                        @Override
+                        public void onAdClicked() {
+                            super.onAdClicked();
+                            Log.d(TAG, "Interstitial ad clicked by user.");
+                        }
+                    });
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    interstitialAd = null;
+                    isInterstitialLoading = false;
+                    Log.e(TAG, "Interstitial Ad failed to load: " + loadAdError.getMessage());
+                }
+            }
+        );
+    }
+
+    /**
+     * Triggered from Java or JavaScript when user completes an action.
+     */
+    public void showInterstitialAd() {
+        if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd != null) {
+            Log.d(TAG, "Showing Interstitial Ad...");
+            interstitialAd.show(this);
+        } else {
+            Log.d(TAG, "Interstitial ad not ready or ads disabled. Proceeding without ad.");
+            if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
+                loadInterstitialAd();
+            }
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 5. JavaScript Interface for React Frontend
+    // ══════════════════════════════════════════════════════════════════
+    private void setupAdJavascriptInterface() {
+        try {
+            if (this.bridge != null && this.bridge.getWebView() != null) {
+                this.bridge.getWebView().addJavascriptInterface(new Object() {
+                    @JavascriptInterface
+                    public void showInterstitial() {
+                        runOnUiThread(() -> MainActivity.this.showInterstitialAd());
+                    }
+
+                    @JavascriptInterface
+                    public void showBanner() {
+                        runOnUiThread(() -> MainActivity.this.setBannerVisibility(true, false));
+                    }
+
+                    @JavascriptInterface
+                    public void showBannerWithTheme(boolean isDark) {
+                        runOnUiThread(() -> MainActivity.this.setBannerVisibility(true, isDark));
+                    }
+
+                    @JavascriptInterface
+                    public void hideBanner() {
+                        runOnUiThread(() -> MainActivity.this.setBannerVisibility(false, false));
+                    }
+
+                    @JavascriptInterface
+                    public void setBannerVisibility(boolean visible) {
+                        runOnUiThread(() -> MainActivity.this.setBannerVisibility(visible, false));
+                    }
+
+                    @JavascriptInterface
+                    public boolean isAdsEnabled() {
+                        return isAdsEnabled;
+                    }
+
+                    @JavascriptInterface
+                    public boolean isBannerAdsEnabled() {
+                        return isAdsEnabled && isBannerAdsEnabled;
+                    }
+
+                    @JavascriptInterface
+                    public boolean isInterstitialAdsEnabled() {
+                        return isAdsEnabled && isInterstitialAdsEnabled;
+                    }
+
+                    @JavascriptInterface
+                    public long getInterstitialCooldownSec() {
+                        return interstitialCooldownSec;
+                    }
+
+                    @JavascriptInterface
+                    public String getBannerAdUnitId() {
+                        return bannerAdUnitId;
+                    }
+
+                    @JavascriptInterface
+                    public String getInterstitialAdUnitId() {
+                        return interstitialAdUnitId;
+                    }
+                }, "AndroidAds");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
+    // 6. In-App Download Listener (Existing Core Functionality)
+    // ══════════════════════════════════════════════════════════════════
     private void setupDownloadListener() {
         try {
             if (this.bridge != null && this.bridge.getWebView() != null) {
@@ -160,14 +639,46 @@ public class MainActivity extends BridgeActivity {
         }).start();
     }
 
+    // ══════════════════════════════════════════════════════════════════
+    // 7. Activity Lifecycle Management
+    // ══════════════════════════════════════════════════════════════════
     @Override
     public void onStart() {
         super.onStart();
-        // Request push notification permission when activity window is attached and active across all Android versions
+        // Request push notification permission when activity window is attached and active
         try {
             OneSignal.getNotifications().requestPermission(true, Continue.none());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onPause() {
+        if (bannerAdView != null) {
+            bannerAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (bannerAdView != null) {
+            bannerAdView.resume();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (bannerAdView != null) {
+            bannerAdView.destroy();
+            bannerAdView = null;
+        }
+        if (bannerContainer != null) {
+            bannerContainer.removeAllViews();
+            bannerContainer = null;
+        }
+        super.onDestroy();
     }
 }

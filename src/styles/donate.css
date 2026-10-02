@@ -1,0 +1,501 @@
+/* ══════════════════════════════════════════════════════════════════
+   Hope & Impact Donate Page Styling
+   Pixel-perfect replication of reference image design
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --donate-canvas-bg: #f5eedc;
+  --donate-card-bg: #ffffff;
+  --donate-text-primary: #1c1917;
+  --donate-text-muted: #78716c;
+  --donate-green: #22c55e;
+  --donate-green-hover: #16a34a;
+  --donate-green-light: #dcfce7;
+  --donate-border: #e7e5e4;
+  --donate-input-bg: #fafaf9;
+}
+
+[data-theme="dark"] {
+  --donate-canvas-bg: #111827;
+  --donate-card-bg: #1f2937;
+  --donate-text-primary: #f9fafb;
+  --donate-text-muted: #9ca3af;
+  --donate-green: #22c55e;
+  --donate-green-hover: #16a34a;
+  --donate-green-light: #064e3b;
+  --donate-border: #374151;
+  --donate-input-bg: #111827;
+}
+
+.pixel-donate-page {
+  background-color: var(--donate-canvas-bg);
+  min-height: 100vh;
+  padding-bottom: calc(40px + var(--safe-area-bottom));
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--donate-text-primary);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* ═══ Top Minimal Navigation Area ═══ */
+.pixel-donate-top-nav {
+  padding: calc(var(--safe-area-top) + 12px) 20px 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pixel-back-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--donate-card-bg);
+  border: 1px solid var(--donate-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--donate-text-primary);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s;
+}
+
+.pixel-back-btn:active {
+  transform: scale(0.92);
+}
+
+/* ═══ Impact Hero Title Section ═══ */
+.pixel-donate-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 24px 22px 24px;
+}
+
+.pixel-impact-badge {
+  background: var(--donate-card-bg);
+  color: var(--donate-text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 18px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  margin-bottom: 16px;
+  letter-spacing: -0.2px;
+}
+
+.pixel-impact-title {
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1.22;
+  letter-spacing: -0.6px;
+  color: var(--donate-text-primary);
+  margin: 0;
+  max-width: 320px;
+}
+
+/* ═══ Main Card Container ═══ */
+.pixel-donate-card-wrapper {
+  padding: 0 16px;
+  flex: 1;
+}
+
+.pixel-donate-card {
+  background: var(--donate-card-bg);
+  border-radius: 36px;
+  padding: 26px 20px 28px 20px;
+  box-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.07);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  box-sizing: border-box;
+}
+
+.pixel-card-title {
+  text-align: center;
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--donate-text-primary);
+  margin: 0 0 18px 0;
+  letter-spacing: -0.3px;
+}
+
+/* ═══ Frequency Toggle: One-Time / Monthly ═══ */
+.pixel-frequency-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.pixel-frequency-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--donate-text-muted);
+  cursor: pointer;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.pixel-frequency-label.active {
+  color: var(--donate-text-primary);
+  font-weight: 800;
+}
+
+.pixel-toggle-switch {
+  width: 48px;
+  height: 26px;
+  background: #e7e5e4;
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.25s;
+}
+
+.pixel-toggle-switch.monthly-active {
+  background: var(--donate-green);
+}
+
+.pixel-toggle-circle {
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.pixel-toggle-switch.monthly-active .pixel-toggle-circle {
+  transform: translateX(22px);
+}
+
+/* ═══ Amount Input Row ═══ */
+.pixel-amount-input-box {
+  background: var(--donate-input-bg);
+  border: 1.5px solid var(--donate-border);
+  border-radius: 18px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px 0 18px;
+  margin-bottom: 14px;
+  transition: all 0.2s;
+}
+
+.pixel-amount-input-box:focus-within {
+  border-color: var(--donate-green);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+  background: var(--donate-card-bg);
+}
+
+.pixel-amount-number-input {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--donate-text-primary);
+  width: 100%;
+  outline: none;
+  font-family: inherit;
+}
+
+.pixel-currency-selector {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--donate-card-bg);
+  border: 1px solid var(--donate-border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--donate-text-primary);
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ═══ 4 Quick Amount Chips in Row ═══ */
+.pixel-presets-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.pixel-preset-chip {
+  height: 48px;
+  border-radius: 16px;
+  background: var(--donate-card-bg);
+  border: 1.5px solid var(--donate-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--donate-text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
+}
+
+.pixel-preset-chip span.dollar-sign {
+  font-size: 12px;
+  color: var(--donate-text-muted);
+  font-weight: 600;
+  margin-right: 1px;
+}
+
+.pixel-preset-chip.active {
+  border-color: var(--donate-green);
+  background: var(--donate-green-light);
+  color: #15803d;
+}
+
+[data-theme="dark"] .pixel-preset-chip.active {
+  color: #4ade80;
+}
+
+/* ═══ Form Controls (Checkboxes & Inputs) ═══ */
+.pixel-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.pixel-checkbox-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid #d6d3d1;
+  background: var(--donate-card-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.pixel-checkbox-box.checked {
+  background: var(--donate-green);
+  border-color: var(--donate-green);
+}
+
+.pixel-checkbox-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--donate-text-primary);
+}
+
+.pixel-donor-name-input {
+  width: 100%;
+  height: 50px;
+  border-radius: 16px;
+  border: 1.5px solid var(--donate-border);
+  background: var(--donate-input-bg);
+  padding: 0 16px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--donate-text-primary);
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 16px;
+  transition: all 0.2s;
+}
+
+.pixel-donor-name-input:focus {
+  border-color: var(--donate-green);
+  background: var(--donate-card-bg);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+/* ═══ Big Vibrant Green Action Button ═══ */
+.pixel-donate-btn {
+  width: 100%;
+  height: 54px;
+  border-radius: 20px;
+  background: var(--donate-green);
+  color: #ffffff;
+  border: none;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+  box-shadow: 0 8px 20px -2px rgba(34, 197, 94, 0.4);
+  transition: all 0.2s;
+}
+
+.pixel-donate-btn:hover {
+  background: var(--donate-green-hover);
+}
+
+.pixel-donate-btn:active {
+  transform: scale(0.98);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STEP 2: Payment Method (bKash & Nagad) Section
+   ══════════════════════════════════════════════════════════════════ */
+.pixel-payment-options-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.pixel-payment-option-card {
+  border: 2px solid var(--donate-border);
+  border-radius: 18px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--donate-input-bg);
+}
+
+.pixel-payment-option-card.selected {
+  border-color: var(--donate-green);
+  background: var(--donate-card-bg);
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.12);
+}
+
+.pixel-payment-option-card.bkash.selected {
+  border-color: #d12053;
+  background: rgba(209, 32, 83, 0.04);
+}
+
+.pixel-payment-option-card.nagad.selected {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.04);
+}
+
+.pixel-payment-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pixel-gateway-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.pixel-gateway-logo-pill {
+  padding: 4px 10px;
+  border-radius: 8px;
+  color: white;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.pixel-gateway-logo-pill.bkash {
+  background: #d12053;
+}
+
+.pixel-gateway-logo-pill.nagad {
+  background: #f97316;
+}
+
+.pixel-number-copy-box {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--donate-card-bg);
+  border: 1px dashed var(--donate-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.pixel-copy-btn {
+  background: var(--donate-green-light);
+  color: #15803d;
+  border: none;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   STEP 3: Thank You Celebration Screen
+   ══════════════════════════════════════════════════════════════════ */
+.pixel-thankyou-screen {
+  text-align: center;
+  padding: 24px 10px 10px 10px;
+}
+
+.pixel-thankyou-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--donate-green-light);
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 18px auto;
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.25);
+  font-size: 32px;
+}
+
+.pixel-thankyou-heading {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--donate-text-primary);
+  margin: 0 0 6px 0;
+}
+
+.pixel-thankyou-sub {
+  font-size: 14px;
+  color: var(--donate-text-muted);
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+}
+
+.pixel-receipt-summary {
+  background: var(--donate-input-bg);
+  border: 1px solid var(--donate-border);
+  border-radius: 20px;
+  padding: 16px;
+  text-align: left;
+  margin-bottom: 22px;
+}
+
+.pixel-receipt-line {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--donate-text-muted);
+  margin-bottom: 8px;
+}
+
+.pixel-receipt-line.total {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--donate-border);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--donate-text-primary);
+  margin-bottom: 0;
+}

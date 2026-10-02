@@ -241,7 +241,7 @@ ul, ol {
 }
 
 .page {
-  padding-bottom: calc(56px + var(--safe-area-bottom));
+  padding-bottom: calc(72px + var(--safe-area-bottom));
   min-height: 100vh;
   min-height: 100dvh;
 }

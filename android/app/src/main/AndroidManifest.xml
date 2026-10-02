@@ -33,6 +33,11 @@
         <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id" android:value="default_channel_id" />
         <meta-data android:name="com.onesignal.messaging.default_notification_icon" android:resource="@drawable/ic_stat_onesignal_default" />
 
+        <!-- Official Google Sample AdMob App ID for safe testing -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713" />
+
         <activity
             android:hardwareAccelerated="true"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode"

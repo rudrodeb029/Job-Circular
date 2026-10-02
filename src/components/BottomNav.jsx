@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, Rss, Bookmark, Bell, User } from './Icons';
+import { Home, Rss, Bookmark, Donate, User } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
-import { getFilteredNotifications } from '../utils/notificationHelpers';
 
 const BottomNav = () => {
   const { state } = useAppContext();
@@ -54,9 +53,6 @@ const BottomNav = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const notificationsList = getFilteredNotifications(adminState.notifications || [], state.installTime);
-  const unreadCount = notificationsList.filter(n => !state.readNotifications.includes(n.id)).length;
-
   return (
     <nav className={`bottom-nav ${isVisible ? 'nav-visible' : 'nav-hidden'}`}>
       <div className="bottom-nav-background">
@@ -90,33 +86,10 @@ const BottomNav = () => {
         </NavLink>
       </div>
 
-      <NavLink to="/notifications" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
+      {/* Modern Donate Tab */}
+      <NavLink to="/donate" className={({ isActive }) => `bottom-nav-item ${isActive ? 'active' : ''}`}>
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Bell size={24} />
-          {unreadCount > 0 && (
-            <span
-              style={{
-                position: 'absolute',
-                top: '-2px',
-                right: '-4px',
-                background: 'var(--danger)',
-                color: 'white',
-                borderRadius: '50%',
-                fontSize: '7.5px',
-                fontWeight: '800',
-                width: '12px',
-                height: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '1.5px solid var(--white)',
-                boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
-                lineHeight: 1
-              }}
-            >
-              {unreadCount}
-            </span>
-          )}
+          <Donate size={24} />
         </div>
       </NavLink>
 

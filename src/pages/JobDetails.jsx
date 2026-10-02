@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bookmark, BookmarkCheck, Calendar, Briefcase, Eye, Download } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
@@ -13,6 +13,7 @@ import PortalWarningModal from '../components/PortalWarningModal';
 import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
+import { showNativeInterstitialAd, showNativeBannerAd, hideNativeBannerAd } from '../utils/admobUtils';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -102,6 +103,9 @@ export default function JobDetails() {
   const handleDownloadNotice = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
     
+    // Trigger Interstitial Ad on Notice download
+    showNativeInterstitialAd();
+
     const rawFileUrl = rawImagesList[activeImageIndex] ||
                        circularImages[activeImageIndex] ||
                        job.imageUrl ||
@@ -127,6 +131,15 @@ export default function JobDetails() {
     setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
     setIsDownloadModalOpen(true);
   };
+
+  // Hide banner ad when full-screen photo zoom viewer is active
+  useEffect(() => {
+    if (showFullImage) {
+      hideNativeBannerAd();
+    } else {
+      showNativeBannerAd(state.theme === 'dark');
+    }
+  }, [showFullImage, state.theme]);
 
   const handleOfficialApply = (e) => {
     if (e && e.preventDefault) e.preventDefault();

@@ -50,3 +50,15 @@
 -dontwarn org.codehaus.mojo.animal_sniffer.**
 -dontwarn okio.**
 -dontwarn retrofit2.**
+
+# ============================================================
+# Keep Google Mobile Ads (AdMob) SDK & Mediation
+# ============================================================
+-keep public class com.google.android.gms.ads.** { public *; }
+-keep public class com.google.ads.mediation.** { public *; }
+
+# ============================================================
+# Keep Meta (Facebook) Audience Network Mediation Adapter
+# ============================================================
+-keep class com.facebook.ads.** { *; }
+-keep class com.google.ads.mediation.facebook.** { *; }

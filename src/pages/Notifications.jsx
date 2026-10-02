@@ -1,6 +1,7 @@
 import React, { useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { Bell } from '../components/Icons';
+import { Bell, ArrowLeft } from '../components/Icons';
 import NotificationItem from '../components/NotificationItem';
 import EmptyState from '../components/EmptyState';
 import { getNotifications } from '../data/notifications';
@@ -9,6 +10,7 @@ import PullToRefresh from '../components/PullToRefresh';
 import { getFilteredNotifications, getNotificationTimestamp } from '../utils/notificationHelpers';
 
 export default function Notifications() {
+  const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const { state: adminState, refreshData } = useAdminContext();
   const isEn = state.language === 'en';
@@ -32,10 +34,30 @@ export default function Notifications() {
   return (
     <div className="page">
       <div className="page-header flex-between" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-          <Bell size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
-          <span>{isEn ? 'Notifications' : 'নোটিফিকেশন'}</span>
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={() => navigate(-1)}
+            aria-label="Back"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border)',
+              cursor: 'pointer',
+              color: 'var(--text-primary)'
+            }}
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: 0, fontSize: '18px' }}>
+            <Bell size={20} color="var(--primary)" style={{ flexShrink: 0 }} />
+            <span>{isEn ? 'Notifications' : 'নোটিফিকেশন'}</span>
+          </h1>
+        </div>
         {notificationsList.some(n => !state.readNotifications.includes(n.id)) && (
           <button
             onClick={handleMarkAllRead}

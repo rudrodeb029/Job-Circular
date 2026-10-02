@@ -15,6 +15,7 @@ import { triggerDeltaSync } from './services/sqliteService'
 import { Capacitor } from '@capacitor/core'
 
 import BottomNav from './components/BottomNav'
+import { showNativeBannerAd, hideNativeBannerAd } from './utils/admobUtils'
 
 const CURRENT_VERSION = "1.0.9";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
@@ -46,6 +47,7 @@ import LiveExamsPage from './pages/LiveExamsPage'
 import LiveExamRoom from './pages/LiveExamRoom'
 import QuestionsHub from './pages/QuestionsHub'
 import Feed from './pages/Feed'
+import Donate from './pages/Donate'
 import OfflineFeed from './pages/OfflineFeed'
 import SplashScreen from './pages/SplashScreen'
 
@@ -311,13 +313,13 @@ function App() {
   const prevPathRef = useRef(location.pathname);
 
   // Smart Tab Index Mapping:
-  // Home (0) -> Feed (1) -> Saved (2) -> Notifications (3) -> Profile (4)
+  // Home (0) -> Feed (1) -> Saved (2) -> Donate (3) -> Profile (4)
   const TAB_ORDER = {
     '/': 0,
     '/home': 0,
     '/feed': 1,
     '/saved': 2,
-    '/notifications': 3,
+    '/donate': 3,
     '/profile': 4
   };
 
@@ -348,8 +350,26 @@ function App() {
 
   const isTabRoute = (
     (location.pathname === '/' && hasSeenOnboarding) ||
-    ['/home', '/feed', '/saved', '/profile', '/notifications'].includes(location.pathname)
+    ['/home', '/feed', '/saved', '/profile', '/donate'].includes(location.pathname)
   );
+
+  // ═══ Native Banner Ad Visibility Controller ═══
+  // Hidden on 5 main tab pages (Home, Feed, Saved, Notifications, Profile), Splash, Onboarding, Admin & Live Exam Room
+  // Shown at bottom navbar position on ALL other pages
+  useEffect(() => {
+    const isExcludedPage = 
+      isTabRoute || 
+      isAdminRoute || 
+      location.pathname === '/splash' || 
+      location.pathname === '/onboarding' ||
+      location.pathname.startsWith('/live-exam-room');
+
+    if (isExcludedPage) {
+      hideNativeBannerAd();
+    } else {
+      showNativeBannerAd(state.theme === 'dark');
+    }
+  }, [location.pathname, isTabRoute, isAdminRoute, state.theme]);
 
   return (
     <ErrorBoundary>
@@ -410,6 +430,7 @@ function App() {
           <Route path="/categories" element={<Categories />} />
           <Route path="/search" element={<SearchFilter />} />
           <Route path="/saved" element={<SavedJobs />} />
+          <Route path="/donate" element={<Donate />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/admit-card" element={<AdmitCardResult />} />
           <Route path="/profile" element={<Profile />} />

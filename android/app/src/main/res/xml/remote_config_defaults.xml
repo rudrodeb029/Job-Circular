@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<defaultsMap>
+    <!-- Master Ad Switch (Safe Default: false) -->
+    <entry>
+        <key>show_ads</key>
+        <value>false</value>
+    </entry>
+
+    <!-- Granular Format Toggles -->
+    <entry>
+        <key>show_banner_ads</key>
+        <value>true</value>
+    </entry>
+    <entry>
+        <key>show_interstitial_ads</key>
+        <value>true</value>
+    </entry>
+
+    <!-- Safety Frequency Capping Cooldown (in seconds) -->
+    <entry>
+        <key>interstitial_cooldown_sec</key>
+        <value>50</value>
+    </entry>
+
+    <!-- Official Test Ad Unit IDs (can be overridden remotely without App Store update) -->
+    <entry>
+        <key>admob_banner_id</key>
+        <value>ca-app-pub-3940256099942544/6300978111</value>
+    </entry>
+    <entry>
+        <key>admob_interstitial_id</key>
+        <value>ca-app-pub-3940256099942544/1033173712</value>
+    </entry>
+</defaultsMap>
