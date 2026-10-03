@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import ModernLoader from './ModernLoader';
 
 /**
  * Production-ready, GPU-accelerated Tab & Toggle Bar
@@ -24,7 +25,7 @@ const TabBar = ({ tabs = [], activeTab, onTabChange, className = '', style = {} 
           width: `calc(${tabWidthPercent}% - 8px)`,
           left: '4px',
           transform: `translate3d(${activeIndex * 100}%, 0, 0)`,
-          transition: 'transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)',
+          transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1)',
           willChange: 'transform'
         }}
       />
@@ -48,16 +49,26 @@ const TabBar = ({ tabs = [], activeTab, onTabChange, className = '', style = {} 
 };
 
 /**
- * Directional Tab Content Wrapper
- * Slides tab content strictly horizontally (left <-> right) ONLY on user tab changes.
- * Does NOT slide on initial page mount (prevents double-slide / zigzag).
- * Synchronously evaluated on render (Frame 0 execution - zero flash/pop).
- * Y-axis locked at 0.
+ * Directional Tab Content Wrapper with Modern Loader
+ * - Slides tab content strictly horizontally (left <-> right) ONLY on user tab changes.
+ * - Shows Modern Loader smoothly for 140ms during tab switches before revealing content.
+ * - Does NOT slide or show loader on initial page mount (prevents double-slide / zigzag).
+ * - Y-axis locked strictly at 0.
  */
-export const TabContent = ({ activeTab, tabs = [], children, className = '', style = {} }) => {
+export const TabContent = ({ 
+  activeTab, 
+  tabs = [], 
+  children, 
+  className = '', 
+  style = {},
+  loaderIcon,
+  showTabLoader = true 
+}) => {
   const isFirstRenderRef = useRef(true);
   const prevTabRef = useRef(activeTab);
   const slideDirectionRef = useRef(null);
+  const [isTabTransitioning, setIsTabTransitioning] = useState(false);
+  const timerRef = useRef(null);
 
   if (isFirstRenderRef.current) {
     isFirstRenderRef.current = false;
@@ -68,6 +79,18 @@ export const TabContent = ({ activeTab, tabs = [], children, className = '', sty
     prevTabRef.current = activeTab;
   }
 
+  useEffect(() => {
+    if (!showTabLoader) return;
+    setIsTabTransitioning(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      setIsTabTransitioning(false);
+    }, 140);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [activeTab, showTabLoader]);
+
   const animationClass =
     slideDirectionRef.current === 'back'
       ? 'tab-slide-back'
@@ -75,13 +98,22 @@ export const TabContent = ({ activeTab, tabs = [], children, className = '', sty
       ? 'tab-slide-forward'
       : '';
 
+  const activeTabObj = tabs.find((t) => t.id === activeTab);
+  const currentIcon = loaderIcon || activeTabObj?.icon || '⚡';
+
   return (
     <div
       key={activeTab}
       className={`tab-pane-content ${animationClass} ${className}`}
-      style={style}
+      style={{ position: 'relative', minHeight: '160px', ...style }}
     >
-      {children}
+      {isTabTransitioning && showTabLoader ? (
+        <div style={{ padding: '48px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <ModernLoader size="md" icon={currentIcon} />
+        </div>
+      ) : (
+        children
+      )}
     </div>
   );
 };

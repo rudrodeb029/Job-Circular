@@ -91,7 +91,7 @@ export default function QuestionsHub() {
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
       <div className="page-header">
-        <button className="back-btn" onClick={() => navigate('/home')}>
+        <button className="back-btn" onClick={() => navigate(-1)}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
