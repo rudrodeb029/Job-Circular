@@ -66,7 +66,7 @@ function CategoryCard({ category }) {
         flexShrink: 0,
         boxShadow: `0 4px 12px ${theme.iconBg}`
       }}>
-        {getCategoryIconComponent(category.id || category.iconType, { size: 26 })}
+        {getCategoryIconComponent(category.id || category.iconType, { size: 24, color: theme.iconColor })}
       </div>
 
       {/* Category Name & Count Info */}

@@ -389,8 +389,8 @@ ul, ol {
 /* Forward Navigation: Right-to-Left Slide (Y locked strictly at 0) */
 @keyframes pageSlideForward {
   0% {
-    opacity: 0.94;
-    transform: translate3d(32px, 0, 0);
+    opacity: 0.88;
+    transform: translate3d(28px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -401,8 +401,8 @@ ul, ol {
 /* Back Navigation: Left-to-Right Slide (Y locked strictly at 0) */
 @keyframes pageSlideBack {
   0% {
-    opacity: 0.94;
-    transform: translate3d(-32px, 0, 0);
+    opacity: 0.88;
+    transform: translate3d(-28px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -411,14 +411,14 @@ ul, ol {
 }
 
 .slide-screen-forward {
-  animation: pageSlideForward 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: pageSlideForward 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 .slide-screen-back {
-  animation: pageSlideBack 0.28s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: pageSlideBack 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
@@ -494,7 +494,7 @@ ul, ol {
 @keyframes tabSlideForward {
   0% {
     opacity: 0.88;
-    transform: translate3d(24px, 0, 0);
+    transform: translate3d(20px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -505,7 +505,7 @@ ul, ol {
 @keyframes tabSlideBack {
   0% {
     opacity: 0.88;
-    transform: translate3d(-24px, 0, 0);
+    transform: translate3d(-20px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -522,11 +522,11 @@ ul, ol {
 }
 
 .tab-slide-forward {
-  animation: tabSlideForward 0.30s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: tabSlideForward 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 .tab-slide-back {
-  animation: tabSlideBack 0.30s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: tabSlideBack 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
 /* Modern GPU-Accelerated Tab Bar & Toggle Bar */
@@ -552,7 +552,7 @@ ul, ol {
   z-index: 1;
   transform: translate3d(0, 0, 0);
   will-change: transform;
-  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.24s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 [data-theme='dark'] .tab-sliding-indicator {
