@@ -28,7 +28,7 @@ export default function ManageLiveExams() {
       question: '', questionEn: '',
       options: ['', '', '', ''],
       optionsEn: ['', '', '', ''],
-      correctIndex: 0,
+      correctIndex: -1,
       explanation: '', explanationEn: ''
     }
   ]);
@@ -54,7 +54,7 @@ export default function ManageLiveExams() {
         question: '', questionEn: '',
         options: ['', '', '', ''],
         optionsEn: ['', '', '', ''],
-        correctIndex: 0,
+        correctIndex: -1,
         explanation: '', explanationEn: ''
       }
     ]);
@@ -91,7 +91,7 @@ export default function ManageLiveExams() {
       const cleanOpt = (opt) => (opt || '').replace(/^[\(\[]?\s*([a-d]|[ক-ঘ]|[1-4])\s*[\)\.\:]?\s*/i, '').trim();
       const cleanedOptions = [cleanOpt(opt1), cleanOpt(opt2), cleanOpt(opt3), cleanOpt(opt4)];
 
-      let finalIndex = 0;
+      let finalIndex = -1;
       const cleanVal = String(correctVal || '').toLowerCase().trim();
       if (cleanVal.includes('ক') || cleanVal === 'a' || cleanVal === '0') finalIndex = 0;
       else if (cleanVal.includes('খ') || cleanVal === 'b' || cleanVal === '1') finalIndex = 1;
@@ -103,7 +103,7 @@ export default function ManageLiveExams() {
           finalIndex = matchedIdx;
         } else {
           const parsed = parseInt(cleanVal, 10);
-          finalIndex = isNaN(parsed) ? 0 : Math.min(3, Math.max(0, parsed));
+          finalIndex = isNaN(parsed) ? -1 : Math.min(3, Math.max(0, parsed));
         }
       }
 
@@ -182,7 +182,7 @@ export default function ManageLiveExams() {
         question: '', questionEn: '',
         options: ['', '', '', ''],
         optionsEn: ['', '', '', ''],
-        correctIndex: 0,
+        correctIndex: -1,
         explanation: '', explanationEn: ''
       }
     ]);
@@ -307,8 +307,9 @@ export default function ManageLiveExams() {
 
                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                             <div className="input-group">
-                               <label>Correct Option Index (0-3)</label>
-                               <select className="modern-input" value={qn.correctIndex} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
+                               <label>Correct Option (optional)</label>
+                               <select className="modern-input" value={typeof qn.correctIndex === 'number' && qn.correctIndex >= 0 && qn.correctIndex < 4 ? qn.correctIndex : -1} onChange={e => handleQuestionFieldChange(qIndex, 'correctIndex', parseInt(e.target.value, 10))}>
+                                  <option value={-1}>No Answer (not set) / কোনো উত্তর নির্বাচন করা হয়নি</option>
                                   <option value={0}>Option 1 / ক</option>
                                   <option value={1}>Option 2 / খ</option>
                                   <option value={2}>Option 3 / গ</option>

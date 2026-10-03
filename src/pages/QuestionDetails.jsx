@@ -74,7 +74,7 @@ export default function QuestionDetails() {
     if (!paper || !Array.isArray(paper.questions)) return 0;
     let correct = 0;
     paper.questions.forEach(q => {
-      if (selectedAnswers[q.id] === q.correctIndex) {
+      if (typeof q.correctIndex === "number" && q.correctIndex >= 0 && q.correctIndex < 4 && selectedAnswers[q.id] === q.correctIndex) {
         correct += 1;
       }
     });
@@ -378,14 +378,14 @@ export default function QuestionDetails() {
                     const prefix = isEn ? englishOptionPrefixes[oIndex] : bengaliOptionPrefixes[oIndex];
 
                     if (mode === 'read') {
-                      if (oIndex === qn.correctIndex) {
+                      if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
                         bg = '#d1fae5';
                         color = '#065f46';
                         border = '1px solid #34d399';
                         prefixIcon = '✅';
                       }
                     } else if (mode === 'practice' && hasAnswered) {
-                      if (oIndex === qn.correctIndex) {
+                      if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
                         // Highlight correct answer in green
                         bg = '#d1fae5';
                         color = '#065f46';

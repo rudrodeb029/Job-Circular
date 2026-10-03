@@ -577,7 +577,7 @@ export default function LiveExamRoom() {
       
       let correct = 0;
       (exam.questions || []).forEach((q, index) => {
-        if (selectedAnswers[index] === q.correctIndex) {
+        if (typeof q.correctIndex === "number" && q.correctIndex >= 0 && q.correctIndex < 4 && selectedAnswers[index] === q.correctIndex) {
           correct += 1;
         }
       });
@@ -856,7 +856,7 @@ export default function LiveExamRoom() {
 
                       // Styling based on state
                       if (currentResult) {
-                        if (oIndex === qn.correctIndex) {
+                        if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
                           bg = '#d1fae5';
                           color = '#065f46';
                           border = '1px solid #34d399';
