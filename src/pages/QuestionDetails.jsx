@@ -345,13 +345,13 @@ export default function QuestionDetails() {
                   gap: '8px'
                 }}>
                   <span>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                  <span>{isEn ? qn.questionEn : qn.question}</span>
+                  <span>{(isEn && qn.questionEn) ? qn.questionEn : qn.question}</span>
                 </h4>
 
                 {/* Option Choices */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {qn.options.map((option, oIndex) => {
-                    let optText = isEn ? qn.optionsEn[oIndex] : option;
+                    let optText = (isEn && qn.optionsEn && qn.optionsEn[oIndex]) ? qn.optionsEn[oIndex] : option;
                     
                     // CLEANUP: Remove double prefixes if present in data (e.g. "(a) Apple" -> "Apple")
                     if (optText) {
@@ -466,7 +466,7 @@ export default function QuestionDetails() {
                       lineHeight: '1.6',
                       margin: 0
                     }}>
-                      {isEn ? qn.explanationEn : qn.explanation}
+                      {(isEn && qn.explanationEn) ? qn.explanationEn : qn.explanation}
                     </p>
                   </div>
                 )}
