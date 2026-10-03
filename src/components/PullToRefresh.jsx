@@ -143,8 +143,8 @@ export default function PullToRefresh({ children, onRefresh, disabled = false })
       {/* Main Content Area */}
       <div
         style={{
-          transform: `translateY(${pullDistance}px)`,
-          transition: isPullingRef.current ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)'
+          transform: pullDistance > 0 ? `translateY(${pullDistance}px)` : undefined,
+          transition: isPullingRef.current ? 'none' : (pullDistance > 0 ? 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)' : undefined)
         }}
       >
         {children}

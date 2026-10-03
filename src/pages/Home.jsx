@@ -374,7 +374,7 @@ export default function Home() {
 
             {/* FIXED MORE CARD - STATIONARY ON THE RIGHT */}
             <div
-              className="category-grid-item animate-scale-in"
+              className="category-grid-item"
               style={{
                 border: '1px solid rgba(226, 232, 240, 0.9)',
                 boxShadow: 'none',
@@ -423,7 +423,7 @@ export default function Home() {
                 const descriptionSentence = isEn ? `Exam date published for the post of ${postTitle}.` : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
                 const displayDesc = item.description || descriptionSentence;
                 return (
-                  <div key={item.id} className="job-card animate-fade-in" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(16, 185, 129, 0.12)', boxShadow: '0 4px 18px rgba(16, 185, 129, 0.04)' }}>
+                  <div key={item.id} className="job-card" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(16, 185, 129, 0.12)', boxShadow: '0 4px 18px rgba(16, 185, 129, 0.04)' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #10b981, #34d399)', borderRadius: '4px 0 0 4px' }}></div>
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669' }}>{displayIcon}</span><span>{orgName}</span></h4>
@@ -443,7 +443,7 @@ export default function Home() {
               const descriptionSentence = isEn ? `Written/Viva exam result published for the post of ${postTitle}. View result now!` : `${postTitle} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
               const displayDesc = item.description || descriptionSentence;
               return (
-                <div key={item.id} className="job-card animate-fade-in" onClick={() => navigate(`/result-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(124, 58, 237, 0.12)', boxShadow: '0 4px 18px rgba(124, 58, 237, 0.04)' }}>
+                <div key={item.id} className="job-card" onClick={() => navigate(`/result-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(124, 58, 237, 0.12)', boxShadow: '0 4px 18px rgba(124, 58, 237, 0.04)' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #7c3aed, #a78bfa)', borderRadius: '4px 0 0 4px' }}></div>
                   <div className="job-card-content">
                     <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed' }}>{displayIcon}</span><span>{orgName}</span></h4>

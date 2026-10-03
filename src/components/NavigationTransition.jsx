@@ -59,49 +59,64 @@ export function useNavigationTracker(location, navigationType) {
 
   // Synchronous, render-time direction evaluation (zero-frame latency)
   if (location.key !== lastKeyRef.current) {
-    const existingIndex = stackRef.current.findIndex(e => e.key === location.key);
+    const prevPath = lastPathRef.current;
+    const nextPath = location.pathname;
 
-    if (existingIndex !== -1) {
-      // Key found in history stack
-      if (existingIndex < pointerRef.current) {
-        // Popping backwards in history stack
+    // Special rule for Home: returning to Home is ALWAYS 'back' (smooth left-to-right slide)
+    // unless navigating directly from Splash or Onboarding
+    if (nextPath === '/' || nextPath === '/home') {
+      if (prevPath !== '/splash' && prevPath !== '/onboarding') {
         directionRef.current = 'back';
-        pointerRef.current = existingIndex;
-      } else if (existingIndex > pointerRef.current) {
-        // Navigating forward in history stack
-        directionRef.current = 'forward';
-        pointerRef.current = existingIndex;
-      }
-      // If equal, direction remains stable
-    } else {
-      // Key not in history stack (new route pushed or POP to unknown entry)
-      if (navigationType === 'POP') {
-        directionRef.current = 'back';
-        if (pointerRef.current > 0) pointerRef.current -= 1;
-        stackRef.current[pointerRef.current] = { key: location.key, pathname: location.pathname, search: location.search };
       } else {
-        // PUSH or REPLACE
-        const prevPath = lastPathRef.current;
-        const nextPath = location.pathname;
-        const prevTabIndex = TAB_ORDER[prevPath] ?? -1;
-        const nextTabIndex = TAB_ORDER[nextPath] ?? -1;
+        directionRef.current = 'forward';
+      }
+      const homeIndex = stackRef.current.findIndex(e => e.pathname === '/' || e.pathname === '/home');
+      if (homeIndex !== -1) {
+        pointerRef.current = homeIndex;
+      } else {
+        stackRef.current = [{ key: location.key, pathname: location.pathname, search: location.search }];
+        pointerRef.current = 0;
+      }
+    } else {
+      const existingIndex = stackRef.current.findIndex(e => e.key === location.key);
 
-        if (prevTabIndex !== -1 && nextTabIndex !== -1) {
-          // Switching between peer bottom tabs
-          directionRef.current = nextTabIndex < prevTabIndex ? 'back' : 'forward';
-        } else if (nextTabIndex === 0 && prevTabIndex !== 0) {
-          // Returning to Home from a sub-screen
+      if (existingIndex !== -1) {
+        // Key found in history stack
+        if (existingIndex < pointerRef.current) {
+          // Popping backwards in history stack
           directionRef.current = 'back';
-        } else {
-          const prevDepth = getRouteDepth(prevPath);
-          const nextDepth = getRouteDepth(nextPath);
-          directionRef.current = nextDepth < prevDepth ? 'back' : 'forward';
+          pointerRef.current = existingIndex;
+        } else if (existingIndex > pointerRef.current) {
+          // Navigating forward in history stack
+          directionRef.current = 'forward';
+          pointerRef.current = existingIndex;
         }
+        // If equal, direction remains stable
+      } else {
+        // Key not in history stack (new route pushed or POP to unknown entry)
+        if (navigationType === 'POP') {
+          directionRef.current = 'back';
+          if (pointerRef.current > 0) pointerRef.current -= 1;
+          stackRef.current[pointerRef.current] = { key: location.key, pathname: location.pathname, search: location.search };
+        } else {
+          // PUSH or REPLACE
+          const prevTabIndex = TAB_ORDER[prevPath] ?? -1;
+          const nextTabIndex = TAB_ORDER[nextPath] ?? -1;
 
-        // Truncate any forward history beyond current pointer and push new entry
-        stackRef.current = stackRef.current.slice(0, pointerRef.current + 1);
-        stackRef.current.push({ key: location.key, pathname: location.pathname, search: location.search });
-        pointerRef.current = stackRef.current.length - 1;
+          if (prevTabIndex !== -1 && nextTabIndex !== -1) {
+            // Switching between peer bottom tabs
+            directionRef.current = nextTabIndex < prevTabIndex ? 'back' : 'forward';
+          } else {
+            const prevDepth = getRouteDepth(prevPath);
+            const nextDepth = getRouteDepth(nextPath);
+            directionRef.current = nextDepth < prevDepth ? 'back' : 'forward';
+          }
+
+          // Truncate any forward history beyond current pointer and push new entry
+          stackRef.current = stackRef.current.slice(0, pointerRef.current + 1);
+          stackRef.current.push({ key: location.key, pathname: location.pathname, search: location.search });
+          pointerRef.current = stackRef.current.length - 1;
+        }
       }
     }
 
@@ -178,10 +193,9 @@ export function SmartPageLoader({ isNavigating }) {
  * - Synchronous scroll reset via useLayoutEffect before paint
  * - Auto-cleans animation class on finish for native position:sticky stability
  */
-export default function PageTransition({ children, isBack, locationKey, pathname }) {
-  const [isAnimating, setIsAnimating] = useState(true);
-  const [isNavigating, setIsNavigating] = useState(false);
+export default function PageTransition({ children, isBack, locationKey }) {
   const containerRef = useRef(null);
+  const isFirstMountRef = useRef(true);
 
   // Synchronous and immediate scroll reset BEFORE browser paint
   useLayoutEffect(() => {
@@ -192,47 +206,31 @@ export default function PageTransition({ children, isBack, locationKey, pathname
     if (container) container.scrollTop = 0;
   }, [locationKey]);
 
-  // Handle route transition lifecycle and smart loader
-  useEffect(() => {
-    setIsAnimating(true);
-    setIsNavigating(true);
-
-    const navTimer = setTimeout(() => {
-      setIsNavigating(false);
-    }, 120);
-
-    const animTimer = setTimeout(() => {
-      setIsAnimating(false);
-    }, 320);
-
-    return () => {
-      clearTimeout(navTimer);
-      clearTimeout(animTimer);
-    };
-  }, [locationKey]);
+  // Mark first mount as completed synchronously
+  useLayoutEffect(() => {
+    isFirstMountRef.current = false;
+  }, []);
 
   const handleAnimationEnd = (e) => {
     if (e.target === containerRef.current) {
-      setIsAnimating(false);
-      setIsNavigating(false);
+      // Remove animation class directly from DOM to avoid triggering any React re-render
+      containerRef.current.classList.remove('slide-screen-forward', 'slide-screen-back');
     }
   };
 
-  const animationClass = isAnimating
-    ? (isBack ? 'slide-screen-back' : 'slide-screen-forward')
-    : '';
+  // Synchronously compute animation class on frame 0 (zero flash, zero mid-flight re-renders)
+  const animationClass = isFirstMountRef.current
+    ? ''
+    : (isBack ? 'slide-screen-back' : 'slide-screen-forward');
 
   return (
-    <>
-      <SmartPageLoader isNavigating={isNavigating} />
-      <div
-        key={locationKey}
-        ref={containerRef}
-        className={`page-screen-container ${animationClass}`}
-        onAnimationEnd={handleAnimationEnd}
-      >
-        {children}
-      </div>
-    </>
+    <div
+      key={locationKey}
+      ref={containerRef}
+      className={`page-screen-container ${animationClass}`}
+      onAnimationEnd={handleAnimationEnd}
+    >
+      {children}
+    </div>
   );
 }
