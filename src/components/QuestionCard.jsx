@@ -77,81 +77,85 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
 
         {/* Vector Illustration or Category Icon Emblem */}
         <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          {/* Vector Illustration - Equal 100x78 Size for ALL Question Cards */}
-          <svg width="100" height="78" viewBox="0 0 120 95" fill="none">
-            {/* Soft Cloud Backdrop */}
-            <path
-              d="M22 56 C12 56 8 42 18 32 C20 20 36 16 48 22 C56 12 76 12 84 22 C96 16 110 20 112 32 C122 42 118 56 106 56 Z"
-              fill="#ffffff"
-              opacity="0.88"
-            />
+          {(!activeIcon || paper.category === 'primary' || activeIcon === '🏫') ? (
+            /* Primary School Building Vector Illustration */
+            <svg width="100" height="78" viewBox="0 0 120 95" fill="none">
+              {/* Soft Cloud Backdrop */}
+              <path
+                d="M22 56 C12 56 8 42 18 32 C20 20 36 16 48 22 C56 12 76 12 84 22 C96 16 110 20 112 32 C122 42 118 56 106 56 Z"
+                fill="#ffffff"
+                opacity="0.9"
+              />
 
-            {/* School / Academy Building Left Wing */}
-            <rect x="25" y="42" width="28" height="34" rx="2" fill="#dbeafe" stroke="#2563eb" strokeWidth="2.5" />
-            <polygon points="23,42 39,28 55,42" fill="#eff6ff" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />
+              {/* School Building Left Wing */}
+              <rect x="25" y="42" width="28" height="34" rx="2" fill="#dbeafe" stroke="#2563eb" strokeWidth="2.5" />
+              <polygon points="23,42 39,28 55,42" fill="#eff6ff" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />
 
-            {/* School / Academy Building Right Wing */}
-            <rect x="67" y="42" width="28" height="34" rx="2" fill="#dbeafe" stroke="#2563eb" strokeWidth="2.5" />
-            <polygon points="65,42 81,28 97,42" fill="#eff6ff" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />
+              {/* School Building Right Wing */}
+              <rect x="67" y="42" width="28" height="34" rx="2" fill="#dbeafe" stroke="#2563eb" strokeWidth="2.5" />
+              <polygon points="65,42 81,28 97,42" fill="#eff6ff" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />
 
-            {/* School / Academy Building Center Tower */}
-            <rect x="44" y="28" width="32" height="48" rx="2" fill="#bfdbfe" stroke="#2563eb" strokeWidth="2.5" />
-            <polygon points="42,28 60,12 78,28" fill="#dbeafe" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />
+              {/* School Building Center Tower */}
+              <rect x="44" y="28" width="32" height="48" rx="2" fill="#bfdbfe" stroke="#2563eb" strokeWidth="2.5" />
+              <polygon points="42,28 60,12 78,28" fill="#dbeafe" stroke="#2563eb" strokeWidth="2.5" strokeLinejoin="round" />
 
-            {/* Left Wing Windows */}
-            <rect x="30" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="37" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="44" y="47" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              {/* Clock in center gable */}
+              <circle cx="60" cy="22" r="5" fill="#ffffff" stroke="#2563eb" strokeWidth="2" />
+              <line x1="60" y1="22" x2="60" y2="19" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round" />
+              <line x1="60" y1="22" x2="62" y2="22" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round" />
 
-            <rect x="30" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="37" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="44" y="56" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              {/* Left Wing Windows */}
+              <rect x="30" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="37" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="44" y="47" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
 
-            <rect x="30" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="37" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="44" y="65" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="30" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="37" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="44" y="56" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
 
-            {/* Right Wing Windows */}
-            <rect x="72" y="47" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="78" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="85" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="30" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="37" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="44" y="65" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
 
-            <rect x="72" y="56" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="78" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="85" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              {/* Right Wing Windows */}
+              <rect x="72" y="47" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="78" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="85" y="47" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
 
-            <rect x="72" y="65" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="78" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
-            <rect x="85" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="72" y="56" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="78" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="85" y="56" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
 
-            {/* Central Doorway Arch */}
-            <path d="M53 76 V60 A7 7 0 0 1 67 60 V76 Z" fill="#ffffff" stroke="#2563eb" strokeWidth="2.2" />
+              <rect x="72" y="65" width="4" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="78" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
+              <rect x="85" y="65" width="5" height="6" rx="1" fill="#ffffff" stroke="#2563eb" strokeWidth="1.5" />
 
-            {/* Category Gable Emblem */}
-            {paper.category === 'bcs' || activeIcon === '🎓' ? (
-              <g transform="translate(48, 11) scale(0.95)">
-                <path d="M12 3 L1 9 L12 15 L23 9 Z" fill="#2563eb" stroke="#ffffff" strokeWidth="1.2" />
-                <path d="M5 11.5 V16.5 C5 19 19 19 19 16.5 V11.5" fill="none" stroke="#2563eb" strokeWidth="1.5" />
-              </g>
-            ) : paper.category === 'bank' || activeIcon === '🏦' ? (
-              <g transform="translate(48, 10) scale(0.95)">
-                <path d="M2 9 L12 3 L22 9 Z" fill="#2563eb" stroke="#ffffff" strokeWidth="1.2" />
-                <path d="M4 10 V17 M9 10 V17 M15 10 V17 M20 10 V17" stroke="#2563eb" strokeWidth="1.8" />
-              </g>
-            ) : paper.category === 'ntrca' || activeIcon === '📜' ? (
-              <g transform="translate(49, 10) scale(0.95)">
-                <rect x="3" y="3" width="18" height="18" rx="2" fill="#ffffff" stroke="#2563eb" strokeWidth="2" />
-                <line x1="7" y1="8" x2="17" y2="8" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" />
-                <line x1="7" y1="13" x2="14" y2="13" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" />
-              </g>
-            ) : (
-              <g>
-                <circle cx="60" cy="22" r="5" fill="#ffffff" stroke="#2563eb" strokeWidth="2" />
-                <line x1="60" y1="22" x2="60" y2="19" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round" />
-                <line x1="60" y1="22" x2="62" y2="22" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round" />
-              </g>
-            )}
-          </svg>
+              {/* Central Doorway Arch */}
+              <path d="M53 76 V60 A7 7 0 0 1 67 60 V76 Z" fill="#ffffff" stroke="#2563eb" strokeWidth="2.2" />
+            </svg>
+          ) : (
+            /* Custom Category Emblem Frame - EQUAL 100x78 Size & 56px Icon */
+            <div style={{ position: 'relative', width: '100px', height: '78px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="110" height="78" viewBox="0 0 120 78" fill="none" style={{ position: 'absolute' }}>
+                <path d="M22 56 C12 56 8 42 18 32 C20 10 36 16 48 22 C56 12 76 12 84 22 C96 16 110 20 112 32 C122 32 118 56 106 56 Z" fill="#ffffff" opacity="0.9" />
+              </svg>
+              <div style={{
+                position: 'relative',
+                zIndex: 3,
+                width: '64px',
+                height: '64px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: typeof activeIcon === 'string' && activeIcon.length <= 4 ? '46px' : '24px',
+                color: '#2563eb'
+              }}>
+                {React.isValidElement(activeIcon) 
+                  ? React.cloneElement(activeIcon, { size: 56, color: '#2563eb' }) 
+                  : activeIcon}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
