@@ -63,8 +63,8 @@ import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
 import AiManager from './pages/admin/AiManager'
 import ManageFeed from './pages/admin/ManageFeed'
-
 import PageTransition, { useNavigationTracker } from './components/NavigationTransition'
+import { GlobalLoaderProvider } from './context/GlobalLoaderContext'
 
 
 function App() {
@@ -342,11 +342,12 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div 
-        className={`container ${isBack ? 'nav-direction-back' : 'nav-direction-forward'}`} 
-        data-theme={state.theme}
-        data-nav-direction={direction}
-      >
+      <GlobalLoaderProvider>
+        <div 
+          className={`container ${isBack ? 'nav-direction-back' : 'nav-direction-forward'}`} 
+          data-theme={state.theme}
+          data-nav-direction={direction}
+        >
         {!isAdminRoute && <ConnectivityBanner />}
 
         {/* ═══ Phase 3: Selective Offline Overlay (AdMob Protected) ═══ */}
@@ -434,7 +435,8 @@ function App() {
           onClose={() => setShowUpdateModal(false)}
         />
       </div>
-    </ErrorBoundary>
+    </GlobalLoaderProvider>
+  </ErrorBoundary>
   )
 }
 

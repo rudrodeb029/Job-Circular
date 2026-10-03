@@ -432,6 +432,62 @@ ul, ol {
   }
 }
 
+/* ==========================================================================
+   SMART CONDITIONAL LOADER OVERLAY (HARDWARE-ACCELERATED, 200MS DEBOUNCED)
+   ========================================================================== */
+
+.smart-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  will-change: opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  animation: smartLoaderFadeIn 0.20s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+[data-theme='dark'] .smart-loader-overlay {
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.smart-loader-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 22px;
+  border-radius: 24px;
+  background: var(--white);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--border-light);
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+[data-theme='dark'] .smart-loader-card {
+  background: #1e293b;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+@keyframes smartLoaderFadeIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 /* Tab Content Slide Animations (Strictly Horizontal, Y locked at 0) */
 @keyframes tabSlideForward {
   0% {

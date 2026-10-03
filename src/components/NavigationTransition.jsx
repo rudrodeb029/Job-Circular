@@ -122,95 +122,51 @@ export function useNavigationTracker(location, navigationType) {
  * preventing any visual frame freezes or blank screens in Android WebView.
  * Instantly resets on rapid forward/back navigation.
  */
+/**
+ * Conditional Smart Page Loader
+ * - 200ms Delay Trigger (No Flickering): The loader will NOT show up if page loads under 200ms
+ * - Centered Modern Spinner: If page rendering takes >200ms, displays a centered modern glass orb overlay
+ * - Proper Cleanup: Clears all timers on route navigation or unmount to avoid memory leaks
+ * - WebView Performance: Hardware-accelerated with translate3d and will-change
+ */
 export function SmartPageLoader({ isNavigating }) {
-  const [showProgressLine, setShowProgressLine] = useState(false);
-  const [showSpinnerOrb, setShowSpinnerOrb] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
 
   useEffect(() => {
     if (!isNavigating) {
-      setShowProgressLine(false);
-      setShowSpinnerOrb(false);
+      setShowSpinner(false);
       return;
     }
 
-    // Micro-delay threshold for slim top progress line (75ms)
-    const lineTimer = setTimeout(() => {
-      setShowProgressLine(true);
-    }, 75);
-
-    // Secondary threshold for centered glass orb spinner (180ms)
-    const orbTimer = setTimeout(() => {
-      setShowSpinnerOrb(true);
-    }, 180);
+    // Strict 200ms delay trigger (prevents flickering on fast cached loads)
+    const timer = setTimeout(() => {
+      setShowSpinner(true);
+    }, 200);
 
     return () => {
-      clearTimeout(lineTimer);
-      clearTimeout(orbTimer);
+      clearTimeout(timer);
     };
   }, [isNavigating]);
 
-  if (!showProgressLine && !showSpinnerOrb) return null;
+  if (!showSpinner) return null;
 
   return (
-    <>
-      {/* Top Slim Glowing Progress Bar */}
-      {showProgressLine && (
-        <div
-          className="smart-nav-progress-bar"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '2.5px',
-            zIndex: 99999,
-            pointerEvents: 'none',
-            overflow: 'hidden'
-          }}
-        >
-          <div
-            style={{
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(90deg, #2563eb 0%, #38bdf8 50%, #2563eb 100%)',
-              backgroundSize: '200% 100%',
-              animation: 'smartNavProgressPulse 1s linear infinite'
-            }}
-          />
-        </div>
-      )}
-
-      {/* Floating Modern Glass Orb Spinner (for prolonged async delays) */}
-      {showSpinnerOrb && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 99998,
-            pointerEvents: 'none',
-            animation: 'fadeIn 0.2s ease-out forwards'
-          }}
-        >
-          <div
-            style={{
-              background: 'rgba(255, 255, 255, 0.92)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              borderRadius: '24px',
-              padding: '12px 18px',
-              boxShadow: '0 12px 36px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.8)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <ModernLoader size="sm" variant="brand" />
-          </div>
-        </div>
-      )}
-    </>
+    <div
+      className="smart-loader-overlay"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        pointerEvents: 'none'
+      }}
+    >
+      <div className="smart-loader-card">
+        <ModernLoader size="md" variant="brand" icon="⚡" />
+      </div>
+    </div>
   );
 }
 
