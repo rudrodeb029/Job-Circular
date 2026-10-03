@@ -20,15 +20,27 @@ export default function LiveExams() {
   const [registrations, setRegistrations] = useState({});
   const [toastMessage, setToastMessage] = useState('');
   const [activeTab, setActiveTab] = useState('live'); // 'live' | 'history'
+  const [isTabLoading, setIsTabLoading] = useState(true);
+  const tabTimerRef = React.useRef(null);
 
   const tabs = [
     { id: 'live', label: isEn ? 'Live Exams' : 'লাইভ পরীক্ষা' },
     { id: 'history', label: isEn ? 'Exam History' : 'পরীক্ষার ইতিহাস' }
   ];
 
+  // Initial entry: show the modern loader briefly, then reveal the exam list
+  useEffect(() => {
+    tabTimerRef.current = setTimeout(() => setIsTabLoading(false), 150);
+    return () => clearTimeout(tabTimerRef.current);
+  }, []);
+
   const handleTabChange = (tab) => {
     if (activeTab === tab) return;
+    // Switch section instantly (header, indicator, info card), list shows loader
+    setIsTabLoading(true);
     setActiveTab(tab);
+    clearTimeout(tabTimerRef.current);
+    tabTimerRef.current = setTimeout(() => setIsTabLoading(false), 180);
   };
 
   // Ticks the clock every second and reads databases reactively
@@ -306,7 +318,13 @@ export default function LiveExams() {
               gap: '16px',
               minHeight: 'calc(100vh - 240px)'
             }}>
-              {filteredExams.map(exam => {
+              {isTabLoading && (
+                <div style={{ padding: '60px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gridColumn: '1 / -1' }}>
+                  <ModernLoader size="md" icon={activeTab === 'live' ? '⏱️' : '📜'} />
+                </div>
+              )}
+
+              {!isTabLoading && filteredExams.map(exam => {
                 const status = getExamStatus(exam);
                 const startMs = parseExamDate(exam.scheduledAt) || parseExamDate(exam.startTime) || parseExamDate(exam.createdAt) || Date.now();
                 const result = getExamResult(exam.id);
@@ -332,7 +350,7 @@ export default function LiveExams() {
                 );
               })}
 
-              {filteredExams.length === 0 && (
+              {!isTabLoading && filteredExams.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
                   <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
                   <p style={{ fontSize: '14px', fontWeight: 600 }}>
