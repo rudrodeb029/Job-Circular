@@ -340,17 +340,17 @@ export default function Home() {
             <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '4px 0' }}>
               <div className="scrolling-content" style={{ gap: '8px' }}>
                 {[
-                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={18} color="#1a56db" />, color: 'rgba(26, 86, 219, 0.08)' },
-                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: <BankIcon size={18} color="#10b981" />, color: 'rgba(16, 185, 129, 0.08)' },
-                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: <NtrcaIcon size={18} color="#8b5cf6" />, color: 'rgba(139, 92, 246, 0.08)' },
-                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: <PrimaryIcon size={18} color="#ec4899" />, color: 'rgba(236, 72, 153, 0.08)' },
-                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: <GovIcon size={18} color="#f59e0b" />, color: 'rgba(245, 158, 11, 0.08)' }
+                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={20} />, color: 'rgba(26, 86, 219, 0.08)' },
+                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: <BankIcon size={20} />, color: 'rgba(16, 185, 129, 0.08)' },
+                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: <NtrcaIcon size={20} />, color: 'rgba(139, 92, 246, 0.08)' },
+                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: <PrimaryIcon size={20} />, color: 'rgba(236, 72, 153, 0.08)' },
+                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: <GovIcon size={20} />, color: 'rgba(245, 158, 11, 0.08)' }
                 ].concat([
-                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={18} color="#1a56db" />, color: 'rgba(26, 86, 219, 0.08)' },
-                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: <BankIcon size={18} color="#10b981" />, color: 'rgba(16, 185, 129, 0.08)' },
-                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: <NtrcaIcon size={18} color="#8b5cf6" />, color: 'rgba(139, 92, 246, 0.08)' },
-                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: <PrimaryIcon size={18} color="#ec4899" />, color: 'rgba(236, 72, 153, 0.08)' },
-                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: <GovIcon size={18} color="#f59e0b" />, color: 'rgba(245, 158, 11, 0.08)' }
+                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={20} />, color: 'rgba(26, 86, 219, 0.08)' },
+                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: <BankIcon size={20} />, color: 'rgba(16, 185, 129, 0.08)' },
+                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: <NtrcaIcon size={20} />, color: 'rgba(139, 92, 246, 0.08)' },
+                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: <PrimaryIcon size={20} />, color: 'rgba(236, 72, 153, 0.08)' },
+                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: <GovIcon size={20} />, color: 'rgba(245, 158, 11, 0.08)' }
                 ]).map((cat, idx) => (
                   <div
                     key={`${cat.id}-${idx}`}

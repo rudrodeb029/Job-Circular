@@ -118,5 +118,29 @@ export const categories = [
     textColor: '#0369a1',
     borderColor: 'rgba(2, 132, 199, 0.18)',
     jobCount: '340+'
+  },
+  {
+    id: 'railway',
+    name: 'বাংলাদেশ রেলওয়ে',
+    nameEn: 'Railway Jobs',
+    iconType: 'railway',
+    icon: '🚂',
+    gradient: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)',
+    color: '#ecfeff',
+    textColor: '#0e7490',
+    borderColor: 'rgba(8, 145, 178, 0.18)',
+    jobCount: '280+'
+  },
+  {
+    id: 'women',
+    name: 'মহিলা বিষয়ক',
+    nameEn: 'Women Jobs',
+    iconType: 'women',
+    icon: '👩‍💼',
+    gradient: 'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)',
+    color: '#fff1f2',
+    textColor: '#be123c',
+    borderColor: 'rgba(225, 29, 72, 0.18)',
+    jobCount: '190+'
   }
 ];
