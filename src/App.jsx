@@ -16,6 +16,7 @@ import { Capacitor } from '@capacitor/core'
 
 import BottomNav from './components/BottomNav'
 import { showNativeBannerAd, hideNativeBannerAd } from './utils/admobUtils'
+import { logAnalyticsEvent } from './firebase'
 
 const CURRENT_VERSION = "1.0.9";
 const VERSION_CHECK_URL = "https://raw.githubusercontent.com/rudrodeb029/Job-Circular/master/version.json";
@@ -339,6 +340,14 @@ function App() {
       showNativeBannerAd(state.theme === 'dark');
     }
   }, [location.pathname, isTabRoute, isAdminRoute, state.theme]);
+
+  // Log page view to Firebase Analytics on route change
+  useEffect(() => {
+    logAnalyticsEvent('page_view', {
+      page_path: location.pathname,
+      page_title: document.title || 'Live Circular'
+    });
+  }, [location.pathname]);
 
   return (
     <ErrorBoundary>
