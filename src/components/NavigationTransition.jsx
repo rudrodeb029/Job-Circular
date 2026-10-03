@@ -230,7 +230,40 @@ export default function PageTransition({ children, isBack, locationKey }) {
       className={`page-screen-container ${animationClass}`}
       onAnimationEnd={handleAnimationEnd}
     >
-      {children}
+      <DeferredContent skip={isFirstMountRef.current}>{children}</DeferredContent>
+    </div>
+  );
+}
+
+/**
+ * Instant Entry + Deferred Heavy Render
+ * Frame 0: the page container + a centered loader are painted immediately (click feels instant).
+ * After the first paint (double rAF), the real page content mounts.
+ * The loader fades in via a compositor-driven CSS delay, so light pages never show it,
+ * while heavy pages (Question Bank, MCQ hub, lists) show it until content appears.
+ */
+function DeferredContent({ children, skip }) {
+  const [ready, setReady] = useState(skip);
+
+  useEffect(() => {
+    if (ready) return;
+    let raf2 = 0;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setReady(true));
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
+  }, [ready]);
+
+  if (ready) return children;
+
+  return (
+    <div className="deferred-page-loader">
+      <div className="smart-loader-card">
+        <ModernLoader size="md" variant="brand" icon="⚡" />
+      </div>
     </div>
   );
 }

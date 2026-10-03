@@ -411,17 +411,32 @@ ul, ol {
 }
 
 .slide-screen-forward {
-  animation: pageSlideForward 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: pageSlideForward 0.20s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 .slide-screen-back {
-  animation: pageSlideBack 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: pageSlideBack 0.20s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+}
+
+/* Instant-entry placeholder shown while heavy page content mounts */
+.deferred-page-loader {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+}
+
+.deferred-page-loader .smart-loader-card {
+  opacity: 0;
+  animation: smartLoaderFadeIn 0.18s cubic-bezier(0.22, 1, 0.36, 1) 0.06s forwards;
 }
 
 /* Smart Navigation Loading Bar Pulse */
