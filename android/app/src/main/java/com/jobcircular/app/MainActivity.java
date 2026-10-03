@@ -224,9 +224,6 @@ public class MainActivity extends BridgeActivity {
     // 2. Google Mobile Ads & Meta Mediation Initialization
     // ══════════════════════════════════════════════════════════════════
     private void initializeMobileAdsAndMediation() {
-        if (isMobileAdsInitialized) {
-            if (isBannerAdsEnabled && isBannerRequestedVisible && bannerAdView == null) {
-                loadBannerAd();
         try {
             if (isMobileAdsInitialized) {
                 if (isBannerAdsEnabled && isBannerRequestedVisible && bannerAdView == null) {
@@ -237,8 +234,6 @@ public class MainActivity extends BridgeActivity {
                 }
                 return;
             }
-            if (isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
-                loadInterstitialAd();
 
             // Meta Audience Network Test Mode
             try {
@@ -246,12 +241,7 @@ public class MainActivity extends BridgeActivity {
             } catch (Throwable t) {
                 Log.w(TAG, "Meta AdSettings setTestMode warning: " + t.getMessage());
             }
-            return;
-        }
 
-        // Meta Audience Network Test Mode
-        AdSettings.setTestMode(true);
-        // AdSettings.addTestDevice("YOUR_META_HASHED_DEVICE_ID_HERE");
             // AdMob Test Device configuration
             try {
                 RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
@@ -262,22 +252,6 @@ public class MainActivity extends BridgeActivity {
                 Log.w(TAG, "MobileAds setRequestConfiguration warning: " + t.getMessage());
             }
 
-        // AdMob Test Device configuration
-        RequestConfiguration requestConfiguration = new RequestConfiguration.Builder()
-            .setTestDeviceIds(Collections.singletonList(AdRequest.DEVICE_ID_EMULATOR))
-            .build();
-        MobileAds.setRequestConfiguration(requestConfiguration);
-
-        MobileAds.initialize(this, initializationStatus -> {
-            isMobileAdsInitialized = true;
-            Log.d(TAG, "Mobile Ads Initialized: " + initializationStatus);
-            runOnUiThread(() -> {
-                if (isBannerAdsEnabled && isBannerRequestedVisible) {
-                    loadBannerAd();
-                }
-                if (isInterstitialAdsEnabled) {
-                    loadInterstitialAd();
-                }
             MobileAds.initialize(this, initializationStatus -> {
                 isMobileAdsInitialized = true;
                 Log.d(TAG, "Mobile Ads Initialized: " + initializationStatus);
@@ -290,7 +264,6 @@ public class MainActivity extends BridgeActivity {
                     }
                 });
             });
-        });
         } catch (Throwable e) {
             Log.e(TAG, "Error initializing MobileAds safely: " + e.getMessage(), e);
         }
@@ -328,20 +301,6 @@ public class MainActivity extends BridgeActivity {
             ViewGroup rootView = findViewById(android.R.id.content);
             if (rootView == null) return;
             try {
-                ViewGroup rootView = findViewById(android.R.id.content);
-                if (rootView == null) return;
-
-            if (bannerContainer == null) {
-                bannerContainer = new FrameLayout(this);
-                FrameLayout.LayoutParams containerParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.BOTTOM
-                );
-                bannerContainer.setLayoutParams(containerParams);
-                bannerContainer.setBackgroundColor(isCurrentThemeDark ? Color.parseColor("#0b0f19") : Color.WHITE);
-                bannerContainer.setElevation(16f);
-                bannerContainer.setVisibility(isBannerRequestedVisible ? View.VISIBLE : View.GONE);
                 if (bannerContainer == null) {
                     bannerContainer = new FrameLayout(this);
                     FrameLayout.LayoutParams containerParams = new FrameLayout.LayoutParams(
@@ -353,16 +312,6 @@ public class MainActivity extends BridgeActivity {
                     bannerContainer.setElevation(16f);
                     bannerContainer.setVisibility(isBannerRequestedVisible ? View.VISIBLE : View.GONE);
 
-                // Top divider line matching bottom navbar border-top
-                bannerTopDivider = new View(this);
-                float density = getResources().getDisplayMetrics().density;
-                FrameLayout.LayoutParams dividerParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    Math.max(1, (int) (1 * density))
-                );
-                dividerParams.gravity = Gravity.TOP;
-                bannerTopDivider.setLayoutParams(dividerParams);
-                bannerContainer.addView(bannerTopDivider);
                     // Top divider line matching bottom navbar border-top
                     bannerTopDivider = new View(this);
                     float density = getResources().getDisplayMetrics().density;
@@ -374,19 +323,10 @@ public class MainActivity extends BridgeActivity {
                     bannerTopDivider.setLayoutParams(dividerParams);
                     bannerContainer.addView(bannerTopDivider);
 
-                updateBannerColors(isCurrentThemeDark);
-                rootView.addView(bannerContainer);
-            }
                     updateBannerColors(isCurrentThemeDark);
                     rootView.addView(bannerContainer);
                 }
 
-            // If bannerAdView exists but adUnitId differs, recreate AdView
-            if (bannerAdView != null && !Objects.equals(bannerAdUnitId, bannerAdView.getAdUnitId())) {
-                bannerContainer.removeView(bannerAdView);
-                bannerAdView.destroy();
-                bannerAdView = null;
-            }
                 // If bannerAdView exists but adUnitId differs, recreate AdView
                 if (bannerAdView != null && !Objects.equals(bannerAdUnitId, bannerAdView.getAdUnitId())) {
                     bannerContainer.removeView(bannerAdView);
@@ -394,23 +334,12 @@ public class MainActivity extends BridgeActivity {
                     bannerAdView = null;
                 }
 
-            if (bannerAdView == null) {
-                bannerAdView = new AdView(this);
-                bannerAdView.setAdSize(AdSize.BANNER);
-                bannerAdView.setAdSize(getAdaptiveAdSize());
-                bannerAdView.setAdUnitId(bannerAdUnitId);
                 if (bannerAdView == null) {
                     bannerAdView = new AdView(this);
                     bannerAdView.setAdSize(getAdaptiveAdSize());
                     bannerAdUnitId = (bannerAdUnitId != null && !bannerAdUnitId.trim().isEmpty()) ? bannerAdUnitId.trim() : DEFAULT_BANNER_AD_UNIT_ID;
                     bannerAdView.setAdUnitId(bannerAdUnitId);
 
-                FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM
-                );
-                bannerContainer.addView(bannerAdView, adParams);
                     FrameLayout.LayoutParams adParams = new FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -418,16 +347,6 @@ public class MainActivity extends BridgeActivity {
                     );
                     bannerContainer.addView(bannerAdView, adParams);
 
-                bannerAdView.setAdListener(new AdListener() {
-                    @Override
-                    public void onAdLoaded() {
-                        super.onAdLoaded();
-                        Log.d(TAG, "Banner Ad loaded successfully (" + bannerAdUnitId + ").");
-                        Log.d(TAG, "Adaptive Banner Ad loaded successfully (" + bannerAdUnitId + ").");
-                        if (isAdsEnabled && isBannerAdsEnabled && isBannerRequestedVisible && bannerContainer != null) {
-                            bannerContainer.setVisibility(View.VISIBLE);
-                        } else if (bannerContainer != null) {
-                            bannerContainer.setVisibility(View.GONE);
                     bannerAdView.setAdListener(new AdListener() {
                         @Override
                         public void onAdLoaded() {
@@ -439,14 +358,7 @@ public class MainActivity extends BridgeActivity {
                                 bannerContainer.setVisibility(View.GONE);
                             }
                         }
-                    }
 
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        super.onAdFailedToLoad(loadAdError);
-                        Log.e(TAG, "Banner Ad failed to load: " + loadAdError.getMessage());
-                        if (bannerContainer != null) {
-                            bannerContainer.setVisibility(View.GONE);
                         @Override
                         public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                             super.onAdFailedToLoad(loadAdError);
@@ -455,8 +367,6 @@ public class MainActivity extends BridgeActivity {
                                 bannerContainer.setVisibility(View.GONE);
                             }
                         }
-                    }
-                });
                     });
                 }
 
@@ -465,9 +375,6 @@ public class MainActivity extends BridgeActivity {
             } catch (Throwable t) {
                 Log.e(TAG, "Error in loadBannerAd: " + t.getMessage(), t);
             }
-
-            AdRequest adRequest = new AdRequest.Builder().build();
-            bannerAdView.loadAd(adRequest);
         });
     }
 
@@ -480,17 +387,9 @@ public class MainActivity extends BridgeActivity {
         this.isBannerRequestedVisible = visible;
         this.isCurrentThemeDark = isDark;
         runOnUiThread(() -> {
-            if (bannerContainer != null) {
-                if (visible && isAdsEnabled && isBannerAdsEnabled && bannerAdView != null) {
-                    bannerContainer.setBackgroundColor(isDark ? Color.parseColor("#0b0f19") : Color.WHITE);
-                    updateBannerColors(isDark);
-                    bannerContainer.setVisibility(View.VISIBLE);
-                } else {
-                    bannerContainer.setVisibility(View.GONE);
             try {
                 if (bannerContainer != null) {
                     if (visible && isAdsEnabled && isBannerAdsEnabled && bannerAdView != null) {
-                        bannerContainer.setBackgroundColor(isDark ? Color.parseColor("#0b0f19") : Color.WHITE);
                         updateBannerColors(isDark);
                         bannerContainer.setVisibility(View.VISIBLE);
                     } else {
@@ -499,8 +398,6 @@ public class MainActivity extends BridgeActivity {
                 } else if (visible && isAdsEnabled && isBannerAdsEnabled) {
                     loadBannerAd();
                 }
-            } else if (visible && isAdsEnabled && isBannerAdsEnabled) {
-                loadBannerAd();
             } catch (Throwable t) {
                 Log.e(TAG, "Error in setBannerVisibility: " + t.getMessage(), t);
             }
@@ -515,22 +412,9 @@ public class MainActivity extends BridgeActivity {
             return;
         }
         try {
-            if (!isAdsEnabled || !isInterstitialAdsEnabled || isInterstitialLoading || interstitialAd != null) {
-                return;
-            }
-
-        isInterstitialLoading = true;
-        AdRequest adRequest = new AdRequest.Builder().build();
             isInterstitialLoading = true;
             AdRequest adRequest = new AdRequest.Builder().build();
 
-        InterstitialAd.load(this, interstitialAdUnitId, adRequest,
-            new InterstitialAdLoadCallback() {
-                @Override
-                public void onAdLoaded(@NonNull InterstitialAd ad) {
-                    interstitialAd = ad;
-                    isInterstitialLoading = false;
-                    Log.d(TAG, "Interstitial Ad successfully loaded into memory cache (" + interstitialAdUnitId + ").");
             InterstitialAd.load(this, interstitialAdUnitId, adRequest,
                 new InterstitialAdLoadCallback() {
                     @Override
@@ -539,13 +423,6 @@ public class MainActivity extends BridgeActivity {
                         isInterstitialLoading = false;
                         Log.d(TAG, "Interstitial Ad successfully loaded into memory cache (" + interstitialAdUnitId + ").");
 
-                    // Attach strict lifecycle callbacks
-                    ad.setFullScreenContentCallback(new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            super.onAdDismissedFullScreenContent();
-                            Log.d(TAG, "Interstitial ad dismissed by user.");
-                        // Attach strict lifecycle callbacks
                         ad.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
@@ -557,8 +434,6 @@ public class MainActivity extends BridgeActivity {
                                 }
                             }
 
-                            // 1. Properly set the current interstitial ad object to null
-                            interstitialAd = null;
                             @Override
                             public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                                 super.onAdFailedToShowFullScreenContent(adError);
@@ -569,57 +444,26 @@ public class MainActivity extends BridgeActivity {
                                 }
                             }
 
-                            // 2. Return user to normal app flow seamlessly (NO second ad immediately)
                             @Override
                             public void onAdShowedFullScreenContent() {
                                 super.onAdShowedFullScreenContent();
                                 Log.d(TAG, "Interstitial ad displayed on screen.");
                             }
 
-                            // 3. Pre-cache next ad in background memory (DOES NOT AUTO SHOW)
-                            if (isAdsEnabled && isInterstitialAdsEnabled) {
-                                loadInterstitialAd();
                             @Override
                             public void onAdImpression() {
                                 super.onAdImpression();
                                 Log.d(TAG, "Interstitial ad impression recorded.");
                             }
-                        }
 
-                        @Override
-                        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
-                            super.onAdFailedToShowFullScreenContent(adError);
-                            Log.e(TAG, "Interstitial ad failed to show: " + adError.getMessage());
-                            interstitialAd = null;
-                            if (isAdsEnabled && isInterstitialAdsEnabled) {
-                                loadInterstitialAd();
                             @Override
                             public void onAdClicked() {
                                 super.onAdClicked();
                                 Log.d(TAG, "Interstitial ad clicked by user.");
                             }
-                        }
                         });
                     }
 
-                        @Override
-                        public void onAdShowedFullScreenContent() {
-                            super.onAdShowedFullScreenContent();
-                            Log.d(TAG, "Interstitial ad displayed on screen.");
-                        }
-
-                        @Override
-                        public void onAdImpression() {
-                            super.onAdImpression();
-                            Log.d(TAG, "Interstitial ad impression recorded.");
-                        }
-
-                        @Override
-                        public void onAdClicked() {
-                            super.onAdClicked();
-                            Log.d(TAG, "Interstitial ad clicked by user.");
-                        }
-                    });
                     @Override
                     public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                         interstitialAd = null;
@@ -627,15 +471,6 @@ public class MainActivity extends BridgeActivity {
                         Log.e(TAG, "Interstitial Ad failed to load: " + loadAdError.getMessage());
                     }
                 }
-
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    interstitialAd = null;
-                    isInterstitialLoading = false;
-                    Log.e(TAG, "Interstitial Ad failed to load: " + loadAdError.getMessage());
-                }
-            }
-        );
             );
         } catch (Throwable t) {
             Log.e(TAG, "Error in loadInterstitialAd: " + t.getMessage(), t);
@@ -921,3 +756,4 @@ public class MainActivity extends BridgeActivity {
         super.onDestroy();
     }
 }
+

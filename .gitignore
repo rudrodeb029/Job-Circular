@@ -42,6 +42,8 @@ android/capacitor-cordova-android-plugins/
 /ios/App/Pods
 
 *.apk
+*.hprof
+android/*.hprof
 
 # Agents / MCP Config (contains secrets)
 .agents/
