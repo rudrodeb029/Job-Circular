@@ -83,7 +83,7 @@ export default function Feed() {
       <AppHeader />
 
       <PullToRefresh>
-        <div className="animate-fade-in" style={{ padding: 0 }}>
+        <div style={{ padding: 0 }}>
         {/* Search Bar Row with App Icon */}
         <div style={{
           background: 'var(--card-bg, #ffffff)',

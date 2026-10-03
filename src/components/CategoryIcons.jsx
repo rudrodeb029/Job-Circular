@@ -281,3 +281,4 @@ export const getCategoryIconComponent = (catId, props = {}) => {
 };
 
 export default getCategoryIconComponent;
+
