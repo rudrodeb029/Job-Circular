@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation, useNavigationType } from 'react-router-dom';
 import ModernLoader from './ModernLoader';
+import { useAppContext } from '../context/AppContext';
 
 /**
  * Route Hierarchy Depth Definition
@@ -193,7 +194,7 @@ export function SmartPageLoader({ isNavigating }) {
  * - Synchronous scroll reset via useLayoutEffect before paint
  * - Auto-cleans animation class on finish for native position:sticky stability
  */
-export default function PageTransition({ children, isBack, locationKey }) {
+export default function PageTransition({ children, isBack, locationKey, pathname }) {
   const containerRef = useRef(null);
   const isFirstMountRef = useRef(true);
 
@@ -230,7 +231,7 @@ export default function PageTransition({ children, isBack, locationKey }) {
       className={`page-screen-container ${animationClass}`}
       onAnimationEnd={handleAnimationEnd}
     >
-      <DeferredContent skip={isFirstMountRef.current}>{children}</DeferredContent>
+      <DeferredContent skip={isFirstMountRef.current} pathname={pathname}>{children}</DeferredContent>
     </div>
   );
 }
@@ -242,7 +243,7 @@ export default function PageTransition({ children, isBack, locationKey }) {
  * The loader fades in via a compositor-driven CSS delay, so light pages never show it,
  * while heavy pages (Question Bank, MCQ hub, lists) show it until content appears.
  */
-function DeferredContent({ children, skip }) {
+function DeferredContent({ children, skip, pathname }) {
   const [ready, setReady] = useState(skip);
 
   useEffect(() => {
@@ -259,9 +260,93 @@ function DeferredContent({ children, skip }) {
 
   if (ready) return children;
 
+  return <PageShell pathname={pathname} />;
+}
+
+/* Route → title map for the instant page shell header */
+const SHELL_TITLES = [
+  ['/questions-hub', 'MCQ Exam ও প্রশ্নব্যাংক', 'MCQ Exam & Questions'],
+  ['/live-exams', 'লাইভ এমসিকিউ পরীক্ষা', 'Live MCQ Exam'],
+  ['/live-exam-room', 'লাইভ পরীক্ষা', 'Live Exam'],
+  ['/question-details', 'প্রশ্নপত্র', 'Question Paper'],
+  ['/questions/', 'প্রশ্নব্যাংক', 'Question Bank'],
+  ['/job/', 'চাকরির বিস্তারিত', 'Job Details'],
+  ['/exam-details', 'পরীক্ষার বিস্তারিত', 'Exam Details'],
+  ['/result-details', 'ফলাফল', 'Result Details'],
+  ['/all-circulars', 'সকল সার্কুলার', 'All Circulars'],
+  ['/categories', 'ক্যাটাগরি', 'Categories'],
+  ['/search', 'খুঁজুন', 'Search'],
+  ['/admit-card', 'প্রবেশপত্র ও ফলাফল', 'Admit Card & Result'],
+  ['/edit-profile', 'প্রোফাইল সম্পাদনা', 'Edit Profile'],
+  ['/settings', 'সেটিংস', 'Settings'],
+  ['/privacy', 'গোপনীয়তা নীতি', 'Privacy Policy'],
+  ['/terms', 'শর্তাবলী', 'Terms & Conditions'],
+  ['/share', 'শেয়ার করুন', 'Share App'],
+  ['/rate', 'রেটিং দিন', 'Rate Us'],
+  ['/contact', 'যোগাযোগ', 'Contact Us'],
+  ['/about', 'অ্যাপ সম্পর্কে', 'About App'],
+  ['/offline-feed', 'অফলাইন ফিড', 'Offline Feed']
+];
+
+const TAB_PATHS = ['/', '/home', '/feed', '/saved', '/notifications', '/profile'];
+
+/**
+ * Instant Page Structure Shell
+ * Painted on frame 0 while the real page mounts: shows the page's header and a
+ * skeleton of its layout, with the modern loader centered on top — never a blank screen.
+ */
+function PageShell({ pathname = '' }) {
+  const { state } = useAppContext();
+  const isEn = state?.language === 'en';
+  const isTab = TAB_PATHS.includes(pathname);
+  const match = SHELL_TITLES.find(([p]) => pathname.startsWith(p));
+  const title = match ? (isEn ? match[2] : match[1]) : '';
+  const isDetail = getRouteDepth(pathname) >= 2;
+
   return (
-    <div className="deferred-page-loader">
-      <div className="deferred-page-loader-inner">
+    <div className="page page-shell" style={{ paddingBottom: isTab ? '80px' : '24px' }}>
+      {isTab ? (
+        <div className="page-shell-appbar">
+          <div className="skeleton skeleton-circle" style={{ width: 34, height: 34 }} />
+          <div className="skeleton" style={{ width: 120, height: 16, borderRadius: 8 }} />
+          <div className="skeleton skeleton-circle" style={{ width: 34, height: 34 }} />
+        </div>
+      ) : (
+        <div className="page-header">
+          <button className="back-btn" aria-label="Back" onClick={() => window.history.back()}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+          </button>
+          {title ? (
+            <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>{title}</h1>
+          ) : (
+            <div className="skeleton" style={{ flex: 1, height: 16, borderRadius: 8, maxWidth: 160 }} />
+          )}
+        </div>
+      )}
+
+      <div className="page-shell-body">
+        {isDetail ? (
+          <>
+            <div className="skeleton" style={{ height: 150, borderRadius: 18, marginBottom: 14 }} />
+            <div className="skeleton skeleton-text" style={{ width: '80%' }} />
+            <div className="skeleton skeleton-text" style={{ width: '95%' }} />
+            <div className="skeleton skeleton-text" style={{ width: '70%', marginBottom: 16 }} />
+            <div className="skeleton skeleton-card" />
+            <div className="skeleton skeleton-card" />
+          </>
+        ) : (
+          <>
+            <div className="skeleton" style={{ height: 44, borderRadius: 14, marginBottom: 14 }} />
+            <div className="skeleton" style={{ height: 96, borderRadius: 16, marginBottom: 16 }} />
+            <div className="skeleton skeleton-card" />
+            <div className="skeleton skeleton-card" />
+            <div className="skeleton skeleton-card" />
+            <div className="skeleton skeleton-card" />
+          </>
+        )}
+      </div>
+
+      <div className="deferred-page-loader-inner page-shell-loader">
         <ModernLoader size="md" icon="📚" />
       </div>
     </div>
