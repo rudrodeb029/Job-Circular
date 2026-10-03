@@ -238,6 +238,7 @@ ul, ol {
   background: var(--bg);
   min-height: inherit;
   box-shadow: 0 0 30px rgba(0,0,0,0.12);
+  overflow-x: hidden;
 }
 
 .page {
@@ -328,23 +329,23 @@ ul, ol {
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translate3d(0, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes slideInRight {
-  from { opacity: 0; transform: translateX(14px); }
-  to { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translate3d(14px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
-/* Sidebar Drawer Left-to-Right Slow & Polished Motion */
+/* Sidebar Drawer Left-to-Right Polished Motion */
 @keyframes drawerSlideInLeft {
   0% {
-    transform: translateX(-100%);
+    transform: translate3d(-100%, 0, 0);
     opacity: 0.6;
   }
   100% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
   }
 }
@@ -352,11 +353,11 @@ ul, ol {
 /* Sidebar Drawer Right-to-Left Exit Motion */
 @keyframes drawerSlideOutLeft {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
   }
   100% {
-    transform: translateX(-100%);
+    transform: translate3d(-100%, 0, 0);
     opacity: 0.5;
   }
 }
@@ -371,81 +372,172 @@ ul, ol {
   100% { opacity: 0; }
 }
 
-/* Page Content Opening Right-to-Left Slow & Polished Motion (Forward Navigation) */
-@keyframes pageContentSlideInRight {
-  0% {
-    transform: translateX(32px);
-    opacity: 0.82;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
+/* ==========================================================================
+   PRODUCTION PAGE SLIDE ANIMATION SYSTEM (STRICT HORIZONTAL, GPU ACCELERATED)
+   ========================================================================== */
+
+/* Page Screen Container (wraps <Routes>) */
+.page-screen-container {
+  width: 100%;
+  min-height: 100%;
+  position: relative;
+  overflow-x: hidden;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-/* Page Content Opening Left-to-Right Slow & Polished Motion (Back Navigation) */
-@keyframes pageContentSlideInLeft {
+/* Forward Navigation: Right-to-Left Slide (Y locked strictly at 0) */
+@keyframes pageSlideForward {
   0% {
-    transform: translateX(-32px);
-    opacity: 0.82;
-  }
-  100% {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Professional Native App Page Transitions (Fast 0.19s Speed & 0-Jumping Scroll) */
-@keyframes slideInFromRight {
-  0% {
-    opacity: 0;
-    transform: translate3d(24px, 0, 0);
+    opacity: 0.88;
+    transform: translate3d(28px, 0, 0);
   }
   100% {
     opacity: 1;
-    transform: none;
+    transform: translate3d(0, 0, 0);
   }
 }
 
-@keyframes slideInFromLeft {
+/* Back Navigation: Left-to-Right Slide (Y locked strictly at 0) */
+@keyframes pageSlideBack {
   0% {
-    opacity: 0;
-    transform: translate3d(-24px, 0, 0);
+    opacity: 0.88;
+    transform: translate3d(-28px, 0, 0);
   }
   100% {
     opacity: 1;
-    transform: none;
+    transform: translate3d(0, 0, 0);
   }
 }
 
-/* Forward Navigation: Right-to-Left Slide (0.20s Professional Speed) */
-.page-content,
-.animate-fade-in,
-.animate-slide-in-right {
-  animation: slideInFromRight 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.slide-screen-forward {
+  animation: pageSlideForward 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.slide-screen-back {
+  animation: pageSlideBack 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Tab Content Slide Animations (Strictly Horizontal, Y locked at 0) */
+@keyframes tabSlideForward {
+  0% {
+    opacity: 0.88;
+    transform: translate3d(20px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes tabSlideBack {
+  0% {
+    opacity: 0.88;
+    transform: translate3d(-20px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.tab-pane-content {
+  width: 100%;
+  position: relative;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.tab-slide-forward {
+  animation: tabSlideForward 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.tab-slide-back {
+  animation: tabSlideBack 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Modern GPU-Accelerated Tab Bar & Toggle Bar */
+.tabs-container {
+  position: relative;
+  display: flex;
+  background: var(--bg-secondary);
+  padding: 4px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  user-select: none;
+}
+
+.tab-sliding-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  background: var(--white);
+  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 1;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, width;
+}
+
+[data-theme='dark'] .tab-sliding-indicator {
+  background: var(--white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.tab-btn {
+  flex: 1;
+  position: relative;
+  z-index: 2;
+  padding: 8px 12px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.20s ease;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Child Utility Animations (Pure Opacity Fade, ZERO Vertical Displacement) */
+.animate-fade-in {
+  animation: fadeIn 0.22s ease-out forwards;
   will-change: opacity;
-  -webkit-overflow-scrolling: touch;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeIn 0.22s ease-out forwards;
   will-change: opacity;
+}
+
+.animate-slide-in-right {
+  animation: fadeIn 0.22s ease-out forwards;
+  will-change: opacity;
+}
+
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale3d(0.98, 0.98, 1); }
+  100% { opacity: 1; transform: scale3d(1, 1, 1); }
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: opacity;
-}
-
-/* Backward Navigation: Left-to-Right Slide (0.20s Professional Speed) */
-[data-nav-direction="back"] .page-content,
-[data-nav-direction="back"] .animate-fade-in,
-[data-nav-direction="back"] .animate-slide-in-right,
-.nav-direction-back .page-content,
-.nav-direction-back .animate-fade-in,
-.nav-direction-back .animate-slide-in-right {
-  animation: slideInFromLeft 0.20s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: opacity;
+  animation: scaleIn 0.20s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  will-change: transform, opacity;
 }
 
 /* GPU Acceleration & Performance Tuning */

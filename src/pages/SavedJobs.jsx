@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { Bookmark, BookmarkCheck, Briefcase, Calendar, Clock, Download, FileText, Search } from '../components/Icons';
 import JobCard from '../components/JobCard';
-import TabBar from '../components/TabBar';
+import TabBar, { TabContent } from '../components/TabBar';
 import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
 import { jobs } from '../data/jobs';
@@ -90,7 +90,7 @@ export default function SavedJobs() {
         </h1>
       </div>
 
-      <div className="page-content animate-fade-in">
+      <div className="page-content">
         {/* Search Bar for Saved Jobs */}
         <div style={{ marginBottom: 'var(--space-md)' }}>
           <SearchBar
@@ -106,8 +106,9 @@ export default function SavedJobs() {
         </div>
 
         {/* Job List or Empty State */}
-        {filteredJobs.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+        <TabContent activeTab={activeTab} tabs={tabs}>
+          {filteredJobs.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {filteredJobs.map(job => {
               if (activeTab === 'result') {
                 const { icon: displayIcon } = getJobIconAndStyle(job);
@@ -298,6 +299,7 @@ export default function SavedJobs() {
             onAction={searchQuery ? () => setSearchQuery('') : null}
           />
         )}
+        </TabContent>
       </div>
 
     </div>

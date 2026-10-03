@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, FileText } from '../components/Icons';
-import TabBar from '../components/TabBar';
+import TabBar, { TabContent } from '../components/TabBar';
 import EmptyState from '../components/EmptyState';
 import SearchBar from '../components/SearchBar';
 import { useAppContext } from '../context/AppContext';
@@ -109,8 +109,9 @@ export default function AdmitCardResult() {
           />
         </div>
 
-        {searchedItems.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+        <TabContent activeTab={activeTab} tabs={tabs}>
+          {searchedItems.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {searchedItems.map(item => {
               const { icon: displayIcon } = getJobIconAndStyle(item);
               const orgName = stripHtmlTags(isEn ? (item.organizationEn || item.organization) : item.organization);
@@ -314,6 +315,7 @@ export default function AdmitCardResult() {
             icon={FileText}
           />
         )}
+        </TabContent>
       </div>
     </div>
   );

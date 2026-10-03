@@ -7,6 +7,7 @@ import { getLiveExams } from '../data/liveExams';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader from '../components/ModernLoader';
 import LiveExamCard from '../components/LiveExamCard';
+import TabBar, { TabContent } from '../components/TabBar';
 
 export default function LiveExams() {
   const navigate = useNavigate();
@@ -19,15 +20,15 @@ export default function LiveExams() {
   const [registrations, setRegistrations] = useState({});
   const [toastMessage, setToastMessage] = useState('');
   const [activeTab, setActiveTab] = useState('live'); // 'live' | 'history'
-  const [isSwitchingTab, setIsSwitchingTab] = useState(false);
+
+  const tabs = [
+    { id: 'live', label: isEn ? 'Live Exams' : 'লাইভ পরীক্ষা' },
+    { id: 'history', label: isEn ? 'Exam History' : 'পরীক্ষার ইতিহাস' }
+  ];
 
   const handleTabChange = (tab) => {
     if (activeTab === tab) return;
-    setIsSwitchingTab(true);
     setActiveTab(tab);
-    setTimeout(() => {
-      setIsSwitchingTab(false);
-    }, 180);
   };
 
   // Ticks the clock every second and reads databases reactively
@@ -163,47 +164,13 @@ export default function LiveExams() {
         </h1>
       </div>
 
-      {/* Tab Selector */}
-      <div style={{
-        display: 'flex',
-        background: 'var(--white)',
-        borderBottom: '1px solid var(--border-light)',
-        padding: '0 8px'
-      }}>
-        <button
-          onClick={() => handleTabChange('live')}
-          style={{
-            flex: 1,
-            padding: '14px 0',
-            background: 'transparent',
-            border: 'none',
-            borderBottom: activeTab === 'live' ? '3px solid var(--primary)' : '3px solid transparent',
-            color: activeTab === 'live' ? 'var(--primary)' : 'var(--text-secondary)',
-            fontWeight: 800,
-            fontSize: '13px',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-        >
-          {isEn ? 'Live' : 'লাইভ'}
-        </button>
-        <button
-          onClick={() => handleTabChange('history')}
-          style={{
-            flex: 1,
-            padding: '14px 0',
-            background: 'transparent',
-            border: 'none',
-            borderBottom: activeTab === 'history' ? '3px solid var(--primary)' : '3px solid transparent',
-            color: activeTab === 'history' ? 'var(--primary)' : 'var(--text-secondary)',
-            fontWeight: 800,
-            fontSize: '13px',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-        >
-          {isEn ? 'History' : 'ইতিহাস'}
-        </button>
+      {/* Modern GPU-Accelerated Tab Selector */}
+      <div style={{ padding: '8px 14px', background: 'var(--white)', borderBottom: '1px solid var(--border-light)' }}>
+        <TabBar
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
       </div>
 
       {/* Floating Toast Notification */}
@@ -228,47 +195,41 @@ export default function LiveExams() {
       )}
 
       <PullToRefresh onRefresh={refreshData}>
-        <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
-        
-        {/* Sleek, Premium Regulations Card (Only shown in Live tab) */}
-        {activeTab === 'live' && (
-          <div style={{
-            background: 'var(--primary-bg)',
-            border: '1px solid var(--chip-primary-border)',
-            borderRadius: '20px',
-            padding: '18px',
-            marginBottom: '20px',
-            boxShadow: 'var(--shadow-sm)'
-          }}>
-            <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
-            </h3>
-            <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
-              {isEn 
-                ? 'Participate in real-time competitive exams. The exam starts exactly at the scheduled time. Results will be calculated instantly upon submission.'
-                : 'নির্ধারিত সময়ে সরাসরি লাইভ পরীক্ষায় অংশ নিন। পরীক্ষা শুরু হওয়ার পর সময়ের মধ্যে সাবমিট করতে হবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাবে।'}
-            </p>
-          </div>
-        )}
+        <div className="page-content" style={{ padding: '16px' }}>
+          <TabContent activeTab={activeTab} tabs={tabs}>
+            {/* Sleek, Premium Regulations Card (Only shown in Live tab) */}
+            {activeTab === 'live' && (
+              <div style={{
+                background: 'var(--primary-bg)',
+                border: '1px solid var(--chip-primary-border)',
+                borderRadius: '20px',
+                padding: '18px',
+                marginBottom: '20px',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
+                </h3>
+                <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
+                  {isEn 
+                    ? 'Participate in real-time competitive exams. The exam starts exactly at the scheduled time. Results will be calculated instantly upon submission.'
+                    : 'নির্ধারিত সময়ে সরাসরি লাইভ পরীক্ষায় অংশ নিন। পরীক্ষা শুরু হওয়ার পর সময়ের মধ্যে সাবমিট করতে হবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাবে।'}
+                </p>
+              </div>
+            )}
 
-        {/* Exams List: 2-Column Cards Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '16px',
-          minHeight: '220px'
-        }}>
-          {isSwitchingTab ? (
-            <div style={{ padding: '60px 20px', gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '220px' }}>
-              <ModernLoader size="md" icon={activeTab === 'live' ? '🏆' : '📜'} />
-            </div>
-          ) : (
-            <>
+            {/* Exams List: 2-Column Cards Grid */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '16px',
+              minHeight: '220px'
+            }}>
               {filteredExams.map(exam => {
                 const status = getExamStatus(exam);
                 const startMs = parseExamDate(exam.scheduledAt) || parseExamDate(exam.startTime) || parseExamDate(exam.createdAt) || Date.now();
@@ -295,20 +256,19 @@ export default function LiveExams() {
                 );
               })}
 
-            {filteredExams.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-                <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
-                <p style={{ fontSize: '14px', fontWeight: 600 }}>
-                  {activeTab === 'live'
-                    ? (isEn ? 'No live or upcoming exams' : 'কোনো লাইভ বা আসন্ন পরীক্ষা নেই')
-                    : (isEn ? 'No exam history found' : 'কোনো পরীক্ষার ইতিহাস পাওয়া যায়নি')}
-                </p>
-              </div>
-            )}
-          </>
-        )}
+              {filteredExams.length === 0 && (
+                <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                  <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
+                  <p style={{ fontSize: '14px', fontWeight: 600 }}>
+                    {activeTab === 'live'
+                      ? (isEn ? 'No live or upcoming exams' : 'কোনো লাইভ বা আসন্ন পরীক্ষা নেই')
+                      : (isEn ? 'No exam history found' : 'কোনো পরীক্ষার ইতিহাস পাওয়া যায়নি')}
+                  </p>
+                </div>
+              )}
+            </div>
+          </TabContent>
         </div>
-      </div>
       </PullToRefresh>
 
     </div>
