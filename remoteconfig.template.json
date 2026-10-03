@@ -2,15 +2,27 @@
   "parameters": {
     "show_ads": {
       "defaultValue": { "value": "false" },
-      "description": "Master ads switch. false = all ads off."
+      "description": "Master ads switch. Set true to enable ads globally, false to disable all ads."
     },
     "show_banner_ads": {
       "defaultValue": { "value": "false" },
-      "description": "Banner ads switch."
+      "description": "Banner ads switch. Set true to show bottom banner ads."
     },
     "show_interstitial_ads": {
       "defaultValue": { "value": "false" },
-      "description": "Interstitial (full-screen) ads switch."
+      "description": "Interstitial ads switch. Set true to show full-screen ads."
+    },
+    "interstitial_cooldown_sec": {
+      "defaultValue": { "value": "50" },
+      "description": "Minimum seconds between interstitial ad displays."
+    },
+    "admob_banner_id": {
+      "defaultValue": { "value": "ca-app-pub-3940256099942544/6300978111" },
+      "description": "AdMob Banner Ad Unit ID."
+    },
+    "admob_interstitial_id": {
+      "defaultValue": { "value": "ca-app-pub-3940256099942544/1033173712" },
+      "description": "AdMob Interstitial Ad Unit ID."
     }
   }
 }

@@ -15,8 +15,21 @@ function FormInput({ label, icon, type = 'text', value, onChange, placeholder, r
   const [isFocused, setIsFocused] = useState(false);
   return (
     <div style={{ marginBottom: '14px' }}>
-      <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '5px', display: 'block' }}>
-        {label}
+      <label style={{
+        fontSize: '12px',
+        fontWeight: 700,
+        color: 'var(--text-secondary)',
+        marginBottom: '6px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px'
+      }}>
+        <span>{label}</span>
+        {isOptional && (
+          <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>
+            ({isEn ? 'Optional' : 'ঐচ্ছিক'})
+          </span>
+        )}
       </label>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
         <div style={{
@@ -43,7 +56,7 @@ function FormInput({ label, icon, type = 'text', value, onChange, placeholder, r
           style={{
             width: '100%',
             height: '42px',
-            padding: isOptional ? '8px 65px 8px 36px' : '8px 12px 8px 36px',
+            padding: '8px 12px 8px 36px',
             fontSize: '13px',
             fontWeight: 600,
             background: isFocused ? 'var(--card-bg, #ffffff)' : 'var(--bg-secondary)',
@@ -55,23 +68,6 @@ function FormInput({ label, icon, type = 'text', value, onChange, placeholder, r
             outline: 'none'
           }}
         />
-        {isOptional && (
-          <span style={{
-            position: 'absolute',
-            right: '10px',
-            fontSize: '9.5px',
-            fontWeight: 600,
-            color: 'var(--text-muted)',
-            background: 'var(--bg-primary, #f1f5f9)',
-            padding: '2px 5px',
-            borderRadius: '5px',
-            border: '1px solid var(--border)',
-            pointerEvents: 'none',
-            zIndex: 2
-          }}>
-            {isEn ? 'Optional' : 'ঐচ্ছিক'}
-          </span>
-        )}
       </div>
     </div>
   );
@@ -87,8 +83,21 @@ function ModernSelect({ label, icon, value, onChange, options = [], placeholder 
 
   return (
     <div style={{ marginBottom: '14px' }}>
-      <label style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '5px', display: 'block' }}>
-        {label}
+      <label style={{
+        fontSize: '12px',
+        fontWeight: 700,
+        color: 'var(--text-secondary)',
+        marginBottom: '6px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px'
+      }}>
+        <span>{label}</span>
+        {isOptional && (
+          <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>
+            ({isEn ? 'Optional' : 'ঐচ্ছিক'})
+          </span>
+        )}
       </label>
 
       <div
@@ -98,7 +107,7 @@ function ModernSelect({ label, icon, value, onChange, options = [], placeholder 
           display: 'flex',
           alignItems: 'center',
           height: '42px',
-          padding: isOptional ? '8px 65px 8px 36px' : '8px 30px 8px 36px',
+          padding: '8px 30px 8px 36px',
           background: isOpen ? 'var(--card-bg, #ffffff)' : 'var(--bg-secondary)',
           border: isOpen ? '1.5px solid var(--primary)' : '1px solid var(--border)',
           borderRadius: '12px',
@@ -130,23 +139,6 @@ function ModernSelect({ label, icon, value, onChange, options = [], placeholder 
         }}>
           {displayLabel}
         </span>
-
-        {isOptional && (
-          <span style={{
-            position: 'absolute',
-            right: '28px',
-            fontSize: '9.5px',
-            fontWeight: 600,
-            color: 'var(--text-muted)',
-            background: 'var(--bg-primary, #f1f5f9)',
-            padding: '2px 5px',
-            borderRadius: '5px',
-            border: '1px solid var(--border)',
-            pointerEvents: 'none'
-          }}>
-            {isEn ? 'Optional' : 'ঐচ্ছিক'}
-          </span>
-        )}
 
         <div style={{
           position: 'absolute',
@@ -532,7 +524,7 @@ export default function EditProfile() {
                 fontSize: '9px',
                 fontWeight: 800
               }}>
-                UPLOADING...
+                {isEn ? 'Uploading...' : 'আপলোড হচ্ছে...'}
               </div>
             )}
 
@@ -571,7 +563,7 @@ export default function EditProfile() {
           {/* Form Fields Card */}
           <div className="card" style={{ padding: '16px 16px 6px 16px', borderRadius: '18px', boxShadow: '0 4px 18px rgba(0, 0, 0, 0.04)', border: '1px solid var(--border)' }}>
             <FormInput
-              label={isEn ? 'Full Name' : 'পূর্ণ নাম'}
+              label={isEn ? 'Full name' : 'পূর্ণ নাম'}
               icon={<User size={16} />}
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
@@ -580,7 +572,7 @@ export default function EditProfile() {
             />
 
             <FormInput
-              label={isEn ? 'Phone Number' : 'মোবাইল নম্বর'}
+              label={isEn ? 'Phone number' : 'মোবাইল নম্বর'}
               icon={<PhoneIcon size={15} />}
               type="tel"
               value={formData.phone}
