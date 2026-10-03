@@ -358,27 +358,42 @@ function App() {
           if (!isAllowed) {
             return (
               <div style={{
-                position:'fixed',inset:0,zIndex:99999,
-                background:'var(--bg-primary, #0f172a)',
+                position:'fixed',top:0,left:0,right:0,
+                bottom:'calc(56px + var(--safe-area-bottom, 0px))',
+                zIndex:99999,
+                background:'var(--bg)',
                 display:'flex',alignItems:'center',justifyContent:'center',
-                textAlign:'center',color:'var(--text-primary, white)',padding:'24px',
-                flexDirection:'column'
+                textAlign:'center',color:'var(--text-primary)',padding:'24px',
+                flexDirection:'column',maxWidth:'430px',margin:'0 auto'
               }}>
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-                </svg>
-                <h2 style={{margin:'16px 0 8px',fontSize:'18px',fontWeight:700}}>ইন্টারনেট সংযোগ নেই</h2>
-                <p style={{margin:'0 0 20px',opacity:0.7,fontSize:'14px'}}>নতুন তথ্য দেখতে ইন্টারনেট সংযোগ প্রয়োজন</p>
-                <button
-                  onClick={() => navigate('/saved')}
-                  style={{
-                    padding:'12px 28px',borderRadius:'10px',
-                    background:'#1a56db',color:'white',border:'none',
-                    fontSize:'14px',fontWeight:600,cursor:'pointer'
-                  }}
-                >
-                  📌 সংরক্ষিত চাকরি দেখুন
-                </button>
+                <div style={{
+                  width:'112px',height:'112px',borderRadius:'50%',
+                  background:'linear-gradient(135deg, rgba(26,86,219,0.12) 0%, rgba(59,130,246,0.06) 100%)',
+                  border:'1px solid rgba(26,86,219,0.18)',
+                  display:'flex',alignItems:'center',justifyContent:'center',
+                  marginBottom:'24px'
+                }}>
+                  <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1a56db" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="2" y1="2" x2="22" y2="22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
+                  </svg>
+                </div>
+                <h2 style={{margin:'0 0 8px',fontSize:'19px',fontWeight:700,color:'var(--text-primary)',letterSpacing:0}}>
+                  {state.language === 'en' ? 'No Internet Connection' : 'ইন্টারনেট সংযোগ নেই'}
+                </h2>
+                <p style={{margin:'0 0 22px',color:'var(--text-secondary)',fontSize:'14px',lineHeight:1.7,maxWidth:'290px'}}>
+                  {state.language === 'en'
+                    ? 'An internet connection is required to view new content. Your saved jobs are available from the bottom menu.'
+                    : 'নতুন তথ্য দেখতে ইন্টারনেট সংযোগ প্রয়োজন। সংরক্ষিত চাকরি নিচের মেনু থেকে দেখতে পারবেন।'}
+                </p>
+                <div style={{
+                  display:'inline-flex',alignItems:'center',gap:'8px',
+                  padding:'8px 16px',borderRadius:'999px',
+                  background:'rgba(245,158,11,0.12)',color:'#b45309',
+                  fontSize:'12.5px',fontWeight:600
+                }}>
+                  <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#f59e0b',animation:'pulse 1.4s ease-in-out infinite'}} />
+                  {state.language === 'en' ? 'Waiting for connection…' : 'সংযোগের অপেক্ষায়…'}
+                </div>
               </div>
             );
           }
