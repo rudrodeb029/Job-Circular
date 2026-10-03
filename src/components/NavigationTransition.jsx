@@ -261,8 +261,8 @@ function DeferredContent({ children, skip }) {
 
   return (
     <div className="deferred-page-loader">
-      <div className="smart-loader-card">
-        <ModernLoader size="md" variant="brand" icon="⚡" />
+      <div className="deferred-page-loader-inner">
+        <ModernLoader size="md" icon="📚" />
       </div>
     </div>
   );
