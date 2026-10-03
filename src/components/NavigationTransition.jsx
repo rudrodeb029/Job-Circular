@@ -244,15 +244,10 @@ export default function PageTransition({ children, isBack, locationKey, pathname
  * while heavy pages (Question Bank, MCQ hub, lists) show it until content appears.
  */
 function DeferredContent({ children, skip, pathname }) {
-  const isTab = TAB_PATHS.includes(pathname);
-  const shouldSkip = skip || isTab;
-  const [ready, setReady] = useState(shouldSkip);
+  const [ready, setReady] = useState(skip);
 
   useEffect(() => {
-    if (shouldSkip) {
-      setReady(true);
-      return;
-    }
+    if (ready) return;
     let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => setReady(true));
@@ -261,7 +256,7 @@ function DeferredContent({ children, skip, pathname }) {
       cancelAnimationFrame(raf1);
       if (raf2) cancelAnimationFrame(raf2);
     };
-  }, [shouldSkip, pathname]);
+  }, [ready]);
 
   if (ready) return children;
 
