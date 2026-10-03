@@ -654,3 +654,9 @@ html[data-lang="en"] {
   --text-2xl: 1.35rem;    /* 21.6px (was 24px) */
   --text-3xl: 1.7rem;     /* 27.2px (was 30px) */
 }
+
+/* Proper Bengali typography for rich descriptions (job/result/exam details) */
+.formatted-text-content, .formatted-text-content * { font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif !important; }
+.formatted-text-content p, .formatted-text-content li { line-height: 1.8; }
+.formatted-text-content strong, .formatted-text-content b { font-weight: 700; color: #1e293b; }
+

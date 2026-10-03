@@ -13,10 +13,12 @@ export default function FormattedText({
   const hasHtml = /<[a-z][\s\S]*>/i.test(text);
 
   const containerStyle = {
-    fontSize: '13.5px',
-    lineHeight: 1.65,
+    fontSize: '14px',
+    lineHeight: 1.8,
+    fontWeight: 400,
     color: '#475569',
-    fontFamily: '"Hind Siliguri", sans-serif',
+    fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
+    letterSpacing: 0,
     wordBreak: 'break-word',
     ...(lineClamp && !showMore ? {
       display: '-webkit-box',

@@ -144,17 +144,16 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
                 zIndex: 3,
                 width: '46px',
                 height: '46px',
-                borderRadius: '14px',
-                background: 'linear-gradient(135deg, #ffffff 0%, #eff6ff 100%)',
-                boxShadow: '0 6px 16px -2px rgba(37, 99, 235, 0.25)',
-                border: '1.5px solid rgba(255, 255, 255, 0.9)',
+                background: 'transparent',
+                boxShadow: 'none',
+                border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: typeof activeIcon === 'string' && activeIcon.length <= 4 ? '24px' : '16px',
+                fontSize: typeof activeIcon === 'string' && activeIcon.length <= 4 ? '28px' : '16px',
                 color: '#2563eb'
               }}>
-                {activeIcon}
+                {React.isValidElement(activeIcon) ? React.cloneElement(activeIcon, { size: 30 }) : activeIcon}
               </div>
             </div>
           )}

@@ -86,7 +86,7 @@ export default function FileDownloadModal({
       background: '#f4f8fc',
       display: 'flex',
       flexDirection: 'column',
-      fontFamily: '"Hind Siliguri", sans-serif',
+      fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
       overflowY: 'auto',
       paddingBottom: 'calc(var(--safe-area-bottom, 0px) + 24px)',
       boxSizing: 'border-box'

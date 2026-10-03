@@ -91,12 +91,11 @@ export const DefenseIcon = ({ size = 22, color = 'currentColor', className = '',
 // 🏥 7. Healthcare & Medical (Stethoscope & Medical Hospital Cross)
 export const HealthcareIcon = ({ size = 22, color = 'currentColor', className = '', style = {} }) => (
   <svg viewBox="0 0 24 24" style={baseSvgStyle(size, color, style)} className={className} fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 14v1a4 4 0 0 1-8 0v-1" />
-    <path d="M11 2v4a3 3 0 0 0 6 0V2" />
-    <path d="M19 10h1.5a1.5 1.5 0 0 1 1.5 1.5V13a2 2 0 0 1-2 2h-1" />
-    <circle cx="5" cy="8" r="3" />
-    <path d="M5 5v6" />
-    <path d="M2 8h6" />
+    <rect x="3" y="6" width="18" height="15" rx="2.5" />
+    <path d="M12 9.2v5" />
+    <path d="M9.5 11.7h5" />
+    <path d="M9.5 21v-3.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V21" />
+    <path d="M8 6V4.5A1.5 1.5 0 0 1 9.5 3h5A1.5 1.5 0 0 1 16 4.5V6" />
   </svg>
 );
 
