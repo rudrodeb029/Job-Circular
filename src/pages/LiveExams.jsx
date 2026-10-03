@@ -164,13 +164,62 @@ export default function LiveExams() {
         </h1>
       </div>
 
-      {/* Modern GPU-Accelerated Tab Selector */}
-      <div style={{ padding: '8px 14px', background: 'var(--white)', borderBottom: '1px solid var(--border-light)' }}>
-        <TabBar
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-        />
+      {/* Native Full-Width Sliding Underline Tab Bar */}
+      <div style={{
+        display: 'flex',
+        background: 'var(--white)',
+        borderBottom: '1px solid var(--border-light)',
+        position: 'relative',
+        userSelect: 'none'
+      }}>
+        <button
+          onClick={() => handleTabChange('live')}
+          type="button"
+          style={{
+            flex: 1,
+            padding: '13px 0',
+            background: 'transparent',
+            border: 'none',
+            color: activeTab === 'live' ? 'var(--primary)' : 'var(--text-secondary)',
+            fontWeight: 800,
+            fontSize: '13px',
+            cursor: 'pointer',
+            transition: 'color 0.22s ease'
+          }}
+        >
+          {isEn ? 'Live' : 'লাইভ'}
+        </button>
+        <button
+          onClick={() => handleTabChange('history')}
+          type="button"
+          style={{
+            flex: 1,
+            padding: '13px 0',
+            background: 'transparent',
+            border: 'none',
+            color: activeTab === 'history' ? 'var(--primary)' : 'var(--text-secondary)',
+            fontWeight: 800,
+            fontSize: '13px',
+            cursor: 'pointer',
+            transition: 'color 0.22s ease'
+          }}
+        >
+          {isEn ? 'History' : 'ইতিহাস'}
+        </button>
+
+        {/* Smooth Sliding Underline Indicator */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '50%',
+          height: '3px',
+          background: 'var(--primary)',
+          borderRadius: '3px 3px 0 0',
+          transform: activeTab === 'live' ? 'translate3d(0%, 0, 0)' : 'translate3d(100%, 0, 0)',
+          transition: 'transform 0.30s cubic-bezier(0.22, 1, 0.36, 1)',
+          willChange: 'transform'
+        }} />
       </div>
 
       {/* Floating Toast Notification */}

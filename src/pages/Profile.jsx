@@ -32,12 +32,12 @@ export default function Profile() {
       {/* Glassmorphism Gradient Header */}
       <div style={{
         background: 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
-        padding: 'calc(var(--safe-area-top) + 20px) 20px 60px 20px',
+        padding: 'calc(var(--safe-area-top) + 16px) 16px 20px 16px',
         color: 'white',
         textAlign: 'center',
         borderRadius: '0 0 28px 28px',
         position: 'relative',
-        boxShadow: '0 10px 30px -5px rgba(26, 86, 219, 0.35)',
+        boxShadow: '0 8px 24px -4px rgba(26, 86, 219, 0.22)',
         overflow: 'hidden'
       }}>
         {/* Background Decorative Rings */}
@@ -166,34 +166,26 @@ export default function Profile() {
                 {isEn ? 'Notifications Active' : 'নোটিফিকেশন সক্রিয়'}
             </div>
         )}
-      </div>
 
-      {/* Floating Activity Stats Bar */}
-      <div className="page-content animate-fade-in" style={{
-        padding: '0 20px',
-        marginTop: '-32px',
-        marginBottom: '20px',
-        position: 'relative',
-        zIndex: 10
-      }}>
+        {/* Integrated Activity Stats Bar */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-around',
           alignItems: 'center',
           background: 'var(--white)',
           padding: '12px 10px',
-          borderRadius: '20px',
-          boxShadow: '0 8px 25px -4px rgba(15, 23, 42, 0.08)',
-          border: '1px solid var(--border-light)'
+          borderRadius: '18px',
+          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.1)',
+          marginTop: '16px'
         }}>
           <div
             onClick={() => navigate('/saved')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)' }}>
+            <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)', margin: 0 }}>
               {state.savedJobs.length}
             </p>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               Saved Jobs
             </p>
           </div>
@@ -202,10 +194,10 @@ export default function Profile() {
             onClick={() => navigate('/saved?tab=applied')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669' }}>
+            <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669', margin: 0 }}>
               {state.appliedJobs.length}
             </p>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               Applied
             </p>
           </div>
@@ -214,17 +206,17 @@ export default function Profile() {
             onClick={() => navigate('/notifications')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c' }}>
+            <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c', margin: 0 }}>
               {unreadNotifCount}
             </p>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               Notified
             </p>
           </div>
         </div>
       </div>
 
-      <div className="page-content" style={{ padding: '0 20px 80px 20px' }}>
+      <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
         {/* Section 1: Account & Activity */}
         <div style={{ marginBottom: '20px' }}>
           <div style={{
