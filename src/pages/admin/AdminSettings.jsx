@@ -342,7 +342,7 @@ const AdminSettings = () => {
 
             <div>
               <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>SHARE APP DOWNLOAD URL</label>
-              <input className="modern-input" type="url" placeholder="https://job-circular-75dbb.web.app" value={appInfo.shareAppUrl || ''} onChange={e => setAppInfo({ ...appInfo, shareAppUrl: e.target.value })} />
+              <input className="modern-input" type="url" placeholder="https://livecircular.web.app" value={appInfo.shareAppUrl || ''} onChange={e => setAppInfo({ ...appInfo, shareAppUrl: e.target.value })} />
             </div>
 
             <div>

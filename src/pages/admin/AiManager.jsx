@@ -95,7 +95,7 @@ export default function AiManager() {
       headers: {
         "Authorization": "Bearer " + openRouterKey,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://job-circular-75dbb.web.app",
+        "HTTP-Referer": "https://livecircular.web.app",
         "X-Title": "Live Circular Pro Admin"
       },
       body: JSON.stringify({

@@ -24,7 +24,7 @@ export default function ShareApp() {
     fetchInfo();
   }, []);
 
-  const shareUrl = info.shareAppUrl || 'https://job-circular-75dbb.web.app';
+  const shareUrl = info.shareAppUrl || 'https://livecircular.web.app';
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareUrl);

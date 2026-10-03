@@ -5,7 +5,7 @@ export const DEFAULT_APP_INFO = {
   contactPhone: '+8801700000000',
   whatsappNumber: '+8801700000000',
   playStoreUrl: 'https://play.google.com/store/apps/details?id=com.jobcircular.app',
-  shareAppUrl: 'https://job-circular-75dbb.web.app',
+  shareAppUrl: 'https://livecircular.web.app',
   facebookPageUrl: 'https://facebook.com',
   telegramChannelUrl: 'https://t.me',
   supportHours: 'Sat - Thu: 9:00 AM - 9:00 PM'
