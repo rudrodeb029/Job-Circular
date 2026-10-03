@@ -523,3 +523,7 @@ export const Copy = ({ size = 22, color = 'currentColor', className = '' }) => (
   </svg>
 );
 
+// ═══ Real Vector Category Icons ═══
+export * from './CategoryIcons';
+
+

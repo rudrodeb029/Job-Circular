@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from './Icons';
+import { getCategoryIconComponent } from './CategoryIcons';
 import { useAppContext } from '../context/AppContext';
 
 const toBengaliNumber = (num) => {
@@ -9,25 +10,27 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-const categoryGradientMap = {
-  gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', shadow: 'rgba(29, 78, 216, 0.3)', badgeBg: '#eff6ff', badgeColor: '#1d4ed8' },
-  bank: { bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(5, 150, 105, 0.3)', badgeBg: '#ecfdf5', badgeColor: '#047857' },
-  ngo: { bg: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)', shadow: 'rgba(234, 88, 12, 0.3)', badgeBg: '#fff7ed', badgeColor: '#c2410c' },
-  private: { bg: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)', shadow: 'rgba(124, 58, 237, 0.3)', badgeBg: '#f5f3ff', badgeColor: '#6d28d9' },
-  teaching: { bg: 'linear-gradient(135deg, #db2777 0%, #ec4899 100%)', shadow: 'rgba(219, 39, 119, 0.3)', badgeBg: '#fdf2f8', badgeColor: '#be185d' },
-  defense: { bg: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)', shadow: 'rgba(220, 38, 38, 0.3)', badgeBg: '#fef2f2', badgeColor: '#b91c1c' },
-  healthcare: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', shadow: 'rgba(13, 148, 136, 0.3)', badgeBg: '#f0fdfa', badgeColor: '#0f766e' },
-  health: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', shadow: 'rgba(13, 148, 136, 0.3)', badgeBg: '#f0fdfa', badgeColor: '#0f766e' },
-  it: { bg: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', shadow: 'rgba(79, 70, 229, 0.3)', badgeBg: '#eef2ff', badgeColor: '#4338ca' },
-  engineering: { bg: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)', shadow: 'rgba(217, 119, 6, 0.3)', badgeBg: '#fffbeb', badgeColor: '#b45309' },
-  parttime: { bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)', shadow: 'rgba(2, 132, 199, 0.3)', badgeBg: '#f0f9ff', badgeColor: '#0369a1' }
+const categoryThemeMap = {
+  gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', iconBg: 'rgba(29, 78, 216, 0.1)', iconColor: '#1d4ed8', badgeBg: '#eff6ff', badgeColor: '#1d4ed8' },
+  bank: { bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', iconBg: 'rgba(5, 150, 105, 0.1)', iconColor: '#059669', badgeBg: '#ecfdf5', badgeColor: '#047857' },
+  ngo: { bg: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)', iconBg: 'rgba(234, 88, 12, 0.1)', iconColor: '#ea580c', badgeBg: '#fff7ed', badgeColor: '#c2410c' },
+  private: { bg: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)', iconBg: 'rgba(124, 58, 237, 0.1)', iconColor: '#7c3aed', badgeBg: '#f5f3ff', badgeColor: '#6d28d9' },
+  teaching: { bg: 'linear-gradient(135deg, #db2777 0%, #ec4899 100%)', iconBg: 'rgba(219, 39, 119, 0.1)', iconColor: '#db2777', badgeBg: '#fdf2f8', badgeColor: '#be185d' },
+  defense: { bg: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)', iconBg: 'rgba(220, 38, 38, 0.1)', iconColor: '#dc2626', badgeBg: '#fef2f2', badgeColor: '#b91c1c' },
+  healthcare: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', iconBg: 'rgba(13, 148, 136, 0.1)', iconColor: '#0d9488', badgeBg: '#f0fdfa', badgeColor: '#0f766e' },
+  health: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', iconBg: 'rgba(13, 148, 136, 0.1)', iconColor: '#0d9488', badgeBg: '#f0fdfa', badgeColor: '#0f766e' },
+  it: { bg: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', iconBg: 'rgba(79, 70, 229, 0.1)', iconColor: '#4f46e5', badgeBg: '#eef2ff', badgeColor: '#4338ca' },
+  engineering: { bg: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)', iconBg: 'rgba(217, 119, 6, 0.1)', iconColor: '#d97706', badgeBg: '#fffbeb', badgeColor: '#b45309' },
+  parttime: { bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)', iconBg: 'rgba(2, 132, 199, 0.1)', iconColor: '#0284c7', badgeBg: '#f0f9ff', badgeColor: '#0369a1' },
+  women: { bg: 'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)', iconBg: 'rgba(225, 29, 72, 0.1)', iconColor: '#e11d48', badgeBg: '#fff1f2', badgeColor: '#be123c' },
+  railway: { bg: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)', iconBg: 'rgba(8, 145, 178, 0.1)', iconColor: '#0891b2', badgeBg: '#ecfeff', badgeColor: '#0e7490' }
 };
 
 function CategoryCard({ category }) {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const isEn = state.language === 'en';
-  const theme = categoryGradientMap[category.id] || categoryGradientMap.gov;
+  const theme = categoryThemeMap[category.id] || categoryThemeMap.gov;
 
   const displayCount = isEn
     ? `${category.jobCount} circulars`
@@ -40,7 +43,7 @@ function CategoryCard({ category }) {
         display: 'flex',
         alignItems: 'center',
         gap: '14px',
-        padding: '16px',
+        padding: '14px 16px',
         marginBottom: '12px',
         borderRadius: '18px',
         background: 'var(--white)',
@@ -50,19 +53,34 @@ function CategoryCard({ category }) {
         cursor: 'pointer'
       }}
     >
-      {/* Category Info with Inline Icon */}
+      {/* Real Category Vector Icon Avatar */}
+      <div style={{
+        width: '44px',
+        height: '44px',
+        borderRadius: '14px',
+        background: theme.iconBg,
+        color: theme.iconColor,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+        boxShadow: `0 4px 12px ${theme.iconBg}`
+      }}>
+        {getCategoryIconComponent(category.id || category.iconType, { size: 22, color: theme.iconColor })}
+      </div>
+
+      {/* Category Name & Count Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <h4 style={{
           fontSize: '15px',
           fontWeight: 700,
           color: 'var(--text-primary)',
           marginBottom: '4px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
         }}>
-          <span style={{ fontSize: '15px', lineHeight: 1, flexShrink: 0 }}>{category.icon}</span>
-          <span>{category.name}</span>
+          {isEn ? (category.nameEn || category.name) : category.name}
         </h4>
         <span style={{
           display: 'inline-block',

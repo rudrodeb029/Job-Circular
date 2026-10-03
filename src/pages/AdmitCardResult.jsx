@@ -8,35 +8,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { formatTimeAgo } from '../utils/timeUtils';
 import { stripHtmlTags } from '../utils/textUtils';
-
-const orgIconsMap = {
-  'শিক্ষা মন্ত্রণালয়': '🏛️',
-  'সোনালী ব্যাংক লিমিটেড': '🏦',
-  'বাংলাদেশ পুলিশ': '👮',
-  'ব্র্যাক': '🤝',
-  'গ্রামীণফোন': '📱',
-  'বাংলাদেশ সেনাবাহিনী': '🛡️',
-  'ইসলামী ব্যাংক': '🕌',
-  'বাংলাদেশ রেলওয়ে': '🚂',
-  'ডাক ও টেলিযোগাযোগ মন্ত্রণালয়': '📡',
-  'স্বাস্থ্য অধিদপ্তর': '🏥',
-  'বাংলাদেশ ব্যাংক': '🏛️',
-  'ভিকারুননিসা নূন স্কুল এন্ড কলেজ': '🎓',
-  'এলজিইডি': '🏗️',
-  'বিকাশ লিমিটেড': '💸',
-  'আশা': '🌱',
-  'জনতা ব্যাংক': '🏦',
-  'স্কয়ার হাসপাতাল': '🩺',
-  'পাঠাও': '🚀',
-  'রাজউক উত্তরা মডেল কলেজ': '🏫',
-  'রূপালী ব্যাংক': '🏦',
-  'আকিক গ্রুপ': '🏭',
-  'ওয়াটারএইড বাংলাদেশ': '💧',
-  'টেন মিনিট স্কুল': '✍️',
-  'প্রাথমিক শিক্ষা অধিদপ্তর': '🏫',
-  'ইসলামী ব্যাংক বাংলাদেশ': '🕌',
-  'প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়': '🏫'
-};
+import { getJobIconAndStyle } from '../utils/jobIconUtils';
 
 export default function AdmitCardResult() {
   const navigate = useNavigate();
@@ -140,7 +112,7 @@ export default function AdmitCardResult() {
         {searchedItems.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {searchedItems.map(item => {
-              const displayIcon = orgIconsMap[item.organization] || '🏛️';
+              const { icon: displayIcon } = getJobIconAndStyle(item);
               const orgName = stripHtmlTags(isEn ? (item.organizationEn || item.organization) : item.organization);
               const examName = stripHtmlTags(isEn ? (item.examNameEn || item.examName) : item.examName);
               const itemDate = isEn ? (item.dateEn || item.date) : item.date;

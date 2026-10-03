@@ -8,35 +8,7 @@ import SearchBar from '../components/SearchBar';
 import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import { categories } from '../data/categories';
 import PullToRefresh from '../components/PullToRefresh';
-
-const orgIconsMap = {
-  'শিক্ষা মন্ত্রণালয়': '🏛️',
-  'সোনালী ব্যাংক লিমিটেড': '🏦',
-  'বাংলাদেশ পুলিশ': '👮',
-  'ব্র্যাক': '🤝',
-  'গ্রামীণফোন': '📱',
-  'বাংলাদেশ সেনাবাহিনী': '🛡️',
-  'ইসলামী ব্যাংক': '🕌',
-  'বাংলাদেশ রেলওয়ে': '🚂',
-  'ডাক ও টেলিযোগাযোগ মন্ত্রণালয়': '📡',
-  'স্বাস্থ্য অধিদপ্তর': '🏥',
-  'বাংলাদেশ ব্যাংক': '🏛️',
-  'ভিকারুননিসা নূন স্কুল এন্ড কলেজ': '🎓',
-  'এলজিইডি': '🏗️',
-  'বিকাশ লিমিটেড': '💸',
-  'আশা': '🌱',
-  'জনতা ব্যাংক': '🏦',
-  'স্কয়ার হাসপাতাল': '🩺',
-  'পাঠাও': '🚀',
-  'রাজউক উত্তরা মডেল কলেজ': '🏫',
-  'রূপালী ব্যাংক': '🏦',
-  'আকিক গ্রুপ': '🏭',
-  'ওয়াটারএইড বাংলাদেশ': '💧',
-  'টেন মিনিট স্কুল': '✍️',
-  'প্রাথমিক শিক্ষা অধিদপ্তর': '🏫',
-  'ইসলামী ব্যাংক বাংলাদেশ': '🕌',
-  'প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়': '🏫'
-};
+import { getJobIconAndStyle } from '../utils/jobIconUtils';
 
 export default function AllCirculars() {
   const navigate = useNavigate();
@@ -236,7 +208,7 @@ export default function AllCirculars() {
                 return <JobCard key={item.id} job={item} />;
               }
 
-              const displayIcon = item.icon || orgIconsMap[item.organization] || '🏛️';
+              const { icon: displayIcon } = getJobIconAndStyle(item);
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
               const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
               const catData = categories.find(c => c.id === (item.category || item.categoryId));

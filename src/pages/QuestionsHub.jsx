@@ -1,6 +1,16 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Clock, LayoutGrid, FileText, ChevronRight } from '../components/Icons';
+import {
+  BcsIcon,
+  BankIcon,
+  NtrcaIcon,
+  PrimaryIcon,
+  GovIcon,
+  RecentQuestionsIcon,
+  SubjectwiseIcon,
+  getCategoryIconComponent
+} from '../components/CategoryIcons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import SearchBar from '../components/SearchBar';
@@ -10,13 +20,13 @@ import QuestionCard from '../components/QuestionCard';
 import { getQuestionsData } from '../data/questionsData';
 
 const categoryConfig = {
-  bcs: { name: 'বিসিএস', nameEn: 'BCS', color: 'rgba(26, 86, 219, 0.05)', icon: '🎓' },
-  bank: { name: 'ব্যাংক', nameEn: 'Bank', color: 'rgba(16, 185, 129, 0.05)', icon: '🏦' },
-  ntrca: { name: 'NTRCA', nameEn: 'NTRCA', color: 'rgba(139, 92, 246, 0.05)', icon: '📜' },
-  primary: { name: 'প্রাইমারি', nameEn: 'Primary', color: 'rgba(236, 72, 153, 0.05)', icon: '🏫' },
-  ministry: { name: 'বিভিন্ন মন্ত্রনালয়', nameEn: 'Ministries', color: 'rgba(6, 182, 212, 0.05)', icon: '🏛️' },
-  recent: { name: 'রিসেন্ট প্রশ্ন', nameEn: 'Recent Questions', color: 'rgba(245, 158, 11, 0.05)', icon: '⏱️' },
-  subjectwise: { name: 'বিষয়ভিত্তিক', nameEn: 'Subjectwise Questions', color: 'rgba(16, 185, 129, 0.05)', icon: '🗂️' }
+  bcs: { name: 'বিসিএস', nameEn: 'BCS', color: 'rgba(26, 86, 219, 0.08)', icon: <BcsIcon size={20} color="#1a56db" /> },
+  bank: { name: 'ব্যাংক', nameEn: 'Bank', color: 'rgba(16, 185, 129, 0.08)', icon: <BankIcon size={20} color="#10b981" /> },
+  ntrca: { name: 'NTRCA', nameEn: 'NTRCA', color: 'rgba(139, 92, 246, 0.08)', icon: <NtrcaIcon size={20} color="#8b5cf6" /> },
+  primary: { name: 'প্রাইমারি', nameEn: 'Primary', color: 'rgba(236, 72, 153, 0.08)', icon: <PrimaryIcon size={20} color="#ec4899" /> },
+  ministry: { name: 'বিভিন্ন মন্ত্রনালয়', nameEn: 'Ministries', color: 'rgba(6, 182, 212, 0.08)', icon: <GovIcon size={20} color="#0891b2" /> },
+  recent: { name: 'রিসেন্ট প্রশ্ন', nameEn: 'Recent Questions', color: 'rgba(245, 158, 11, 0.08)', icon: <RecentQuestionsIcon size={20} color="#f59e0b" /> },
+  subjectwise: { name: 'বিষয়ভিত্তিক', nameEn: 'Subjectwise Questions', color: 'rgba(16, 185, 129, 0.08)', icon: <SubjectwiseIcon size={20} color="#10b981" /> }
 };
 
 export default function QuestionsHub() {
@@ -55,8 +65,8 @@ export default function QuestionsHub() {
         config[p.category] = {
           name: p.categoryName || p.category,
           nameEn: p.categoryNameEn || p.category,
-          color: 'rgba(139, 92, 246, 0.05)',
-          icon: '📝'
+          color: 'rgba(139, 92, 246, 0.08)',
+          icon: getCategoryIconComponent(p.category, { size: 20, color: '#8b5cf6' })
         };
       }
     });

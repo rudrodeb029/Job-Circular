@@ -11,35 +11,8 @@ import { HomeSkeleton } from '../components/SkeletonLoader';
 import { categories } from '../data/categories';
 import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeUtils';
 import PullToRefresh from '../components/PullToRefresh';
-
-const orgIconsMap = {
-  'শিক্ষা মন্ত্রণালয়': '🏛️',
-  'সোনালী ব্যাংক লিমিটেড': '🏦',
-  'বাংলাদেশ পুলিশ': '👮',
-  'ব্র্যাক': '🤝',
-  'গ্রামীণফোন': '📱',
-  'বাংলাদেশ সেনাবাহিনী': '🛡️',
-  'ইসলামী ব্যাংক': '🕌',
-  'বাংলাদেশ রেলওয়ে': '🚂',
-  'ডাক ও টেলিযোগাযোগ মন্ত্রণালয়': '📡',
-  'স্বাস্থ্য অধিদপ্তর': '🏥',
-  'বাংলাদেশ ব্যাংক': '🏛️',
-  'ভিকারুননিসা নূন স্কুল এন্ড কলেজ': '🎓',
-  'এলজিইডি': '🏗️',
-  'বিকাশ লিমিটেড': '💸',
-  'আশা': '🌱',
-  'জনতা ব্যাংক': '🏦',
-  'স্কয়ার হাসপাতাল': '🩺',
-  'পাঠাও': '🚀',
-  'রাজউক উত্তরা মডেল কলেজ': '🏫',
-  'রূপালী ব্যাংক': '🏦',
-  'আকিক গ্রুপ': '🏭',
-  'ওয়াটারএইড বাংলাদেশ': '💧',
-  'টেন মিনিট স্কুল': '✍️',
-  'প্রাথমিক শিক্ষা অধিদপ্তর': '🏫',
-  'ইসলামী ব্যাংক বাংলাদেশ': '🕌',
-  'প্রাথমিক ও গণশিক্ষা মন্ত্রণালয়': '🏫'
-};
+import { getJobIconAndStyle } from '../utils/jobIconUtils';
+import { BcsIcon, BankIcon, NtrcaIcon, PrimaryIcon, GovIcon, getCategoryIconComponent } from '../components/CategoryIcons';
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -367,17 +340,17 @@ export default function Home() {
             <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '4px 0' }}>
               <div className="scrolling-content" style={{ gap: '8px' }}>
                 {[
-                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
-                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
-                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
-                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
-                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={18} color="#1a56db" />, color: 'rgba(26, 86, 219, 0.08)' },
+                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: <BankIcon size={18} color="#10b981" />, color: 'rgba(16, 185, 129, 0.08)' },
+                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: <NtrcaIcon size={18} color="#8b5cf6" />, color: 'rgba(139, 92, 246, 0.08)' },
+                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: <PrimaryIcon size={18} color="#ec4899" />, color: 'rgba(236, 72, 153, 0.08)' },
+                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: <GovIcon size={18} color="#f59e0b" />, color: 'rgba(245, 158, 11, 0.08)' }
                 ].concat([
-                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: '🎓', color: 'rgba(26, 86, 219, 0.05)' },
-                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: '🏦', color: 'rgba(16, 185, 129, 0.05)' },
-                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: '📜', color: 'rgba(139, 92, 246, 0.05)' },
-                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: '🏫', color: 'rgba(5, 150, 105, 0.05)' },
-                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: '🏛️', color: 'rgba(245, 158, 11, 0.05)' }
+                  { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={18} color="#1a56db" />, color: 'rgba(26, 86, 219, 0.08)' },
+                  { id: 'bank', name: 'ব্যাংক', nameEn: 'Bank', icon: <BankIcon size={18} color="#10b981" />, color: 'rgba(16, 185, 129, 0.08)' },
+                  { id: 'ntrca', name: 'NTRCA', nameEn: 'NTRCA', icon: <NtrcaIcon size={18} color="#8b5cf6" />, color: 'rgba(139, 92, 246, 0.08)' },
+                  { id: 'primary', name: 'প্রাইমারি', nameEn: 'Primary', icon: <PrimaryIcon size={18} color="#ec4899" />, color: 'rgba(236, 72, 153, 0.08)' },
+                  { id: 'ministry', name: 'মন্ত্রনালয়', nameEn: 'Ministries', icon: <GovIcon size={18} color="#f59e0b" />, color: 'rgba(245, 158, 11, 0.08)' }
                 ]).map((cat, idx) => (
                   <div
                     key={`${cat.id}-${idx}`}
@@ -392,7 +365,7 @@ export default function Home() {
                     }}
                     onClick={() => navigate(`/questions-hub?category=${cat.id}`)}
                   >
-                    <div className="category-grid-icon" style={{ background: cat.color, fontSize: '13px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
+                    <div className="category-grid-icon" style={{ background: cat.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{cat.icon}</div>
                     <span className="category-grid-label">{isEn ? cat.nameEn : cat.name}</span>
                   </div>
                 ))}
@@ -440,7 +413,7 @@ export default function Home() {
                 return <JobCard key={item.id} job={item} />;
               }
 
-              const displayIcon = item.icon || orgIconsMap[item.organization] || '🏛️';
+              const { icon: displayIcon } = getJobIconAndStyle(item);
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
               const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
               const catData = categories.find(c => c.id === (item.category || item.categoryId));
@@ -453,7 +426,7 @@ export default function Home() {
                   <div key={item.id} className="job-card animate-fade-in" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(16, 185, 129, 0.12)', boxShadow: '0 4px 18px rgba(16, 185, 129, 0.04)' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #10b981, #34d399)', borderRadius: '4px 0 0 4px' }}></div>
                     <div className="job-card-content">
-                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '12px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
+                      <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '14px', flexShrink: 0, display: 'inline-flex' }}>{displayIcon}</span><span>{orgName}</span></h4>
                       <p className="job-card-org" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', lineHeight: '1.4', marginBottom: '4px', fontWeight: 400 }}>{displayDesc}</p>
                       <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                         <span style={{ fontSize: '8.5px', color: '#059669', background: '#d1fae5', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}><Calendar size={10} /><span>{isEn ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}</span></span>
@@ -473,7 +446,7 @@ export default function Home() {
                 <div key={item.id} className="job-card animate-fade-in" onClick={() => navigate(`/result-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(124, 58, 237, 0.12)', boxShadow: '0 4px 18px rgba(124, 58, 237, 0.04)' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #7c3aed, #a78bfa)', borderRadius: '4px 0 0 4px' }}></div>
                   <div className="job-card-content">
-                    <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '12px', flexShrink: 0 }}>{displayIcon}</span><span>{orgName}</span></h4>
+                    <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ fontSize: '14px', flexShrink: 0, display: 'inline-flex' }}>{displayIcon}</span><span>{orgName}</span></h4>
                     <p className="job-card-org" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', lineHeight: '1.4', marginBottom: '4px', fontWeight: 400 }}>{displayDesc}</p>
                     <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                       <span style={{ fontSize: '8.5px', color: '#7e22ce', background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', whiteSpace: 'nowrap' }}>🏆 <span>{isEn ? 'Result Published' : 'ফলাফল প্রকাশিত'}</span></span>
