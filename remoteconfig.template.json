@@ -1,0 +1,16 @@
+{
+  "parameters": {
+    "show_ads": {
+      "defaultValue": { "value": "false" },
+      "description": "Master ads switch. false = all ads off."
+    },
+    "show_banner_ads": {
+      "defaultValue": { "value": "false" },
+      "description": "Banner ads switch."
+    },
+    "show_interstitial_ads": {
+      "defaultValue": { "value": "false" },
+      "description": "Interstitial (full-screen) ads switch."
+    }
+  }
+}
