@@ -135,25 +135,23 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
             </svg>
           ) : (
             /* Custom Category Emblem inside Cloud Frame */
-            <div style={{ position: 'relative', width: '90px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="100" height="64" viewBox="0 0 120 75" fill="none" style={{ position: 'absolute' }}>
-                <path d="M22 46 C12 46 8 32 18 22 C20 10 36 6 48 12 C56 2 76 2 84 12 C96 6 110 10 112 22 C122 32 118 46 106 46 Z" fill="#ffffff" opacity="0.9" />
+            <div style={{ position: 'relative', width: '100px', height: '75px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <svg width="110" height="75" viewBox="0 0 120 75" fill="none" style={{ position: 'absolute' }}>
+                <path d="M22 46 C12 46 8 32 18 22 C20 10 36 6 48 12 C56 2 76 2 84 12 C96 6 110 10 112 22 C122 32 118 46 106 46 Z" fill="#ffffff" opacity="0.92" />
               </svg>
               <div style={{
                 position: 'relative',
                 zIndex: 3,
-                width: '46px',
-                height: '46px',
+                width: '64px',
+                height: '64px',
                 background: 'transparent',
-                boxShadow: 'none',
-                border: 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: typeof activeIcon === 'string' && activeIcon.length <= 4 ? '28px' : '16px',
+                fontSize: typeof activeIcon === 'string' && activeIcon.length <= 4 ? '44px' : '22px',
                 color: '#2563eb'
               }}>
-                {React.isValidElement(activeIcon) ? React.cloneElement(activeIcon, { size: 30 }) : activeIcon}
+                {React.isValidElement(activeIcon) ? React.cloneElement(activeIcon, { size: 48, color: '#2563eb' }) : activeIcon}
               </div>
             </div>
           )}
