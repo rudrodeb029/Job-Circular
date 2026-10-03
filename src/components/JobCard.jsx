@@ -116,7 +116,7 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
 
       <div className="job-card-content">
         <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '12px', flexShrink: 0 }}>{displayIcon}</span>
+          <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: styleConfig?.primaryColor || 'var(--primary)' }}>{displayIcon}</span>
           <span>{orgName}</span>
         </h4>
 

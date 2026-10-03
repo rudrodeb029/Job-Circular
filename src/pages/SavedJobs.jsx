@@ -129,7 +129,7 @@ export default function SavedJobs() {
                   >
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '14px', flexShrink: 0, display: 'inline-flex' }}>{displayIcon}</span>
+                        <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed' }}>{displayIcon}</span>
                         <span>{orgName}</span>
                       </h4>
                       <p className="job-card-org" style={{
@@ -216,7 +216,7 @@ export default function SavedJobs() {
                   >
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '14px', flexShrink: 0, display: 'inline-flex' }}>{displayIcon}</span>
+                        <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669' }}>{displayIcon}</span>
                         <span>{orgName}</span>
                       </h4>
                       <p className="job-card-org" style={{

@@ -208,7 +208,7 @@ export default function AllCirculars() {
                 return <JobCard key={item.id} job={item} />;
               }
 
-              const { icon: displayIcon } = getJobIconAndStyle(item);
+              const { icon: displayIcon, style: styleConfig } = getJobIconAndStyle(item);
               const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
               const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
               const catData = categories.find(c => c.id === (item.category || item.categoryId));
@@ -230,7 +230,7 @@ export default function AllCirculars() {
                   >
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                        <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669' }}>{displayIcon}</span>
                         <span>{orgName}</span>
                       </h4>
                       <p className="job-card-org" style={{
@@ -312,7 +312,7 @@ export default function AllCirculars() {
                 >
                   <div className="job-card-content">
                     <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ fontSize: '16px', flexShrink: 0 }}>{displayIcon}</span>
+                      <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed' }}>{displayIcon}</span>
                       <span>{orgName}</span>
                     </h4>
                     <p className="job-card-org" style={{
