@@ -51,30 +51,27 @@ const TabBar = ({ tabs = [], activeTab, onTabChange, className = '', style = {} 
  * Directional Tab Content Wrapper
  * Slides tab content strictly horizontally (left <-> right) ONLY on user tab changes.
  * Does NOT slide on initial page mount (prevents double-slide / zigzag).
+ * Synchronously evaluated on render (Frame 0 execution - zero flash/pop).
  * Y-axis locked at 0.
  */
-export const TabContent = ({ activeTab, tabs = [], children, className = '' }) => {
-  const isFirstRender = useRef(true);
+export const TabContent = ({ activeTab, tabs = [], children, className = '', style = {} }) => {
+  const isFirstRenderRef = useRef(true);
   const prevTabRef = useRef(activeTab);
-  const [slideDirection, setSlideDirection] = useState(null);
+  const slideDirectionRef = useRef(null);
 
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (prevTabRef.current !== activeTab) {
-      const prevIndex = tabs.findIndex((t) => t.id === prevTabRef.current);
-      const currentIndex = tabs.findIndex((t) => t.id === activeTab);
-      setSlideDirection(currentIndex < prevIndex ? 'back' : 'forward');
-      prevTabRef.current = activeTab;
-    }
-  }, [activeTab, tabs]);
+  if (isFirstRenderRef.current) {
+    isFirstRenderRef.current = false;
+  } else if (prevTabRef.current !== activeTab) {
+    const prevIndex = tabs.findIndex((t) => t.id === prevTabRef.current);
+    const currentIndex = tabs.findIndex((t) => t.id === activeTab);
+    slideDirectionRef.current = currentIndex < prevIndex ? 'back' : 'forward';
+    prevTabRef.current = activeTab;
+  }
 
   const animationClass =
-    slideDirection === 'back'
+    slideDirectionRef.current === 'back'
       ? 'tab-slide-back'
-      : slideDirection === 'forward'
+      : slideDirectionRef.current === 'forward'
       ? 'tab-slide-forward'
       : '';
 
@@ -82,6 +79,7 @@ export const TabContent = ({ activeTab, tabs = [], children, className = '' }) =
     <div
       key={activeTab}
       className={`tab-pane-content ${animationClass} ${className}`}
+      style={style}
     >
       {children}
     </div>

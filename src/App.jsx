@@ -64,38 +64,8 @@ import AdminSettings from './pages/admin/AdminSettings'
 import AiManager from './pages/admin/AiManager'
 import ManageFeed from './pages/admin/ManageFeed'
 
-/**
- * Production-ready GPU-Accelerated Page Transition Wrapper
- * Locks Y-axis strictly at 0 (translate3d)
- * Smooth cubic-bezier horizontal movement
- * Auto-cleans transition class on animation end for perfect position:sticky behavior
- */
-function PageTransition({ children, isBack, pathname }) {
-  const [animating, setAnimating] = useState(true);
+import PageTransition, { useNavigationTracker } from './components/NavigationTransition'
 
-  useEffect(() => {
-    setAnimating(true);
-    const timer = setTimeout(() => {
-      setAnimating(false);
-    }, 380);
-    return () => clearTimeout(timer);
-  }, [pathname]);
-
-  const handleAnimationEnd = (e) => {
-    if (e.target === e.currentTarget) {
-      setAnimating(false);
-    }
-  };
-
-  return (
-    <div
-      className={`page-screen-container ${animating ? (isBack ? 'slide-screen-back' : 'slide-screen-forward') : ''}`}
-      onAnimationEnd={handleAnimationEnd}
-    >
-      {children}
-    </div>
-  );
-}
 
 function App() {
   const { state } = useAppContext()
@@ -342,85 +312,7 @@ function App() {
   }
 
   const navigationType = useNavigationType();
-  const prevPathRef = useRef(location.pathname);
-
-  // Hierarchical Route Depth
-  // Level 0: Main bottom navigation tabs
-  // Level 1: Sub-sections, lists, filters, settings, static pages
-  // Level 2: Detailed entity views (job details, exam details, etc.)
-  // Level 3: Immersive exam room / full interactive screens
-  const getRouteDepth = (path) => {
-    if (path === '/' || path === '/home' || path === '/feed' || path === '/saved' || path === '/notifications' || path === '/profile') {
-      return 0;
-    }
-    if (path.startsWith('/live-exam-room/')) {
-      return 3;
-    }
-    if (
-      path.startsWith('/job/') ||
-      path.startsWith('/exam-details/') ||
-      path.startsWith('/result-details/') ||
-      path.startsWith('/question-details/') ||
-      path.startsWith('/questions/')
-    ) {
-      return 2;
-    }
-    return 1;
-  };
-
-  // Smart Tab Index Mapping:
-  // Home (0) -> Feed (1) -> Saved (2) -> Notifications (3) -> Profile (4)
-  const TAB_ORDER = {
-    '/': 0,
-    '/home': 0,
-    '/feed': 1,
-    '/saved': 2,
-    '/notifications': 3,
-    '/profile': 4
-  };
-
-  const prevPath = prevPathRef.current;
-  const currentPath = location.pathname;
-
-  const prevIndex = TAB_ORDER[prevPath] ?? -1;
-  const currentIndex = TAB_ORDER[currentPath] ?? -1;
-
-  const prevDepth = getRouteDepth(prevPath);
-  const currentDepth = getRouteDepth(currentPath);
-
-  let isBackNavigation = navigationType === 'POP';
-
-  if (navigationType !== 'POP') {
-    if (prevIndex !== -1 && currentIndex !== -1) {
-      // Navigating between bottom tabs: left tab -> right tab (forward), right tab -> left tab (back)
-      isBackNavigation = currentIndex < prevIndex;
-    } else if (currentDepth < prevDepth) {
-      // Returning to a shallower route level (e.g. JobDetails [2] -> Home [0])
-      isBackNavigation = true;
-    } else if (currentDepth > prevDepth) {
-      // Navigating deeper into details (e.g. Home [0] -> JobDetails [2])
-      isBackNavigation = false;
-    } else if (currentIndex === 0) {
-      // Returning to Home from another level
-      isBackNavigation = true;
-    } else {
-      isBackNavigation = false;
-    }
-  }
-
-  useEffect(() => {
-    prevPathRef.current = location.pathname;
-  }, [location.pathname]);
-
-  // Synchronous and immediate scroll reset on page transition
-  // Prevents previous page's scroll offset from causing vertical jumps
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
-    const container = document.querySelector('.container');
-    if (container) container.scrollTop = 0;
-  }, [location.pathname]);
+  const { direction, isBack } = useNavigationTracker(location, navigationType);
 
   const hasSeenOnboarding = state.hasSeenOnboarding || JSON.parse(localStorage.getItem('hasSeenOnboarding') || 'false');
   const isHomeOrFeed = location.pathname === '/' || location.pathname === '/home' || location.pathname === '/feed';
@@ -451,9 +343,9 @@ function App() {
   return (
     <ErrorBoundary>
       <div 
-        className={`container ${isBackNavigation ? 'nav-direction-back' : 'nav-direction-forward'}`} 
+        className={`container ${isBack ? 'nav-direction-back' : 'nav-direction-forward'}`} 
         data-theme={state.theme}
-        data-nav-direction={isBackNavigation ? 'back' : 'forward'}
+        data-nav-direction={direction}
       >
         {!isAdminRoute && <ConnectivityBanner />}
 
@@ -492,7 +384,7 @@ function App() {
           return null;
         })()}
 
-        <PageTransition isBack={isBackNavigation} pathname={location.pathname}>
+        <PageTransition isBack={isBack} locationKey={location.key} pathname={location.pathname}>
           <Routes location={location}>
             <Route path="/" element={
               hasSeenOnboarding ? <Home /> : <SplashScreen />

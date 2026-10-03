@@ -169,7 +169,9 @@ export default function LiveExams() {
         display: 'flex',
         background: 'var(--white)',
         borderBottom: '1px solid var(--border-light)',
-        position: 'relative',
+        position: 'sticky',
+        top: 'calc(52px + var(--safe-area-top))',
+        zIndex: 40,
         userSelect: 'none'
       }}>
         <button
@@ -272,12 +274,37 @@ export default function LiveExams() {
               </div>
             )}
 
+            {/* Sleek, Matching History Overview Card (History tab) */}
+            {activeTab === 'history' && (
+              <div style={{
+                background: 'var(--primary-bg)',
+                border: '1px solid var(--chip-primary-border)',
+                borderRadius: '20px',
+                padding: '18px',
+                marginBottom: '20px',
+                boxShadow: 'var(--shadow-sm)'
+              }}>
+                <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span>{isEn ? 'Exam History & Past Results' : 'পরীক্ষার ইতিহাস ও পূর্ববর্তী ফলাফল'}</span>
+                </h3>
+                <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
+                  {isEn 
+                    ? 'Review your attended live exams, scores, merit positions, and detailed answer explanations. Tap on any completed exam below.'
+                    : 'আপনার সম্পন্ন করা সকল লাইভ পরীক্ষার ফলাফল, মেধা স্কোর ও বিস্তারিত সমাধান দেখুন। ফলাফল দেখতে নিচের যেকোনো কার্ডে ট্যাপ করুন।'}
+                </p>
+              </div>
+            )}
+
             {/* Exams List: 2-Column Cards Grid */}
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
               gap: '16px',
-              minHeight: '220px'
+              minHeight: 'calc(100vh - 240px)'
             }}>
               {filteredExams.map(exam => {
                 const status = getExamStatus(exam);
