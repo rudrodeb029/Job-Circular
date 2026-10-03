@@ -246,7 +246,7 @@ export const broadcastPush = async (title, message, data = {}, sendAfter = null)
             android_visibility: 1,
             priority: 10,
             android_accent_color: 'FF1A56DB',
-            large_icon: 'https://job-circular-75dbb.web.app/app-icon.png',
+            large_icon: 'https://job-circular-75dbb.web.app/app-logo-transparent.png',
             chrome_web_icon: 'https://job-circular-75dbb.web.app/app-icon.png',
             small_icon: 'ic_stat_onesignal_default',
             android_sound: 'notification'

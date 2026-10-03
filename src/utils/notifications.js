@@ -96,7 +96,7 @@ export const triggerLocalNotification = async (title, body) => {
             id: Date.now(),
             schedule: { at: new Date(Date.now() + 500) },
             channelId: 'default_channel_id',
-            smallIcon: 'ic_launcher',
+            smallIcon: 'ic_stat_onesignal_default',
             actionTypeId: '',
             extra: null
           }
