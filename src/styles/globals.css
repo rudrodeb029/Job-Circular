@@ -390,8 +390,8 @@ ul, ol {
 /* Forward Navigation: Right-to-Left Slide (Y locked strictly at 0) */
 @keyframes pageSlideForward {
   0% {
-    opacity: 0.88;
-    transform: translate3d(28px, 0, 0);
+    opacity: 0.80;
+    transform: translate3d(38px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -402,8 +402,8 @@ ul, ol {
 /* Back Navigation: Left-to-Right Slide (Y locked strictly at 0) */
 @keyframes pageSlideBack {
   0% {
-    opacity: 0.88;
-    transform: translate3d(-28px, 0, 0);
+    opacity: 0.80;
+    transform: translate3d(-38px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -412,18 +412,18 @@ ul, ol {
 }
 
 .slide-screen-forward {
-  animation: pageSlideForward 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: pageSlideForward 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .slide-screen-back {
-  animation: pageSlideBack 0.26s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: pageSlideBack 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Tab Content Slide Animations (Strictly Horizontal, Y locked at 0) */
 @keyframes tabSlideForward {
   0% {
-    opacity: 0.88;
-    transform: translate3d(20px, 0, 0);
+    opacity: 0.82;
+    transform: translate3d(26px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -433,8 +433,8 @@ ul, ol {
 
 @keyframes tabSlideBack {
   0% {
-    opacity: 0.88;
-    transform: translate3d(-20px, 0, 0);
+    opacity: 0.82;
+    transform: translate3d(-26px, 0, 0);
   }
   100% {
     opacity: 1;
@@ -451,11 +451,11 @@ ul, ol {
 }
 
 .tab-slide-forward {
-  animation: tabSlideForward 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: tabSlideForward 0.30s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .tab-slide-back {
-  animation: tabSlideBack 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation: tabSlideBack 0.30s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Modern GPU-Accelerated Tab Bar & Toggle Bar */
@@ -481,6 +481,7 @@ ul, ol {
   z-index: 1;
   transform: translate3d(0, 0, 0);
   will-change: transform, width;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 [data-theme='dark'] .tab-sliding-indicator {
@@ -501,7 +502,7 @@ ul, ol {
   background: transparent;
   cursor: pointer;
   white-space: nowrap;
-  transition: color 0.20s ease;
+  transition: color 0.24s cubic-bezier(0.22, 1, 0.36, 1);
   outline: none;
   display: flex;
   align-items: center;

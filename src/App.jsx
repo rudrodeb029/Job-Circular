@@ -77,7 +77,7 @@ function PageTransition({ children, isBack, pathname }) {
     setAnimating(true);
     const timer = setTimeout(() => {
       setAnimating(false);
-    }, 280);
+    }, 380);
     return () => clearTimeout(timer);
   }, [pathname]);
 

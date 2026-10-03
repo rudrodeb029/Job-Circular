@@ -50,7 +50,7 @@ const TabBar = ({ tabs = [], activeTab, onTabChange, className = '', style = {} 
           width: `${indicator.width}px`,
           transform: `translate3d(${indicator.left}px, 0, 0)`,
           transition: indicator.ready
-            ? 'transform 0.28s cubic-bezier(0.25, 1, 0.5, 1), width 0.28s cubic-bezier(0.25, 1, 0.5, 1)'
+            ? 'transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1)'
             : 'none',
           opacity: indicator.width > 0 ? 1 : 0
         }}
