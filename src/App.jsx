@@ -321,6 +321,11 @@ function App() {
   const hasSeenOnboarding = state.hasSeenOnboarding || JSON.parse(localStorage.getItem('hasSeenOnboarding') || 'false');
   const isHomeOrFeed = location.pathname === '/' || location.pathname === '/home' || location.pathname === '/feed';
 
+  const isTabRoute = (
+    (location.pathname === '/' && hasSeenOnboarding) ||
+    ['/home', '/feed', '/saved', '/notifications', '/profile'].includes(location.pathname)
+  );
+
   const isScrollBannerTabRoute = (
     (location.pathname === '/' && hasSeenOnboarding) ||
     ['/home', '/feed', '/saved', '/notifications'].includes(location.pathname)
