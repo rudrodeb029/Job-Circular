@@ -1,0 +1,5 @@
+# Google AdMob (Replace pub-XXXXXXXXXXXXXXXX with your 16-digit AdMob Publisher ID)
+google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+
+# Meta Audience Network (Replace YYYYYYYYYYYYYYYY with your Meta Business / Account ID)
+facebook.com, YYYYYYYYYYYYYYYY, RESELLER, c3e20e66b1a370e7

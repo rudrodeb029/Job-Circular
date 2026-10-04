@@ -4,7 +4,7 @@ export const DEFAULT_APP_INFO = {
   contactEmail: 'support@livecircular.app',
   contactPhone: '+8801700000000',
   whatsappNumber: '+8801700000000',
-  playStoreUrl: 'https://play.google.com/store/apps/details?id=com.jobcircular.app',
+  playStoreUrl: 'https://play.google.com/store/apps/details?id=com.livecircular.bdjobs',
   shareAppUrl: 'https://livecircular.web.app',
   facebookPageUrl: 'https://facebook.com',
   telegramChannelUrl: 'https://t.me',
