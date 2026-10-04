@@ -413,17 +413,11 @@ ul, ol {
 }
 
 .slide-screen-forward {
-  animation: pageSlideForward 0.20s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  animation: pageSlideForward 0.20s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .slide-screen-back {
-  animation: pageSlideBack 0.20s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  animation: pageSlideBack 0.20s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Instant-entry placeholder shown while heavy page content mounts */
