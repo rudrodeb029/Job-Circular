@@ -38,7 +38,7 @@ const AppHeader = React.memo(function AppHeader() {
   return (
     <>
       {/* Top Header Bar (BBC News Inspired Header Design) */}
-      <header style={{
+      <header className="app-header-bar" style={{
         position: 'sticky',
         top: 0,
         zIndex: 100,
