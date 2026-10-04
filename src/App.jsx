@@ -9,7 +9,7 @@ import ConnectivityBanner from './components/ConnectivityBanner'
 import ErrorBoundary from './components/ErrorBoundary'
 import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
-import { initializeOneSignal, setupOneSignalClickHandler } from './utils/oneSignalWrapper'
+import { initializeOneSignal, setupOneSignalClickHandler, loginOneSignal } from './utils/oneSignalWrapper'
 import { syncCoreDataOnStartup } from './services/supabaseService'
 import { triggerDeltaSync } from './services/sqliteService'
 import { Capacitor } from '@capacitor/core'
@@ -133,6 +133,9 @@ function App() {
     triggerDeltaSync().catch(err => console.error('SQLite delta sync failed:', err));
     initializePushNotifications();
     initializeOneSignal();
+    if (state.user?.id) {
+      loginOneSignal(state.user.id);
+    }
 
     // Handle OneSignal Notification Clicks (Protected by Notification Processing Lock)
     setupOneSignalClickHandler(async (data) => {

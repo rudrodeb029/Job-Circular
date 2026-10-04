@@ -4,6 +4,7 @@ import { Heart, HeartFilled, Search, X } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { incrementFeedLike, addFeedComment } from '../services/supabaseService';
+import { sendTargetedFeedNotification } from '../utils/oneSignalWrapper';
 import AppHeader from '../components/AppHeader';
 import PullToRefresh from '../components/PullToRefresh';
 import SearchBar from '../components/SearchBar';
@@ -153,14 +154,54 @@ export default function Feed() {
                 onToggleLike={() => {
                   const isCurrentlyLiked = state.likedPosts?.includes(post.id);
                   const delta = isCurrentlyLiked ? -1 : 1;
+                  const currentUserId = state.user?.id || localStorage.getItem('user_id');
+                  const currentUserName = (state.user?.name && state.user.name.trim())
+                    ? state.user.name.trim()
+                    : (isEn ? 'A user' : 'একজন ব্যবহারকারী');
+
                   dispatch({ type: 'TOGGLE_LIKE_POST', payload: post.id });
-                  
+
+                  // Update likedBy array on the post
+                  const currentLikedBy = Array.isArray(post.likedBy) ? [...post.likedBy] : [];
+                  let updatedLikedBy = [];
+                  if (delta > 0) {
+                    if (!currentLikedBy.includes(currentUserId)) {
+                      updatedLikedBy = [...currentLikedBy, currentUserId];
+                    } else {
+                      updatedLikedBy = currentLikedBy;
+                    }
+                  } else {
+                    updatedLikedBy = currentLikedBy.filter(id => id !== currentUserId);
+                  }
+
                   // Update post object in state so like count updates immediately
                   const newLikes = Math.max(0, (Number(post.likes) || 0) + delta);
-                  const updatedPost = { ...post, likes: newLikes };
+                  const updatedPost = { ...post, likes: newLikes, likedBy: updatedLikedBy };
                   adminDispatch({ type: 'UPDATE_FEED_POST', payload: updatedPost });
 
-                  incrementFeedLike(post.id, delta).catch(console.error);
+                  incrementFeedLike(post.id, delta, currentUserId).catch(console.error);
+
+                  // If liking (delta > 0), notify all previous likers, commenters, and author (excluding self)
+                  if (delta > 0) {
+                    const commentUserIds = (post.comments || []).map(c => c.userId || c.user_id).filter(Boolean);
+                    const prevLikedUserIds = (post.likedBy || []).filter(Boolean);
+                    const authorId = post.authorId || post.userId;
+
+                    const targetUserIds = Array.from(new Set([...prevLikedUserIds, ...commentUserIds, authorId]))
+                      .filter(id => id && id !== currentUserId && id !== 'admin');
+
+                    if (targetUserIds.length > 0) {
+                      const title = isEn ? '❤️ New Like on Post' : '❤️ পোস্টে নতুন লাইক';
+                      const message = isEn
+                        ? `${currentUserName} liked a post you follow.`
+                        : `${currentUserName} আপনার পছন্দের পোস্টে লাইক দিয়েছেন।`;
+
+                      sendTargetedFeedNotification(targetUserIds, title, message, {
+                        postId: post.id,
+                        action: 'like'
+                      }).catch(console.error);
+                    }
+                  }
                 }}
               />
             ))}
@@ -292,8 +333,12 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
       return;
     }
 
+    const currentUserId = appState.user?.id || localStorage.getItem('user_id');
+    const currentUserName = (activeUser.name && activeUser.name.trim()) ? activeUser.name.trim() : (isEn ? 'A user' : 'একজন ব্যবহারকারী');
+
     const newComment = {
       id: 'c_' + Date.now(),
+      userId: currentUserId,
       userName: activeUser.name,
       userAvatar: activeUser.avatar,
       text: text,
@@ -304,10 +349,29 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
     setLocalComments(updatedComments);
     setCommentText('');
 
+    // Collect all previous participants to notify (previous commenters, previous likers, author)
+    const prevCommentUserIds = localComments.map(c => c.userId || c.user_id).filter(Boolean);
+    const prevLikedUserIds = (post.likedBy || []).filter(Boolean);
+    const authorId = post.authorId || post.userId;
+
+    const targetUserIds = Array.from(new Set([...prevLikedUserIds, ...prevCommentUserIds, authorId]))
+      .filter(id => id && id !== currentUserId && id !== 'admin');
+
     const updatedPost = { ...post, comments: updatedComments };
     adminDispatch({ type: 'UPDATE_FEED_POST', payload: updatedPost });
 
     addFeedComment(post.id, newComment).catch(console.error);
+
+    if (targetUserIds.length > 0) {
+      const shortText = text.length > 50 ? text.slice(0, 47) + '...' : text;
+      const title = isEn ? '💬 New Comment on Post' : '💬 পোস্টে নতুন মন্তব্য';
+      const message = `${currentUserName}: "${shortText}"`;
+
+      sendTargetedFeedNotification(targetUserIds, title, message, {
+        postId: post.id,
+        action: 'comment'
+      }).catch(console.error);
+    }
   };
 
   const [isInputFocused, setIsInputFocused] = useState(false);

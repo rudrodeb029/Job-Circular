@@ -327,7 +327,7 @@ const TABLE_COLUMNS = {
   ],
   [COLLECTIONS.FEED_POSTS]: [
     'id', 'content', 'contentEn', 'mediaType', 'mediaUrl',
-    'bannerGradient', 'likes', 'comments', 'createdAt', 'updatedAt'
+    'bannerGradient', 'likes', 'likedBy', 'comments', 'authorId', 'createdAt', 'updatedAt'
   ],
   [COLLECTIONS.APP_CONFIG]: [
     'id', 'contactEmail', 'contactPhone', 'whatsappNumber',
@@ -486,13 +486,13 @@ export const deleteDocument = async (collectionName, docId) => {
  * @param {string} postId - The feed post ID
  * @param {number} delta - +1 to like, -1 to unlike
  */
-export const incrementFeedLike = async (postId, delta = 1) => {
+export const incrementFeedLike = async (postId, delta = 1, userId = null) => {
   try {
     const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
     const res = await fetch(`${WORKER_URL}/feed/like`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ postId, delta })
+      body: JSON.stringify({ postId, delta, userId })
     });
     if (!res.ok) throw new Error(`HTTP error ${res.status}`);
     const data = await res.json();

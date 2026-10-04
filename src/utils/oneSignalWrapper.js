@@ -359,9 +359,92 @@ export const sendExamCountdownPush = async (exam) => {
 };
 
 export const loginOneSignal = (externalId) => {
-  if (!Capacitor.isNativePlatform()) return;
-  const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
-  if (OneSignal && typeof OneSignal.login === 'function') {
-    OneSignal.login(externalId);
+  if (!externalId) return;
+  if (Capacitor.isNativePlatform()) {
+    const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+    if (OneSignal && typeof OneSignal.login === 'function') {
+      OneSignal.login(externalId);
+      console.log('OneSignal: Native login with external_id:', externalId);
+    }
+  } else {
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push((OneSignal) => {
+      if (typeof OneSignal.login === 'function') {
+        OneSignal.login(externalId);
+        console.log('OneSignal: Web login with external_id:', externalId);
+      }
+    });
+  }
+};
+
+/**
+ * Sends a modern targeted push notification to specific users who interacted with a feed post.
+ * @param {Array<string>} targetUserIds - Array of user.id strings (OneSignal external_ids)
+ * @param {string} title - Notification title
+ * @param {string} message - Notification message
+ * @param {object} data - Custom payload (postId, action, etc.)
+ */
+export const sendTargetedFeedNotification = async (targetUserIds = [], title, message, data = {}) => {
+  if (!targetUserIds || targetUserIds.length === 0) return { success: true, recipients: 0 };
+
+  const uniqueUserIds = Array.from(new Set(targetUserIds.filter(id => Boolean(id) && typeof id === 'string')));
+  if (uniqueUserIds.length === 0) return { success: true, recipients: 0 };
+
+  let config;
+  try {
+    config = await getOneSignalConfig();
+  } catch (err) {
+    config = { appId: DEFAULT_APP_ID, restApiKey: DEFAULT_REST_API_KEY };
+  }
+
+  const { appId, restApiKey } = config;
+  if (!restApiKey) {
+    console.warn('OneSignal: REST API Key missing. Skipping targeted feed push.');
+    return { success: false, error: 'REST API Key is missing.' };
+  }
+
+  try {
+    const authHeader = restApiKey.startsWith('os_v2_app_') ? `Key ${restApiKey}` : `Basic ${restApiKey}`;
+
+    const payload = {
+      app_id: appId,
+      include_aliases: {
+        external_id: uniqueUserIds
+      },
+      include_external_user_ids: uniqueUserIds,
+      target_channel: "push",
+      headings: { en: title, bn: title },
+      contents: { en: message, bn: message },
+      data: {
+        ...data,
+        type: 'feed_interaction',
+        feedType: 'feed_post'
+      },
+      android_visibility: 1,
+      priority: 10,
+      android_accent_color: 'FF1A56DB',
+      large_icon: 'https://livecircular.web.app/app-logo-transparent.png',
+      chrome_web_icon: 'https://livecircular.web.app/app-icon.png',
+      small_icon: 'ic_stat_onesignal_default',
+      android_sound: 'notification'
+    };
+
+    console.log(`OneSignal: Sending targeted feed push to ${uniqueUserIds.length} users:`, uniqueUserIds);
+
+    const response = await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Authorization': authHeader
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    console.log('OneSignal: Targeted feed push result:', result);
+    return { success: true, recipients: result.recipients || uniqueUserIds.length, data: result };
+  } catch (err) {
+    console.error('OneSignal: Targeted push send failed:', err);
+    return { success: false, error: err.message };
   }
 };
