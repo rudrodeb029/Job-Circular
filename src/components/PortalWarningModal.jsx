@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { useAppContext } from '../context/AppContext';
-import { showInterstitialAd } from '../utils/adService';
 
 // Smart URL Formatter: BD Govt / Teletalk subdomains fail on HTTPS with ERR_CERT_AUTHORITY_INVALID, but work on HTTP
 export function sanitizePortalUrl(inputUrl) {
@@ -62,33 +61,30 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
     }
   };
 
-  const proceedToPortal = () => {
+  const proceedToPortal = async () => {
     setLoading(true);
     onClose();
 
-    // Show Interstitial ad and ONLY open destination portal URL AFTER ad completes/closes
-    showInterstitialAd(async () => {
-      try {
-        if (Capacitor.isNativePlatform()) {
-          try {
-            await Browser.open({
-              url: targetUrl,
-              toolbarColor: '#1d4ed8',
-              presentationStyle: 'popover'
-            });
-          } catch (err) {
-            console.warn('Native Browser.open failed:', err);
-            window.open(targetUrl, '_blank', 'noopener,noreferrer');
-          }
-        } else {
+    try {
+      if (Capacitor.isNativePlatform()) {
+        try {
+          await Browser.open({
+            url: targetUrl,
+            toolbarColor: '#1d4ed8',
+            presentationStyle: 'popover'
+          });
+        } catch (err) {
+          console.warn('Native Browser.open failed:', err);
           window.open(targetUrl, '_blank', 'noopener,noreferrer');
         }
-      } catch (e) {
-        console.error('Error proceeding to portal:', e);
-      } finally {
-        setLoading(false);
+      } else {
+        window.open(targetUrl, '_blank', 'noopener,noreferrer');
       }
-    }, { url: targetUrl, pageType });
+    } catch (e) {
+      console.error('Error proceeding to portal:', e);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
