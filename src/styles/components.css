@@ -1720,6 +1720,30 @@ mark {
   color: #93c5fd !important;
 }
 
+/* Job Card Title Category Mark / Icon */
+.job-card-title-icon {
+  font-size: 15px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--card-icon-color, var(--primary));
+  transition: color 0.2s ease, filter 0.2s ease;
+}
+
+[data-theme='dark'] .job-card-title-icon {
+  color: var(--card-icon-color-dark, #60a5fa) !important;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+[data-theme='dark'] .job-card-title-icon-exam {
+  color: #34d399 !important;
+}
+
+[data-theme='dark'] .job-card-title-icon-result {
+  color: #c084fc !important;
+}
+
 
 
 

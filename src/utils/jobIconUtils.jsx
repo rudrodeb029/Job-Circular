@@ -26,19 +26,19 @@ import {
  */
 
 export const categoryStyles = {
-  gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', primaryColor: '#1d4ed8', shadow: 'rgba(29, 78, 216, 0.35)', iconType: 'gov', defaultIcon: <GovIcon size={16} color="currentColor" /> },
-  bank: { bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', primaryColor: '#059669', shadow: 'rgba(5, 150, 105, 0.35)', iconType: 'bank', defaultIcon: <BankIcon size={16} color="currentColor" /> },
-  ngo: { bg: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)', primaryColor: '#ea580c', shadow: 'rgba(234, 88, 12, 0.35)', iconType: 'ngo', defaultIcon: <NgoIcon size={16} color="currentColor" /> },
-  private: { bg: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)', primaryColor: '#7c3aed', shadow: 'rgba(124, 58, 237, 0.35)', iconType: 'private', defaultIcon: <PrivateIcon size={16} color="currentColor" /> },
-  teaching: { bg: 'linear-gradient(135deg, #db2777 0%, #ec4899 100%)', primaryColor: '#db2777', shadow: 'rgba(219, 39, 119, 0.35)', iconType: 'teaching', defaultIcon: <TeachingIcon size={16} color="currentColor" /> },
-  defense: { bg: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)', primaryColor: '#dc2626', shadow: 'rgba(220, 38, 38, 0.35)', iconType: 'defense', defaultIcon: <DefenseIcon size={16} color="currentColor" /> },
-  healthcare: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', primaryColor: '#0d9488', shadow: 'rgba(13, 148, 136, 0.35)', iconType: 'healthcare', defaultIcon: <HealthcareIcon size={16} color="currentColor" /> },
-  health: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', primaryColor: '#0d9488', shadow: 'rgba(13, 148, 136, 0.35)', iconType: 'healthcare', defaultIcon: <HealthcareIcon size={16} color="currentColor" /> },
-  it: { bg: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', primaryColor: '#4f46e5', shadow: 'rgba(79, 70, 229, 0.35)', iconType: 'it', defaultIcon: <ItIcon size={16} color="currentColor" /> },
-  engineering: { bg: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)', primaryColor: '#d97706', shadow: 'rgba(217, 119, 6, 0.35)', iconType: 'engineering', defaultIcon: <EngineeringIcon size={16} color="currentColor" /> },
-  parttime: { bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)', primaryColor: '#0284c7', shadow: 'rgba(2, 132, 199, 0.35)', iconType: 'parttime', defaultIcon: <PartTimeIcon size={16} color="currentColor" /> },
-  women: { bg: 'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)', primaryColor: '#e11d48', shadow: 'rgba(225, 29, 72, 0.35)', iconType: 'women', defaultIcon: <WomenIcon size={16} color="currentColor" /> },
-  railway: { bg: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)', primaryColor: '#0891b2', shadow: 'rgba(8, 145, 178, 0.35)', iconType: 'railway', defaultIcon: <RailwayIcon size={16} color="currentColor" /> }
+  gov: { bg: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)', primaryColor: '#1d4ed8', darkColor: '#60a5fa', shadow: 'rgba(29, 78, 216, 0.35)', iconType: 'gov', defaultIcon: <GovIcon size={16} color="currentColor" /> },
+  bank: { bg: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', primaryColor: '#059669', darkColor: '#34d399', shadow: 'rgba(5, 150, 105, 0.35)', iconType: 'bank', defaultIcon: <BankIcon size={16} color="currentColor" /> },
+  ngo: { bg: 'linear-gradient(135deg, #ea580c 0%, #f97316 100%)', primaryColor: '#ea580c', darkColor: '#fb923c', shadow: 'rgba(234, 88, 12, 0.35)', iconType: 'ngo', defaultIcon: <NgoIcon size={16} color="currentColor" /> },
+  private: { bg: 'linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%)', primaryColor: '#7c3aed', darkColor: '#c084fc', shadow: 'rgba(124, 58, 237, 0.35)', iconType: 'private', defaultIcon: <PrivateIcon size={16} color="currentColor" /> },
+  teaching: { bg: 'linear-gradient(135deg, #db2777 0%, #ec4899 100%)', primaryColor: '#db2777', darkColor: '#f472b6', shadow: 'rgba(219, 39, 119, 0.35)', iconType: 'teaching', defaultIcon: <TeachingIcon size={16} color="currentColor" /> },
+  defense: { bg: 'linear-gradient(135deg, #dc2626 0%, #ef4444 100%)', primaryColor: '#dc2626', darkColor: '#f87171', shadow: 'rgba(220, 38, 38, 0.35)', iconType: 'defense', defaultIcon: <DefenseIcon size={16} color="currentColor" /> },
+  healthcare: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', primaryColor: '#0d9488', darkColor: '#2dd4bf', shadow: 'rgba(13, 148, 136, 0.35)', iconType: 'healthcare', defaultIcon: <HealthcareIcon size={16} color="currentColor" /> },
+  health: { bg: 'linear-gradient(135deg, #0d9488 0%, #14b8a6 100%)', primaryColor: '#0d9488', darkColor: '#2dd4bf', shadow: 'rgba(13, 148, 136, 0.35)', iconType: 'healthcare', defaultIcon: <HealthcareIcon size={16} color="currentColor" /> },
+  it: { bg: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)', primaryColor: '#4f46e5', darkColor: '#818cf8', shadow: 'rgba(79, 70, 229, 0.35)', iconType: 'it', defaultIcon: <ItIcon size={16} color="currentColor" /> },
+  engineering: { bg: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)', primaryColor: '#d97706', darkColor: '#fbbf24', shadow: 'rgba(217, 119, 6, 0.35)', iconType: 'engineering', defaultIcon: <EngineeringIcon size={16} color="currentColor" /> },
+  parttime: { bg: 'linear-gradient(135deg, #0284c7 0%, #06b6d4 100%)', primaryColor: '#0284c7', darkColor: '#38bdf8', shadow: 'rgba(2, 132, 199, 0.35)', iconType: 'parttime', defaultIcon: <PartTimeIcon size={16} color="currentColor" /> },
+  women: { bg: 'linear-gradient(135deg, #e11d48 0%, #fb7185 100%)', primaryColor: '#e11d48', darkColor: '#fb7185', shadow: 'rgba(225, 29, 72, 0.35)', iconType: 'women', defaultIcon: <WomenIcon size={16} color="currentColor" /> },
+  railway: { bg: 'linear-gradient(135deg, #0891b2 0%, #06b6d4 100%)', primaryColor: '#0891b2', darkColor: '#22d3ee', shadow: 'rgba(8, 145, 178, 0.35)', iconType: 'railway', defaultIcon: <RailwayIcon size={16} color="currentColor" /> }
 };
 
 export const orgIconsMap = {

@@ -37,9 +37,9 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
     <div
       onClick={handleCardClick}
       style={{
-        background: '#ffffff',
+        background: 'var(--card-bg, #ffffff)',
         borderRadius: '16px',
-        border: '1px solid rgba(203, 213, 225, 0.6)',
+        border: '1px solid var(--border-light, rgba(203, 213, 225, 0.6))',
         boxShadow: '0 6px 16px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
         overflow: 'hidden',
         cursor: 'pointer',
@@ -166,7 +166,7 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
           style={{
             fontSize: '12px',
             fontWeight: 800,
-            color: '#0f172a',
+            color: 'var(--text-primary, #0f172a)',
             margin: '0 0 6px 0',
             lineHeight: '1.35',
             display: '-webkit-box',
@@ -189,7 +189,7 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
           flexWrap: 'nowrap',
           width: '100%',
           fontSize: '9.5px',
-          color: '#475569',
+          color: 'var(--text-secondary, #475569)',
           fontWeight: 600,
           whiteSpace: 'nowrap',
           overflow: 'hidden'

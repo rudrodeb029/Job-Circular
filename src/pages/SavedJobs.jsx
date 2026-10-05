@@ -130,7 +130,7 @@ export default function SavedJobs() {
                   >
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed' }}>{displayIcon}</span>
+                        <span className="job-card-title-icon job-card-title-icon-result" style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed', '--card-icon-color': '#7c3aed', '--card-icon-color-dark': '#c084fc' }}>{displayIcon}</span>
                         <span>{orgName}</span>
                       </h4>
                       <p className="job-card-org" style={{
@@ -150,8 +150,8 @@ export default function SavedJobs() {
                       <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                         <span style={{
                           fontSize: '8.5px',
-                          color: '#7e22ce',
-                          background: '#f3e8ff',
+                          color: 'var(--chip-purple-color, #7e22ce)',
+                          background: 'var(--chip-purple-bg, #f3e8ff)',
                           padding: '2px 6px',
                           borderRadius: '4px',
                           fontWeight: 600,
@@ -217,7 +217,7 @@ export default function SavedJobs() {
                   >
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669' }}>{displayIcon}</span>
+                        <span className="job-card-title-icon job-card-title-icon-exam" style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669', '--card-icon-color': '#059669', '--card-icon-color-dark': '#34d399' }}>{displayIcon}</span>
                         <span>{orgName}</span>
                       </h4>
                       <p className="job-card-org" style={{
@@ -237,8 +237,8 @@ export default function SavedJobs() {
                       <div style={{ marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', overflow: 'hidden' }}>
                         <span style={{
                           fontSize: '8.5px',
-                          color: '#059669',
-                          background: '#d1fae5',
+                          color: 'var(--chip-success-color, #059669)',
+                          background: 'var(--chip-success-bg, #d1fae5)',
                           padding: '2px 6px',
                           borderRadius: '4px',
                           fontWeight: 600,

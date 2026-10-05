@@ -116,7 +116,20 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
 
       <div className="job-card-content">
         <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <span style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: styleConfig?.primaryColor || 'var(--primary)' }}>{displayIcon}</span>
+          <span
+            className="job-card-title-icon"
+            style={{
+              fontSize: '15px',
+              flexShrink: 0,
+              display: 'inline-flex',
+              alignItems: 'center',
+              color: styleConfig?.primaryColor || 'var(--primary)',
+              '--card-icon-color': styleConfig?.primaryColor || 'var(--primary)',
+              '--card-icon-color-dark': styleConfig?.darkColor || '#60a5fa'
+            }}
+          >
+            {displayIcon}
+          </span>
           <span>{orgName}</span>
         </h4>
 
@@ -139,8 +152,8 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
           {job.showInResult ? (
             <span style={{
               fontSize: '8.5px',
-              color: '#7e22ce',
-              background: '#f3e8ff',
+              color: 'var(--chip-purple-color, #7e22ce)',
+              background: 'var(--chip-purple-bg, #f3e8ff)',
               padding: '2px 6px',
               borderRadius: '4px',
               fontWeight: 600,
@@ -154,8 +167,8 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
           ) : job.showInExamDate ? (
             <span style={{
               fontSize: '8.5px',
-              color: '#059669',
-              background: '#d1fae5',
+              color: 'var(--chip-success-color, #059669)',
+              background: 'var(--chip-success-bg, #d1fae5)',
               padding: '2px 6px',
               borderRadius: '4px',
               fontWeight: 600,
@@ -186,15 +199,15 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
           )}
 
           {job.vacancy && (
-            <span className="job-card-tag font-bold" style={{ color: '#1a56db', background: '#eff6ff', fontSize: '9px' }}>
+            <span className="job-card-tag font-bold" style={{ color: 'var(--primary)', background: 'var(--primary-bg)', fontSize: '9px' }}>
               {isEn ? `${job.vacancy} Positions` : `${toBengaliNumber(job.vacancy)} টি পদ`}
             </span>
           )}
 
           <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
             <span style={{ opacity: 0.4 }}>•</span>
-            <Clock size={9} style={{ color: '#475569' }} /> 
-            <span style={{ color: '#475569', fontWeight: 500 }}>
+            <Clock size={9} style={{ color: 'var(--text-muted)' }} /> 
+            <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
               {formatTimeAgo(job.createdAt, isEn)}
             </span>
           </span>
