@@ -40,6 +40,8 @@ if (typeof window !== 'undefined') {
  * @param {boolean} force - If true, bypasses the cooldown (used for key milestones like exam submit or portal leave)
  * Returns true if the native method was called, false otherwise.
  */
+export { showInterstitialAd } from './adService';
+
 export const showNativeInterstitialAd = (force = false) => {
   // Check native cooldown value if updated
   if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getInterstitialCooldownSec === 'function') {
