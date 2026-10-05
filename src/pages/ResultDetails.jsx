@@ -203,7 +203,7 @@ export default function ResultDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
             {orgName}
           </h2>
 
@@ -230,7 +230,7 @@ export default function ResultDetails() {
 
         {/* Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
             {isEn ? 'Description' : 'পরীক্ষার বিবরণ'}
           </h3>
           <FormattedText text={job.description} lineClamp={3} showMore={showFullDescription} />
@@ -259,7 +259,7 @@ export default function ResultDetails() {
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <h3 style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
+              <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
                 {isEn ? 'Result Sheet' : 'ফলাফল বিজ্ঞপ্তি'}
               </h3>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
@@ -306,13 +306,13 @@ export default function ResultDetails() {
           {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
           <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
             {circularImages.length === 0 ? (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center', gap: '12px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px dashed var(--border-light)' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center', gap: '12px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px dashed var(--border)' }}>
                 <div style={{ fontSize: '32px' }}>📄</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                  <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)' }}>
                     {isEn ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
                   </span>
-                  <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                  <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 600 }}>
                     {isEn ? 'Please click the button below to view or download! 👇' : 'ফলাফল দেখতে বা ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
                   </span>
                 </div>
@@ -340,26 +340,12 @@ export default function ResultDetails() {
                     setActiveImageIndex(prev => (prev > 0 ? prev - 1 : circularImages.length - 1));
                   }}
                   title="Previous Page"
+                  className="image-viewer-arrow-btn"
                   style={{
                     position: 'absolute',
                     left: '10px',
                     top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
+                    transform: 'translateY(-50%)'
                   }}
                 >
                   ‹
@@ -370,26 +356,12 @@ export default function ResultDetails() {
                     setActiveImageIndex(prev => (prev < circularImages.length - 1 ? prev + 1 : 0));
                   }}
                   title="Next Page"
+                  className="image-viewer-arrow-btn"
                   style={{
                     position: 'absolute',
                     right: '10px',
                     top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
+                    transform: 'translateY(-50%)'
                   }}
                 >
                   ›
@@ -398,16 +370,7 @@ export default function ResultDetails() {
             )}
 
             {!showFullImage && (
-              <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '60px',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
-                pointerEvents: 'none',
-                zIndex: 6
-              }}></div>
+              <div className="image-viewer-bottom-fade"></div>
             )}
 
             {/* Indicator Dots (Mark Options) */}
@@ -501,22 +464,11 @@ export default function ResultDetails() {
             <button
               onClick={handleDownloadNotice}
               disabled={downloading}
+              className="notice-btn-outline"
               style={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '6px',
                 padding: '12px 8px',
-                borderRadius: '12px',
-                background: 'var(--primary-bg)',
-                color: 'var(--primary)',
-                border: '1.5px solid var(--primary)',
-                fontWeight: 700,
                 fontSize: '13px',
-                cursor: downloading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
+                cursor: downloading ? 'not-allowed' : 'pointer'
               }}
             >
               {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={16} />}

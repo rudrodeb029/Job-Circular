@@ -214,14 +214,14 @@ export default function ExamDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '0' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0' }}>
             {stripHtmlTags(state.language === 'en' ? (job.organizationEn || job.organization) : job.organization)}
           </h2>
         </div>
 
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
             {state.language === 'en' ? 'Description' : 'পরীক্ষার বিবরণ'}
           </h3>
           <FormattedText text={job.description} lineClamp={3} showMore={showFullDescription} />
@@ -256,7 +256,7 @@ export default function ExamDetails() {
             <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--chip-warning-color)' }}>
               ⚠️ Instructions / সাধারণ নির্দেশনাবলী
             </h3>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
+            <p style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
               {job.examInstructions}
             </p>
           </div>
@@ -266,7 +266,7 @@ export default function ExamDetails() {
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <h3 style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', margin: '0 0 2px 0' }}>
+              <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
                 {state.language === 'en' ? 'Exam Notice' : 'পরীক্ষার নোটিশ'}
               </h3>
               <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
@@ -347,26 +347,12 @@ export default function ExamDetails() {
                     setActiveImageIndex(prev => (prev > 0 ? prev - 1 : circularImages.length - 1));
                   }}
                   title="Previous Page"
+                  className="image-viewer-arrow-btn"
                   style={{
                     position: 'absolute',
                     left: '10px',
                     top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
+                    transform: 'translateY(-50%)'
                   }}
                 >
                   ‹
@@ -377,26 +363,12 @@ export default function ExamDetails() {
                     setActiveImageIndex(prev => (prev < circularImages.length - 1 ? prev + 1 : 0));
                   }}
                   title="Next Page"
+                  className="image-viewer-arrow-btn"
                   style={{
                     position: 'absolute',
                     right: '10px',
                     top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    background: 'rgba(255, 255, 255, 0.92)',
-                    backdropFilter: 'blur(4px)',
-                    border: '1px solid var(--border-light)',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    color: 'var(--text-primary)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    zIndex: 10
+                    transform: 'translateY(-50%)'
                   }}
                 >
                   ›
@@ -405,16 +377,7 @@ export default function ExamDetails() {
             )}
 
             {!showFullImage && (
-              <div style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '60px',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
-                pointerEvents: 'none',
-                zIndex: 6
-              }}></div>
+              <div className="image-viewer-bottom-fade"></div>
             )}
 
             {/* Indicator Dots (Mark Options) */}
@@ -484,23 +447,8 @@ export default function ExamDetails() {
               type="button"
               disabled={downloading}
               onClick={handleDownloadNotice}
+              className="notice-btn-outline"
               style={{
-                flex: 1,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '4px',
-                padding: '10px 6px',
-                borderRadius: '12px',
-                background: 'var(--primary-bg)',
-                color: 'var(--primary)',
-                fontWeight: 700,
-                fontSize: '12px',
-                border: '1.5px solid #dbeafe',
-                boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
-                transition: 'all 0.2s ease',
-                textAlign: 'center',
-                whiteSpace: 'nowrap',
                 cursor: downloading ? 'wait' : 'pointer',
                 opacity: downloading ? 0.75 : 1
               }}

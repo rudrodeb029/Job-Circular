@@ -251,18 +251,18 @@ export default function JobDetails() {
           }}>
             {displayIcon}
           </div>
-          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '10px' }}>
             {orgName}
           </h2>
 
           {/* Chips Row: Job Type + Deadline Badge */}
           <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
             {job.showInResult ? (
-              <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px', background: '#f3e8ff', color: '#7e22ce', border: '1px solid #e9d5ff' }}>
+              <span className="chip chip-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px' }}>
                 🏆 {state.language === 'en' ? 'Result Published' : 'ফলাফল প্রকাশিত'}
               </span>
             ) : job.showInExamDate ? (
-              <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px', background: '#d1fae5', color: '#059669', border: '1px solid #a7f3d0' }}>
+              <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px' }}>
                 <Calendar size={12} /> {state.language === 'en' ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}
               </span>
             ) : (
@@ -275,17 +275,15 @@ export default function JobDetails() {
           </div>
         </div>
 
-
-
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
-          <h3 className="font-bold mb-xs" style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '8px' }}>
+          <h3 className="font-bold mb-xs" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
             {state.language === 'en' ? 'Job Description' : 'চাকরির বিবরণ'}
           </h3>
           <FormattedText text={job.description} lineClamp={3} showMore={showMore} />
           <button
             onClick={() => setShowMore(!showMore)}
-            style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '11px', marginTop: '8px', background: 'none', border: 'none', cursor: 'pointer' }}
+            style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '12px', marginTop: '8px', background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
           >
             {showMore ? 'View Less ▲' : 'View More ▼'}
           </button>
@@ -297,7 +295,7 @@ export default function JobDetails() {
             {/* Section Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', gap: '8px' }}>
               <div style={{ minWidth: 0, flex: 1 }}>
-                <h3 style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--text-secondary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   অফিসিয়াল নিয়োগ বিজ্ঞপ্তি
                 </h3>
                 <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -363,26 +361,12 @@ export default function JobDetails() {
                       setActiveImageIndex(prev => (prev > 0 ? prev - 1 : circularImages.length - 1));
                     }}
                     title="Previous Page"
+                    className="image-viewer-arrow-btn"
                     style={{
                       position: 'absolute',
                       left: '10px',
                       top: '50%',
-                      transform: 'translateY(-50%)',
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.92)',
-                      backdropFilter: 'blur(4px)',
-                      border: '1px solid var(--border-light)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      color: 'var(--text-primary)',
-                      fontSize: '20px',
-                      fontWeight: 800,
-                      zIndex: 10
+                      transform: 'translateY(-50%)'
                     }}
                   >
                     ‹
@@ -393,26 +377,12 @@ export default function JobDetails() {
                       setActiveImageIndex(prev => (prev < circularImages.length - 1 ? prev + 1 : 0));
                     }}
                     title="Next Page"
+                    className="image-viewer-arrow-btn"
                     style={{
                       position: 'absolute',
                       right: '10px',
                       top: '50%',
-                      transform: 'translateY(-50%)',
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.92)',
-                      backdropFilter: 'blur(4px)',
-                      border: '1px solid var(--border-light)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      color: 'var(--text-primary)',
-                      fontSize: '20px',
-                      fontWeight: 800,
-                      zIndex: 10
+                      transform: 'translateY(-50%)'
                     }}
                   >
                     ›
@@ -421,16 +391,7 @@ export default function JobDetails() {
               )}
 
               {!showFullImage && (
-                <div style={{
-                  position: 'absolute',
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  height: '60px',
-                  background: 'linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 100%)',
-                  pointerEvents: 'none',
-                  zIndex: 6
-                }}></div>
+                <div className="image-viewer-bottom-fade"></div>
               )}
 
               {/* Indicator Dots (Mark Options) */}
@@ -500,23 +461,9 @@ export default function JobDetails() {
                 type="button"
                 disabled={downloading}
                 onClick={handleDownloadNotice}
+                className="notice-btn-outline"
                 style={{
-                  flex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  padding: '10px 10px',
-                  borderRadius: '12px',
-                  background: 'var(--primary-bg)',
-                  color: 'var(--primary)',
-                  fontWeight: 700,
-                  fontSize: '12px',
-                  border: '1.5px solid #dbeafe',
-                  boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
-                  transition: 'all 0.15s ease',
                   cursor: downloading ? 'wait' : 'pointer',
-                  textAlign: 'center',
                   opacity: downloading ? 0.75 : 1
                 }}
               >
@@ -569,17 +516,17 @@ export default function JobDetails() {
               padding: '40px 20px',
               background: 'var(--bg-secondary)',
               borderRadius: '12px',
-              border: '1px dashed var(--border-light)',
+              border: '1px dashed var(--border)',
               textAlign: 'center',
               gap: '12px',
               marginBottom: '14px'
             }}>
               <div style={{ fontSize: '32px' }}>📄</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+                <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-primary)' }}>
                   {isEn ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
                 </span>
-                <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
+                <span style={{ fontSize: '11.5px', color: 'var(--text-secondary)', fontWeight: 600 }}>
                   {isEn ? 'Please click the button below to view or apply! 👇' : 'সার্কুলার দেখতে বা আবেদন করতে নিচের বাটনে চাপ দিন! 👇'}
                 </span>
               </div>
@@ -590,23 +537,9 @@ export default function JobDetails() {
                 type="button"
                 disabled={downloading}
                 onClick={handleDownloadNotice}
+                className="notice-btn-outline"
                 style={{
-                  flex: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  padding: '10px 10px',
-                  borderRadius: '12px',
-                  background: 'var(--primary-bg)',
-                  color: 'var(--primary)',
-                  fontWeight: 700,
-                  fontSize: '12px',
-                  border: '1.5px solid #dbeafe',
-                  boxShadow: '0 2px 8px rgba(26, 86, 219, 0.08)',
-                  transition: 'all 0.15s ease',
                   cursor: downloading ? 'wait' : 'pointer',
-                  textAlign: 'center',
                   opacity: downloading ? 0.75 : 1
                 }}
               >

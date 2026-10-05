@@ -32,6 +32,10 @@
   --chip-warning-color: #d97706;
   --chip-warning-border: #fde68a;
 
+  --chip-purple-bg: #f3e8ff;
+  --chip-purple-color: #7e22ce;
+  --chip-purple-border: #e9d5ff;
+
   /* Unified Card variables */
   --card-bg: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
   --card-border: 1px solid rgba(226, 232, 240, 0.9);
@@ -85,6 +89,9 @@
 }
 
 [data-theme='dark'] {
+  --primary: #3b82f6; /* crisp, accessible bright blue in dark mode */
+  --primary-light: #60a5fa;
+  --primary-lighter: #93c5fd;
   --bg: #0b0f19; /* soft deep slate-navy */
   --bg-secondary: #111827; /* dark slate secondary background */
   --white: #1f2937; /* soft dark container background */
@@ -93,8 +100,8 @@
   --text-muted: #94a3b8; /* muted gray-blue */
   --border: #334155; /* soft subtle dark slate border */
   --border-light: #1e293b; /* very subtle dark border */
-  --primary-bg: rgba(37, 99, 235, 0.18); /* soft translucent primary blue */
-  --primary-lightest: rgba(37, 99, 235, 0.14);
+  --primary-bg: rgba(59, 130, 246, 0.18); /* soft translucent primary blue */
+  --primary-lightest: rgba(59, 130, 246, 0.12);
 
   /* Modern shadows for dark theme */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
@@ -114,6 +121,10 @@
   --chip-warning-bg: rgba(245, 158, 11, 0.18);
   --chip-warning-color: #fbbf24;
   --chip-warning-border: rgba(245, 158, 11, 0.3);
+
+  --chip-purple-bg: rgba(168, 85, 247, 0.18);
+  --chip-purple-color: #c084fc;
+  --chip-purple-border: rgba(168, 85, 247, 0.3);
 
   /* Unified Card variables */
   --card-bg: linear-gradient(180deg, #1f2937 0%, #16202e 100%);

@@ -115,15 +115,15 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
         }
       `}</style>
       <div style={{
-        background: 'var(--bg-primary, #ffffff)',
+        background: 'var(--white, #ffffff)',
         borderRadius: '24px',
         padding: '24px',
         width: '100%',
         maxWidth: '340px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.08)',
         textAlign: 'center',
         animation: 'scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        border: '1px solid var(--border-light, #e2e8f0)',
+        border: '1px solid var(--border)',
         boxSizing: 'border-box',
         position: 'relative'
       }}>
@@ -136,7 +136,7 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
             right: '16px',
             background: 'transparent',
             border: 'none',
-            color: 'var(--text-secondary, #64748b)',
+            color: 'var(--text-secondary)',
             fontSize: '18px',
             fontWeight: 'bold',
             cursor: 'pointer',
@@ -155,7 +155,7 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
         <h3 style={{
           fontSize: '16px',
           fontWeight: 800,
-          color: 'var(--text-primary, #0f172a)',
+          color: 'var(--text-primary)',
           margin: '0 0 12px 0',
           lineHeight: 1.4
         }}>
@@ -164,7 +164,7 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
 
         <p style={{
           fontSize: '11px',
-          color: 'var(--text-secondary, #64748b)',
+          color: 'var(--text-secondary)',
           margin: '0 0 24px 0',
           lineHeight: 1.55,
           textAlign: 'left'
@@ -190,9 +190,9 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
               flex: 1,
               padding: '12px',
               borderRadius: '12px',
-              border: '1.5px solid #2563eb',
-              background: copied ? '#ecfdf5' : 'var(--bg-primary, #ffffff)',
-              color: copied ? '#065f46' : '#2563eb',
+              border: '1.5px solid var(--primary)',
+              background: copied ? 'var(--chip-success-bg, #ecfdf5)' : 'var(--white, #ffffff)',
+              color: copied ? 'var(--chip-success-color, #065f46)' : 'var(--primary)',
               fontWeight: 800,
               fontSize: '13px',
               cursor: 'pointer',

@@ -16,7 +16,7 @@ export default function FormattedText({
     fontSize: '14px',
     lineHeight: 1.8,
     fontWeight: 400,
-    color: '#475569',
+    color: 'var(--text-primary)',
     fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
     letterSpacing: 0,
     wordBreak: 'break-word',

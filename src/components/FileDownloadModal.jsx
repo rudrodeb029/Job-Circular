@@ -83,7 +83,7 @@ export default function FileDownloadModal({
       right: 0,
       bottom: 0,
       zIndex: 99999,
-      background: '#f4f8fc',
+      background: 'var(--bg, #f4f8fc)',
       display: 'flex',
       flexDirection: 'column',
       fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
@@ -222,8 +222,8 @@ export default function FileDownloadModal({
           {/* Status Pill Badge */}
           <div style={{
             marginTop: '6px',
-            background: status === 'completed' ? '#e6f4ea' : '#eff6ff',
-            border: status === 'completed' ? '1px solid #b7eb8f' : '1px solid #bfdbfe',
+            background: status === 'completed' ? 'var(--chip-success-bg, #e6f4ea)' : 'var(--chip-primary-bg, #eff6ff)',
+            border: status === 'completed' ? '1px solid var(--chip-success-border, #b7eb8f)' : '1px solid var(--chip-primary-border, #bfdbfe)',
             padding: '6px 16px',
             borderRadius: '20px',
             display: 'inline-flex',
@@ -247,7 +247,7 @@ export default function FileDownloadModal({
             <span style={{
               fontSize: '13px',
               fontWeight: 800,
-              color: status === 'completed' ? '#047857' : '#1d4ed8'
+              color: status === 'completed' ? 'var(--chip-success-color, #047857)' : 'var(--chip-primary-color, #1d4ed8)'
             }}>
               {status === 'completed' && 'Completed!'}
               {status === 'downloading' && 'Downloading...'}
@@ -258,9 +258,9 @@ export default function FileDownloadModal({
 
         {/* 3. Card 1: Progress Bar */}
         <div style={{
-          background: '#ffffff',
+          background: 'var(--white, #ffffff)',
           borderRadius: '14px',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border, #e2e8f0)',
           padding: '12px',
           boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
         }}>
@@ -268,7 +268,7 @@ export default function FileDownloadModal({
           <div style={{
             width: '100%',
             height: '32px',
-            background: status === 'completed' ? '#059669' : '#e2e8f0',
+            background: status === 'completed' ? '#059669' : 'var(--bg-secondary, #e2e8f0)',
             borderRadius: '16px',
             overflow: 'hidden',
             position: 'relative',
@@ -305,19 +305,19 @@ export default function FileDownloadModal({
 
         {/* 4. Card 2: Tips & Guidelines Card ("কিছু গুরুত্বপূর্ণ টিপস") */}
         <div style={{
-          background: '#ffffff',
+          background: 'var(--white, #ffffff)',
           borderRadius: '14px',
-          border: '1px solid #e2e8f0',
+          border: '1px solid var(--border, #e2e8f0)',
           padding: '14px',
           boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
         }}>
           {/* Section Header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '8px', borderBottom: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '8px', borderBottom: '1px solid var(--border-light, #f1f5f9)' }}>
             <div style={{
               width: '24px',
               height: '24px',
               borderRadius: '50%',
-              background: '#2563eb',
+              background: 'var(--primary, #2563eb)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
@@ -326,7 +326,7 @@ export default function FileDownloadModal({
             }}>
               <Lightbulb size={14} color="#ffffff" />
             </div>
-            <h3 style={{ fontSize: '13px', fontWeight: 800, color: '#1d4ed8', margin: 0 }}>
+            <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary, #1d4ed8)', margin: 0 }}>
               কিছু গুরুত্বপূর্ণ টিপস
             </h3>
           </div>
@@ -338,8 +338,8 @@ export default function FileDownloadModal({
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                background: '#dbeafe',
-                color: '#1d4ed8',
+                background: 'var(--chip-primary-bg, #dbeafe)',
+                color: 'var(--chip-primary-color, #1d4ed8)',
                 fontSize: '11px',
                 fontWeight: 800,
                 display: 'flex',
@@ -350,7 +350,7 @@ export default function FileDownloadModal({
               }}>
                 1
               </div>
-              <p style={{ margin: 0, fontSize: '11px', color: '#334155', fontWeight: 600, lineHeight: 1.4 }}>
+              <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-primary, #334155)', fontWeight: 600, lineHeight: 1.4 }}>
                 ডাউনলোড সম্পন্ন হলে ডিভাইসের ডাউনলোড ফোল্ডারে ফাইলটি দেখতে পাবেন।
               </p>
             </div>
@@ -360,8 +360,8 @@ export default function FileDownloadModal({
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                background: '#dbeafe',
-                color: '#1d4ed8',
+                background: 'var(--chip-primary-bg, #dbeafe)',
+                color: 'var(--chip-primary-color, #1d4ed8)',
                 fontSize: '11px',
                 fontWeight: 800,
                 display: 'flex',
@@ -372,7 +372,7 @@ export default function FileDownloadModal({
               }}>
                 2
               </div>
-              <p style={{ margin: 0, fontSize: '11px', color: '#334155', fontWeight: 600, lineHeight: 1.4 }}>
+              <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-primary, #334155)', fontWeight: 600, lineHeight: 1.4 }}>
                 অথবা ডাউনলোড সম্পন্ন হলে ডিভাইসের নোটিফিকেশন বার থেকেও ফাইলটি দেখতে পাবেন।
               </p>
             </div>
@@ -382,8 +382,8 @@ export default function FileDownloadModal({
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                background: '#dbeafe',
-                color: '#1d4ed8',
+                background: 'var(--chip-primary-bg, #dbeafe)',
+                color: 'var(--chip-primary-color, #1d4ed8)',
                 fontSize: '11px',
                 fontWeight: 800,
                 display: 'flex',
@@ -394,7 +394,7 @@ export default function FileDownloadModal({
               }}>
                 3
               </div>
-              <p style={{ margin: 0, fontSize: '11px', color: '#334155', fontWeight: 600, lineHeight: 1.4 }}>
+              <p style={{ margin: 0, fontSize: '11px', color: 'var(--text-primary, #334155)', fontWeight: 600, lineHeight: 1.4 }}>
                 এছাড়াও ফাইল ম্যানেজার বা গ্যালারি থেকেও সরাসরি ফাইলটি ওপেন করা যাবে।
               </p>
             </div>
@@ -402,7 +402,7 @@ export default function FileDownloadModal({
 
           {/* Bottom Light-Blue Notice Box */}
           <div style={{
-            background: '#eff6ff',
+            background: 'var(--primary-bg, #eff6ff)',
             borderRadius: '10px',
             padding: '10px',
             marginTop: '12px',
@@ -410,8 +410,8 @@ export default function FileDownloadModal({
             alignItems: 'flex-start',
             gap: '8px'
           }}>
-            <Folder size={16} color="#2563eb" style={{ marginTop: '2px', flexShrink: 0 }} />
-            <p style={{ margin: 0, fontSize: '10px', color: '#1d4ed8', fontWeight: 600, lineHeight: 1.4 }}>
+            <Folder size={16} color="var(--primary, #2563eb)" style={{ marginTop: '2px', flexShrink: 0 }} />
+            <p style={{ margin: 0, fontSize: '10px', color: 'var(--primary, #1d4ed8)', fontWeight: 600, lineHeight: 1.4 }}>
               বিঃ দ্রঃ ডাউনলোড চলাকালীন আপনি চাইলে এই পেজটি বন্ধ (Close) করে দিতে পারেন। ব্যাকগ্রাউন্ডে ফাইলটি স্বয়ংক্রিয়ভাবে ডাউনলোড ও সংরক্ষিত হতে থাকবে।
             </p>
           </div>

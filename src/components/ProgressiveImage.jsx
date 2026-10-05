@@ -86,22 +86,22 @@ export default function ProgressiveImage({
 
   if (hasError || !src) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '32px 20px',
-        textAlign: 'center',
-        gap: '12px',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%)',
-        borderRadius: '16px',
-        border: '1px dashed #bfdbfe',
-        boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.02)',
-        width: '100%',
-        margin: '8px 0',
-        ...style
-      }} className={className}>
+      <div
+        className={`progressive-image-fallback ${className}`}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '32px 20px',
+          textAlign: 'center',
+          gap: '12px',
+          borderRadius: '16px',
+          width: '100%',
+          margin: '8px 0',
+          ...style
+        }}
+      >
         <div style={{
           width: '50px',
           height: '50px',
@@ -117,10 +117,10 @@ export default function ProgressiveImage({
           📄
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxWidth: '320px' }}>
-          <span style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--text-secondary)' }}>
+          <span className="fallback-title">
             প্রিভিউ দেখা যাচ্ছে না?
           </span>
-          <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
+          <span className="fallback-desc">
             {fallbackTitle || 'অফিসিয়াল নোটিশ বা বিজ্ঞপ্তি দেখতে নিচের বাটনে চাপ দিন! 👇'}
           </span>
         </div>
@@ -134,7 +134,7 @@ export default function ProgressiveImage({
       overflow: 'hidden',
       width: '100%',
       maxWidth,
-      background: '#f8fafc',
+      background: 'var(--bg-secondary)',
       borderRadius: '14px',
       minHeight: isLoaded ? 'none' : '300px',
       ...style
@@ -168,7 +168,7 @@ export default function ProgressiveImage({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(248, 250, 252, 0.9)',
+          background: 'var(--header-bg)',
           backdropFilter: 'blur(6px)',
           zIndex: 10
         }}>
