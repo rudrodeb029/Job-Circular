@@ -1,15 +1,12 @@
-import { Capacitor } from '@capacitor/core';
-
 let activeAdSession = null;
 
 /**
- * Shows an Interstitial Ad and guarantees onComplete() runs ONLY AFTER the ad completes/closes.
- * Supports:
- * 1. Native Android JavascriptInterface (window.AndroidAds)
- * 2. In-App Interactive Countdown Modal Fallback (for web & when native ad is loading)
+ * Triggers the default native Google AdMob Interstitial Ad.
+ * Guarantees onComplete() executes ONLY AFTER the AdMob interstitial ad completes/is dismissed by user.
+ * If running in a web browser or if ads are disabled/unavailable, proceeds directly to destination.
  *
  * @param {Function} onComplete - Destination callback (e.g. open portal or open file download modal)
- * @param {object} [options] - Metadata (title, url, pageType)
+ * @param {object} [options] - Optional metadata
  */
 export function showInterstitialAd(onComplete, options = {}) {
   let executed = false;
@@ -36,10 +33,10 @@ export function showInterstitialAd(onComplete, options = {}) {
 
   activeAdSession = { onComplete: destinationCallback };
 
-  // 1. Check Native Android Bridge (window.AndroidAds)
+  // 1. Check Native Android Bridge (window.AndroidAds) for Google AdMob
   if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.showInterstitial === 'function') {
     try {
-      // Check if interstitial ads are enabled and ready
+      // Check if interstitial ads are enabled
       const adsEnabled = typeof window.AndroidAds.isInterstitialAdsEnabled === 'function'
         ? window.AndroidAds.isInterstitialAdsEnabled()
         : true;
@@ -49,11 +46,11 @@ export function showInterstitialAd(onComplete, options = {}) {
         return;
       }
 
-      // Safety timeout: Ensure destination callback is invoked even if native ad freezes or takes > 7s
+      // Safety timeout: Ensure destination callback is invoked even if native ad freezes or takes > 6s
       const safetyTimeout = setTimeout(() => {
         cleanupNativeListeners();
         destinationCallback();
-      }, 7000);
+      }, 6000);
 
       const onDismissed = () => {
         clearTimeout(safetyTimeout);
@@ -75,27 +72,16 @@ export function showInterstitialAd(onComplete, options = {}) {
       window.addEventListener('native_interstitial_dismissed', onDismissed, { once: true });
       window.addEventListener('native_interstitial_failed', onFailed, { once: true });
 
-      // Trigger the native interstitial ad in Android MainActivity
+      // Trigger the official Google AdMob interstitial ad in Android MainActivity
       window.AndroidAds.showInterstitial();
       return;
     } catch (e) {
       console.warn('Native AndroidAds.showInterstitial error:', e);
-      // Fall through to in-app fallback
+      destinationCallback();
+      return;
     }
   }
 
-  // 2. In-App Interstitial Ad Fallback (Full screen ad with 5s countdown & skip button)
-  const fallbackTimeout = setTimeout(() => {
-    destinationCallback();
-  }, 10000);
-
-  window.dispatchEvent(new CustomEvent('show_in_app_interstitial', {
-    detail: {
-      onComplete: () => {
-        clearTimeout(fallbackTimeout);
-        destinationCallback();
-      },
-      options
-    }
-  }));
+  // 2. In Web Browser / Non-Android: Proceed directly to destination (no fake/custom ad UI)
+  destinationCallback();
 }
