@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Shield, FileText, Share2, Star, Mail, Info, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 
+import { openInAppBrowser } from '../utils/browserUtils';
+
 const TrashIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="3 6 5 6 21 6"></polyline>
@@ -27,13 +29,13 @@ export default function Settings() {
     { 
       icon: Shield, 
       label: isEn ? 'Privacy Policy' : 'প্রাইভেসি পলিসি', 
-      path: '/privacy',
+      externalUrl: 'https://live-circulars.web.app/privacy-policy',
       gradient: 'linear-gradient(135deg, #10b981, #059669)'
     },
     { 
       icon: FileText, 
       label: isEn ? 'Terms & Conditions' : 'শর্তাবলী ও নীতিমালা', 
-      path: '/terms',
+      externalUrl: 'https://live-circulars.web.app/terms-conditions',
       gradient: 'linear-gradient(135deg, #f59e0b, #d97706)'
     },
     { 
@@ -101,6 +103,8 @@ export default function Settings() {
               onClick={() => {
                 if (item.key === 'delete') {
                   handleDeleteAccount();
+                } else if (item.externalUrl) {
+                  openInAppBrowser(item.externalUrl);
                 } else {
                   navigate(item.path);
                 }
