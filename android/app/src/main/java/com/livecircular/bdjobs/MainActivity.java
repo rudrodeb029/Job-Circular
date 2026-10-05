@@ -428,6 +428,11 @@ public class MainActivity extends BridgeActivity {
                             public void onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent();
                                 Log.d(TAG, "Interstitial ad dismissed by user.");
+                                MainActivity.this.runOnUiThread(() -> {
+                                    if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                                        MainActivity.this.bridge.getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('native_interstitial_dismissed'));", null);
+                                    }
+                                });
                                 interstitialAd = null;
                                 if (isAdsEnabled && isInterstitialAdsEnabled) {
                                     loadInterstitialAd();
@@ -438,6 +443,11 @@ public class MainActivity extends BridgeActivity {
                             public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
                                 super.onAdFailedToShowFullScreenContent(adError);
                                 Log.e(TAG, "Interstitial ad failed to show: " + adError.getMessage());
+                                MainActivity.this.runOnUiThread(() -> {
+                                    if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                                        MainActivity.this.bridge.getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('native_interstitial_failed'));", null);
+                                    }
+                                });
                                 interstitialAd = null;
                                 if (isAdsEnabled && isInterstitialAdsEnabled) {
                                     loadInterstitialAd();
@@ -491,6 +501,11 @@ public class MainActivity extends BridgeActivity {
             if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
                 loadInterstitialAd();
             }
+            runOnUiThread(() -> {
+                if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                    MainActivity.this.bridge.getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('native_interstitial_failed'));", null);
+                }
+            });
         }
     }
 
@@ -506,6 +521,13 @@ public class MainActivity extends BridgeActivity {
                     @SuppressWarnings("unused")
                     public void showInterstitial() {
                         runOnUiThread(MainActivity.this::showInterstitialAd);
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public boolean isInterstitialReady() {
+                        return isAdsEnabled && isInterstitialAdsEnabled && interstitialAd != null;
                     }
 
                     @JavascriptInterface

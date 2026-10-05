@@ -5,6 +5,7 @@ import { Network } from '@capacitor/network'
 import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import VersionUpdateModal from './components/VersionUpdateModal'
+import InterstitialAdModal from './components/InterstitialAdModal'
 import ConnectivityBanner from './components/ConnectivityBanner'
 import ErrorBoundary from './components/ErrorBoundary'
 import ModernLoader from './components/ModernLoader'
@@ -517,6 +518,7 @@ function App() {
           currentVersion={CURRENT_VERSION}
           onClose={() => setShowUpdateModal(false)}
         />
+        <InterstitialAdModal />
       </div>
     </GlobalLoaderProvider>
   </ErrorBoundary>

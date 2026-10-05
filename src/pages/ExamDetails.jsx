@@ -15,6 +15,7 @@ import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
+import { showInterstitialAd } from '../utils/adService';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -121,9 +122,6 @@ export default function ExamDetails() {
 
   const handleDownloadNotice = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
-    
-    // Trigger Interstitial Ad on Notice download
-    showNativeInterstitialAd();
 
     const rawFileUrl = rawImagesList[activeImageIndex] ||
                        circularImages[activeImageIndex] ||
@@ -147,10 +145,14 @@ export default function ExamDetails() {
 
     const cleanOrg = stripHtmlTags(job.organization || 'Exam');
     const name = `${cleanOrg}_Notice_Page_${activeImageIndex + 1}`;
-    setDownloadUrl(rawFileUrl);
-    setDownloadFileName(name);
-    setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
-    setIsDownloadModalOpen(true);
+
+    // Show Interstitial ad and ONLY open download destination modal AFTER ad completes/closes
+    showInterstitialAd(() => {
+      setDownloadUrl(rawFileUrl);
+      setDownloadFileName(name);
+      setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
+      setIsDownloadModalOpen(true);
+    }, { title: name, type: 'notice_download' });
   };
 
   const handleDownloadAdmitCard = () => {

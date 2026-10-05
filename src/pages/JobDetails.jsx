@@ -14,6 +14,7 @@ import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd, showNativeBannerAd, hideNativeBannerAd } from '../utils/admobUtils';
+import { showInterstitialAd } from '../utils/adService';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -102,9 +103,6 @@ export default function JobDetails() {
 
   const handleDownloadNotice = (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
-    
-    // Trigger Interstitial Ad on Notice download
-    showNativeInterstitialAd();
 
     const rawFileUrl = rawImagesList[activeImageIndex] ||
                        circularImages[activeImageIndex] ||
@@ -126,10 +124,14 @@ export default function JobDetails() {
     }
 
     const name = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
-    setDownloadUrl(rawFileUrl);
-    setDownloadFileName(name);
-    setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
-    setIsDownloadModalOpen(true);
+    
+    // Show Interstitial ad and ONLY open download destination modal AFTER ad completes/closes
+    showInterstitialAd(() => {
+      setDownloadUrl(rawFileUrl);
+      setDownloadFileName(name);
+      setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
+      setIsDownloadModalOpen(true);
+    }, { title: name, type: 'notice_download' });
   };
 
   // Hide banner ad when full-screen photo zoom viewer is active
