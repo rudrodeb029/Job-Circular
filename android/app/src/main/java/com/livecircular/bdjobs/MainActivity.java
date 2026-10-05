@@ -430,7 +430,8 @@ public class MainActivity extends BridgeActivity {
                                 Log.d(TAG, "Interstitial ad dismissed by user.");
                                 MainActivity.this.runOnUiThread(() -> {
                                     if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
-                                        MainActivity.this.bridge.getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('native_interstitial_dismissed'));", null);
+                                        String script = "try { if (typeof window.onNativeInterstitialDismissed === 'function') { window.onNativeInterstitialDismissed(); } window.dispatchEvent(new CustomEvent('native_interstitial_dismissed')); } catch(e){}";
+                                        MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
                                     }
                                 });
                                 interstitialAd = null;
@@ -445,7 +446,8 @@ public class MainActivity extends BridgeActivity {
                                 Log.e(TAG, "Interstitial ad failed to show: " + adError.getMessage());
                                 MainActivity.this.runOnUiThread(() -> {
                                     if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
-                                        MainActivity.this.bridge.getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('native_interstitial_failed'));", null);
+                                        String script = "try { if (typeof window.onNativeInterstitialFailed === 'function') { window.onNativeInterstitialFailed(); } window.dispatchEvent(new CustomEvent('native_interstitial_failed')); } catch(e){}";
+                                        MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
                                     }
                                 });
                                 interstitialAd = null;
@@ -503,7 +505,8 @@ public class MainActivity extends BridgeActivity {
             }
             runOnUiThread(() -> {
                 if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
-                    MainActivity.this.bridge.getWebView().evaluateJavascript("window.dispatchEvent(new CustomEvent('native_interstitial_failed'));", null);
+                    String script = "try { if (typeof window.onNativeInterstitialFailed === 'function') { window.onNativeInterstitialFailed(); } window.dispatchEvent(new CustomEvent('native_interstitial_failed')); } catch(e){}";
+                    MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
                 }
             });
         }

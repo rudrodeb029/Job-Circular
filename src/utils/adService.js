@@ -36,7 +36,6 @@ export function showInterstitialAd(onComplete, options = {}) {
   // 1. Check Native Android Bridge (window.AndroidAds) for Google AdMob
   if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.showInterstitial === 'function') {
     try {
-      // Check if interstitial ads are enabled
       const adsEnabled = typeof window.AndroidAds.isInterstitialAdsEnabled === 'function'
         ? window.AndroidAds.isInterstitialAdsEnabled()
         : true;
@@ -46,31 +45,29 @@ export function showInterstitialAd(onComplete, options = {}) {
         return;
       }
 
-      // Safety timeout: Ensure destination callback is invoked even if native ad freezes or takes > 6s
+      // Safety timeout: Ensure destination callback is invoked even if native ad freezes or takes > 8s
       const safetyTimeout = setTimeout(() => {
-        cleanupNativeListeners();
+        cleanup();
         destinationCallback();
-      }, 6000);
+      }, 8000);
 
-      const onDismissed = () => {
+      const onFinished = () => {
         clearTimeout(safetyTimeout);
-        cleanupNativeListeners();
+        cleanup();
         destinationCallback();
       };
 
-      const onFailed = () => {
-        clearTimeout(safetyTimeout);
-        cleanupNativeListeners();
-        destinationCallback();
+      const cleanup = () => {
+        window.removeEventListener('native_interstitial_dismissed', onFinished);
+        window.removeEventListener('native_interstitial_failed', onFinished);
+        window.onNativeInterstitialDismissed = null;
+        window.onNativeInterstitialFailed = null;
       };
 
-      const cleanupNativeListeners = () => {
-        window.removeEventListener('native_interstitial_dismissed', onDismissed);
-        window.removeEventListener('native_interstitial_failed', onFailed);
-      };
-
-      window.addEventListener('native_interstitial_dismissed', onDismissed, { once: true });
-      window.addEventListener('native_interstitial_failed', onFailed, { once: true });
+      window.addEventListener('native_interstitial_dismissed', onFinished, { once: true });
+      window.addEventListener('native_interstitial_failed', onFinished, { once: true });
+      window.onNativeInterstitialDismissed = onFinished;
+      window.onNativeInterstitialFailed = onFinished;
 
       // Trigger the official Google AdMob interstitial ad in Android MainActivity
       window.AndroidAds.showInterstitial();
@@ -82,6 +79,6 @@ export function showInterstitialAd(onComplete, options = {}) {
     }
   }
 
-  // 2. In Web Browser / Non-Android: Proceed directly to destination (no fake/custom ad UI)
+  // 2. In Web Browser / Non-Android: Proceed directly to destination
   destinationCallback();
 }
