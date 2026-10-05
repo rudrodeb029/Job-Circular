@@ -331,7 +331,8 @@ function StoryCard({ job, index, isEn, onClick }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: '#ffffff'
+              background: '#ffffff',
+              color: theme.avatarRing
             }}
           >
             {hasImage ? (
@@ -340,8 +341,16 @@ function StoryCard({ job, index, isEn, onClick }) {
                 alt={orgName}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
+            ) : React.isValidElement(displayIcon) ? (
+              React.cloneElement(displayIcon, {
+                size: 13,
+                color: theme.avatarRing,
+                style: { ...displayIcon.props?.style, color: theme.avatarRing }
+              })
             ) : (
-              <span style={{ fontSize: '11px' }}>{displayIcon}</span>
+              <span style={{ fontSize: '11px', color: theme.avatarRing, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {displayIcon}
+              </span>
             )}
           </div>
 

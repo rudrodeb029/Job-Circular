@@ -603,18 +603,9 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
         {/* Love Reaction Button & Counter Pill [❤️ 2] */}
         <button
           onClick={handleLike}
+          className={`feed-action-pill ${isLiked ? 'is-liked' : ''}`}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: isLiked ? '#fef2f2' : '#f8fafc',
-            border: isLiked ? '1px solid #fca5a5' : '1px solid #cbd5e1',
-            borderRadius: '20px',
-            padding: '4px 12px 4px 6px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)'
           }}
         >
           <div style={{
@@ -632,25 +623,14 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
           }}>
             ❤️
           </div>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
+          <span className="feed-pill-count">
             {likesCount}
           </span>
         </button>
 
         <button
           onClick={() => setShowComments(!showComments)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: showComments ? '#f1f5f9' : '#f8fafc',
-            border: showComments ? '1px solid #cbd5e1' : '1px solid #cbd5e1',
-            borderRadius: '20px',
-            padding: '4px 12px 4px 6px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
-          }}
+          className={`feed-action-pill ${showComments ? 'comments-active' : ''}`}
         >
           <div style={{
             width: '20px',
@@ -666,7 +646,7 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
           }}>
             💬
           </div>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-primary)' }}>
+          <span className="feed-pill-count">
             {commentsCount}
           </span>
         </button>
@@ -741,10 +721,10 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
 
             <div style={{
               flex: 1,
-              background: '#f0f2f5',
+              background: 'var(--bg, #f0f2f5)',
               borderRadius: '18px',
               padding: '8px 12px',
-              border: isInputFocused ? '1.5px solid #1877f2' : '1px solid #e4e6eb',
+              border: isInputFocused ? '1.5px solid #1877f2' : '1px solid var(--border, #e4e6eb)',
               boxShadow: isInputFocused ? '0 0 0 3px rgba(24, 119, 242, 0.2)' : 'none',
               transition: 'all 0.2s ease',
               display: 'flex',
@@ -768,7 +748,7 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
                   border: 'none',
                   outline: 'none',
                   fontSize: '13.5px',
-                  color: '#050505',
+                  color: 'var(--text-primary, #050505)',
                   padding: '2px 0'
                 }}
               />

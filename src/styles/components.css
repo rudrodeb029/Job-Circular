@@ -1652,5 +1652,74 @@ mark {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4) !important;
 }
 
+/* Feed Action Reaction Pills */
+.feed-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-secondary, #f8fafc);
+  border: 1px solid var(--border, #cbd5e1);
+  border-radius: 20px;
+  padding: 4px 12px 4px 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.feed-action-pill .feed-pill-count {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--text-primary, #1e293b);
+  transition: color 0.2s ease;
+}
+
+.feed-action-pill.is-liked {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.feed-action-pill.is-liked .feed-pill-count {
+  color: #dc2626;
+}
+
+.feed-action-pill.comments-active {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.feed-action-pill.comments-active .feed-pill-count {
+  color: var(--primary, #1a56db);
+}
+
+/* Feed Action Pills - Dark Mode Support */
+[data-theme='dark'] .feed-action-pill {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme='dark'] .feed-action-pill .feed-pill-count {
+  color: #f8fafc !important;
+}
+
+[data-theme='dark'] .feed-action-pill.is-liked {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+}
+
+[data-theme='dark'] .feed-action-pill.is-liked .feed-pill-count {
+  color: #fca5a5 !important;
+}
+
+[data-theme='dark'] .feed-action-pill.comments-active {
+  background: rgba(59, 130, 246, 0.2) !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+[data-theme='dark'] .feed-action-pill.comments-active .feed-pill-count {
+  color: #93c5fd !important;
+}
+
+
 
 
