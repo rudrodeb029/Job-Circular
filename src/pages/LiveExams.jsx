@@ -349,7 +349,7 @@ export default function LiveExams() {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: '12px',
-                minHeight: 'calc(100vh - 280px)'
+                alignItems: 'start'
               }}>
                 {filteredExams.map(exam => {
                   const status = getExamStatus(exam);

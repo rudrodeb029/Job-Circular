@@ -7,6 +7,7 @@ import { getQuestionById } from '../data/questionsData';
 import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
 import { supabase } from '../services/supabaseClient';
 import { normalizeDoc } from '../services/supabaseService';
+import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
 
 export default function QuestionDetails() {
   const { id } = useParams();
@@ -335,38 +336,24 @@ export default function QuestionDetails() {
                 }}
               >
                 {/* Question Label */}
-                <h4 style={{
-                  fontSize: '12.5px',
-                  fontWeight: 600,
-                  color: 'var(--text-secondary)',
-                  marginBottom: '14px',
-                  lineHeight: '1.45',
-                  display: 'flex',
-                  gap: '8px'
-                }}>
-                  <span>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                  <span>{(isEn && qn.questionEn) ? qn.questionEn : qn.question}</span>
-                </h4>
+                  <h4 style={{
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '14px',
+                    lineHeight: '1.45',
+                    display: 'flex',
+                    gap: '8px',
+                    alignItems: 'baseline'
+                  }}>
+                    <span style={{ flexShrink: 0 }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
+                    <QuestionContent content={(isEn && qn.questionEn) ? qn.questionEn : qn.question} style={{ flex: 1 }} />
+                  </h4>
 
                 {/* Option Choices */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {qn.options.map((option, oIndex) => {
-                    let optText = (isEn && qn.optionsEn && qn.optionsEn[oIndex]) ? qn.optionsEn[oIndex] : option;
-                    
-                    // CLEANUP: Remove double prefixes if present in data (e.g. "(a) Apple" -> "Apple")
-                    if (optText) {
-                      const prefixPatterns = [
-                        /^\([a-d]\)\s*/i,   // (a), (b), (c), (d)
-                        /^[a-d][\.\)]\s*/i, // a., a), b., b)
-                        /^\([ক-ঘ]\)\s*/,   // (ক), (খ), (গ), (ঘ)
-                        /^[ক-ঘ][\।\)]\s*/, // ক।, ক), খ।, খ)
-                        /^\(\d+\)\s*/,     // (1), (2)
-                        /^\d+[\.\)]\s*/    // 1., 1)
-                      ];
-                      prefixPatterns.forEach(pattern => {
-                        optText = optText.replace(pattern, '');
-                      });
-                    }
+                    const optText = cleanOptionText((isEn && qn.optionsEn && qn.optionsEn[oIndex]) ? qn.optionsEn[oIndex] : option);
 
                     let bg = 'var(--bg)';
                     let color = 'var(--text-primary)';
@@ -460,14 +447,10 @@ export default function QuestionDetails() {
                     }}>
                       💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
                     </h5>
-                    <p style={{
-                      fontSize: '12px',
-                      color: 'var(--text-secondary)',
-                      lineHeight: '1.6',
-                      margin: 0
-                    }}>
-                      {(isEn && qn.explanationEn) ? qn.explanationEn : qn.explanation}
-                    </p>
+                    <ExplanationContent
+                      content={(isEn && qn.explanationEn) ? qn.explanationEn : qn.explanation}
+                      style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
+                    />
                   </div>
                 )}
               </div>
@@ -487,3 +470,51 @@ const toBengaliNumber = (num) => {
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
+
+function QuestionContent({ content, style = {}, className = '' }) {
+  if (!content) return null;
+  const rawStr = typeof content === 'object' ? (content.text || content.title || content.bn || content.en || '') : String(content || '');
+  const hasHtml = /<[a-z/][\s\S]*>/i.test(rawStr);
+
+  if (hasHtml) {
+    const cleanHtml = sanitizeQuestionHtml(rawStr);
+    return (
+      <span
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{ __html: cleanHtml }}
+      />
+    );
+  }
+
+  const cleanPlain = stripHtmlTags(rawStr);
+  return (
+    <span className={className} style={style}>
+      {cleanPlain}
+    </span>
+  );
+}
+
+function ExplanationContent({ content, style = {}, className = '' }) {
+  if (!content) return null;
+  const rawStr = typeof content === 'object' ? (content.text || content.title || content.bn || content.en || '') : String(content || '');
+  const hasHtml = /<[a-z/][\s\S]*>/i.test(rawStr);
+
+  if (hasHtml) {
+    const cleanHtml = sanitizeQuestionHtml(rawStr);
+    return (
+      <div
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{ __html: cleanHtml }}
+      />
+    );
+  }
+
+  const cleanPlain = stripHtmlTags(rawStr);
+  return (
+    <div className={className} style={style}>
+      {cleanPlain}
+    </div>
+  );
+}

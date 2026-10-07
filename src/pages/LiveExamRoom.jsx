@@ -9,6 +9,7 @@ import { supabase } from '../services/supabaseClient';
 import ModernLoader from '../components/ModernLoader';
 import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult, getExamResult, saveLeaderboard, getLeaderboard, getExamFromSQLite, saveExamToSQLite } from '../services/sqliteService';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
+import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
 
 export default function LiveExamRoom() {
   const { id } = useParams();
@@ -836,16 +837,17 @@ export default function LiveExamRoom() {
                     marginBottom: '14px',
                     lineHeight: '1.45',
                     display: 'flex',
-                    gap: '8px'
+                    gap: '8px',
+                    alignItems: 'baseline'
                   }}>
-                    <span>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                    <span>{toSafeString(isEn ? (qn.questionEn || qn.question) : qn.question)}</span>
+                    <span style={{ flexShrink: 0 }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
+                    <QuestionContent content={isEn ? (qn.questionEn || qn.question) : qn.question} style={{ flex: 1 }} />
                   </h4>
 
                   {/* Option Choices */}
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {qOptions.map((option, oIndex) => {
-                      const optText = toSafeString(isEn ? (qOptionsEn[oIndex] || option) : option);
+                      const optText = cleanOptionText(isEn ? (qOptionsEn[oIndex] || option) : option);
                       const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
                       const prefix = optionPrefixes[oIndex];
 
@@ -941,9 +943,10 @@ export default function LiveExamRoom() {
                       <h5 style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)', marginBottom: '4px' }}>
                         💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
                       </h5>
-                      <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}>
-                        {toSafeString(isEn ? (qn.explanationEn || qn.explanation) : qn.explanation)}
-                      </p>
+                      <ExplanationContent
+                        content={isEn ? (qn.explanationEn || qn.explanation) : qn.explanation}
+                        style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
+                      />
                     </div>
                   )}
                 </div>
@@ -1201,24 +1204,30 @@ export default function LiveExamRoom() {
 
         {/* Submit Button */}
         {showQuestionsSheet && (
-          <button
-            onClick={handleSubmit}
-            style={{
-              width: '100%',
-              padding: '16px',
-              borderRadius: '14px',
-              border: 'none',
-              background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-              color: 'white',
-              fontSize: '15px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              boxShadow: 'var(--shadow-lg)',
-              transition: 'transform 0.2s'
-            }}
-          >
-            🚀 {isEn ? 'Submit Live Exam' : 'পরীক্ষা সম্পন্ন করুন'}
-          </button>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px', marginBottom: '24px' }}>
+            <button
+              onClick={handleSubmit}
+              style={{
+                width: 'auto',
+                minWidth: '150px',
+                padding: '9px 24px',
+                borderRadius: '10px',
+                border: 'none',
+                background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+                color: 'white',
+                fontSize: '13px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.25)',
+                transition: 'all 0.2s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              Submit
+            </button>
+          </div>
         )}
           </>
         )}
@@ -1243,6 +1252,54 @@ const toSafeString = (val, fallback = '') => {
   }
   return fallback;
 };
+
+function QuestionContent({ content, style = {}, className = '' }) {
+  if (!content) return null;
+  const rawStr = toSafeString(content);
+  const hasHtml = /<[a-z/][\s\S]*>/i.test(rawStr);
+
+  if (hasHtml) {
+    const cleanHtml = sanitizeQuestionHtml(rawStr);
+    return (
+      <span
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{ __html: cleanHtml }}
+      />
+    );
+  }
+
+  const cleanPlain = stripHtmlTags(rawStr);
+  return (
+    <span className={className} style={style}>
+      {cleanPlain}
+    </span>
+  );
+}
+
+function ExplanationContent({ content, style = {}, className = '' }) {
+  if (!content) return null;
+  const rawStr = toSafeString(content);
+  const hasHtml = /<[a-z/][\s\S]*>/i.test(rawStr);
+
+  if (hasHtml) {
+    const cleanHtml = sanitizeQuestionHtml(rawStr);
+    return (
+      <div
+        className={className}
+        style={style}
+        dangerouslySetInnerHTML={{ __html: cleanHtml }}
+      />
+    );
+  }
+
+  const cleanPlain = stripHtmlTags(rawStr);
+  return (
+    <div className={className} style={style}>
+      {cleanPlain}
+    </div>
+  );
+}
 
 const isValidAvatar = (url) => {
   if (!url || typeof url !== 'string') return false;

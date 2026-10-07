@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { stripHtmlTags } from '../utils/textUtils';
 
 /**
  * 1:1 Pixel-Perfect Live Exam & History Card Component
@@ -219,11 +220,14 @@ export default function LiveExamCard({
 
             if (activeSubjectTopics) {
               return activeSubjectTopics.map((st, idx) => {
-                const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
+                const rawSubj = isEn ? (st.subjectEn || st.subject) : st.subject;
+                const subjText = stripHtmlTags(safeStringify(rawSubj, 'General')).trim() || 'General';
                 const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
-                const topicsList = Array.isArray(rawTopics)
-                  ? rawTopics.map(t => safeStringify(t))
-                  : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
+                const cleanTopicItem = (t) => stripHtmlTags(safeStringify(t)).trim();
+                const topicsList = (Array.isArray(rawTopics)
+                  ? rawTopics.map(cleanTopicItem)
+                  : safeStringify(rawTopics).split(',').map(cleanTopicItem)
+                ).filter(t => t && t !== '&nbsp;');
 
                 const { visible: displayedTopics, remaining: remainingTopicsCount } = calculateVisibleTopics(topicsList, 130);
 
@@ -303,11 +307,13 @@ export default function LiveExamCard({
             }
 
             // Default Subjects Fallback
-            const subjName = safeStringify(isEn ? (exam.subjectsEn || exam.subjects || 'General') : (exam.subjects || 'BCS EXAM'));
+            const rawSubj = isEn ? (exam.subjectsEn || exam.subjects || 'General') : (exam.subjects || 'BCS EXAM');
+            const subjName = stripHtmlTags(safeStringify(rawSubj, 'General')).trim() || 'General';
+            const cleanTopicItem = (t) => stripHtmlTags(safeStringify(t)).trim();
             const topicsArr = (Array.isArray(isEn ? (exam.topicsEn || exam.topics) : exam.topics)
-              ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics)
-              : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
-            );
+              ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics).map(cleanTopicItem)
+              : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(cleanTopicItem)
+            ).filter(t => t && t !== '&nbsp;');
             const { visible: displayedFallbackTopics, remaining: remainingFallbackTopics } = calculateVisibleTopics(topicsArr, 130);
 
             return (
@@ -600,11 +606,14 @@ export default function LiveExamCard({
 
                 if (activeSubjectTopics) {
                   return activeSubjectTopics.map((st, idx) => {
-                    const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
+                    const rawSubj = isEn ? (st.subjectEn || st.subject) : st.subject;
+                    const subjText = stripHtmlTags(safeStringify(rawSubj, 'General')).trim() || 'General';
                     const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
-                    const topicsList = Array.isArray(rawTopics)
-                      ? rawTopics.map(t => safeStringify(t))
-                      : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
+                    const cleanTopicItem = (t) => stripHtmlTags(safeStringify(t)).trim();
+                    const topicsList = (Array.isArray(rawTopics)
+                      ? rawTopics.map(cleanTopicItem)
+                      : safeStringify(rawTopics).split(',').map(cleanTopicItem)
+                    ).filter(t => t && t !== '&nbsp;');
 
                     return (
                       <div
@@ -673,11 +682,13 @@ export default function LiveExamCard({
                 }
 
                 // Default Subject Fallback
-                const subjName = safeStringify(isEn ? (exam.subjectsEn || exam.subjects || 'General') : (exam.subjects || 'BCS EXAM'));
+                const rawSubj = isEn ? (exam.subjectsEn || exam.subjects || 'General') : (exam.subjects || 'BCS EXAM');
+                const subjName = stripHtmlTags(safeStringify(rawSubj, 'General')).trim() || 'General';
+                const cleanTopicItem = (t) => stripHtmlTags(safeStringify(t)).trim();
                 const topicsArr = (Array.isArray(isEn ? (exam.topicsEn || exam.topics) : exam.topics)
-                  ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics)
-                  : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
-                );
+                  ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics).map(cleanTopicItem)
+                  : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(cleanTopicItem)
+                ).filter(t => t && t !== '&nbsp;');
 
                 return (
                   <div

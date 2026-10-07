@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
+import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../../utils/textUtils';
 
 export default function ManageLiveExams() {
   const { state, dispatch } = useAdminContext();
@@ -147,23 +148,48 @@ export default function ManageLiveExams() {
 
   const handleSaveExam = (e) => {
     e.preventDefault();
-    if (!title.trim()) {
+    const cleanTitle = stripHtmlTags(title).trim();
+    if (!cleanTitle) {
       triggerToast('Please enter an exam title', 'error');
       return;
     }
 
     const scheduledDateIso = startTime ? new Date(startTime).toISOString() : new Date().toISOString();
+
+    const cleanedSubjectTopics = (subjectTopics || []).map(st => ({
+      subject: stripHtmlTags(st.subject || '').trim(),
+      subjectEn: stripHtmlTags(st.subjectEn || '').trim(),
+      topics: (Array.isArray(st.topics)
+        ? st.topics.map(t => stripHtmlTags(t).trim())
+        : stripHtmlTags(st.topics || '').split(',').map(t => t.trim())
+      ).filter(t => t && t !== '&nbsp;'),
+      topicsEn: (Array.isArray(st.topicsEn)
+        ? st.topicsEn.map(t => stripHtmlTags(t).trim())
+        : stripHtmlTags(st.topicsEn || '').split(',').map(t => t.trim())
+      ).filter(t => t && t !== '&nbsp;')
+    }));
+
+    const cleanedQuestions = (questions || []).map(q => ({
+      ...q,
+      question: sanitizeQuestionHtml(q.question || ''),
+      questionEn: sanitizeQuestionHtml(q.questionEn || ''),
+      options: (q.options || []).map(opt => cleanOptionText(opt)),
+      optionsEn: (q.optionsEn || []).map(opt => cleanOptionText(opt)),
+      explanation: sanitizeQuestionHtml(q.explanation || ''),
+      explanationEn: sanitizeQuestionHtml(q.explanationEn || '')
+    }));
+
     const newExam = {
       id: `live-exam-${Date.now()}`,
-      title: title.trim(),
-      titleEn: titleEn.trim() || title.trim(),
+      title: cleanTitle,
+      titleEn: stripHtmlTags(titleEn).trim() || cleanTitle,
       startTime: scheduledDateIso,
       scheduledAt: scheduledDateIso,
       duration: parseInt(duration, 10) || 10,
-      totalQuestions: questions.length,
-      subjectTopics,
-      subjects: subjectTopics,
-      questions,
+      totalQuestions: cleanedQuestions.length,
+      subjectTopics: cleanedSubjectTopics,
+      subjects: cleanedSubjectTopics,
+      questions: cleanedQuestions,
       status: 'active',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
