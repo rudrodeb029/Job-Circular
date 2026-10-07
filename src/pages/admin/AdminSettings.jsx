@@ -76,7 +76,7 @@ const AdminSettings = () => {
     setAppInfoSaving(true);
     try {
       await saveAppInfoConfig(appInfo);
-      alert('✅ Contact Us, Rate Us & Share App info saved to Firestore successfully!');
+      alert('✅ App Info, Privacy Policy & Terms links saved to Firestore successfully!');
     } catch (err) {
       alert('❌ Failed to save App Info: ' + err.message);
     } finally {
@@ -312,16 +312,16 @@ const AdminSettings = () => {
           </div>
         </div>
 
-        {/* Contact Us, Rate Us & Share App Admin Configuration Card */}
+        {/* Contact Us, Rate Us, Legal & Share App Admin Configuration Card */}
         <div className="settings-card" style={{ gridColumn: '1 / -1' }}>
           <div className="section-header">
             <div style={{ width: '36px', height: '36px', background: '#e0e7ff', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#4338ca' }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
             </div>
-            <h3>Contact Us, Rate Us & Share App Configuration</h3>
+            <h3>Contact Us, Legal & App Links Configuration</h3>
           </div>
           <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '20px', lineHeight: 1.5 }}>
-            Manage support email, WhatsApp number, Play Store rating link, and Share App URLs displayed across all user devices.
+            Manage support email, WhatsApp number, Play Store rating link, Share App URL, Privacy Policy, and Terms & Conditions external links displayed across user devices.
           </p>
 
           <form onSubmit={handleSaveAppInfo} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
@@ -346,6 +346,16 @@ const AdminSettings = () => {
             </div>
 
             <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>PRIVACY POLICY URL (EXTERNAL)</label>
+              <input className="modern-input" type="url" placeholder="https://live-circulars.web.app/privacy-policy" value={appInfo.privacyPolicyUrl || ''} onChange={e => setAppInfo({ ...appInfo, privacyPolicyUrl: e.target.value })} />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>TERMS & CONDITIONS URL (EXTERNAL)</label>
+              <input className="modern-input" type="url" placeholder="https://live-circulars.web.app/terms-conditions" value={appInfo.termsConditionsUrl || ''} onChange={e => setAppInfo({ ...appInfo, termsConditionsUrl: e.target.value })} />
+            </div>
+
+            <div>
               <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>FACEBOOK PAGE URL</label>
               <input className="modern-input" type="url" placeholder="https://facebook.com/..." value={appInfo.facebookPageUrl || ''} onChange={e => setAppInfo({ ...appInfo, facebookPageUrl: e.target.value })} />
             </div>
@@ -357,7 +367,7 @@ const AdminSettings = () => {
 
             <div style={{ gridColumn: '1 / -1', marginTop: '8px', display: 'flex', gap: '12px' }}>
               <button type="submit" disabled={appInfoSaving} style={{ padding: '14px 28px', background: '#4338ca', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(67, 56, 202, 0.2)' }}>
-                {appInfoSaving ? 'Saving Info...' : '💾 Save Contact, Rate & Share Config'}
+                {appInfoSaving ? 'Saving Info...' : '💾 Save App Info, Legal Links & Settings'}
               </button>
             </div>
           </form>

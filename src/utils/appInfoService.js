@@ -8,7 +8,9 @@ export const DEFAULT_APP_INFO = {
   shareAppUrl: 'https://livecircular.web.app',
   facebookPageUrl: 'https://facebook.com',
   telegramChannelUrl: 'https://t.me',
-  supportHours: 'Sat - Thu: 9:00 AM - 9:00 PM'
+  supportHours: 'Sat - Thu: 9:00 AM - 9:00 PM',
+  privacyPolicyUrl: 'https://live-circulars.web.app/privacy-policy',
+  termsConditionsUrl: 'https://live-circulars.web.app/terms-conditions'
 };
 
 let _appInfoCache = null;

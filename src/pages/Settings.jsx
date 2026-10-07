@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, User, Shield, FileText, Share2, Star, Mail, Info, ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
-
 import { openInAppBrowser } from '../utils/browserUtils';
+import { getAppInfoConfig, DEFAULT_APP_INFO } from '../utils/appInfoService';
 
 const TrashIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -18,6 +18,15 @@ export default function Settings() {
   const navigate = useNavigate();
   const { state } = useAppContext();
   const isEn = state.language === 'en';
+  const [appInfo, setAppInfo] = useState(DEFAULT_APP_INFO);
+
+  useEffect(() => {
+    getAppInfoConfig().then(info => {
+      if (info) setAppInfo(info);
+    }).catch(err => {
+      console.warn('Settings: Failed to load dynamic app info:', err);
+    });
+  }, []);
 
   const items = [
     { 
@@ -29,13 +38,13 @@ export default function Settings() {
     { 
       icon: Shield, 
       label: isEn ? 'Privacy Policy' : 'প্রাইভেসি পলিসি', 
-      externalUrl: 'https://live-circulars.web.app/privacy-policy',
+      externalUrl: appInfo?.privacyPolicyUrl || DEFAULT_APP_INFO.privacyPolicyUrl,
       gradient: 'linear-gradient(135deg, #10b981, #059669)'
     },
     { 
       icon: FileText, 
       label: isEn ? 'Terms & Conditions' : 'শর্তাবলী ও নীতিমালা', 
-      externalUrl: 'https://live-circulars.web.app/terms-conditions',
+      externalUrl: appInfo?.termsConditionsUrl || DEFAULT_APP_INFO.termsConditionsUrl,
       gradient: 'linear-gradient(135deg, #f59e0b, #d97706)'
     },
     { 
