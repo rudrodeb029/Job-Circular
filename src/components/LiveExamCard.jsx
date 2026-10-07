@@ -225,9 +225,7 @@ export default function LiveExamCard({
                   ? rawTopics.map(t => safeStringify(t))
                   : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
 
-                const maxTopics = 2;
-                const displayedTopics = topicsList.length <= maxTopics ? topicsList : topicsList.slice(0, maxTopics);
-                const remainingTopicsCount = topicsList.length - displayedTopics.length;
+                const { visible: displayedTopics, remaining: remainingTopicsCount } = calculateVisibleTopics(topicsList, 130);
 
                 return (
                   <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
@@ -268,7 +266,7 @@ export default function LiveExamCard({
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          maxWidth: remainingTopicsCount > 0 ? '54px' : '72px',
+                          maxWidth: remainingTopicsCount > 0 ? '56px' : '85px',
                           flexShrink: 1
                         }}>
                           {t}
@@ -310,9 +308,7 @@ export default function LiveExamCard({
               ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics)
               : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
             );
-            const maxFallbackTopics = 2;
-            const displayedFallbackTopics = topicsArr.length <= maxFallbackTopics ? topicsArr : topicsArr.slice(0, maxFallbackTopics);
-            const remainingFallbackTopics = topicsArr.length - displayedFallbackTopics.length;
+            const { visible: displayedFallbackTopics, remaining: remainingFallbackTopics } = calculateVisibleTopics(topicsArr, 130);
 
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
@@ -352,7 +348,7 @@ export default function LiveExamCard({
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      maxWidth: remainingFallbackTopics > 0 ? '54px' : '72px',
+                      maxWidth: remainingFallbackTopics > 0 ? '56px' : '85px',
                       flexShrink: 1
                     }}>
                       {t}
@@ -798,4 +794,48 @@ const toBengaliNumber = (num) => {
   const engNum = safeStringify(num);
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
+};
+
+const calculateVisibleTopics = (topicsList, maxLineWidth = 130) => {
+  if (!topicsList || topicsList.length === 0) return { visible: [], remaining: 0 };
+
+  const getPillWidth = (str) => {
+    const s = String(str || '');
+    return 12 + s.length * 4.5;
+  };
+
+  const PLUS_BADGE_WIDTH = 22;
+  const GAP = 3;
+
+  // 1. Check if ALL topics can fit on the line without any '+N' badge
+  let totalAllWidth = 0;
+  for (let i = 0; i < topicsList.length; i++) {
+    totalAllWidth += getPillWidth(topicsList[i]) + (i > 0 ? GAP : 0);
+  }
+  if (totalAllWidth <= maxLineWidth) {
+    return { visible: topicsList, remaining: 0 };
+  }
+
+  // 2. Otherwise fit as many as possible while leaving room for the '+N' badge at the end
+  let currentWidth = 0;
+  const visible = [];
+
+  for (let i = 0; i < topicsList.length; i++) {
+    const pillW = Math.min(getPillWidth(topicsList[i]), 54);
+    const addedWidth = (visible.length > 0 ? GAP : 0) + pillW;
+
+    if (visible.length === 0 || (currentWidth + addedWidth + GAP + PLUS_BADGE_WIDTH <= maxLineWidth)) {
+      visible.push(topicsList[i]);
+      currentWidth += addedWidth;
+    } else {
+      break;
+    }
+  }
+
+  if (visible.length === 0 && topicsList.length > 0) {
+    visible.push(topicsList[0]);
+  }
+
+  const remaining = topicsList.length - visible.length;
+  return { visible, remaining };
 };
