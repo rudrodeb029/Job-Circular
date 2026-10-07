@@ -115,15 +115,23 @@ export default function UserMessages() {
 
   // Toggle Read / Unread Status
   const handleToggleRead = (msg, e) => {
-    if (e) e.stopPropagation();
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    if (!msg) return;
     const newReadState = !msg.read;
     const updatedRaw = {
-      ...msg.raw,
+      ...(msg.raw || msg),
       read: newReadState,
       status: newReadState ? 'read' : 'unread'
     };
 
-    dispatch({ type: 'UPDATE_ACTIVITY', payload: updatedRaw });
+    try {
+      dispatch({ type: 'UPDATE_ACTIVITY', payload: updatedRaw });
+    } catch (err) {
+      console.error('Failed to dispatch UPDATE_ACTIVITY:', err);
+    }
 
     if (selectedMessage && selectedMessage.id === msg.id) {
       setSelectedMessage(prev => prev ? { ...prev, read: newReadState, raw: updatedRaw } : null);
@@ -134,15 +142,20 @@ export default function UserMessages() {
 
   // Open Message Detail Modal (auto-mark as read if unread)
   const handleOpenDetail = (msg) => {
-    setSelectedMessage(msg);
-    if (!msg.read) {
-      const updatedRaw = {
-        ...msg.raw,
-        read: true,
-        status: 'read'
-      };
-      dispatch({ type: 'UPDATE_ACTIVITY', payload: updatedRaw });
-      setSelectedMessage({ ...msg, read: true, raw: updatedRaw });
+    if (!msg) return;
+    const isUnread = !msg.read;
+    const updatedRaw = {
+      ...(msg.raw || msg),
+      read: true,
+      status: 'read'
+    };
+    setSelectedMessage({ ...msg, read: true, raw: updatedRaw });
+    if (isUnread) {
+      try {
+        dispatch({ type: 'UPDATE_ACTIVITY', payload: updatedRaw });
+      } catch (err) {
+        console.error('Failed to dispatch UPDATE_ACTIVITY:', err);
+      }
     }
   };
 
@@ -815,7 +828,7 @@ export default function UserMessages() {
                     gap: '10px',
                     flexShrink: 0
                   }}>
-                    <span style={{ fontSize: '11.5px', color: '#94a3b8', fontWeight: 600, whiteSilkWrapped: 'nowrap' }}>
+                    <span style={{ fontSize: '11.5px', color: '#94a3b8', fontWeight: 600, whiteSpace: 'nowrap' }}>
                       {formatTimeAgo(msg.createdAt)}
                     </span>
 
@@ -1183,3 +1196,4 @@ export default function UserMessages() {
     </div>
   );
 }
+

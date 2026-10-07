@@ -63,7 +63,7 @@ export default function LiveExamCard({
 
       <div>
         {/* Row 1: Badges (Status Pill + Duration Pill) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', position: 'relative', zIndex: 2 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px', marginBottom: '8px', position: 'relative', zIndex: 2 }}>
           {/* Status Badge */}
           {status === 'upcoming' && (
             <span style={{
@@ -151,6 +151,8 @@ export default function LiveExamCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '3px',
           position: 'relative',
           zIndex: 2,
           boxShadow: '0 1px 3px rgba(0,0,0,0.03)'

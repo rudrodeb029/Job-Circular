@@ -8,6 +8,7 @@ import {
   clearCollectionCache,
   onCollectionSnapshot,
   setDocument,
+  updateDocument,
   deleteDocument,
   COLLECTIONS
 } from '../services/supabaseService';
@@ -495,17 +496,33 @@ const adminReducer = (state, action) => {
 
     case 'UPDATE_ACTIVITY': {
       const updatedActivity = action.payload;
-      updateDocument(COLLECTIONS.ACTIVITIES, updatedActivity.id, updatedActivity).catch(console.error);
-      newState.activities = (newState.activities || state.activities || []).map(a => a.id === updatedActivity.id ? { ...a, ...updatedActivity } : a);
-      saveLocalCache(COLLECTIONS.ACTIVITIES, newState.activities);
+      if (updatedActivity && updatedActivity.id) {
+        try {
+          updateDocument(COLLECTIONS.ACTIVITIES, updatedActivity.id, updatedActivity).catch(err => {
+            console.error('Failed to update activity in Supabase:', err);
+          });
+        } catch (err) {
+          console.error('Error triggering updateDocument:', err);
+        }
+        newState.activities = (newState.activities || state.activities || []).map(a => a.id === updatedActivity.id ? { ...a, ...updatedActivity } : a);
+        saveLocalCache(COLLECTIONS.ACTIVITIES, newState.activities);
+      }
       break;
     }
     case 'DELETE_ACTIVITY': {
       const deleteActId = action.payload;
-      registerPendingDelete(deleteActId);
-      deleteDocument(COLLECTIONS.ACTIVITIES, deleteActId).catch(console.error);
-      newState.activities = (newState.activities || state.activities || []).filter(a => a.id !== deleteActId);
-      saveLocalCache(COLLECTIONS.ACTIVITIES, newState.activities);
+      if (deleteActId) {
+        registerPendingDelete(deleteActId);
+        try {
+          deleteDocument(COLLECTIONS.ACTIVITIES, deleteActId).catch(err => {
+            console.error('Failed to delete activity from Supabase:', err);
+          });
+        } catch (err) {
+          console.error('Error triggering deleteDocument:', err);
+        }
+        newState.activities = (newState.activities || state.activities || []).filter(a => a.id !== deleteActId);
+        saveLocalCache(COLLECTIONS.ACTIVITIES, newState.activities);
+      }
       break;
     }
 

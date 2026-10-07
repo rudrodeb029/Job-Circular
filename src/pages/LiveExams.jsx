@@ -311,11 +311,11 @@ export default function LiveExams() {
               </div>
             )}
 
-            {/* Exams List: 2-Column Cards Grid */}
+            {/* Exams List: 2-Column Cards Grid for History (matching Questions cards) */}
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '16px',
+              display: (isTabLoading || filteredExams.length === 0) ? 'flex' : 'grid',
+              gridTemplateColumns: activeTab === 'history' ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: activeTab === 'history' ? '12px' : '16px',
               minHeight: 'calc(100vh - 240px)'
             }}>
               {isTabLoading && (

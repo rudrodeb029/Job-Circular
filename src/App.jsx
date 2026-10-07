@@ -298,22 +298,24 @@ function App() {
   // Admin routes don't use the mobile container
   if (isAdminRoute) {
     return (
-      <Routes location={location}>
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="jobs" element={<ManageJobs />} />
-          <Route path="live-exams" element={<ManageLiveExams />} />
-          <Route path="questions" element={<ManageQuestions />} />
-          <Route path="notifications" element={<ManageNotifications />} />
-          <Route path="messages" element={<UserMessages />} />
-          <Route path="stats" element={<Statistics />} />
-          <Route path="reports" element={<Reports />} />
-          <Route path="settings" element={<AdminSettings />} />
-          <Route path="ai-manager" element={<AiManager />} />
-          <Route path="feed" element={<ManageFeed />} />
-        </Route>
-      </Routes>
+      <ErrorBoundary>
+        <Routes location={location}>
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="jobs" element={<ManageJobs />} />
+            <Route path="live-exams" element={<ManageLiveExams />} />
+            <Route path="questions" element={<ManageQuestions />} />
+            <Route path="notifications" element={<ManageNotifications />} />
+            <Route path="messages" element={<UserMessages />} />
+            <Route path="stats" element={<Statistics />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<AdminSettings />} />
+            <Route path="ai-manager" element={<AiManager />} />
+            <Route path="feed" element={<ManageFeed />} />
+          </Route>
+        </Routes>
+      </ErrorBoundary>
     )
   }
 
