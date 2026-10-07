@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 
 /**
  * 1:1 Pixel-Perfect Live Exam & History Card Component
@@ -19,6 +20,8 @@ export default function LiveExamCard({
   isEn = false
 }) {
   if (!exam) return null;
+
+  const [showSyllabusModal, setShowSyllabusModal] = useState(false);
 
   const title = isEn ? (exam.titleEn || exam.title) : exam.title;
   const durationText = isEn ? `${exam.duration || 10} Mins` : `${toBengaliNumber(exam.duration || 10)} মিনিট`;
@@ -192,18 +195,23 @@ export default function LiveExamCard({
         </h3>
 
         {/* Subjects & Topics Container */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.65)',
-          border: '1px solid rgba(255, 255, 255, 0.9)',
-          borderRadius: '8px',
-          padding: '5px 6px',
-          marginBottom: '8px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '4px',
-          position: 'relative',
-          zIndex: 2
-        }}>
+        <div
+          onClick={() => setShowSyllabusModal(true)}
+          style={{
+            background: 'rgba(255, 255, 255, 0.65)',
+            border: '1px solid rgba(255, 255, 255, 0.9)',
+            borderRadius: '8px',
+            padding: '5px 6px',
+            marginBottom: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '4px',
+            position: 'relative',
+            zIndex: 2,
+            cursor: 'pointer'
+          }}
+          title={isEn ? "Tap to view full syllabus" : "সিলেবাস দেখতে ট্যাপ করুন"}
+        >
           {(() => {
             const activeSubjectTopics = (exam.subjectTopics && exam.subjectTopics.length > 0)
               ? exam.subjectTopics
@@ -256,16 +264,25 @@ export default function LiveExamCard({
                             </span>
                           ))}
                           {remainingTopicsCount > 0 && (
-                            <span style={{
-                              fontSize: '7.5px',
-                              fontWeight: 800,
-                              background: '#eff6ff',
-                              border: '1px solid #bfdbfe',
-                              color: '#2563eb',
-                              padding: '1.5px 4px',
-                              borderRadius: '4px',
-                              whiteSpace: 'nowrap'
-                            }}>
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowSyllabusModal(true);
+                              }}
+                              style={{
+                                fontSize: '7.5px',
+                                fontWeight: 800,
+                                background: '#eff6ff',
+                                border: '1px solid #bfdbfe',
+                                color: '#2563eb',
+                                padding: '1.5px 5px',
+                                borderRadius: '4px',
+                                whiteSpace: 'nowrap',
+                                cursor: 'pointer',
+                                boxShadow: '0 1px 3px rgba(37,99,235,0.1)'
+                              }}
+                              title={isEn ? "View all topics" : "সকল টপিক দেখুন"}
+                            >
                               +{remainingTopicsCount}
                             </span>
                           )}
@@ -274,14 +291,31 @@ export default function LiveExamCard({
                     );
                   })}
                   {remainingSubjectsCount > 0 && (
-                    <span style={{
-                      fontSize: '7.5px',
-                      color: '#64748b',
-                      fontWeight: 700,
-                      paddingLeft: '4px'
-                    }}>
-                      +{remainingSubjectsCount} {isEn ? 'more subject' : 'টি বিষয়'}
-                    </span>
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSyllabusModal(true);
+                      }}
+                      style={{
+                        fontSize: '7.5px',
+                        color: '#2563eb',
+                        fontWeight: 800,
+                        padding: '2px 6px',
+                        background: 'rgba(37, 99, 235, 0.08)',
+                        borderRadius: '6px',
+                        border: '0.5px solid rgba(37, 99, 235, 0.25)',
+                        width: 'fit-content',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '3px',
+                        marginTop: '1px'
+                      }}
+                      title={isEn ? "View full syllabus" : "সম্পূর্ণ সিলেবাস দেখুন"}
+                    >
+                      <span>+{remainingSubjectsCount} {isEn ? 'more subject' : 'টি বিষয়'}</span>
+                      <span style={{ fontSize: '7px' }}>↗</span>
+                    </div>
                   )}
                 </>
               );
@@ -327,16 +361,25 @@ export default function LiveExamCard({
                     </span>
                   ))}
                   {remainingFallbackTopics > 0 && (
-                    <span style={{
-                      fontSize: '7.5px',
-                      fontWeight: 800,
-                      background: '#eff6ff',
-                      border: '1px solid #bfdbfe',
-                      color: '#2563eb',
-                      padding: '1.5px 4px',
-                      borderRadius: '4px',
-                      whiteSpace: 'nowrap'
-                    }}>
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowSyllabusModal(true);
+                      }}
+                      style={{
+                        fontSize: '7.5px',
+                        fontWeight: 800,
+                        background: '#eff6ff',
+                        border: '1px solid #bfdbfe',
+                        color: '#2563eb',
+                        padding: '1.5px 5px',
+                        borderRadius: '4px',
+                        whiteSpace: 'nowrap',
+                        cursor: 'pointer',
+                        boxShadow: '0 1px 3px rgba(37,99,235,0.1)'
+                      }}
+                      title={isEn ? "View all topics" : "সকল টপিক দেখুন"}
+                    >
                       +{remainingFallbackTopics}
                     </span>
                   )}
@@ -443,6 +486,298 @@ export default function LiveExamCard({
           </button>
         )}
       </div>
+
+      {/* Complete Exam Syllabus / Subjects Modal */}
+      {showSyllabusModal && typeof document !== 'undefined' && createPortal(
+        <div
+          onClick={() => setShowSyllabusModal(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(5px)',
+            WebkitBackdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10000,
+            padding: '16px',
+            boxSizing: 'border-box'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'var(--white, #ffffff)',
+              color: 'var(--text-primary, #0f172a)',
+              borderRadius: '20px',
+              width: '100%',
+              maxWidth: '380px',
+              maxHeight: '82vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 20px 30px -10px rgba(0, 0, 0, 0.25)',
+              border: '1px solid var(--border, #e2e8f0)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div style={{
+              padding: '14px 16px',
+              borderBottom: '1px solid var(--border-light, #f1f5f9)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '10px',
+                  background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '18px',
+                  color: '#ffffff',
+                  boxShadow: '0 4px 10px rgba(37, 99, 235, 0.25)'
+                }}>
+                  📚
+                </div>
+                <div>
+                  <h3 style={{
+                    margin: 0,
+                    fontSize: '14px',
+                    fontWeight: 800,
+                    color: '#0f172a',
+                    lineHeight: 1.25,
+                    fontFamily: '"Hind Siliguri", "Poppins", sans-serif'
+                  }}>
+                    {title}
+                  </h3>
+                  <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 700 }}>
+                    {isEn ? 'Exam Syllabus & Topics' : 'সিলেবাস ও বিষয়ভিত্তিক টপিক'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setShowSyllabusModal(false)}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid rgba(203, 213, 225, 0.8)',
+                  borderRadius: '50%',
+                  width: '30px',
+                  height: '30px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: '#64748b',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div style={{
+              padding: '16px',
+              overflowY: 'auto',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+              flex: 1
+            }}>
+              {(() => {
+                const activeSubjectTopics = (exam.subjectTopics && exam.subjectTopics.length > 0)
+                  ? exam.subjectTopics
+                  : (Array.isArray(exam.subjects) && exam.subjects.length > 0 ? exam.subjects : null);
+
+                if (activeSubjectTopics) {
+                  return activeSubjectTopics.map((st, idx) => {
+                    const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
+                    const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
+                    const topicsList = Array.isArray(rawTopics)
+                      ? rawTopics.map(t => safeStringify(t))
+                      : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
+
+                    return (
+                      <div
+                        key={idx}
+                        style={{
+                          background: 'var(--bg-secondary, #f8fafc)',
+                          border: '1px solid var(--border, #e2e8f0)',
+                          borderRadius: '12px',
+                          padding: '10px 12px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '8px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <span style={{
+                            fontSize: '12px',
+                            color: '#2563eb',
+                            fontWeight: 800,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.3px',
+                            borderLeft: '3px solid #2563eb',
+                            paddingLeft: '6px'
+                          }}>
+                            {subjText}
+                          </span>
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: 700,
+                            color: '#64748b',
+                            background: 'rgba(100, 116, 139, 0.1)',
+                            padding: '2px 7px',
+                            borderRadius: '10px'
+                          }}>
+                            {topicsList.length} {isEn ? 'topics' : 'টি টপিক'}
+                          </span>
+                        </div>
+
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                          {topicsList.map((t, tIdx) => (
+                            <span
+                              key={tIdx}
+                              style={{
+                                fontSize: '11px',
+                                fontWeight: 600,
+                                background: 'var(--white, #ffffff)',
+                                border: '1px solid var(--border-light, #e2e8f0)',
+                                color: 'var(--text-primary, #1e293b)',
+                                padding: '4px 10px',
+                                borderRadius: '6px',
+                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                              }}
+                            >
+                              {t}
+                            </span>
+                          ))}
+                          {topicsList.length === 0 && (
+                            <span style={{ fontSize: '11px', color: '#94a3b8', fontStyle: 'italic' }}>
+                              {isEn ? 'No topics specified' : 'কোনো টপিক নেই'}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  });
+                }
+
+                // Default Subject Fallback
+                const subjName = safeStringify(isEn ? (exam.subjectsEn || exam.subjects || 'General') : (exam.subjects || 'BCS EXAM'));
+                const topicsArr = (Array.isArray(isEn ? (exam.topicsEn || exam.topics) : exam.topics)
+                  ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics)
+                  : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
+                );
+
+                return (
+                  <div
+                    style={{
+                      background: 'var(--bg-secondary, #f8fafc)',
+                      border: '1px solid var(--border, #e2e8f0)',
+                      borderRadius: '12px',
+                      padding: '10px 12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <span style={{
+                        fontSize: '12px',
+                        color: '#2563eb',
+                        fontWeight: 800,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.3px',
+                        borderLeft: '3px solid #2563eb',
+                        paddingLeft: '6px'
+                      }}>
+                        {subjName}
+                      </span>
+                      <span style={{
+                        fontSize: '10px',
+                        fontWeight: 700,
+                        color: '#64748b',
+                        background: 'rgba(100, 116, 139, 0.1)',
+                        padding: '2px 7px',
+                        borderRadius: '10px'
+                      }}>
+                        {topicsArr.length} {isEn ? 'topics' : 'টি টপিক'}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {topicsArr.map((t, idx) => (
+                        <span
+                          key={idx}
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 600,
+                            background: 'var(--white, #ffffff)',
+                            border: '1px solid var(--border-light, #e2e8f0)',
+                            color: 'var(--text-primary, #1e293b)',
+                            padding: '4px 10px',
+                            borderRadius: '6px',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                          }}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{
+              padding: '12px 16px',
+              borderTop: '1px solid var(--border-light, #f1f5f9)',
+              background: 'var(--bg-secondary, #f8fafc)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between'
+            }}>
+              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                ⏱️ {durationText}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowSyllabusModal(false)}
+                style={{
+                  background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  padding: '7px 20px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 8px rgba(37, 99, 235, 0.3)'
+                }}
+              >
+                {isEn ? 'Close' : 'ঠিক আছে'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }
