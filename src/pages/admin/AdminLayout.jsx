@@ -34,6 +34,11 @@ const AdminLayout = () => {
   const notifications = adminState.notifications || [];
   const unreadNotifications = notifications.filter(n => !n.read).length;
 
+  const activities = adminState.activities || [];
+  const unreadMessagesCount = activities.filter(a => 
+    (a.type === 'contact_message' || a.action === 'Support Message Received' || (a.subject && a.message)) && !a.read
+  ).length;
+
   const getPageTitle = () => {
     const path = location.pathname;
     if (path === '/admin') return 'Dashboard';
@@ -43,6 +48,7 @@ const AdminLayout = () => {
     if (path.includes('/admin/live-exams')) return 'Manage Live Exams';
     if (path.includes('/admin/questions')) return 'Manage Questions';
     if (path.includes('/admin/notifications')) return 'Notifications';
+    if (path.includes('/admin/messages')) return 'User Messages';
     if (path.includes('/admin/stats')) return 'Statistics';
     if (path.includes('/admin/reports')) return 'Reports';
     if (path.includes('/admin/settings')) return 'Settings';
@@ -98,6 +104,11 @@ const AdminLayout = () => {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        )},
+        { name: 'User Messages', path: '/admin/messages', exact: false, badge: unreadMessagesCount, icon: (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
         )}
       ]
@@ -242,6 +253,22 @@ const AdminLayout = () => {
                         {React.cloneElement(item.icon, { width: 16, height: 16 })}
                       </span>
                       <span style={{ fontSize: '12px' }}>{item.name}</span>
+                      {item.badge !== undefined && item.badge > 0 && (
+                        <span style={{
+                          marginLeft: 'auto',
+                          background: '#ef4444',
+                          color: '#ffffff',
+                          fontSize: '10px',
+                          fontWeight: 700,
+                          borderRadius: '999px',
+                          padding: '1px 6px',
+                          lineHeight: '14px',
+                          minWidth: '16px',
+                          textAlign: 'center'
+                        }}>
+                          {item.badge}
+                        </span>
+                      )}
                     </div>
                   );
                 })}

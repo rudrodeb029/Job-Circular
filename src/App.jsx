@@ -64,6 +64,7 @@ import Reports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/AdminSettings'
 import AiManager from './pages/admin/AiManager'
 import ManageFeed from './pages/admin/ManageFeed'
+import UserMessages from './pages/admin/UserMessages'
 import PageTransition, { useNavigationTracker } from './components/NavigationTransition'
 import { GlobalLoaderProvider } from './context/GlobalLoaderContext'
 
@@ -305,6 +306,7 @@ function App() {
           <Route path="live-exams" element={<ManageLiveExams />} />
           <Route path="questions" element={<ManageQuestions />} />
           <Route path="notifications" element={<ManageNotifications />} />
+          <Route path="messages" element={<UserMessages />} />
           <Route path="stats" element={<Statistics />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<AdminSettings />} />

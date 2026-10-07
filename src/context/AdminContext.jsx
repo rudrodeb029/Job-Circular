@@ -493,6 +493,22 @@ const adminReducer = (state, action) => {
       break;
     }
 
+    case 'UPDATE_ACTIVITY': {
+      const updatedActivity = action.payload;
+      updateDocument(COLLECTIONS.ACTIVITIES, updatedActivity.id, updatedActivity).catch(console.error);
+      newState.activities = (newState.activities || state.activities || []).map(a => a.id === updatedActivity.id ? { ...a, ...updatedActivity } : a);
+      saveLocalCache(COLLECTIONS.ACTIVITIES, newState.activities);
+      break;
+    }
+    case 'DELETE_ACTIVITY': {
+      const deleteActId = action.payload;
+      registerPendingDelete(deleteActId);
+      deleteDocument(COLLECTIONS.ACTIVITIES, deleteActId).catch(console.error);
+      newState.activities = (newState.activities || state.activities || []).filter(a => a.id !== deleteActId);
+      saveLocalCache(COLLECTIONS.ACTIVITIES, newState.activities);
+      break;
+    }
+
     case 'ADMIN_LOGIN':
       localStorage.setItem('admin_user', JSON.stringify(action.payload));
       return { ...state, adminUser: action.payload };

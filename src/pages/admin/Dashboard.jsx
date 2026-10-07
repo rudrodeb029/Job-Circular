@@ -46,6 +46,11 @@ const Dashboard = () => {
     return sum + (isNaN(qCount) ? 0 : qCount);
   }, 0);
 
+  const userMessages = activities.filter(a => 
+    a && (a.type === 'contact_message' || a.action === 'Support Message Received' || (a.subject && a.message))
+  );
+  const unreadMessages = userMessages.filter(m => !m.read).length;
+
   const catList = ['gov', 'bank', 'ngo', 'private', 'it', 'defense', 'healthcare', 'teaching', 'engineering', 'parttime'];
   const categoryCounts = catList.map(catId => {
     const count = jobs.filter(j => (j.categoryId || j.category) === catId).length;
@@ -112,15 +117,22 @@ const Dashboard = () => {
       {/* STATS GRID */}
       <div className="stats-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '16px' }}>
         {[
-          { label: 'Total Circulars', val: totalCirculars },
-          { label: 'Active Jobs', val: activeJobs },
-          { label: 'Expired', val: expiredJobs },
-          { label: 'Active Live Exam', val: activeLiveExams },
-          { label: 'Total MCQ', val: totalMCQs }
+          { label: 'Total Circulars', val: formatNumber(totalCirculars) },
+          { label: 'Active Jobs', val: formatNumber(activeJobs) },
+          { label: 'Expired', val: formatNumber(expiredJobs) },
+          { label: 'Active Live Exam', val: formatNumber(activeLiveExams) },
+          { label: 'Total MCQ', val: formatNumber(totalMCQs) },
+          { 
+            label: 'User Inquiries', 
+            val: unreadMessages > 0 ? `${unreadMessages} new` : formatNumber(userMessages.length), 
+            highlight: unreadMessages > 0, 
+            link: '/admin/messages' 
+          }
         ].map((stat, i) => (
           <div
             key={i}
             className="stat-card animate-card stat-card-hover"
+            onClick={() => stat.link && navigate(stat.link)}
             style={{
               padding: '12px 14px',
               background: '#ffffff',
@@ -131,12 +143,18 @@ const Dashboard = () => {
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              border: '1px solid #e2e8f0'
+              border: stat.highlight ? '1px solid #fca5a5' : '1px solid #e2e8f0',
+              borderLeft: stat.highlight ? '4px solid #ef4444' : '1px solid #e2e8f0',
+              cursor: stat.link ? 'pointer' : 'default'
             }}
           >
             <div>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{stat.label}</p>
-              <h3 style={{ margin: '2px 0 0 0', fontSize: '20px', color: '#0f172a', fontWeight: 800 }}>{formatNumber(stat.val)}</h3>
+              <p style={{ color: stat.highlight ? '#b91c1c' : '#64748b', margin: 0, fontSize: '10.5px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                {stat.label}
+              </p>
+              <h3 style={{ margin: '2px 0 0 0', fontSize: '20px', color: stat.highlight ? '#ef4444' : '#0f172a', fontWeight: 800 }}>
+                {stat.val}
+              </h3>
             </div>
           </div>
         ))}

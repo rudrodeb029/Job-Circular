@@ -32,18 +32,26 @@ export default function ContactUs() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.subject?.trim() || !formData.message?.trim()) {
+      alert(isEn ? 'Please fill in both Subject and Message.' : 'দয়া করে বিষয় এবং বার্তা লিখুন।');
+      return;
+    }
     setSubmitting(true);
 
     try {
-      // Write user feedback message to Firestore 'activities' or 'feedback' collection
+      const msgId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 7)}`;
+      // Write user feedback message to Firestore 'activities' collection
       await addDocument(COLLECTIONS.ACTIVITIES, {
+        id: msgId,
         type: 'contact_message',
         action: 'Support Message Received',
-        userName: formData.name || 'Anonymous User',
-        description: `Subject: ${formData.subject}. Message: ${formData.message}`,
-        email: formData.email || 'N/A',
-        subject: formData.subject,
-        message: formData.message,
+        userName: formData.name?.trim() || (isEn ? 'Anonymous User' : 'নামহীন ব্যবহারকারী'),
+        description: `Subject: ${formData.subject.trim()}. Message: ${formData.message.trim()}`,
+        email: formData.email?.trim() || 'N/A',
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
+        read: false,
+        status: 'unread',
         createdAt: new Date().toISOString()
       });
       setSubmitted(true);
