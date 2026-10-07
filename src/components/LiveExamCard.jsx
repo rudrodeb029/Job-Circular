@@ -259,18 +259,18 @@ export default function LiveExamCard({
                     }}>
                       {displayedTopics.map((t, tIdx) => (
                         <span key={tIdx} style={{
-                          fontSize: '8px',
+                          fontSize: '7px',
                           fontWeight: 700,
                           background: '#ffffff',
                           border: '1px solid rgba(226, 232, 240, 0.8)',
                           color: '#1e293b',
-                          padding: '1.5px 5px',
-                          borderRadius: '4px',
+                          padding: '1px 4.5px',
+                          borderRadius: '3px',
                           boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          maxWidth: remainingTopicsCount > 0 ? '56px' : '85px',
+                          maxWidth: remainingTopicsCount > 0 ? '52px' : '80px',
                           flexShrink: 1
                         }}>
                           {t}
@@ -283,13 +283,13 @@ export default function LiveExamCard({
                             setShowSyllabusModal(true);
                           }}
                           style={{
-                            fontSize: '7.5px',
+                            fontSize: '6.8px',
                             fontWeight: 800,
                             background: '#eff6ff',
                             border: '1px solid #bfdbfe',
                             color: '#2563eb',
-                            padding: '1.5px 5px',
-                            borderRadius: '4px',
+                            padding: '1px 4px',
+                            borderRadius: '3px',
                             whiteSpace: 'nowrap',
                             cursor: 'pointer',
                             boxShadow: '0 1px 3px rgba(37,99,235,0.1)',
@@ -343,18 +343,18 @@ export default function LiveExamCard({
                 }}>
                   {displayedFallbackTopics.map((t, idx) => (
                     <span key={idx} style={{
-                      fontSize: '8px',
+                      fontSize: '7px',
                       fontWeight: 700,
                       background: '#ffffff',
                       border: '1px solid rgba(226, 232, 240, 0.8)',
                       color: '#1e293b',
-                      padding: '1.5px 5px',
-                      borderRadius: '4px',
+                      padding: '1px 4.5px',
+                      borderRadius: '3px',
                       boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      maxWidth: remainingFallbackTopics > 0 ? '56px' : '85px',
+                      maxWidth: remainingFallbackTopics > 0 ? '52px' : '80px',
                       flexShrink: 1
                     }}>
                       {t}
@@ -367,13 +367,13 @@ export default function LiveExamCard({
                         setShowSyllabusModal(true);
                       }}
                       style={{
-                        fontSize: '7.5px',
+                        fontSize: '6.8px',
                         fontWeight: 800,
                         background: '#eff6ff',
                         border: '1px solid #bfdbfe',
                         color: '#2563eb',
-                        padding: '1.5px 5px',
-                        borderRadius: '4px',
+                        padding: '1px 4px',
+                        borderRadius: '3px',
                         whiteSpace: 'nowrap',
                         cursor: 'pointer',
                         boxShadow: '0 1px 3px rgba(37,99,235,0.1)',
@@ -807,16 +807,16 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-const calculateVisibleTopics = (topicsList, maxLineWidth = 130) => {
+const calculateVisibleTopics = (topicsList, maxLineWidth = 132) => {
   if (!topicsList || topicsList.length === 0) return { visible: [], remaining: 0 };
 
   const getPillWidth = (str) => {
     const s = String(str || '');
-    return 12 + s.length * 4.5;
+    return 10 + s.length * 3.8;
   };
 
-  const PLUS_BADGE_WIDTH = 22;
-  const GAP = 3;
+  const PLUS_BADGE_WIDTH = 20;
+  const GAP = 2.5;
 
   // 1. Check if ALL topics can fit on the line without any '+N' badge
   let totalAllWidth = 0;
@@ -832,7 +832,7 @@ const calculateVisibleTopics = (topicsList, maxLineWidth = 130) => {
   const visible = [];
 
   for (let i = 0; i < topicsList.length; i++) {
-    const pillW = Math.min(getPillWidth(topicsList[i]), 54);
+    const pillW = Math.min(getPillWidth(topicsList[i]), 50);
     const addedWidth = (visible.length > 0 ? GAP : 0) + pillW;
 
     if (visible.length === 0 || (currentWidth + addedWidth + GAP + PLUS_BADGE_WIDTH <= maxLineWidth)) {
