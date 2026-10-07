@@ -218,107 +218,90 @@ export default function LiveExamCard({
               : (Array.isArray(exam.subjects) && exam.subjects.length > 0 ? exam.subjects : null);
 
             if (activeSubjectTopics) {
-              const displayedSubjects = activeSubjectTopics.slice(0, 2);
-              const remainingSubjectsCount = activeSubjectTopics.length - displayedSubjects.length;
+              return activeSubjectTopics.map((st, idx) => {
+                const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
+                const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
+                const topicsList = Array.isArray(rawTopics)
+                  ? rawTopics.map(t => safeStringify(t))
+                  : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
 
-              return (
-                <>
-                  {displayedSubjects.map((st, idx) => {
-                    const subjText = safeStringify(isEn ? (st.subjectEn || st.subject) : st.subject, 'General');
-                    const rawTopics = isEn ? (st.topicsEn || st.topics) : st.topics;
-                    const topicsList = Array.isArray(rawTopics)
-                      ? rawTopics.map(t => safeStringify(t))
-                      : safeStringify(rawTopics).split(',').map(t => t.trim()).filter(Boolean);
+                const maxTopics = 2;
+                const displayedTopics = topicsList.length <= maxTopics ? topicsList : topicsList.slice(0, maxTopics);
+                const remainingTopicsCount = topicsList.length - displayedTopics.length;
 
-                    const displayedTopics = topicsList.slice(0, 3);
-                    const remainingTopicsCount = topicsList.length - displayedTopics.length;
-
-                    return (
-                      <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                        <span style={{
-                          fontSize: '8.5px',
-                          color: '#2563eb',
-                          fontWeight: 800,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.2px',
-                          borderLeft: '2px solid #2563eb',
-                          paddingLeft: '4px',
-                          lineHeight: '1.2'
+                return (
+                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
+                    <span style={{
+                      fontSize: '8.5px',
+                      color: '#2563eb',
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.2px',
+                      borderLeft: '2px solid #2563eb',
+                      paddingLeft: '4px',
+                      lineHeight: '1.2',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {subjText}
+                    </span>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'nowrap',
+                      gap: '3px',
+                      paddingLeft: '1px',
+                      width: '100%',
+                      overflow: 'hidden'
+                    }}>
+                      {displayedTopics.map((t, tIdx) => (
+                        <span key={tIdx} style={{
+                          fontSize: '8px',
+                          fontWeight: 700,
+                          background: '#ffffff',
+                          border: '1px solid rgba(226, 232, 240, 0.8)',
+                          color: '#1e293b',
+                          padding: '1.5px 5px',
+                          borderRadius: '4px',
+                          boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: remainingTopicsCount > 0 ? '54px' : '72px',
+                          flexShrink: 1
                         }}>
-                          {subjText}
+                          {t}
                         </span>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', paddingLeft: '1px' }}>
-                          {displayedTopics.map((t, tIdx) => (
-                            <span key={tIdx} style={{
-                              fontSize: '8px',
-                              fontWeight: 700,
-                              background: '#ffffff',
-                              border: '1px solid rgba(226, 232, 240, 0.8)',
-                              color: '#1e293b',
-                              padding: '1.5px 5px',
-                              borderRadius: '4px',
-                              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {t}
-                            </span>
-                          ))}
-                          {remainingTopicsCount > 0 && (
-                            <span
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setShowSyllabusModal(true);
-                              }}
-                              style={{
-                                fontSize: '7.5px',
-                                fontWeight: 800,
-                                background: '#eff6ff',
-                                border: '1px solid #bfdbfe',
-                                color: '#2563eb',
-                                padding: '1.5px 5px',
-                                borderRadius: '4px',
-                                whiteSpace: 'nowrap',
-                                cursor: 'pointer',
-                                boxShadow: '0 1px 3px rgba(37,99,235,0.1)'
-                              }}
-                              title={isEn ? "View all topics" : "সকল টপিক দেখুন"}
-                            >
-                              +{remainingTopicsCount}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {remainingSubjectsCount > 0 && (
-                    <div
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowSyllabusModal(true);
-                      }}
-                      style={{
-                        fontSize: '7.5px',
-                        color: '#2563eb',
-                        fontWeight: 800,
-                        padding: '2px 6px',
-                        background: 'rgba(37, 99, 235, 0.08)',
-                        borderRadius: '6px',
-                        border: '0.5px solid rgba(37, 99, 235, 0.25)',
-                        width: 'fit-content',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '3px',
-                        marginTop: '1px'
-                      }}
-                      title={isEn ? "View full syllabus" : "সম্পূর্ণ সিলেবাস দেখুন"}
-                    >
-                      <span>+{remainingSubjectsCount} {isEn ? 'more subject' : 'টি বিষয়'}</span>
-                      <span style={{ fontSize: '7px' }}>↗</span>
+                      ))}
+                      {remainingTopicsCount > 0 && (
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowSyllabusModal(true);
+                          }}
+                          style={{
+                            fontSize: '7.5px',
+                            fontWeight: 800,
+                            background: '#eff6ff',
+                            border: '1px solid #bfdbfe',
+                            color: '#2563eb',
+                            padding: '1.5px 5px',
+                            borderRadius: '4px',
+                            whiteSpace: 'nowrap',
+                            cursor: 'pointer',
+                            boxShadow: '0 1px 3px rgba(37,99,235,0.1)',
+                            flexShrink: 0
+                          }}
+                          title={isEn ? "View all topics" : "সকল টপিক দেখুন"}
+                        >
+                          +{remainingTopicsCount}
+                        </span>
+                      )}
                     </div>
-                  )}
-                </>
-              );
+                  </div>
+                );
+              });
             }
 
             // Default Subjects Fallback
@@ -327,11 +310,12 @@ export default function LiveExamCard({
               ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics)
               : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(t => t.trim()).filter(Boolean)
             );
-            const displayedFallbackTopics = topicsArr.slice(0, 3);
+            const maxFallbackTopics = 2;
+            const displayedFallbackTopics = topicsArr.length <= maxFallbackTopics ? topicsArr : topicsArr.slice(0, maxFallbackTopics);
             const remainingFallbackTopics = topicsArr.length - displayedFallbackTopics.length;
 
             return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
                 <span style={{
                   fontSize: '8.5px',
                   color: '#2563eb',
@@ -340,11 +324,21 @@ export default function LiveExamCard({
                   letterSpacing: '0.2px',
                   borderLeft: '2px solid #2563eb',
                   paddingLeft: '4px',
-                  lineHeight: '1.2'
+                  lineHeight: '1.2',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
                 }}>
                   {subjName}
                 </span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'nowrap',
+                  gap: '3px',
+                  width: '100%',
+                  overflow: 'hidden'
+                }}>
                   {displayedFallbackTopics.map((t, idx) => (
                     <span key={idx} style={{
                       fontSize: '8px',
@@ -355,7 +349,11 @@ export default function LiveExamCard({
                       padding: '1.5px 5px',
                       borderRadius: '4px',
                       boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
-                      whiteSpace: 'nowrap'
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxWidth: remainingFallbackTopics > 0 ? '54px' : '72px',
+                      flexShrink: 1
                     }}>
                       {t}
                     </span>
@@ -376,7 +374,8 @@ export default function LiveExamCard({
                         borderRadius: '4px',
                         whiteSpace: 'nowrap',
                         cursor: 'pointer',
-                        boxShadow: '0 1px 3px rgba(37,99,235,0.1)'
+                        boxShadow: '0 1px 3px rgba(37,99,235,0.1)',
+                        flexShrink: 0
                       }}
                       title={isEn ? "View all topics" : "সকল টপিক দেখুন"}
                     >
