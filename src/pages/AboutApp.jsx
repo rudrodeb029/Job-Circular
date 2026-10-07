@@ -164,7 +164,7 @@ export default function AboutApp() {
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--white)', border: '1px solid var(--border)', padding: '4px 12px', borderRadius: '30px', marginTop: '8px' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
             <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-secondary)' }}>
-              {isEn ? 'Version 1.0.9' : 'ভার্সন ১.০.৯'}
+              {isEn ? 'Version 1.0.0' : 'ভার্সন ১.০.০'}
             </span>
           </div>
 
