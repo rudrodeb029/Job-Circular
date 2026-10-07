@@ -311,56 +311,73 @@ export default function LiveExams() {
               </div>
             )}
 
-            {/* Exams List: 2-Column Cards Grid (matching Questions cards) */}
-            <div style={{
-              display: (isTabLoading || filteredExams.length === 0) ? 'flex' : 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '12px',
-              minHeight: 'calc(100vh - 240px)'
-            }}>
-              {isTabLoading && (
-                <div style={{ padding: '60px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', gridColumn: '1 / -1' }}>
-                  <ModernLoader size="md" icon={activeTab === 'live' ? '⏱️' : '📜'} />
-                </div>
-              )}
+            {/* Exams Content Area */}
+            {isTabLoading ? (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                minHeight: '280px',
+                padding: '60px 0',
+                boxSizing: 'border-box'
+              }}>
+                <ModernLoader size="md" icon={activeTab === 'live' ? '⏱️' : '📜'} />
+              </div>
+            ) : filteredExams.length === 0 ? (
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                minHeight: '240px',
+                textAlign: 'center',
+                padding: '50px 20px',
+                color: 'var(--text-muted)',
+                boxSizing: 'border-box'
+              }}>
+                <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
+                <p style={{ fontSize: '14px', fontWeight: 600 }}>
+                  {activeTab === 'live'
+                    ? (isEn ? 'No live or upcoming exams' : 'কোনো লাইভ বা আসন্ন পরীক্ষা নেই')
+                    : (isEn ? 'No exam history found' : 'কোনো পরীক্ষার ইতিহাস পাওয়া যায়নি')}
+                </p>
+              </div>
+            ) : (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '12px',
+                minHeight: 'calc(100vh - 280px)'
+              }}>
+                {filteredExams.map(exam => {
+                  const status = getExamStatus(exam);
+                  const startMs = parseExamDate(exam.scheduledAt) || parseExamDate(exam.startTime) || parseExamDate(exam.createdAt) || Date.now();
+                  const result = getExamResult(exam.id);
+                  const isRegistered = !!registrations[exam.id];
+                  const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
 
-              {!isTabLoading && filteredExams.map(exam => {
-                const status = getExamStatus(exam);
-                const startMs = parseExamDate(exam.scheduledAt) || parseExamDate(exam.startTime) || parseExamDate(exam.createdAt) || Date.now();
-                const result = getExamResult(exam.id);
-                const isRegistered = !!registrations[exam.id];
-                const durationMins = typeof exam.duration === 'number' ? exam.duration : (parseInt(exam.duration) || 60);
-
-                return (
-                  <LiveExamCard
-                    key={exam.id}
-                    exam={exam}
-                    status={status}
-                    startMs={startMs}
-                    countdownStr={status === 'running' 
-                      ? getCountdownString(startMs + durationMins * 60 * 1000)
-                      : getCountdownString(startMs)}
-                    isRegistered={isRegistered}
-                    result={result}
-                    isEn={isEn}
-                    onRegister={handleRegister}
-                    onEnter={(id) => navigate(`/live-exam-room/${id}`)}
-                    onViewResult={(id) => navigate(`/live-exam-room/${id}`)}
-                  />
-                );
-              })}
-
-              {!isTabLoading && filteredExams.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-                  <span style={{ fontSize: '48px', display: 'block', marginBottom: '12px' }}>📅</span>
-                  <p style={{ fontSize: '14px', fontWeight: 600 }}>
-                    {activeTab === 'live'
-                      ? (isEn ? 'No live or upcoming exams' : 'কোনো লাইভ বা আসন্ন পরীক্ষা নেই')
-                      : (isEn ? 'No exam history found' : 'কোনো পরীক্ষার ইতিহাস পাওয়া যায়নি')}
-                  </p>
-                </div>
-              )}
-            </div>
+                  return (
+                    <LiveExamCard
+                      key={exam.id}
+                      exam={exam}
+                      status={status}
+                      startMs={startMs}
+                      countdownStr={status === 'running' 
+                        ? getCountdownString(startMs + durationMins * 60 * 1000)
+                        : getCountdownString(startMs)}
+                      isRegistered={isRegistered}
+                      result={result}
+                      isEn={isEn}
+                      onRegister={handleRegister}
+                      onEnter={(id) => navigate(`/live-exam-room/${id}`)}
+                      onViewResult={(id) => navigate(`/live-exam-room/${id}`)}
+                    />
+                  );
+                })}
+              </div>
+            )}
           </TabContent>
         </div>
       </PullToRefresh>

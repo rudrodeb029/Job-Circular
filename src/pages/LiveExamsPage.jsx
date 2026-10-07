@@ -57,7 +57,7 @@ export default function LiveExamsPage() {
           })}
 
           {exams.length === 0 && (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
               <Clock size={40} style={{ opacity: 0.3, marginBottom: '12px' }} />
               <p>{isEn ? 'No live exams scheduled' : 'কোনো লাইভ পরীক্ষা পাওয়া যায়নি'}</p>
             </div>
