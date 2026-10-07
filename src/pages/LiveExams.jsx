@@ -265,12 +265,12 @@ export default function LiveExams() {
               <div style={{
                 background: 'var(--primary-bg)',
                 border: '1px solid var(--chip-primary-border)',
-                borderRadius: '20px',
-                padding: '18px',
-                marginBottom: '20px',
+                borderRadius: '14px',
+                padding: '12px 14px',
+                marginBottom: '14px',
                 boxShadow: 'var(--shadow-sm)'
               }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -278,7 +278,7 @@ export default function LiveExams() {
                   </svg>
                   <span>{isEn ? 'Live Exam Regulations' : 'লাইভ পরীক্ষার নিয়াবলী'}</span>
                 </h3>
-                <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
+                <p style={{ fontSize: '11px', lineHeight: 1.5, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
                   {isEn 
                     ? 'Participate in real-time competitive exams. The exam starts exactly at the scheduled time. Results will be calculated instantly upon submission.'
                     : 'নির্ধারিত সময়ে সরাসরি লাইভ পরীক্ষায় অংশ নিন। পরীক্ষা শুরু হওয়ার পর সময়ের মধ্যে সাবমিট করতে হবে। সময় শেষ হলে স্বয়ংক্রিয়ভাবে সাবমিট হয়ে যাবে।'}
@@ -291,19 +291,19 @@ export default function LiveExams() {
               <div style={{
                 background: 'var(--primary-bg)',
                 border: '1px solid var(--chip-primary-border)',
-                borderRadius: '20px',
-                padding: '18px',
-                marginBottom: '20px',
+                borderRadius: '14px',
+                padding: '12px 14px',
+                marginBottom: '14px',
                 boxShadow: 'var(--shadow-sm)'
               }}>
-                <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span>{isEn ? 'Exam History & Past Results' : 'পরীক্ষার ইতিহাস ও পূর্ববর্তী ফলাফল'}</span>
                 </h3>
-                <p style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
+                <p style={{ fontSize: '11px', lineHeight: 1.5, color: 'var(--text-secondary)', fontWeight: 500, margin: 0 }}>
                   {isEn 
                     ? 'Review your attended live exams, scores, merit positions, and detailed answer explanations. Tap on any completed exam below.'
                     : 'আপনার সম্পন্ন করা সকল লাইভ পরীক্ষার ফলাফল, মেধা স্কোর ও বিস্তারিত সমাধান দেখুন। ফলাফল দেখতে নিচের যেকোনো কার্ডে ট্যাপ করুন।'}
@@ -311,11 +311,11 @@ export default function LiveExams() {
               </div>
             )}
 
-            {/* Exams List: 2-Column Cards Grid for History (matching Questions cards) */}
+            {/* Exams List: 2-Column Cards Grid (matching Questions cards) */}
             <div style={{
               display: (isTabLoading || filteredExams.length === 0) ? 'flex' : 'grid',
-              gridTemplateColumns: activeTab === 'history' ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: activeTab === 'history' ? '12px' : '16px',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '12px',
               minHeight: 'calc(100vh - 240px)'
             }}>
               {isTabLoading && (

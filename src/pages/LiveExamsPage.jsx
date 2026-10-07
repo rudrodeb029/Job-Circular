@@ -37,8 +37,8 @@ export default function LiveExamsPage() {
       <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '16px'
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '12px'
         }}>
           {exams.map(exam => {
             const status = getStatus(exam.startTime, exam.duration);
