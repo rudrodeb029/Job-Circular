@@ -386,6 +386,7 @@ export default function LiveExams() {
                       key={exam.id}
                       exam={exam}
                       status={status}
+                      isHistory={activeTab === 'history'}
                       startMs={startMs}
                       countdownStr={status === 'running' 
                         ? getCountdownString(startMs + durationMins * 60 * 1000)

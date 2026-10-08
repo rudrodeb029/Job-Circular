@@ -11,6 +11,7 @@ import { stripHtmlTags } from '../utils/textUtils';
 function LiveExamCard({
   exam,
   status = 'upcoming', // 'upcoming' | 'running' | 'completed'
+  isHistory = false,
   startMs = null,
   countdownStr = '',
   isRegistered = false,
@@ -22,6 +23,7 @@ function LiveExamCard({
 }) {
   if (!exam) return null;
 
+  const isHistorySection = isHistory || status === 'completed';
   const [showSyllabusModal, setShowSyllabusModal] = useState(false);
 
   const title = isEn ? (exam.titleEn || exam.title) : exam.title;
@@ -72,14 +74,53 @@ function LiveExamCard({
       </svg>
 
       <div>
-        {/* Row 1: Badges (Status Pill + Duration Pill) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '3px', marginBottom: '5px', position: 'relative', zIndex: 2 }}>
-          {/* Status Badge */}
-          {status === 'upcoming' && (
+        {/* Row 1: Badges (Status Pill + Duration Pill) - Removed in History tab section */}
+        {!isHistorySection && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '3px', marginBottom: '5px', position: 'relative', zIndex: 2 }}>
+            {/* Status Badge */}
+            {status === 'upcoming' && (
+              <span style={{
+                background: '#fef3c7',
+                border: '1px solid rgba(251, 191, 36, 0.4)',
+                color: '#92400e',
+                fontSize: '6.8px',
+                fontWeight: 800,
+                padding: '1.5px 4.5px',
+                borderRadius: '10px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '2px',
+                lineHeight: 1.2
+              }}>
+                <span role="img" aria-label="calendar" style={{ fontSize: '7px' }}>🗓️</span>
+                <span>{isEn ? 'Upcoming' : 'আসন্ন'}</span>
+              </span>
+            )}
+
+            {status === 'running' && (
+              <span style={{
+                background: '#fee2e2',
+                border: '1px solid rgba(248, 113, 113, 0.4)',
+                color: '#dc2626',
+                fontSize: '6.8px',
+                fontWeight: 800,
+                padding: '1.5px 4.5px',
+                borderRadius: '10px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '2.5px',
+                lineHeight: 1.2
+              }}>
+                <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 1.2s infinite', display: 'inline-block' }} />
+                <span>{isEn ? 'LIVE NOW' : 'লাইভ চলছে'}</span>
+              </span>
+            )}
+
+            {/* Duration Pill */}
             <span style={{
-              background: '#fef3c7',
-              border: '1px solid rgba(251, 191, 36, 0.4)',
-              color: '#92400e',
+              background: '#e0f2fe',
+              border: '1px solid rgba(56, 189, 248, 0.4)',
+              color: '#0284c7',
               fontSize: '6.8px',
               fontWeight: 800,
               padding: '1.5px 4.5px',
@@ -87,73 +128,17 @@ function LiveExamCard({
               display: 'inline-flex',
               alignItems: 'center',
               gap: '2px',
+              whiteSpace: 'nowrap',
               lineHeight: 1.2
             }}>
-              <span role="img" aria-label="calendar" style={{ fontSize: '7px' }}>🗓️</span>
-              <span>{isEn ? 'Upcoming' : 'আসন্ন'}</span>
+              <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12 6 12 12 16 14" />
+              </svg>
+              <span>{durationText}</span>
             </span>
-          )}
-
-          {status === 'running' && (
-            <span style={{
-              background: '#fee2e2',
-              border: '1px solid rgba(248, 113, 113, 0.4)',
-              color: '#dc2626',
-              fontSize: '6.8px',
-              fontWeight: 800,
-              padding: '1.5px 4.5px',
-              borderRadius: '10px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '2.5px',
-              lineHeight: 1.2
-            }}>
-              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 1.2s infinite', display: 'inline-block' }} />
-              <span>{isEn ? 'LIVE NOW' : 'লাইভ চলছে'}</span>
-            </span>
-          )}
-
-          {status === 'completed' && (
-            <span style={{
-              background: '#e0e7ff',
-              border: '1px solid rgba(165, 180, 252, 0.4)',
-              color: '#3730a3',
-              fontSize: '6.8px',
-              fontWeight: 800,
-              padding: '1.5px 4.5px',
-              borderRadius: '10px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '2px',
-              lineHeight: 1.2
-            }}>
-              <span role="img" aria-label="check" style={{ fontSize: '7px' }}>✅</span>
-              <span>{isEn ? 'Completed' : 'সম্পন্ন'}</span>
-            </span>
-          )}
-
-          {/* Duration Pill */}
-          <span style={{
-            background: '#e0f2fe',
-            border: '1px solid rgba(56, 189, 248, 0.4)',
-            color: '#0284c7',
-            fontSize: '6.8px',
-            fontWeight: 800,
-            padding: '1.5px 4.5px',
-            borderRadius: '10px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '2px',
-            whiteSpace: 'nowrap',
-            lineHeight: 1.2
-          }}>
-            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12 6 12 12 16 14" />
-            </svg>
-            <span>{durationText}</span>
-          </span>
-        </div>
+          </div>
+        )}
 
         {/* Row 2: Scheduled Date & Countdown Bar */}
         <div style={{
@@ -163,7 +148,7 @@ function LiveExamCard({
           marginBottom: '5px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: isHistorySection ? 'flex-start' : 'space-between',
           flexWrap: 'wrap',
           gap: '2px',
           position: 'relative',
@@ -175,14 +160,18 @@ function LiveExamCard({
             <span>{dateFormatted}</span>
           </span>
 
-          <span style={{ color: 'rgba(203, 213, 225, 0.8)', margin: '0 1px', fontSize: '6.8px' }}>|</span>
+          {!isHistorySection && countdownStr && (
+            <>
+              <span style={{ color: 'rgba(203, 213, 225, 0.8)', margin: '0 1px', fontSize: '6.8px' }}>|</span>
 
-          <span style={{ fontSize: '6.8px', color: '#475569', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
-            <span>{isEn ? 'Left:' : 'বাকি:'}</span>
-            <span style={{ color: '#d97706', fontWeight: 800 }}>
-              {countdownStr || (isEn ? '0m 00s' : '০মি: ০০সে:')}
-            </span>
-          </span>
+              <span style={{ fontSize: '6.8px', color: '#475569', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
+                <span>{isEn ? 'Left:' : 'বাকি:'}</span>
+                <span style={{ color: '#d97706', fontWeight: 800 }}>
+                  {countdownStr}
+                </span>
+              </span>
+            </>
+          )}
         </div>
 
         {/* Exam Title */}
