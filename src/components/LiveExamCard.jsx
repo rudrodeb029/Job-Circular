@@ -8,7 +8,7 @@ import { stripHtmlTags } from '../utils/textUtils';
  * gold/cyan header badges, scheduled date & remaining time bar, subject topic pills, 
  * and pill action button with star icon.
  */
-export default function LiveExamCard({
+function LiveExamCard({
   exam,
   status = 'upcoming', // 'upcoming' | 'running' | 'completed'
   startMs = null,
@@ -50,10 +50,15 @@ export default function LiveExamCard({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        transition: 'all 0.2s ease-in-out',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)',
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        contentVisibility: 'auto',
+        containIntrinsicSize: '0 190px'
       }}
       className="live-exam-card-hover"
     >
@@ -68,22 +73,23 @@ export default function LiveExamCard({
 
       <div>
         {/* Row 1: Badges (Status Pill + Duration Pill) */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '4px', marginBottom: '6px', position: 'relative', zIndex: 2 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '3px', marginBottom: '5px', position: 'relative', zIndex: 2 }}>
           {/* Status Badge */}
           {status === 'upcoming' && (
             <span style={{
               background: '#fef3c7',
               border: '1px solid rgba(251, 191, 36, 0.4)',
               color: '#92400e',
-              fontSize: '8.5px',
+              fontSize: '6.8px',
               fontWeight: 800,
-              padding: '2px 6px',
-              borderRadius: '12px',
+              padding: '1.5px 4.5px',
+              borderRadius: '10px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '3px'
+              gap: '2px',
+              lineHeight: 1.2
             }}>
-              <span role="img" aria-label="calendar" style={{ fontSize: '9px' }}>🗓️</span>
+              <span role="img" aria-label="calendar" style={{ fontSize: '7px' }}>🗓️</span>
               <span>{isEn ? 'Upcoming' : 'আসন্ন'}</span>
             </span>
           )}
@@ -93,15 +99,16 @@ export default function LiveExamCard({
               background: '#fee2e2',
               border: '1px solid rgba(248, 113, 113, 0.4)',
               color: '#dc2626',
-              fontSize: '8.5px',
+              fontSize: '6.8px',
               fontWeight: 800,
-              padding: '2px 6px',
-              borderRadius: '12px',
+              padding: '1.5px 4.5px',
+              borderRadius: '10px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '3px'
+              gap: '2.5px',
+              lineHeight: 1.2
             }}>
-              <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 1.2s infinite', display: 'inline-block' }} />
+              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 1.2s infinite', display: 'inline-block' }} />
               <span>{isEn ? 'LIVE NOW' : 'লাইভ চলছে'}</span>
             </span>
           )}
@@ -111,15 +118,16 @@ export default function LiveExamCard({
               background: '#e0e7ff',
               border: '1px solid rgba(165, 180, 252, 0.4)',
               color: '#3730a3',
-              fontSize: '8.5px',
+              fontSize: '6.8px',
               fontWeight: 800,
-              padding: '2px 6px',
-              borderRadius: '12px',
+              padding: '1.5px 4.5px',
+              borderRadius: '10px',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '3px'
+              gap: '2px',
+              lineHeight: 1.2
             }}>
-              <span role="img" aria-label="check" style={{ fontSize: '9px' }}>✅</span>
+              <span role="img" aria-label="check" style={{ fontSize: '7px' }}>✅</span>
               <span>{isEn ? 'Completed' : 'সম্পন্ন'}</span>
             </span>
           )}
@@ -129,16 +137,17 @@ export default function LiveExamCard({
             background: '#e0f2fe',
             border: '1px solid rgba(56, 189, 248, 0.4)',
             color: '#0284c7',
-            fontSize: '8.5px',
+            fontSize: '6.8px',
             fontWeight: 800,
-            padding: '2px 6px',
-            borderRadius: '12px',
+            padding: '1.5px 4.5px',
+            borderRadius: '10px',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '3px',
-            whiteSpace: 'nowrap'
+            gap: '2px',
+            whiteSpace: 'nowrap',
+            lineHeight: 1.2
           }}>
-            <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <polyline points="12 6 12 12 16 14" />
             </svg>
@@ -148,11 +157,10 @@ export default function LiveExamCard({
 
         {/* Row 2: Scheduled Date & Countdown Bar */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.85)',
-          backdropFilter: 'blur(4px)',
-          borderRadius: '6px',
-          padding: '3px 6px',
-          marginBottom: '6px',
+          background: 'rgba(255, 255, 255, 0.96)',
+          borderRadius: '5px',
+          padding: '2px 5px',
+          marginBottom: '5px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -162,14 +170,14 @@ export default function LiveExamCard({
           zIndex: 2,
           boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
         }}>
-          <span style={{ fontSize: '8px', color: '#1e293b', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
-            <span role="img" aria-label="calendar" style={{ fontSize: '8.5px' }}>🗓️</span>
+          <span style={{ fontSize: '6.8px', color: '#1e293b', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
+            <span role="img" aria-label="calendar" style={{ fontSize: '7px' }}>🗓️</span>
             <span>{dateFormatted}</span>
           </span>
 
-          <span style={{ color: 'rgba(203, 213, 225, 0.8)', margin: '0 2px', fontSize: '8px' }}>|</span>
+          <span style={{ color: 'rgba(203, 213, 225, 0.8)', margin: '0 1px', fontSize: '6.8px' }}>|</span>
 
-          <span style={{ fontSize: '8px', color: '#475569', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: '6.8px', color: '#475569', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
             <span>{isEn ? 'Left:' : 'বাকি:'}</span>
             <span style={{ color: '#d97706', fontWeight: 800 }}>
               {countdownStr || (isEn ? '0m 00s' : '০মি: ০০সে:')}
@@ -850,3 +858,5 @@ const calculateVisibleTopics = (topicsList, maxLineWidth = 132) => {
   const remaining = topicsList.length - visible.length;
   return { visible, remaining };
 };
+
+export default React.memo(LiveExamCard);

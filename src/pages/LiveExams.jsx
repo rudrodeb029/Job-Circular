@@ -43,7 +43,7 @@ export default function LiveExams() {
     tabTimerRef.current = setTimeout(() => setIsTabLoading(false), 180);
   };
 
-  // Ticks the clock every second and reads databases reactively
+  // Update exams and registrations
   useEffect(() => {
     if (Array.isArray(adminState.liveExams)) {
       setExams(adminState.liveExams);
@@ -57,7 +57,13 @@ export default function LiveExams() {
     } catch (e) {
       console.error(e);
     }
+  }, [adminState.liveExams]);
 
+  // Ticks the clock every second ONLY when activeTab is 'live'
+  useEffect(() => {
+    if (activeTab !== 'live') return;
+
+    setNow(Date.now());
     const interval = setInterval(() => {
       setNow(Date.now());
     }, 1000);
@@ -65,7 +71,7 @@ export default function LiveExams() {
     return () => {
       clearInterval(interval);
     };
-  }, [adminState.liveExams]);
+  }, [activeTab]);
 
   const parseExamDate = (dateVal) => {
     if (!dateVal) return null;
@@ -125,18 +131,28 @@ export default function LiveExams() {
     }
   };
 
-  const handleRegister = (examId) => {
-    const next = { ...registrations, [examId]: !registrations[examId] };
-    setRegistrations(next);
-    localStorage.setItem('registered_exams', JSON.stringify(next));
+  const handleRegister = React.useCallback((examId) => {
+    setRegistrations(prev => {
+      const next = { ...prev, [examId]: !prev[examId] };
+      localStorage.setItem('registered_exams', JSON.stringify(next));
 
-    const msg = next[examId]
-      ? (isEn ? 'Registration successful for the live exam!' : 'লাইভ পরীক্ষার জন্য রেজিস্ট্রেশন সম্পন্ন হয়েছে!')
-      : (isEn ? 'Registration cancelled.' : 'রেজিস্ট্রেশন বাতিল করা হয়েছে।');
+      const msg = next[examId]
+        ? (isEn ? 'Registration successful for the live exam!' : 'লাইভ পরীক্ষার জন্য রেজিস্ট্রেশন সম্পন্ন হয়েছে!')
+        : (isEn ? 'Registration cancelled.' : 'রেজিস্ট্রেশন বাতিল করা হয়েছে।');
 
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3000);
-  };
+      setToastMessage(msg);
+      setTimeout(() => setToastMessage(''), 3000);
+      return next;
+    });
+  }, [isEn]);
+
+  const handleEnter = React.useCallback((id) => {
+    navigate(`/live-exam-room/${id}`);
+  }, [navigate]);
+
+  const handleViewResult = React.useCallback((id) => {
+    navigate(`/live-exam-room/${id}`);
+  }, [navigate]);
 
   const getExamResult = (examId) => {
     try {
@@ -164,7 +180,12 @@ export default function LiveExams() {
   });
 
   return (
-    <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
+    <div className="page" style={{
+      paddingBottom: '100px',
+      background: 'var(--bg-secondary)',
+      WebkitOverflowScrolling: 'touch',
+      overscrollBehaviorY: 'contain'
+    }}>
       {/* Header */}
       <div className="page-header" style={{ borderBottom: 'none' }}>
         <button className="back-btn" onClick={() => navigate(-1)}>
@@ -348,8 +369,10 @@ export default function LiveExams() {
               <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: '12px',
-                alignItems: 'start'
+                gap: '10px',
+                alignItems: 'start',
+                contain: 'content',
+                WebkitOverflowScrolling: 'touch'
               }}>
                 {filteredExams.map(exam => {
                   const status = getExamStatus(exam);
@@ -366,13 +389,13 @@ export default function LiveExams() {
                       startMs={startMs}
                       countdownStr={status === 'running' 
                         ? getCountdownString(startMs + durationMins * 60 * 1000)
-                        : getCountdownString(startMs)}
+                        : (status === 'upcoming' ? getCountdownString(startMs) : '')}
                       isRegistered={isRegistered}
                       result={result}
                       isEn={isEn}
                       onRegister={handleRegister}
-                      onEnter={(id) => navigate(`/live-exam-room/${id}`)}
-                      onViewResult={(id) => navigate(`/live-exam-room/${id}`)}
+                      onEnter={handleEnter}
+                      onViewResult={handleViewResult}
                     />
                   );
                 })}

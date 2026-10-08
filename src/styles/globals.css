@@ -557,17 +557,18 @@ ul, ol {
 .tab-pane-content {
   width: 100%;
   position: relative;
-  will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
 .tab-slide-forward {
   animation: tabSlideForward 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .tab-slide-back {
   animation: tabSlideBack 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  will-change: transform, opacity;
 }
 
 /* Modern GPU-Accelerated Tab Bar & Toggle Bar */

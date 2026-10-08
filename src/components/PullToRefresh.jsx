@@ -39,6 +39,7 @@ export default function PullToRefresh({ children, onRefresh, disabled = false })
       setPullDistance(distance);
     } else {
       setPullDistance(0);
+      isPullingRef.current = false;
     }
   };
 
