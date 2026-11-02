@@ -15,6 +15,7 @@ import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
+import { openInAppBrowser } from '../utils/browserUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -119,8 +120,9 @@ export default function ExamDetails() {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
 
-  const handleDownloadNotice = (e) => {
+  const handleDownloadNotice = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
+    if (downloading) return;
 
     const rawFileUrl = rawImagesList[activeImageIndex] ||
                        circularImages[activeImageIndex] ||
@@ -132,24 +134,18 @@ export default function ExamDetails() {
                        (job.images && job.images[0]) ||
                        job.downloadLink ||
                        job.examLink ||
-                       job.applyLink;
+                       job.applyLink ||
+                       job.applicationLink ||
+                       job.link ||
+                       job.url ||
+                       'http://alljobs.teletalk.com.bd';
 
-    if (!rawFileUrl || rawFileUrl === '#' || rawFileUrl.trim() === '') {
-      const link = job.examLink || job.downloadLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
-      setModalUrl(link);
-      setModalType('admit_card');
-      setIsModalOpen(true);
-      return;
+    setDownloading(true);
+    try {
+      await openInAppBrowser(rawFileUrl);
+    } finally {
+      setDownloading(false);
     }
-
-    const cleanOrg = stripHtmlTags(job.organization || 'Exam');
-    const name = `${cleanOrg}_Notice_Page_${activeImageIndex + 1}`;
-
-    // Open download destination modal directly without showing ads
-    setDownloadUrl(rawFileUrl);
-    setDownloadFileName(name);
-    setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
-    setIsDownloadModalOpen(true);
   };
 
   const handleDownloadAdmitCard = () => {

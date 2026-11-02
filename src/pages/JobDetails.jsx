@@ -14,6 +14,7 @@ import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd, showNativeBannerAd, hideNativeBannerAd } from '../utils/admobUtils';
+import { openInAppBrowser } from '../utils/browserUtils';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -100,8 +101,9 @@ export default function JobDetails() {
     dispatch({ type: 'TOGGLE_APPLY_JOB', payload: job.id });
   };
 
-  const handleDownloadNotice = (e) => {
+  const handleDownloadNotice = async (e) => {
     if (e && e.stopPropagation) e.stopPropagation();
+    if (downloading) return;
 
     const rawFileUrl = rawImagesList[activeImageIndex] ||
                        circularImages[activeImageIndex] ||
@@ -112,23 +114,19 @@ export default function JobDetails() {
                        job.pdfUrl ||
                        (job.images && job.images[0]) ||
                        job.downloadLink ||
-                       job.applyLink;
+                       job.applyLink ||
+                       job.applicationLink ||
+                       job.link ||
+                       job.circularLink ||
+                       job.url ||
+                       'http://alljobs.teletalk.com.bd';
 
-    if (!rawFileUrl || rawFileUrl === '#' || rawFileUrl.trim() === '') {
-      const link = job.applyLink || job.applicationLink || job.link || job.url || 'https://alljobs.teletalk.com.bd';
-      setModalUrl(link);
-      setModalType('new_job');
-      setIsModalOpen(true);
-      return;
+    setDownloading(true);
+    try {
+      await openInAppBrowser(rawFileUrl);
+    } finally {
+      setDownloading(false);
     }
-
-    const name = `${orgName || titleName || 'Job_Circular'}_Notice_Page_${activeImageIndex + 1}`;
-    
-    // Open download destination modal directly without showing ads
-    setDownloadUrl(rawFileUrl);
-    setDownloadFileName(name);
-    setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
-    setIsDownloadModalOpen(true);
   };
 
   // Hide banner ad when full-screen photo zoom viewer is active

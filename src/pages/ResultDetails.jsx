@@ -15,6 +15,7 @@ import FormattedText from '../components/FormattedText';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
+import { openInAppBrowser } from '../utils/browserUtils';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -124,20 +125,32 @@ export default function ResultDetails() {
     setIsModalOpen(true);
   };
 
-  const handleDownloadNotice = () => {
-    const rawFileUrl = rawImagesList[activeImageIndex] || circularImages[activeImageIndex] || job.examResult;
-    if (!rawFileUrl || rawFileUrl === '#' || rawFileUrl.trim() === '') {
-      handleViewResult();
-      return;
-    }
-    const cleanOrg = stripHtmlTags(job.organization || 'Result');
-    const name = `${cleanOrg}_Notice_Page_${activeImageIndex + 1}`;
+  const handleDownloadNotice = async (e) => {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (downloading) return;
 
-    // Open download destination modal directly without showing ads
-    setDownloadUrl(rawFileUrl);
-    setDownloadFileName(name);
-    setDownloadDetails(`${name}.${rawFileUrl.toLowerCase().includes('.pdf') ? 'pdf' : 'png'} (1236×1600)`);
-    setIsDownloadModalOpen(true);
+    const rawFileUrl = rawImagesList[activeImageIndex] ||
+                       circularImages[activeImageIndex] ||
+                       job.examResult ||
+                       job.imageUrl ||
+                       job.circularImage ||
+                       job.noticeUrl ||
+                       job.noticeImage ||
+                       job.pdfUrl ||
+                       (job.images && job.images[0]) ||
+                       job.downloadLink ||
+                       job.applyLink ||
+                       job.applicationLink ||
+                       job.link ||
+                       job.url ||
+                       'http://alljobs.teletalk.com.bd';
+
+    setDownloading(true);
+    try {
+      await openInAppBrowser(rawFileUrl);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const handleApplyClick = () => {
