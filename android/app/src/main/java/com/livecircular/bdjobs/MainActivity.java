@@ -181,23 +181,12 @@ public class MainActivity extends BridgeActivity {
         isBannerAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_BANNER);
         isInterstitialAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_INTERSTITIAL);
         isNativeAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_NATIVE);
-        nativeAdCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC);
-        if (nativeAdCooldownSec <= 0) {
-            nativeAdCooldownSec = 30;
-        }
 
-        String nId = remoteConfig.getString(REMOTE_CONFIG_KEY_NATIVE_ID);
-        if (!nId.trim().isEmpty()) {
-            nativeAdUnitId = nId.trim();
-        } else {
-            nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
-        }
-
-        isNativeAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_NATIVE);
         interstitialCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_COOLDOWN_SEC);
         if (interstitialCooldownSec <= 0) {
             interstitialCooldownSec = 50;
         }
+
         nativeAdCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC);
         if (nativeAdCooldownSec <= 0) {
             nativeAdCooldownSec = 30;
