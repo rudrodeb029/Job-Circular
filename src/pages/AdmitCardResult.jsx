@@ -127,7 +127,7 @@ export default function AdmitCardResult() {
                   <div 
                     key={item.id} 
                     className="job-card animate-fade-in" 
-                    onClick={() => navigate(`/exam-details/${item.id}`)}
+                    onClick={() => navigate(`/exam-details/${item.jobId || item.id}`)}
                     style={{
                       cursor: 'pointer',
                       position: 'relative',
@@ -189,7 +189,7 @@ export default function AdmitCardResult() {
                       <div 
                         onClick={(e) => {
                           e.stopPropagation();
-                          navigate(`/exam-details/${item.id}`);
+                          navigate(`/exam-details/${item.jobId || item.id}`);
                         }}
                         title="View Exam Details"
                         style={{ 
@@ -223,7 +223,7 @@ export default function AdmitCardResult() {
                 <div 
                   key={item.id} 
                   className="job-card animate-fade-in" 
-                  onClick={() => navigate(`/result-details/${item.id}`)}
+                  onClick={() => navigate(`/result-details/${item.jobId || item.id}`)}
                   style={{
                     cursor: 'pointer',
                     position: 'relative',
@@ -285,7 +285,7 @@ export default function AdmitCardResult() {
                     <div 
                       onClick={(e) => {
                         e.stopPropagation();
-                        navigate(`/result-details/${item.id}`);
+                        navigate(`/result-details/${item.jobId || item.id}`);
                       }}
                       title="View Result Details"
                       style={{ 

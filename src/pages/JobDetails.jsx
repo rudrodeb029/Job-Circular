@@ -36,8 +36,44 @@ export default function JobDetails() {
 
   const { state: adminState } = useAdminContext();
   const localJobs = adminState.jobs || [];
-
-  const job = localJobs.find(j => j.id === id);
+  const localAdmits = adminState.admits || [];
+  const cleanId = String(id || '').replace(/^(admit-|result-|exam_|result_|dynamic-exam-|dynamic-result-)/, '');
+  const matchedAdmit = localAdmits.find(
+    a => String(a.id) === String(id) || String(a.jobId) === String(id) || String(a.jobId) === cleanId || String(a.id) === `admit-${cleanId}` || String(a.id) === `result-${cleanId}`
+  );
+  const matchedJob = localJobs.find(
+    j => String(j.id) === String(id) || String(j.id) === cleanId || (matchedAdmit?.jobId && String(j.id) === String(matchedAdmit.jobId))
+  );
+  const job = matchedJob
+    ? {
+        ...matchedJob,
+        examDate: matchedJob.examDate || matchedAdmit?.date || '',
+        examLink: matchedJob.examLink || matchedAdmit?.downloadLink || matchedJob.applyLink || '',
+        examResult: matchedJob.examResult || matchedAdmit?.downloadLink || ''
+      }
+    : matchedAdmit
+      ? {
+          id: matchedAdmit.jobId || cleanId || matchedAdmit.id,
+          organization: matchedAdmit.organization || matchedAdmit.examName || '',
+          organizationEn: matchedAdmit.organizationEn || matchedAdmit.organization || '',
+          title: matchedAdmit.examName || matchedAdmit.organization || '',
+          titleEn: matchedAdmit.examNameEn || matchedAdmit.examName || '',
+          description: matchedAdmit.description || matchedAdmit.examName || '',
+          category: matchedAdmit.category || '',
+          type: matchedAdmit.jobType || '',
+          examDate: matchedAdmit.date || '',
+          examDateEn: matchedAdmit.dateEn || matchedAdmit.date || '',
+          examLink: matchedAdmit.downloadLink || '',
+          applyLink: matchedAdmit.downloadLink || '',
+          downloadLink: matchedAdmit.downloadLink || '',
+          examResult: matchedAdmit.downloadLink || '',
+          imageUrl: matchedAdmit.imageUrl || matchedAdmit.noticeUrl || '',
+          images: matchedAdmit.images || [],
+          createdAt: matchedAdmit.createdAt,
+          showInExamDate: matchedAdmit.type === 'admit_card',
+          showInResult: matchedAdmit.type === 'result'
+        }
+      : undefined;
 
   // Auto-mark notifications as read when viewing details
   React.useEffect(() => {
