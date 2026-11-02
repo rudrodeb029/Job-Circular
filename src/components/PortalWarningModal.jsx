@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { useAppContext } from '../context/AppContext';
@@ -87,48 +88,19 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
     }
   };
 
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(15, 23, 42, 0.65)',
-      backdropFilter: 'blur(6px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 10000,
-      padding: '20px',
-      animation: 'fadeIn 0.2s ease-out',
-      boxSizing: 'border-box'
-    }}>
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes scaleIn {
-          from { transform: scale(0.93); opacity: 0; }
-          to { transform: scale(1); opacity: 1; }
-        }
-      `}</style>
-      <div style={{
-        background: 'var(--white, #ffffff)',
-        borderRadius: '24px',
-        padding: '24px',
-        width: '100%',
-        maxWidth: '340px',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.08)',
-        textAlign: 'center',
-        animation: 'scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        border: '1px solid var(--border)',
-        boxSizing: 'border-box',
-        position: 'relative'
-      }}>
+  const modalContent = (
+    <div
+      className="portal-warning-backdrop"
+      data-theme={appState?.theme || 'light'}
+      onClick={onClose}
+    >
+      <div
+        className="portal-warning-card"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Top-Right Close Button */}
         <button
+          type="button"
           onClick={onClose}
           style={{
             position: 'absolute',
@@ -185,6 +157,7 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
         {/* Actions Grid (Side-by-Side) */}
         <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
           <button
+            type="button"
             onClick={copyLink}
             style={{
               flex: 1,
@@ -196,13 +169,14 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
               fontWeight: 800,
               fontSize: '13px',
               cursor: 'pointer',
-              transition: 'all 0.15s ease'
+              transition: 'background-color 0.15s ease, color 0.15s ease'
             }}
           >
             {copied ? (isEn ? 'Copied' : 'কপি হয়েছে') : (isEn ? 'Copy Link' : 'লিংক কপি')}
           </button>
 
           <button
+            type="button"
             onClick={proceedToPortal}
             disabled={loading}
             style={{
@@ -225,4 +199,9 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined' && document.body) {
+    return createPortal(modalContent, document.body);
+  }
+  return modalContent;
 }

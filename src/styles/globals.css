@@ -668,3 +668,50 @@ html[data-lang="en"] {
 .formatted-text-content p, .formatted-text-content li { line-height: 1.8; }
 .formatted-text-content strong, .formatted-text-content b { font-weight: 700; color: #1e293b; }
 
+
+/* ==========================================================================
+   PORTAL WARNING MODAL (ZERO-FLICKER ANDROID WEBVIEW HARDWARE COMPOSITING)
+   ========================================================================== */
+@keyframes portalModalCardEnter {
+  0% {
+    transform: translate3d(0, 6px, 0) scale3d(0.97, 0.97, 1);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+.portal-warning-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100000;
+  padding: 20px;
+  box-sizing: border-box;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  perspective: 1000px;
+  touch-action: none;
+}
+
+.portal-warning-card {
+  background: var(--white, #ffffff);
+  border-radius: 24px;
+  padding: 24px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.28), 0 10px 10px -5px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  border: 1px solid var(--border, #e2e8f0);
+  box-sizing: border-box;
+  position: relative;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  animation: portalModalCardEnter 0.16s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
