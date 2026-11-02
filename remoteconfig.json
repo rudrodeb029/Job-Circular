@@ -1,0 +1,67 @@
+{
+  "parameters": {
+    "admob_banner_id": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/6300978111"
+      },
+      "description": "AdMob Banner Ad Unit ID.",
+      "valueType": "STRING"
+    },
+    "admob_interstitial_id": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/1033173712"
+      },
+      "description": "AdMob Interstitial Ad Unit ID.",
+      "valueType": "STRING"
+    },
+    "admob_native_id": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/2247690483"
+      },
+      "description": "AdMob Native Advanced Ad Unit ID.",
+      "valueType": "STRING"
+    },
+    "interstitial_cooldown_sec": {
+      "defaultValue": {
+        "value": "50"
+      },
+      "description": "Minimum seconds between interstitial ad displays.",
+      "valueType": "STRING"
+    },
+    "native_ad_cooldown_sec": {
+      "defaultValue": {
+        "value": "30"
+      },
+      "description": "Minimum seconds between native ad displays.",
+      "valueType": "STRING"
+    },
+    "show_ads": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Master ads switch. Set true to enable ads globally, false to disable all ads.",
+      "valueType": "STRING"
+    },
+    "show_banner_ads": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Banner ads switch. Set true to show bottom banner ads.",
+      "valueType": "STRING"
+    },
+    "show_interstitial_ads": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Interstitial ads switch. Set true to show full-screen ads.",
+      "valueType": "STRING"
+    },
+    "show_native_ads": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Native ads switch. Set true to show native advanced card ads.",
+      "valueType": "STRING"
+    }
+  }
+}
