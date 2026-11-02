@@ -193,9 +193,14 @@ public class MainActivity extends BridgeActivity {
             nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
         }
 
+        isNativeAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_NATIVE);
         interstitialCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_COOLDOWN_SEC);
         if (interstitialCooldownSec <= 0) {
             interstitialCooldownSec = 50;
+        }
+        nativeAdCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC);
+        if (nativeAdCooldownSec <= 0) {
+            nativeAdCooldownSec = 30;
         }
 
         String bId = remoteConfig.getString(REMOTE_CONFIG_KEY_BANNER_ID);
@@ -212,10 +217,17 @@ public class MainActivity extends BridgeActivity {
             interstitialAdUnitId = DEFAULT_INTERSTITIAL_AD_UNIT_ID;
         }
 
+        String nId = remoteConfig.getString(REMOTE_CONFIG_KEY_NATIVE_ID);
+        if (!nId.trim().isEmpty()) {
+            nativeAdUnitId = nId.trim();
+        } else {
+            nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
+        }
+
         Log.d(TAG, String.format(
             Locale.US,
-            "Remote Config Applied -> show_ads: %b, banner: %b, interstitial: %b, cooldown: %ds, bannerId: %s, interstitialId: %s",
-            isAdsEnabled, isBannerAdsEnabled, isInterstitialAdsEnabled, interstitialCooldownSec, bannerAdUnitId, interstitialAdUnitId
+            "Remote Config Applied -> show_ads: %b, banner: %b, interstitial: %b, native: %b, cooldown: %ds, nativeCooldown: %ds, bannerId: %s, interstitialId: %s, nativeId: %s",
+            isAdsEnabled, isBannerAdsEnabled, isInterstitialAdsEnabled, isNativeAdsEnabled, interstitialCooldownSec, nativeAdCooldownSec, bannerAdUnitId, interstitialAdUnitId, nativeAdUnitId
         ));
 
         runOnUiThread(() -> {
@@ -230,10 +242,20 @@ public class MainActivity extends BridgeActivity {
                 } else if (bannerContainer != null) {
                     bannerContainer.setVisibility(View.GONE);
                 }
+                if (isNativeAdsEnabled && isNativeRequestedVisible) {
+                    displayNativeAdCard(isCurrentThemeDark);
+                } else if (nativeAdContainer != null) {
+                    nativeAdContainer.setVisibility(View.GONE);
+                }
             } else {
                 Log.d(TAG, "Ads are disabled via Remote Config master switch.");
                 if (bannerContainer != null) {
                     bannerContainer.setVisibility(View.GONE);
+                }
+                if (isNativeAdsEnabled && isNativeRequestedVisible) {
+                    displayNativeAdCard(isCurrentThemeDark);
+                } else if (nativeAdContainer != null) {
+                    nativeAdContainer.setVisibility(View.GONE);
                 }
                 interstitialAd = null;
             }
@@ -405,6 +427,11 @@ public class MainActivity extends BridgeActivity {
                                 bannerContainer.setVisibility(View.VISIBLE);
                             } else if (bannerContainer != null) {
                                 bannerContainer.setVisibility(View.GONE);
+                }
+                if (isNativeAdsEnabled && isNativeRequestedVisible) {
+                    displayNativeAdCard(isCurrentThemeDark);
+                } else if (nativeAdContainer != null) {
+                    nativeAdContainer.setVisibility(View.GONE);
                             }
                         }
 
@@ -414,6 +441,11 @@ public class MainActivity extends BridgeActivity {
                             Log.e(TAG, "Banner Ad failed to load: " + loadAdError.getMessage());
                             if (bannerContainer != null) {
                                 bannerContainer.setVisibility(View.GONE);
+                }
+                if (isNativeAdsEnabled && isNativeRequestedVisible) {
+                    displayNativeAdCard(isCurrentThemeDark);
+                } else if (nativeAdContainer != null) {
+                    nativeAdContainer.setVisibility(View.GONE);
                             }
                         }
                     });
@@ -443,6 +475,11 @@ public class MainActivity extends BridgeActivity {
                         bannerContainer.setVisibility(View.VISIBLE);
                     } else {
                         bannerContainer.setVisibility(View.GONE);
+                }
+                if (isNativeAdsEnabled && isNativeRequestedVisible) {
+                    displayNativeAdCard(isCurrentThemeDark);
+                } else if (nativeAdContainer != null) {
+                    nativeAdContainer.setVisibility(View.GONE);
                     }
                 } else if (visible && isAdsEnabled && isBannerAdsEnabled) {
                     loadBannerAd();
