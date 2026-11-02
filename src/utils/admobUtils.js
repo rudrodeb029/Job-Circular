@@ -8,6 +8,7 @@
 // Minimum interval between interstitials to prevent AdMob "Too Many Ads" and "Ad Serving Limits"
 let lastInterstitialTime = 0;
 let dynamicCooldownMs = 50000; // Default: 50 seconds cooldown
+let dynamicNativeCooldownMs = 30000; // Default: 30 seconds cooldown for Native Advanced Ads
 
 // Initialize cooldown from Native interface if available on startup
 if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getInterstitialCooldownSec === 'function') {
@@ -15,6 +16,10 @@ if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidA
     const sec = window.AndroidAds.getInterstitialCooldownSec();
     if (sec > 0) {
       dynamicCooldownMs = sec * 1000;
+    }
+    if (typeof window.AndroidAds.getNativeAdCooldownSec === 'function') {
+      const nSec = window.AndroidAds.getNativeAdCooldownSec();
+      if (nSec > 0) dynamicNativeCooldownMs = nSec * 1000;
     }
   } catch (e) {
     // Non-fatal fallback
@@ -25,10 +30,14 @@ if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidA
 if (typeof window !== 'undefined') {
   window.addEventListener('remote_config_ads_updated', (e) => {
     if (e && e.detail) {
-      const { interstitial_cooldown_sec, show_ads, show_banner_ads, show_interstitial_ads } = e.detail;
+      const { interstitial_cooldown_sec, native_ad_cooldown_sec, show_ads, show_banner_ads, show_interstitial_ads, show_native_ads } = e.detail;
       if (typeof interstitial_cooldown_sec === 'number' && interstitial_cooldown_sec > 0) {
         dynamicCooldownMs = interstitial_cooldown_sec * 1000;
         console.log(`[AdMob Remote Config] Updated cooldown to ${interstitial_cooldown_sec}s`);
+      }
+      if (typeof native_ad_cooldown_sec === 'number' && native_ad_cooldown_sec > 0) {
+        dynamicNativeCooldownMs = native_ad_cooldown_sec * 1000;
+        console.log(`[AdMob Remote Config] Updated native ad cooldown to ${native_ad_cooldown_sec}s`);
       }
       console.log('[AdMob Remote Config] Live config updated:', e.detail);
     }
@@ -170,4 +179,105 @@ export const getNativeInterstitialCooldownSec = () => {
     }
   } catch (err) {}
   return Math.round(dynamicCooldownMs / 1000);
+};
+
+/**
+ * ═══ Native Advanced Ads Engine ═══
+ * Shows the native AdMob Advanced Ad card at the bottom of the screen.
+ * Seamless, non-intrusive card layout with Ad attribution and dismiss option.
+ *
+ * @param {boolean} isDark - Whether the active app theme is dark mode.
+ * @returns {boolean} Whether the native call was successfully dispatched.
+ */
+export const showNativeAdvancedAd = (isDark = false) => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds) {
+      if (typeof window.AndroidAds.showNativeAdWithTheme === 'function') {
+        window.AndroidAds.showNativeAdWithTheme(Boolean(isDark));
+        return true;
+      } else if (typeof window.AndroidAds.showNativeAd === 'function') {
+        window.AndroidAds.showNativeAd();
+        return true;
+      }
+    }
+  } catch (err) {
+    console.error('Error showing native advanced ad:', err);
+  }
+  return false;
+};
+
+/**
+ * Hides the native Advanced Ad card immediately (with smooth slide-down animation).
+ */
+export const hideNativeAdvancedAd = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.hideNativeAd === 'function') {
+      window.AndroidAds.hideNativeAd();
+      return true;
+    }
+  } catch (err) {
+    console.error('Error hiding native advanced ad:', err);
+  }
+  return false;
+};
+
+/**
+ * Controls the visibility of the native Advanced Ad card.
+ */
+export const setNativeAdvancedAdVisibility = (visible, isDark = false) => {
+  if (visible) {
+    return showNativeAdvancedAd(isDark);
+  } else {
+    return hideNativeAdvancedAd();
+  }
+};
+
+/**
+ * Checks whether Native Advanced ads are enabled via Firebase Remote Config.
+ */
+export const isNativeAdvancedAdsEnabled = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.isNativeAdsEnabled === 'function') {
+      return Boolean(window.AndroidAds.isNativeAdsEnabled());
+    }
+  } catch (err) {
+    console.error('Error checking native advanced ads status:', err);
+  }
+  return false;
+};
+
+/**
+ * Checks whether a Native Advanced ad is preloaded in memory and ready to show.
+ */
+export const isNativeAdvancedAdReady = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.isNativeAdReady === 'function') {
+      return Boolean(window.AndroidAds.isNativeAdReady());
+    }
+  } catch (err) {}
+  return false;
+};
+
+/**
+ * Gets the configured Native Advanced ad unit ID.
+ */
+export const getNativeAdvancedAdUnitId = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getNativeAdUnitId === 'function') {
+      return window.AndroidAds.getNativeAdUnitId();
+    }
+  } catch (err) {}
+  return 'ca-app-pub-3940256099942544/2247690483';
+};
+
+/**
+ * Gets the configured Native Advanced ad cooldown in seconds.
+ */
+export const getNativeAdvancedAdCooldownSec = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getNativeAdCooldownSec === 'function') {
+      return window.AndroidAds.getNativeAdCooldownSec();
+    }
+  } catch (err) {}
+  return Math.round(dynamicNativeCooldownMs / 1000);
 };

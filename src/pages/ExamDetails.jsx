@@ -16,6 +16,7 @@ import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
 import { openInAppBrowser } from '../utils/browserUtils';
+import NativeAdCard from '../components/NativeAdCard';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -294,6 +295,9 @@ export default function ExamDetails() {
             </p>
           </div>
         )}
+
+        {/* AdMob Native Advanced Ad Card (Non-intrusive, dismissible) */}
+        <NativeAdCard />
 
         {/* Circular Notice Attachment Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>

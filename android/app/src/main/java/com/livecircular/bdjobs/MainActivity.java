@@ -7,6 +7,18 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.nativead.MediaView;
+import com.google.android.gms.ads.nativead.NativeAd;
+import com.google.android.gms.ads.nativead.NativeAdOptions;
+import com.google.android.gms.ads.nativead.NativeAdView;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
@@ -56,10 +68,16 @@ public class MainActivity extends BridgeActivity {
     private static final String REMOTE_CONFIG_KEY_COOLDOWN_SEC = "interstitial_cooldown_sec";
     private static final String REMOTE_CONFIG_KEY_BANNER_ID = "admob_banner_id";
     private static final String REMOTE_CONFIG_KEY_INTERSTITIAL_ID = "admob_interstitial_id";
+    private static final String REMOTE_CONFIG_KEY_SHOW_NATIVE = "show_native_ads";
+    private static final String REMOTE_CONFIG_KEY_NATIVE_ID = "admob_native_id";
+    private static final String REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC = "native_ad_cooldown_sec";
+
 
     // ═══ Default Official Test Ad Unit IDs ═══
     private static final String DEFAULT_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111";
     private static final String DEFAULT_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
+    private static final String DEFAULT_NATIVE_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247690483";
+
 
     // ═══ Ad State & Remote Config Configured Values ═══
     private FirebaseRemoteConfig remoteConfig;
@@ -78,6 +96,16 @@ public class MainActivity extends BridgeActivity {
     private boolean isCurrentThemeDark = false;
     private InterstitialAd interstitialAd;
     private boolean isInterstitialLoading = false;
+    private boolean isNativeAdsEnabled = true;
+    private long nativeAdCooldownSec = 30;
+    private String nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
+    private NativeAd currentNativeAd;
+    private boolean isNativeAdLoading = false;
+    private FrameLayout nativeAdContainer;
+    private NativeAdView currentNativeAdView;
+    private boolean isNativeRequestedVisible = false;
+    private long lastNativeAdDismissedTime = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +180,19 @@ public class MainActivity extends BridgeActivity {
         isAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_ADS);
         isBannerAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_BANNER);
         isInterstitialAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_INTERSTITIAL);
+        isNativeAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_NATIVE);
+        nativeAdCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC);
+        if (nativeAdCooldownSec <= 0) {
+            nativeAdCooldownSec = 30;
+        }
+
+        String nId = remoteConfig.getString(REMOTE_CONFIG_KEY_NATIVE_ID);
+        if (!nId.trim().isEmpty()) {
+            nativeAdUnitId = nId.trim();
+        } else {
+            nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
+        }
+
         interstitialCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_COOLDOWN_SEC);
         if (interstitialCooldownSec <= 0) {
             interstitialCooldownSec = 50;
@@ -208,10 +249,12 @@ public class MainActivity extends BridgeActivity {
                 String js = String.format(
                     Locale.US,
                     "window.dispatchEvent(new CustomEvent('remote_config_ads_updated', { detail: { " +
-                    "show_ads: %b, show_banner_ads: %b, show_interstitial_ads: %b, " +
-                    "interstitial_cooldown_sec: %d, admob_banner_id: '%s', admob_interstitial_id: '%s' } }));",
-                    isAdsEnabled, isBannerAdsEnabled, isInterstitialAdsEnabled,
-                    interstitialCooldownSec, bannerAdUnitId, interstitialAdUnitId
+                    "show_ads: %b, show_banner_ads: %b, show_interstitial_ads: %b, show_native_ads: %b, " +
+                    "interstitial_cooldown_sec: %d, native_ad_cooldown_sec: %d, " +
+                    "admob_banner_id: '%s', admob_interstitial_id: '%s', admob_native_id: '%s' } }));",
+                    isAdsEnabled, isBannerAdsEnabled, isInterstitialAdsEnabled, isNativeAdsEnabled,
+                    interstitialCooldownSec, nativeAdCooldownSec,
+                    bannerAdUnitId, interstitialAdUnitId, nativeAdUnitId
                 );
                 this.bridge.getWebView().evaluateJavascript(js, null);
             }
@@ -231,6 +274,9 @@ public class MainActivity extends BridgeActivity {
                 }
                 if (isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
                     loadInterstitialAd();
+                }
+                if (isNativeAdsEnabled && currentNativeAd == null && !isNativeAdLoading) {
+                    loadNativeAd();
                 }
                 return;
             }
@@ -261,6 +307,9 @@ public class MainActivity extends BridgeActivity {
                     }
                     if (isInterstitialAdsEnabled) {
                         loadInterstitialAd();
+                    }
+                    if (isNativeAdsEnabled) {
+                        loadNativeAd();
                     }
                 });
             });
@@ -512,6 +561,264 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
+        // ══════════════════════════════════════════════════════════════════
+    // 4.5. Native Advanced Ad Engine (Smart, Seamless Card Integration)
+    // ══════════════════════════════════════════════════════════════════
+    public void loadNativeAd() {
+        if (!isAdsEnabled || !isNativeAdsEnabled || isNativeAdLoading) {
+            return;
+        }
+        try {
+            isNativeAdLoading = true;
+            AdLoader adLoader = new AdLoader.Builder(this, nativeAdUnitId)
+                .forNativeAd(nativeAd -> {
+                    if (currentNativeAd != null) {
+                        currentNativeAd.destroy();
+                    }
+                    currentNativeAd = nativeAd;
+                    isNativeAdLoading = false;
+                    Log.d(TAG, "Native Advanced Ad loaded successfully into cache (" + nativeAdUnitId + ").");
+                    if (isNativeRequestedVisible) {
+                        displayNativeAdCard(isCurrentThemeDark);
+                    }
+                })
+                .withAdListener(new AdListener() {
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        isNativeAdLoading = false;
+                        Log.e(TAG, "Native Advanced Ad failed to load: " + loadAdError.getMessage());
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        Log.d(TAG, "Native Advanced Ad clicked by user.");
+                    }
+
+                    @Override
+                    public void onAdImpression() {
+                        super.onAdImpression();
+                        Log.d(TAG, "Native Advanced Ad impression recorded.");
+                    }
+                })
+                .withNativeAdOptions(new NativeAdOptions.Builder()
+                    .setAdChoicesPlacement(NativeAdOptions.ADCHOICES_TOP_RIGHT)
+                    .build())
+                .build();
+
+            adLoader.loadAd(new AdRequest.Builder().build());
+        } catch (Throwable t) {
+            Log.e(TAG, "Error in loadNativeAd: " + t.getMessage(), t);
+            isNativeAdLoading = false;
+        }
+    }
+
+    public void setNativeAdVisibility(boolean visible, boolean isDark) {
+        this.isNativeRequestedVisible = visible;
+        this.isCurrentThemeDark = isDark;
+        if (visible) {
+            displayNativeAdCard(isDark);
+        } else {
+            hideNativeAdCard();
+        }
+    }
+
+    private void displayNativeAdCard(boolean isDark) {
+        long now = System.currentTimeMillis();
+        if (now - lastNativeAdDismissedTime < (nativeAdCooldownSec * 1000L)) {
+            Log.d(TAG, "Native ad cooldown active (" + nativeAdCooldownSec + "s). Skipping display.");
+            return;
+        }
+
+        if (!isAdsEnabled || !isNativeAdsEnabled) {
+            if (nativeAdContainer != null) {
+                nativeAdContainer.setVisibility(View.GONE);
+            }
+            return;
+        }
+
+        if (currentNativeAd == null) {
+            if (!isNativeAdLoading) {
+                loadNativeAd();
+            }
+            return;
+        }
+
+        runOnUiThread(() -> {
+            try {
+                ViewGroup rootView = findViewById(android.R.id.content);
+                if (rootView == null) return;
+
+                if (nativeAdContainer == null) {
+                    nativeAdContainer = new FrameLayout(this);
+                    FrameLayout.LayoutParams containerParams = new FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        Gravity.BOTTOM
+                    );
+                    if (bannerContainer != null && bannerContainer.getVisibility() == View.VISIBLE) {
+                        int bannerH = bannerContainer.getHeight();
+                        if (bannerH <= 0) {
+                            float density = getResources().getDisplayMetrics().density;
+                            bannerH = (int) (56 * density);
+                        }
+                        containerParams.bottomMargin = bannerH;
+                    }
+                    nativeAdContainer.setLayoutParams(containerParams);
+                    nativeAdContainer.setElevation(24f);
+                    rootView.addView(nativeAdContainer);
+                } else {
+                    FrameLayout.LayoutParams containerParams = (FrameLayout.LayoutParams) nativeAdContainer.getLayoutParams();
+                    if (containerParams != null) {
+                        if (bannerContainer != null && bannerContainer.getVisibility() == View.VISIBLE) {
+                            int bannerH = bannerContainer.getHeight();
+                            if (bannerH <= 0) {
+                                float density = getResources().getDisplayMetrics().density;
+                                bannerH = (int) (56 * density);
+                            }
+                            containerParams.bottomMargin = bannerH;
+                        } else {
+                            containerParams.bottomMargin = 0;
+                        }
+                        nativeAdContainer.setLayoutParams(containerParams);
+                    }
+                }
+
+                nativeAdContainer.removeAllViews();
+                LayoutInflater inflater = LayoutInflater.from(this);
+                currentNativeAdView = (NativeAdView) inflater.inflate(R.layout.native_ad_card, nativeAdContainer, false);
+
+                populateNativeAdView(currentNativeAd, currentNativeAdView, isDark);
+                nativeAdContainer.addView(currentNativeAdView);
+                nativeAdContainer.setVisibility(View.VISIBLE);
+
+                TranslateAnimation animate = new TranslateAnimation(0, 0, 160, 0);
+                animate.setDuration(240);
+                nativeAdContainer.startAnimation(animate);
+            } catch (Throwable t) {
+                Log.e(TAG, "Error in displayNativeAdCard: " + t.getMessage(), t);
+            }
+        });
+    }
+
+    private void populateNativeAdView(NativeAd nativeAd, NativeAdView adView, boolean isDark) {
+        View cardContainer = adView.findViewById(R.id.native_ad_card_container);
+        if (cardContainer != null) {
+            cardContainer.setBackgroundResource(isDark ? R.drawable.bg_native_ad_card_dark : R.drawable.bg_native_ad_card);
+        }
+
+        TextView headlineView = adView.findViewById(R.id.ad_headline);
+        if (headlineView != null) {
+            headlineView.setText(nativeAd.getHeadline());
+            headlineView.setTextColor(isDark ? Color.parseColor("#F8FAFC") : Color.parseColor("#0F172A"));
+            adView.setHeadlineView(headlineView);
+        }
+
+        TextView bodyView = adView.findViewById(R.id.ad_body);
+        if (bodyView != null) {
+            if (nativeAd.getBody() != null && !nativeAd.getBody().isEmpty()) {
+                bodyView.setText(nativeAd.getBody());
+                bodyView.setTextColor(isDark ? Color.parseColor("#CBD5E1") : Color.parseColor("#475569"));
+                bodyView.setVisibility(View.VISIBLE);
+                adView.setBodyView(bodyView);
+            } else {
+                bodyView.setVisibility(View.GONE);
+            }
+        }
+
+        ImageView iconView = adView.findViewById(R.id.ad_app_icon);
+        if (iconView != null) {
+            if (nativeAd.getIcon() != null && nativeAd.getIcon().getDrawable() != null) {
+                iconView.setImageDrawable(nativeAd.getIcon().getDrawable());
+                iconView.setVisibility(View.VISIBLE);
+                adView.setIconView(iconView);
+            } else {
+                iconView.setVisibility(View.GONE);
+            }
+        }
+
+        TextView advertiserView = adView.findViewById(R.id.ad_advertiser);
+        if (advertiserView != null) {
+            if (nativeAd.getAdvertiser() != null && !nativeAd.getAdvertiser().isEmpty()) {
+                advertiserView.setText(nativeAd.getAdvertiser());
+                advertiserView.setTextColor(isDark ? Color.parseColor("#94A3B8") : Color.parseColor("#64748B"));
+                advertiserView.setVisibility(View.VISIBLE);
+                adView.setAdvertiserView(advertiserView);
+            } else if (nativeAd.getStore() != null) {
+                advertiserView.setText(nativeAd.getStore());
+                advertiserView.setVisibility(View.VISIBLE);
+                adView.setAdvertiserView(advertiserView);
+            } else {
+                advertiserView.setVisibility(View.GONE);
+            }
+        }
+
+        MediaView mediaView = adView.findViewById(R.id.ad_media);
+        if (mediaView != null) {
+            if (nativeAd.getMediaContent() != null && nativeAd.getMediaContent().hasVideoContent()) {
+                mediaView.setVisibility(View.VISIBLE);
+                adView.setMediaView(mediaView);
+            } else {
+                mediaView.setVisibility(View.GONE);
+            }
+        }
+
+        Button ctaView = adView.findViewById(R.id.ad_call_to_action);
+        if (ctaView != null) {
+            if (nativeAd.getCallToAction() != null && !nativeAd.getCallToAction().isEmpty()) {
+                ctaView.setText(nativeAd.getCallToAction());
+                ctaView.setVisibility(View.VISIBLE);
+                adView.setCallToActionView(ctaView);
+            } else {
+                ctaView.setVisibility(View.GONE);
+            }
+        }
+
+        ImageView closeBtn = adView.findViewById(R.id.ad_close_btn);
+        if (closeBtn != null) {
+            closeBtn.setOnClickListener(v -> {
+                lastNativeAdDismissedTime = System.currentTimeMillis();
+                hideNativeAdCard();
+                Log.d(TAG, "Native ad dismissed by user. Cooldown initiated (" + nativeAdCooldownSec + "s).");
+                currentNativeAd = null;
+                if (isAdsEnabled && isNativeAdsEnabled) {
+                    loadNativeAd();
+                }
+            });
+        }
+
+        adView.setNativeAd(nativeAd);
+    }
+
+    public void hideNativeAdCard() {
+        isNativeRequestedVisible = false;
+        runOnUiThread(() -> {
+            try {
+                if (nativeAdContainer != null && nativeAdContainer.getVisibility() == View.VISIBLE) {
+                    TranslateAnimation animate = new TranslateAnimation(0, 0, 0, 160);
+                    animate.setDuration(160);
+                    animate.setAnimationListener(new Animation.AnimationListener() {
+                        @Override
+                        public void onAnimationStart(Animation animation) {}
+                        @Override
+                        public void onAnimationEnd(Animation animation) {
+                            if (nativeAdContainer != null) {
+                                nativeAdContainer.setVisibility(View.GONE);
+                                nativeAdContainer.removeAllViews();
+                            }
+                        }
+                        @Override
+                        public void onAnimationRepeat(Animation animation) {}
+                    });
+                    nativeAdContainer.startAnimation(animate);
+                }
+            } catch (Throwable t) {
+                Log.e(TAG, "Error in hideNativeAdCard: " + t.getMessage(), t);
+            }
+        });
+    }
+
     // ══════════════════════════════════════════════════════════════════
     // 5. JavaScript Interface for React Frontend
     // ══════════════════════════════════════════════════════════════════
@@ -531,6 +838,55 @@ public class MainActivity extends BridgeActivity {
                     @SuppressWarnings("unused")
                     public boolean isInterstitialReady() {
                         return isAdsEnabled && isInterstitialAdsEnabled && interstitialAd != null;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public void showNativeAd() {
+                        runOnUiThread(() -> MainActivity.this.setNativeAdVisibility(true, false));
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public void showNativeAdWithTheme(boolean isDark) {
+                        runOnUiThread(() -> MainActivity.this.setNativeAdVisibility(true, isDark));
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public void hideNativeAd() {
+                        runOnUiThread(MainActivity.this::hideNativeAdCard);
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public boolean isNativeAdsEnabled() {
+                        return isAdsEnabled && isNativeAdsEnabled;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public String getNativeAdUnitId() {
+                        return nativeAdUnitId;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public boolean isNativeAdReady() {
+                        return isAdsEnabled && isNativeAdsEnabled && currentNativeAd != null;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public long getNativeAdCooldownSec() {
+                        return nativeAdCooldownSec;
                     }
 
                     @JavascriptInterface
@@ -777,6 +1133,14 @@ public class MainActivity extends BridgeActivity {
             bannerContainer.removeAllViews();
             bannerContainer = null;
             bannerTopDivider = null;
+        }
+        if (currentNativeAd != null) {
+            currentNativeAd.destroy();
+            currentNativeAd = null;
+        }
+        if (nativeAdContainer != null) {
+            nativeAdContainer.removeAllViews();
+            nativeAdContainer = null;
         }
         super.onDestroy();
     }
