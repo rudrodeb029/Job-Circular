@@ -105,6 +105,11 @@ public class MainActivity extends BridgeActivity {
     private NativeAdView currentNativeAdView;
     private boolean isNativeRequestedVisible = false;
     private long lastNativeAdDismissedTime = 0;
+    private boolean isActivityResumed = false;
+    private boolean pendingAdOnBrowserReturn = false;
+    private boolean hasLeftActivityForBrowser = false;
+    private long pendingBrowserReturnShowUntil = 0;
+    private long lastInterstitialShownTimestamp = 0;
 
 
     @Override
@@ -535,6 +540,14 @@ public class MainActivity extends BridgeActivity {
                             public void onAdShowedFullScreenContent() {
                                 super.onAdShowedFullScreenContent();
                                 Log.d(TAG, "Interstitial ad displayed on screen.");
+                                MainActivity.this.runOnUiThread(() -> {
+                                    if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                                        MainActivity.this.bridge.getWebView().evaluateJavascript(
+                                            "try { window.dispatchEvent(new CustomEvent('native_interstitial_shown')); } catch(e){}",
+                                            null
+                                        );
+                                    }
+                                });
                             }
 
                             @Override
@@ -549,6 +562,12 @@ public class MainActivity extends BridgeActivity {
                                 Log.d(TAG, "Interstitial ad clicked by user.");
                             }
                         });
+
+                        if (pendingBrowserReturnShowUntil > System.currentTimeMillis() && isActivityResumed && !isFinishing() && !isDestroyed()) {
+                            pendingBrowserReturnShowUntil = 0;
+                            Log.d(TAG, "Interstitial finished loading within browser return grace window — displaying now.");
+                            showInterstitialAd();
+                        }
                     }
 
                     @Override
@@ -570,9 +589,24 @@ public class MainActivity extends BridgeActivity {
      * Triggered from Java or JavaScript when user completes an action.
      */
     public void showInterstitialAd() {
+        long now = System.currentTimeMillis();
+        if (now - lastInterstitialShownTimestamp < 2500L) {
+            Log.d(TAG, "Skipping duplicate showInterstitialAd call within 2.5s window.");
+            return;
+        }
+        if (!isActivityResumed) {
+            Log.d(TAG, "Activity not yet resumed during showInterstitialAd; deferring to onResume.");
+            pendingAdOnBrowserReturn = true;
+            hasLeftActivityForBrowser = true;
+            return;
+        }
         if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd != null) {
             Log.d(TAG, "Showing Interstitial Ad...");
-            interstitialAd.show(this);
+            lastInterstitialShownTimestamp = now;
+            pendingBrowserReturnShowUntil = 0;
+            InterstitialAd adToShow = interstitialAd;
+            interstitialAd = null;
+            adToShow.show(this);
         } else {
             Log.d(TAG, "Interstitial ad not ready or ads disabled. Proceeding without ad.");
             if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
@@ -901,6 +935,20 @@ public class MainActivity extends BridgeActivity {
                     @JavascriptInterface
                     @Keep
                     @SuppressWarnings("unused")
+                    public void notifyInAppBrowserOpened() {
+                        runOnUiThread(() -> {
+                            pendingAdOnBrowserReturn = true;
+                            hasLeftActivityForBrowser = false;
+                            if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
+                                loadInterstitialAd();
+                            }
+                            Log.d(TAG, "Custom In-App Browser opened: armed interstitial ad for return.");
+                        });
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public void showNativeAd() {
                         runOnUiThread(() -> MainActivity.this.setNativeAdVisibility(true, false));
                     }
@@ -1215,6 +1263,10 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onPause() {
+        isActivityResumed = false;
+        if (pendingAdOnBrowserReturn) {
+            hasLeftActivityForBrowser = true;
+        }
         if (bannerAdView != null) {
             bannerAdView.pause();
         }
@@ -1224,8 +1276,20 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onResume() {
         super.onResume();
+        isActivityResumed = true;
         if (bannerAdView != null) {
             bannerAdView.resume();
+        }
+        if (pendingAdOnBrowserReturn && hasLeftActivityForBrowser) {
+            pendingAdOnBrowserReturn = false;
+            hasLeftActivityForBrowser = false;
+            pendingBrowserReturnShowUntil = System.currentTimeMillis() + 2500L;
+            Log.d(TAG, "User returned from Custom In-App Browser (Cross/Back clicked). Scheduling Interstitial Ad...");
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                if (isActivityResumed && !isFinishing() && !isDestroyed()) {
+                    showInterstitialAd();
+                }
+            }, 200);
         }
     }
 

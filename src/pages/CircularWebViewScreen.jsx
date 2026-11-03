@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
 import { ButtonSpinner } from '../components/ModernLoader';
-import { Browser } from '@capacitor/browser';
-import { Capacitor } from '@capacitor/core';
 import { useAppContext } from '../context/AppContext';
+import { openInAppBrowser } from '../utils/browserUtils';
 
 // Smart URL Formatter: BD Govt / Teletalk subdomains fail on HTTPS with ERR_CERT_AUTHORITY_INVALID, but work on HTTP
 export function sanitizePortalUrl(inputUrl) {
@@ -99,21 +98,11 @@ export default function CircularWebViewScreen() {
   // Opens the circular application link in Chrome Tab / Native In-App Browser
   const openPortal = async () => {
     setLoading(true);
-    if (Capacitor.isNativePlatform()) {
-      try {
-        await Browser.open({
-          url: targetUrl,
-          toolbarColor: '#1d4ed8',
-          presentationStyle: 'popover'
-        });
-      } catch (err) {
-        console.warn('Native Browser.open failed:', err);
-        window.open(targetUrl, '_blank', 'noopener,noreferrer');
-      }
-    } else {
-      window.open(targetUrl, '_blank', 'noopener,noreferrer');
+    try {
+      await openInAppBrowser(targetUrl);
+    } finally {
+      setTimeout(() => setLoading(false), 600);
     }
-    setTimeout(() => setLoading(false), 600);
   };
 
   return (

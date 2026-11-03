@@ -414,3 +414,29 @@ export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = fals
     executeNavigation();
   }
 };
+
+
+// Sync lastInterstitialTime when native Android triggers an interstitial directly (e.g. onResume from Custom In-App Browser)
+if (typeof window !== 'undefined') {
+  window.addEventListener('native_interstitial_shown', () => {
+    lastInterstitialTime = Date.now();
+  });
+}
+
+/**
+ * Arms the Native Android engine and preloads an Interstitial Ad before opening
+ * the Custom In-App Browser (Chrome Custom Tabs). When the user clicks the Cross (✕)
+ * icon or Back button to return to the app, the Interstitial Ad displays automatically.
+ */
+export const armInterstitialOnBrowserReturn = () => {
+  try {
+    preloadInterstitialAd();
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.notifyInAppBrowserOpened === 'function') {
+      window.AndroidAds.notifyInAppBrowserOpened();
+      return true;
+    }
+  } catch (err) {
+    console.error('Error arming interstitial on browser return:', err);
+  }
+  return false;
+};

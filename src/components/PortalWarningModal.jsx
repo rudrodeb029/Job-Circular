@@ -1,30 +1,9 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Browser } from '@capacitor/browser';
-import { Capacitor } from '@capacitor/core';
 import { useAppContext } from '../context/AppContext';
+import { sanitizePortalUrl, openInAppBrowser } from '../utils/browserUtils';
 
-// Smart URL Formatter: BD Govt / Teletalk subdomains fail on HTTPS with ERR_CERT_AUTHORITY_INVALID, but work on HTTP
-export function sanitizePortalUrl(inputUrl) {
-  if (!inputUrl || typeof inputUrl !== 'string') return 'http://alljobs.teletalk.com.bd';
-  let clean = inputUrl.trim();
-
-  if (clean.includes('teletalk.com.bd')) {
-    if (clean.startsWith('https://')) {
-      return clean.replace('https://', 'http://');
-    }
-    if (!clean.startsWith('http://')) {
-      return `http://${clean}`;
-    }
-    return clean;
-  }
-
-  if (clean.startsWith('http://') || clean.startsWith('https://')) {
-    return clean;
-  }
-
-  return `https://${clean}`;
-}
+export { sanitizePortalUrl };
 
 export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'new_job' }) {
   const { state: appState } = useAppContext();
@@ -67,20 +46,7 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
     onClose();
 
     try {
-      if (Capacitor.isNativePlatform()) {
-        try {
-          await Browser.open({
-            url: targetUrl,
-            toolbarColor: '#1d4ed8',
-            presentationStyle: 'popover'
-          });
-        } catch (err) {
-          console.warn('Native Browser.open failed:', err);
-          window.open(targetUrl, '_blank', 'noopener,noreferrer');
-        }
-      } else {
-        window.open(targetUrl, '_blank', 'noopener,noreferrer');
-      }
+      await openInAppBrowser(targetUrl);
     } catch (e) {
       console.error('Error proceeding to portal:', e);
     } finally {
