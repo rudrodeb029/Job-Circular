@@ -430,7 +430,7 @@ export default function LiveExamRoom() {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
         <div className="page-header">
-          <button className="back-btn" onClick={() => navigate(-1)}>
+          <button type="button" className="back-btn" onClick={handleRoomBack}>
             <ArrowLeft size={22} />
           </button>
           <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
@@ -475,7 +475,7 @@ export default function LiveExamRoom() {
     return (
       <div className="page" style={{ paddingBottom: '100px' }}>
         <div className="page-header">
-          <button className="back-btn" onClick={() => navigate(-1)}>
+          <button type="button" className="back-btn" onClick={handleRoomBack}>
             <ArrowLeft size={22} />
           </button>
           <h1 style={{ flex: 1 }}>{isEn ? 'Not Found' : 'পাওয়া যায়নি'}</h1>
@@ -665,19 +665,30 @@ export default function LiveExamRoom() {
     }
   }
 
+  const handleRoomBack = () => {
+    const hasHistory = window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0;
+    if (currentResult) {
+      if (hasHistory) {
+        navigateWithAdOnReturn(navigate, -1);
+      } else {
+        navigateWithAdOnReturn(navigate, '/live-exams-list');
+      }
+    } else {
+      if (hasHistory) {
+        navigate(-1);
+      } else {
+        navigate('/live-exams-list');
+      }
+    }
+  };
+
   const showQuestionsSheet = isRunning && !currentResult;
 
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
       {/* Header */}
       <div className="page-header flex-between" style={{ borderBottom: 'none' }}>
-        <button className="back-btn" onClick={() => {
-          if (currentResult) {
-            navigateWithAdOnReturn(navigate, '/live-exams');
-          } else {
-            navigate(-1);
-          }
-        }}>
+        <button type="button" className="back-btn" onClick={handleRoomBack}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>

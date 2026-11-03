@@ -44,17 +44,7 @@ export default function LiveExams() {
   };
 
   const handleBack = () => {
-    if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
-      navigate(-1);
-      const currentPath = window.location.pathname;
-      setTimeout(() => {
-        if (window.location.pathname === currentPath) {
-          navigate('/questions-hub');
-        }
-      }, 120);
-    } else {
-      navigate('/questions-hub');
-    }
+    navigate('/questions-hub');
   };
 
   // Update exams and registrations

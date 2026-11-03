@@ -256,12 +256,8 @@ function App() {
 
       if (isQuestionSet || isLiveExam) {
         navigateWithAdOnReturn(navigate, -1);
-      } else if (location.pathname.startsWith('/live-exam')) {
-        if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
-          navigate(-1);
-        } else {
-          navigate('/questions-hub');
-        }
+      } else if (location.pathname === '/live-exams' || location.pathname === '/live-exams-list') {
+        navigate('/questions-hub');
       } else if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
         navigate(-1);
       } else {
