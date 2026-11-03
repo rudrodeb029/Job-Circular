@@ -16,6 +16,7 @@ import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd, showNativeBannerAd, hideNativeBannerAd } from '../utils/admobUtils';
 import { openInAppBrowser } from '../utils/browserUtils';
 import NativeAdCard from '../components/NativeAdCard';
+import DetailsHeaderCard from '../components/DetailsHeaderCard';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -268,46 +269,15 @@ export default function JobDetails() {
       </div>
 
       <div className="page-content animate-fade-in">
-        {/* Title Card (Deadline badge shown in top chip row) */}
-        <div className="card" style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
-          <div style={{
-            background: styleConfig.bg,
-            color: 'white',
-            margin: '0 auto 10px',
-            fontSize: '18px',
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: `0 4px 14px ${styleConfig.shadow}`
-          }}>
-            {displayIcon}
-          </div>
-          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '10px' }}>
-            {orgName}
-          </h2>
-
-          {/* Chips Row: Job Type + Deadline Badge */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', flexWrap: 'wrap' }}>
-            {job.showInResult ? (
-              <span className="chip chip-purple" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px' }}>
-                🏆 {state.language === 'en' ? 'Result Published' : 'ফলাফল প্রকাশিত'}
-              </span>
-            ) : job.showInExamDate ? (
-              <span className="chip chip-success" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 800, fontSize: '11px', padding: '4px 10px', borderRadius: '8px' }}>
-                <Calendar size={12} /> {state.language === 'en' ? 'Exam Date Published' : 'পরীক্ষার তারিখ প্রকাশিত'}
-              </span>
-            ) : (
-              <span className="chip chip-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600, fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>
-                <Calendar size={11} /> Deadline: {job.deadline}
-              </span>
-            )}
-            {job.type && <span className="chip" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>{job.type}</span>}
-            {isApplied && <span className="chip chip-success" style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '6px' }}>✓ Applied</span>}
-          </div>
-        </div>
+        {/* Modern Gradient Fluid Header Card */}
+        <DetailsHeaderCard
+          title={titleName || orgName}
+          categoryId={job.categoryId || job.category}
+          type="job"
+          date={job.deadline}
+          time={job.deadlineTime || '23:59'}
+          isEn={isEn}
+        />
 
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>

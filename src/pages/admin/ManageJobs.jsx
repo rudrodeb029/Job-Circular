@@ -37,6 +37,10 @@ export default function ManageJobs() {
     vacancy: '',
     salary: '',
     deadline: '',
+    deadlineTime: '23:59',
+    examTime: '10:00 AM',
+    resultDate: '',
+    resultTime: 'প্রকাশিত',
     description: '',
     requirements: '',
     applyLink: '',
@@ -213,7 +217,11 @@ export default function ManageJobs() {
         showInResult: job.showInResult ?? !!job.examResult,
         linkedCircularId: job.linkedCircularId || '',
         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : (job.requirements || ''),
-        images: Array.isArray(job.images) ? job.images.join(', ') : (job.images || '')
+        images: Array.isArray(job.images) ? job.images.join(', ') : (job.images || ''),
+        deadlineTime: job.deadlineTime || '23:59',
+        examTime: job.examTime || '10:00 AM',
+        resultDate: job.resultDate || '',
+        resultTime: job.resultTime || 'প্রকাশিত'
       });
     } else {
       setEditingJob(null);
@@ -492,7 +500,7 @@ export default function ManageJobs() {
                  <input name="jobType" className="modern-input" value={formData.jobType} onChange={handleInputChange} placeholder="e.g. সরকারি, ব্যাংক" />
               </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '24px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '20px' }}>
               <div className="input-group">
                  <label>Location</label>
                  <input name="location" className="modern-input" value={formData.location} onChange={handleInputChange} />
@@ -502,8 +510,12 @@ export default function ManageJobs() {
                  <input type="number" name="vacancy" className="modern-input" value={formData.vacancy} onChange={handleInputChange} />
               </div>
               <div className="input-group">
-                 <label>Deadline</label>
+                 <label>Deadline Date (শেষ তারিখ)</label>
                  <input type="date" name="deadline" className="modern-input" value={formData.deadline} onChange={handleInputChange} required />
+              </div>
+              <div className="input-group">
+                 <label>Deadline Time (শেষ সময়)</label>
+                 <input type="text" name="deadlineTime" className="modern-input" value={formData.deadlineTime || ''} onChange={handleInputChange} placeholder="e.g. 23:59 or রাত ১১:৫৯" />
               </div>
             </div>
 
@@ -617,16 +629,33 @@ export default function ManageJobs() {
             </div>
 
             {formData.showInExamDate && (
-              <div style={{ gridColumn: 'span 2' }} className="input-group">
-                 <label>Exam Date Information (পরীক্ষার তারিখ)</label>
-                 <input name="examDate" className="modern-input" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024 / ১৫ জুন ২০২৪" />
+              <div style={{ gridColumn: 'span 2', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                 <div className="input-group">
+                    <label>Exam Date (পরীক্ষার তারিখ)</label>
+                    <input name="examDate" className="modern-input" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024 / ১৫ জুন ২০২৪" />
+                 </div>
+                 <div className="input-group">
+                    <label>Exam Time (পরীক্ষার সময়)</label>
+                    <input name="examTime" className="modern-input" value={formData.examTime || ''} onChange={handleInputChange} placeholder="e.g. 10:00 AM / সকাল ১০:০০" />
+                 </div>
               </div>
             )}
 
             {formData.showInResult && (
               <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                   <div className="input-group">
+                      <label>Result Published Date (ফলাফল প্রকাশের তারিখ)</label>
+                      <input name="resultDate" className="modern-input" value={formData.resultDate || ''} onChange={handleInputChange} placeholder="e.g. 25 September 2026 / ২৫ সেপ্টেম্বর ২০২৬" />
+                   </div>
+                   <div className="input-group">
+                      <label>Result Status (ফলাফল স্ট্যাটাস)</label>
+                      <input name="resultTime" className="modern-input" value={formData.resultTime || ''} onChange={handleInputChange} placeholder="e.g. প্রকাশিত / Published" />
+                   </div>
+                </div>
+
                 <div className="input-group">
-                   <label>Exam Date (পরীক্ষার তারিখ)</label>
+                   <label>Exam Date (পরীক্ষার তারিখ - ঐচ্ছিক)</label>
                    <input name="examDate" className="modern-input" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024 / ১৫ জুন ২০২৪" />
                 </div>
 

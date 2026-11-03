@@ -17,6 +17,7 @@ import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
 import { openInAppBrowser } from '../utils/browserUtils';
 import NativeAdCard from '../components/NativeAdCard';
+import DetailsHeaderCard from '../components/DetailsHeaderCard';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -236,47 +237,24 @@ export default function ResultDetails() {
       </div>
 
       <div className="page-content animate-fade-in">
-        {/* Title Card */}
-        <div className="card" style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)',
-            color: 'white',
-            margin: '0 auto 10px',
-            fontSize: '18px',
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 14px rgba(124, 58, 237, 0.25)'
-          }}>
-            {displayIcon}
-          </div>
-          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
-            {orgName}
-          </h2>
-
-          {/* Exam Date & Meta Pills */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginTop: '10px' }}>
-            {(job.examDate || job.date || job.resultDate) && (
-              <div style={{ background: 'var(--primary-bg)', color: 'var(--primary)', padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Calendar size={12} />
-                <span>{isEn ? 'Exam Date:' : 'পরীক্ষার তারিখ:'} {job.examDate || job.date || job.resultDate}</span>
-              </div>
-            )}
-            {job.vacancy && (
-              <div style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 700 }}>
-                {isEn ? 'Vacancy:' : 'পদসংখ্যা:'} {job.vacancy}
-              </div>
-            )}
-            {job.publishDate && (
-              <div style={{ background: 'var(--bg-secondary)', color: 'var(--text-muted)', padding: '5px 12px', borderRadius: '20px', fontSize: '11px', fontWeight: 600 }}>
-                {isEn ? 'Published:' : 'প্রকাশিত:'} {job.publishDate}
-              </div>
-            )}
-          </div>
-        </div>
+        {/* Modern Gradient Fluid Header Card */}
+        <DetailsHeaderCard
+          title={postName || orgName}
+          categoryId={job.categoryId || job.category}
+          type="result"
+          date={job.resultDate || job.examDate || job.publishDate || job.deadline}
+          time={job.resultTime || (isEn ? 'Published' : 'প্রকাশিত')}
+          dateLabel={isEn ? 'Published Date:' : 'প্রকাশের তারিখ:'}
+          timeLabel={isEn ? 'Status:' : 'ফলাফল স্ট্যাটাস:'}
+          bannerText={isEn ? 'Result Summary' : 'ফলাফল সারসংক্ষেপ'}
+          extraStats={[
+            { value: job.vacancy ? (isEn ? String(job.vacancy) : String(job.vacancy).split('').map(d => ({'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'}[d]||d)).join('')) : (isEn ? '1' : '১'), label: isEn ? 'Vacancy' : 'পদসংখ্যা' },
+            { value: job.jobType || (isEn ? 'MCQ' : 'এমসিকিউ'), label: isEn ? 'Exam Type' : 'পরীক্ষার ধরন' },
+            { value: isEn ? String(circularImages.length || 1) : String(circularImages.length || 1).split('').map(d => ({'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'}[d]||d)).join(''), label: isEn ? 'Pages' : 'পৃষ্ঠা' },
+            { value: isEn ? '100%' : '১০০%', label: isEn ? 'Published' : 'প্রকাশিত' }
+          ]}
+          isEn={isEn}
+        />
 
         {/* Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>

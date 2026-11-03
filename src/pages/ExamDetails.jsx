@@ -17,6 +17,7 @@ import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
 import { openInAppBrowser } from '../utils/browserUtils';
 import NativeAdCard from '../components/NativeAdCard';
+import DetailsHeaderCard from '../components/DetailsHeaderCard';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -230,27 +231,15 @@ export default function ExamDetails() {
       </div>
 
       <div className="page-content animate-fade-in">
-        {/* Title Card */}
-        <div className="card" style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
-          <div style={{
-            background: styleConfig.bg,
-            color: 'white',
-            margin: '0 auto 10px',
-            fontSize: '18px',
-            width: '36px',
-            height: '36px',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: `0 4px 14px ${styleConfig.shadow}`
-          }}>
-            {displayIcon}
-          </div>
-          <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0' }}>
-            {stripHtmlTags(state.language === 'en' ? (job.organizationEn || job.organization) : job.organization)}
-          </h2>
-        </div>
+        {/* Modern Gradient Fluid Header Card */}
+        <DetailsHeaderCard
+          title={stripHtmlTags(state.language === 'en' ? (job.titleEn || job.organizationEn || job.title || job.organization) : (job.title || job.organization))}
+          categoryId={job.categoryId || job.category}
+          type="exam"
+          date={job.examDate || job.date || job.deadline}
+          time={job.examTime || '10:00 AM'}
+          isEn={state.language === 'en'}
+        />
 
         {/* Job Description Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
