@@ -300,7 +300,10 @@ public class MainActivity extends BridgeActivity {
 
             // Meta Audience Network Test Mode
             try {
-                if (BuildConfig.DEBUG) { AdSettings.setTestMode(true); }
+                boolean isDebuggable = (0 != (getApplicationInfo().flags & android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE));
+                if (isDebuggable) {
+                    AdSettings.setTestMode(true);
+                }
             } catch (Throwable t) {
                 Log.w(TAG, "Meta AdSettings setTestMode warning: " + t.getMessage());
             }
