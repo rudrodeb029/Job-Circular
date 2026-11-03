@@ -154,11 +154,16 @@ export default function DetailsHeaderCard({
   timeLabel = '',
   bannerText = '',
   extraStats = null,
+  showStats = true,
+  showCountdown = true,
   isEn = false
 }) {
+  const shouldShowBottomSection = showStats && (type === 'result' ? Boolean(extraStats) : showCountdown);
+
   const targetTimestamp = useMemo(() => {
+    if (!shouldShowBottomSection && type === 'result') return null;
     return parseTargetTimestamp(date, time);
-  }, [date, time]);
+  }, [date, time, shouldShowBottomSection, type]);
 
   const [timeLeft, setTimeLeft] = useState(() => {
     if (!targetTimestamp) return { days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true };
@@ -244,7 +249,7 @@ export default function DetailsHeaderCard({
         borderRadius: '20px',
         border: '1px solid rgba(219, 234, 254, 0.8)',
         boxShadow: '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
-        padding: '22px 14px 18px 14px',
+        padding: shouldShowBottomSection ? '22px 14px 18px 14px' : '20px 14px 16px 14px',
         position: 'relative',
         overflow: 'hidden',
         marginBottom: 'var(--space-lg)'
@@ -340,7 +345,7 @@ export default function DetailsHeaderCard({
             alignItems: 'center',
             justifyContent: 'center',
             gap: '12px',
-            marginBottom: '14px',
+            marginBottom: shouldShowBottomSection ? '14px' : '4px',
             width: '100%',
             maxWidth: '340px'
           }}
@@ -375,85 +380,89 @@ export default function DetailsHeaderCard({
           </div>
         </div>
 
-        {/* Centered Blue Banner Pill */}
-        <div
-          style={{
-            background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)',
-            color: '#ffffff',
-            borderRadius: '20px',
-            fontSize: '10.5px',
-            fontWeight: 800,
-            padding: '3.5px 16px',
-            display: 'inline-block',
-            marginBottom: '8px',
-            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
-            letterSpacing: '0.2px'
-          }}
-        >
-          {resolvedBanner}
-        </div>
+        {shouldShowBottomSection && (
+          <>
+            {/* Centered Blue Banner Pill */}
+            <div
+              style={{
+                background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)',
+                color: '#ffffff',
+                borderRadius: '20px',
+                fontSize: '10.5px',
+                fontWeight: 800,
+                padding: '3.5px 16px',
+                display: 'inline-block',
+                marginBottom: '8px',
+                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+                letterSpacing: '0.2px'
+              }}
+            >
+              {resolvedBanner}
+            </div>
 
-        {/* 4-Box Grid: Countdown or Result Overview Stats */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '6px',
-            width: '100%',
-            maxWidth: '350px'
-          }}
-        >
-          {extraStats ? (
-            // Custom 4-Box Stats (e.g. for Result Details)
-            extraStats.map((stat, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: 'linear-gradient(180deg, #f0f7ff 0%, #e0effe 100%)',
-                  border: '1px solid rgba(191, 219, 254, 0.8)',
-                  borderRadius: '10px',
-                  padding: '6px 2px 7px 2px',
-                  textAlign: 'center',
-                  boxShadow: '0 1px 3px rgba(37, 99, 235, 0.04)'
-                }}
-              >
-                <div style={{ fontSize: '16px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15 }}>
-                  {stat.value}
-                </div>
-                <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', marginTop: '3px' }}>
-                  {stat.label}
-                </div>
-              </div>
-            ))
-          ) : (
-            // Default 4-Box Countdown Timer
-            [
-              { val: isEn ? String(timeLeft.days).padStart(2, '0') : toBengaliNumber(timeLeft.days, 2), label: isEn ? 'Days' : 'দিন' },
-              { val: isEn ? String(timeLeft.hours).padStart(2, '0') : toBengaliNumber(timeLeft.hours, 2), label: isEn ? 'Hours' : 'ঘণ্টা' },
-              { val: isEn ? String(timeLeft.minutes).padStart(2, '0') : toBengaliNumber(timeLeft.minutes, 2), label: isEn ? 'Mins' : 'মিনিট' },
-              { val: isEn ? String(timeLeft.seconds).padStart(2, '0') : toBengaliNumber(timeLeft.seconds, 2), label: isEn ? 'Secs' : 'সেকেন্ড' }
-            ].map((box, idx) => (
-              <div
-                key={idx}
-                style={{
-                  background: 'linear-gradient(180deg, #f0f7ff 0%, #e0effe 100%)',
-                  border: '1px solid rgba(191, 219, 254, 0.8)',
-                  borderRadius: '10px',
-                  padding: '6px 2px 7px 2px',
-                  textAlign: 'center',
-                  boxShadow: '0 1px 3px rgba(37, 99, 235, 0.04)'
-                }}
-              >
-                <div style={{ fontSize: '17px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15, fontFamily: '"Poppins", sans-serif' }}>
-                  {box.val}
-                </div>
-                <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', marginTop: '3px' }}>
-                  {box.label}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
+            {/* 4-Box Grid: Countdown or Result Overview Stats */}
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '6px',
+                width: '100%',
+                maxWidth: '350px'
+              }}
+            >
+              {extraStats ? (
+                // Custom 4-Box Stats (e.g. for Result Details)
+                extraStats.map((stat, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      background: 'linear-gradient(180deg, #f0f7ff 0%, #e0effe 100%)',
+                      border: '1px solid rgba(191, 219, 254, 0.8)',
+                      borderRadius: '10px',
+                      padding: '6px 2px 7px 2px',
+                      textAlign: 'center',
+                      boxShadow: '0 1px 3px rgba(37, 99, 235, 0.04)'
+                    }}
+                  >
+                    <div style={{ fontSize: '16px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15 }}>
+                      {stat.value}
+                    </div>
+                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', marginTop: '3px' }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                // Default 4-Box Countdown Timer
+                [
+                  { val: isEn ? String(timeLeft.days).padStart(2, '0') : toBengaliNumber(timeLeft.days, 2), label: isEn ? 'Days' : 'দিন' },
+                  { val: isEn ? String(timeLeft.hours).padStart(2, '0') : toBengaliNumber(timeLeft.hours, 2), label: isEn ? 'Hours' : 'ঘণ্টা' },
+                  { val: isEn ? String(timeLeft.minutes).padStart(2, '0') : toBengaliNumber(timeLeft.minutes, 2), label: isEn ? 'Mins' : 'মিনিট' },
+                  { val: isEn ? String(timeLeft.seconds).padStart(2, '0') : toBengaliNumber(timeLeft.seconds, 2), label: isEn ? 'Secs' : 'সেকেন্ড' }
+                ].map((box, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      background: 'linear-gradient(180deg, #f0f7ff 0%, #e0effe 100%)',
+                      border: '1px solid rgba(191, 219, 254, 0.8)',
+                      borderRadius: '10px',
+                      padding: '6px 2px 7px 2px',
+                      textAlign: 'center',
+                      boxShadow: '0 1px 3px rgba(37, 99, 235, 0.04)'
+                    }}
+                  >
+                    <div style={{ fontSize: '17px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15, fontFamily: '"Poppins", sans-serif' }}>
+                      {box.val}
+                    </div>
+                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', marginTop: '3px' }}>
+                      {box.label}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </>
+        )}
 
       </div>
     </div>

@@ -246,13 +246,7 @@ export default function ResultDetails() {
           time={job.resultTime || (isEn ? 'Published' : 'প্রকাশিত')}
           dateLabel={isEn ? 'Published Date:' : 'প্রকাশের তারিখ:'}
           timeLabel={isEn ? 'Status:' : 'ফলাফল স্ট্যাটাস:'}
-          bannerText={isEn ? 'Result Summary' : 'ফলাফল সারসংক্ষেপ'}
-          extraStats={[
-            { value: job.vacancy ? (isEn ? String(job.vacancy) : String(job.vacancy).split('').map(d => ({'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'}[d]||d)).join('')) : (isEn ? '1' : '১'), label: isEn ? 'Vacancy' : 'পদসংখ্যা' },
-            { value: job.jobType || (isEn ? 'MCQ' : 'এমসিকিউ'), label: isEn ? 'Exam Type' : 'পরীক্ষার ধরন' },
-            { value: isEn ? String(circularImages.length || 1) : String(circularImages.length || 1).split('').map(d => ({'0':'০','1':'১','2':'২','3':'৩','4':'৪','5':'৫','6':'৬','7':'৭','8':'৮','9':'৯'}[d]||d)).join(''), label: isEn ? 'Pages' : 'পৃষ্ঠা' },
-            { value: isEn ? '100%' : '১০০%', label: isEn ? 'Published' : 'প্রকাশিত' }
-          ]}
+          showStats={false}
           isEn={isEn}
         />
 
