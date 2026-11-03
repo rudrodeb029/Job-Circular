@@ -319,9 +319,7 @@ export default function JobDetails() {
                 <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   অফিসিয়াল নিয়োগ বিজ্ঞপ্তি
                 </h3>
-                <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  Official Job Circular Notice ({circularImages.length} Page{circularImages.length > 1 ? 's' : ''})
-                </p>
+                
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
@@ -532,9 +530,7 @@ export default function JobDetails() {
                 <h3 style={{ fontSize: '14px', fontWeight: 800, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   অফিসিয়াল নিয়োগ বিজ্ঞপ্তি
                 </h3>
-                <p style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  Official Job Circular Notice (0 Pages)
-                </p>
+                
               </div>
             </div>
 

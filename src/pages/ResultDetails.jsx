@@ -285,14 +285,10 @@ export default function ResultDetails() {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
-              <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
+              <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>
                 {isEn ? 'Result Sheet' : 'ফলাফল বিজ্ঞপ্তি'}
               </h3>
-              <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
-                {isEn 
-                  ? `Result Document (${circularImages.length} Page${circularImages.length > 1 ? 's' : ''})` 
-                  : `ফলাফল বিজ্ঞপ্তি (${circularImages.length}টি পেজ)`}
-              </p>
+              
             </div>
 
             <div style={{ display: 'flex', gap: '6px' }}>
