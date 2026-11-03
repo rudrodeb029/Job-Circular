@@ -6,14 +6,16 @@ import {
   triggerNativeAdClick,
   preloadNativeAd,
   showNativeAdvancedAd,
-  hideNativeAdvancedAd
+  hideNativeAdvancedAd,
+  getNativeAdvancedAdUnitId
 } from '../utils/admobUtils';
 
 /**
  * NativeAdCard Component
  * Real AdMob Native Advanced Ad Card.
- * Receives and displays real test ad content directly from the Google AdMob SDK
+ * Receives and displays real ad content directly from the Google AdMob SDK
  * (headline, body, advertiser, star rating, CTA button, and official AdMob branding).
+ * Automatically detects Test Mode vs Live Production Mode.
  * Fully responsive to Dark Mode, light mode, user dismiss, and Remote Config switches.
  */
 export default function NativeAdCard({
@@ -26,6 +28,7 @@ export default function NativeAdCard({
 
   const [dismissed, setDismissed] = useState(false);
   const [adsEnabled, setAdsEnabled] = useState(true);
+  const [unitId, setUnitId] = useState(() => getNativeAdvancedAdUnitId());
 
   // Real AdMob native ad data state
   const [adData, setAdData] = useState(() => {
@@ -37,6 +40,9 @@ export default function NativeAdCard({
     if (typeof window !== 'undefined' && window.AndroidAds) {
       if (typeof window.AndroidAds.isNativeAdsEnabled === 'function') {
         setAdsEnabled(Boolean(window.AndroidAds.isNativeAdsEnabled()));
+      }
+      if (typeof window.AndroidAds.getNativeAdUnitId === 'function') {
+        setUnitId(window.AndroidAds.getNativeAdUnitId());
       }
       // Check if ad data is already in cache
       const cached = getNativeAdData();
@@ -57,8 +63,13 @@ export default function NativeAdCard({
 
     // 3. Remote Config Live Updates Listener
     const handleRemoteConfigUpdate = (e) => {
-      if (e && e.detail && typeof e.detail.show_native_ads !== 'undefined') {
-        setAdsEnabled(Boolean(e.detail.show_ads && e.detail.show_native_ads));
+      if (e && e.detail) {
+        if (typeof e.detail.show_native_ads !== 'undefined') {
+          setAdsEnabled(Boolean(e.detail.show_ads && e.detail.show_native_ads));
+        }
+        if (e.detail.admob_native_id) {
+          setUnitId(e.detail.admob_native_id);
+        }
       }
     };
 
@@ -71,7 +82,10 @@ export default function NativeAdCard({
     };
   }, []);
 
-  if (dismissed || !adsEnabled) {
+  const isTestMode = String(unitId || '').includes('3940256099942544');
+
+  // In live production mode, if no ad is filled or ready, do not show any blank space
+  if (dismissed || !adsEnabled || (!isTestMode && !adData)) {
     return null;
   }
 
@@ -90,12 +104,14 @@ export default function NativeAdCard({
   };
 
   // Content provided by Google AdMob or clean official test defaults
-  const headline = adData?.headline || (isEn ? 'Test Ad: Google' : 'Test Ad: Google AdMob');
-  const bodyText = adData?.body || (isEn
-    ? 'Nice job! This is a real AdMob Native Advanced test ad. Tap to test interaction.'
-    : 'এটি গুগল অ্যাডমবের অফিসিয়াল নেটিভ অ্যাড টেস্ট। বিস্তারিত দেখতে বাটনে চাপুন।');
+  const headline = adData?.headline || (isTestMode ? (isEn ? 'Test Ad: Google' : 'Test Ad: Google AdMob') : '');
+  const bodyText = adData?.body || (isTestMode
+    ? (isEn
+      ? 'Nice job! This is a real AdMob Native Advanced test ad. Tap to test interaction.'
+      : 'এটি গুগল অ্যাডমবের অফিসিয়াল নেটিভ অ্যাড টেস্ট। বিস্তারিত দেখতে বাটনে চাপুন।')
+    : '');
   const ctaText = adData?.callToAction || (isEn ? 'Install' : 'ইনস্টল করুন');
-  const advertiser = adData?.advertiser || (adData?.store ? adData.store : 'Google Partner');
+  const advertiser = adData?.advertiser || (adData?.store ? adData.store : (isTestMode ? 'Google Partner' : ''));
   const iconUrl = adData?.iconUrl || null;
 
   return (
@@ -127,7 +143,7 @@ export default function NativeAdCard({
               fontSize: '10px',
               fontWeight: 800,
               color: '#ffffff',
-              backgroundColor: '#059669', // AdMob compliant green test badge
+              backgroundColor: isTestMode ? '#059669' : '#1d4ed8', // Green for Test Ad, Blue for Live
               padding: '2px 7px',
               borderRadius: '4px',
               letterSpacing: '0.4px',
@@ -136,17 +152,19 @@ export default function NativeAdCard({
               textTransform: 'uppercase'
             }}
           >
-            Test Ad • Ad
+            {isTestMode ? 'Test Ad • Ad' : (isEn ? 'Sponsored • Ad' : 'বিজ্ঞাপন • Ad')}
           </span>
-          <span
-            style={{
-              fontSize: '11px',
-              color: isDark ? '#94a3b8' : '#64748b',
-              fontWeight: 600
-            }}
-          >
-            {advertiser}
-          </span>
+          {advertiser && (
+            <span
+              style={{
+                fontSize: '11px',
+                color: isDark ? '#94a3b8' : '#64748b',
+                fontWeight: 600
+              }}
+            >
+              {advertiser}
+            </span>
+          )}
         </div>
 
         {/* User Dismissal Button */}
@@ -192,7 +210,7 @@ export default function NativeAdCard({
             }}
           />
         ) : (
-          /* Official Google AdMob 4-Color Pinwheel / App Icon */
+          /* Official Google AdMob 4-Color Icon */
           <div
             style={{
               width: '44px',
