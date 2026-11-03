@@ -9,11 +9,12 @@ export default function FormattedText({
 }) {
   if (!text) return null;
 
-  // Clean inline font-size declarations so rich-text copies cannot override standard size
+  // Clean inline font-size and background declarations so rich-text copies cannot override standard size or card background
   const cleanedText = typeof text === 'string'
     ? text
         .replace(/font-size\s*:\s*[^;"]+;?/gi, '')
         .replace(/size\s*=\s*["'][^"']+["']/gi, '')
+        .replace(/background(-color)?\s*:\s*[^;"]+;?/gi, '')
     : text;
 
   // Check if text has HTML tags

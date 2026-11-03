@@ -1505,10 +1505,12 @@
   line-height: 1.65 !important;
   font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif !important;
   color: inherit;
+  background-color: transparent;
 }
 
 .formatted-text-content p {
   color: inherit;
+  background-color: transparent;
   line-height: 1.65 !important;
   margin: 0 0 8px 0;
 }
@@ -1520,6 +1522,7 @@
 .formatted-text-content span,
 .formatted-text-content div {
   color: inherit;
+  background-color: transparent;
 }
 
 .formatted-text-content strong,

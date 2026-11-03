@@ -242,7 +242,17 @@ export default function ExamDetails() {
         />
 
         {/* Job Description Section */}
-        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+        <div
+          className="card"
+          style={{
+            marginBottom: 'var(--space-lg)',
+            background: state.theme === 'dark' ? 'var(--card-bg, #1e293b)' : '#ffffff',
+            borderRadius: '20px',
+            border: state.theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.8)',
+            boxShadow: state.theme === 'dark' ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)' : '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
+            padding: '16px'
+          }}
+        >
           <h3 className="font-bold mb-xs" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
             {state.language === 'en' ? 'Description' : 'পরীক্ষার বিবরণ'}
           </h3>
@@ -269,7 +279,17 @@ export default function ExamDetails() {
 
 
         {/* Circular Notice Attachment Section */}
-        <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>
+        <div
+          className="card"
+          style={{
+            marginBottom: 'var(--space-lg)',
+            background: state.theme === 'dark' ? 'var(--card-bg, #1e293b)' : '#ffffff',
+            borderRadius: '20px',
+            border: state.theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.8)',
+            boxShadow: state.theme === 'dark' ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)' : '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
+            padding: '16px'
+          }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
             <div>
               <h3 style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 2px 0' }}>
