@@ -16,7 +16,7 @@ import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd } from '../utils/admobUtils';
 import { openInAppBrowser } from '../utils/browserUtils';
-import NativeAdCard from '../components/NativeAdCard';
+
 import DetailsHeaderCard from '../components/DetailsHeaderCard';
 
 const orgIconsMap = {
@@ -259,7 +259,7 @@ export default function ResultDetails() {
         </div>
 
         {/* AdMob Native Advanced Ad Card (Non-intrusive, dismissible) */}
-        <NativeAdCard />
+
 
         {/* Result PDF Attachment Section */}
         <div className="card" style={{ marginBottom: 'var(--space-lg)' }}>

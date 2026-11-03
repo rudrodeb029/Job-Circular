@@ -299,17 +299,7 @@ export const getNativeAdData = () => {
  * Triggers native click interaction on the loaded AdMob Native Ad.
  */
 export const triggerNativeAdClick = () => {
-  try {
-    if (typeof window !== 'undefined' && window.AndroidAds) {
-      if (typeof window.AndroidAds.triggerNativeAdClick === 'function') {
-        window.AndroidAds.triggerNativeAdClick();
-        return true;
-      } else if (typeof window.AndroidAds.showNativeAd === 'function') {
-        window.AndroidAds.showNativeAd();
-        return true;
-      }
-    }
-  } catch (err) {}
+  // Deprecated for policy compliance: programmatic performClick is prohibited by AdMob
   return false;
 };
 

@@ -15,7 +15,7 @@ import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd, showNativeBannerAd, hideNativeBannerAd } from '../utils/admobUtils';
 import { openInAppBrowser } from '../utils/browserUtils';
-import NativeAdCard from '../components/NativeAdCard';
+
 import DetailsHeaderCard from '../components/DetailsHeaderCard';
 
 export default function JobDetails() {
@@ -288,7 +288,7 @@ export default function JobDetails() {
         </div>
 
         {/* AdMob Native Advanced Ad Card (Non-intrusive, dismissible) */}
-        <NativeAdCard />
+
 
         {/* Multi-Image Official Circular Notice Gallery Section */}
         {circularImages.length > 0 ? (

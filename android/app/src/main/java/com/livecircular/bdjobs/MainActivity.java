@@ -110,6 +110,7 @@ public class MainActivity extends BridgeActivity {
     private boolean hasLeftActivityForBrowser = false;
     private long pendingBrowserReturnShowUntil = 0;
     private long lastInterstitialShownTimestamp = 0;
+    private long browserOpenedTimestamp = 0;
 
 
     @Override
@@ -299,7 +300,7 @@ public class MainActivity extends BridgeActivity {
 
             // Meta Audience Network Test Mode
             try {
-                AdSettings.setTestMode(true);
+                if (BuildConfig.DEBUG) { AdSettings.setTestMode(true); }
             } catch (Throwable t) {
                 Log.w(TAG, "Meta AdSettings setTestMode warning: " + t.getMessage());
             }
@@ -589,9 +590,18 @@ public class MainActivity extends BridgeActivity {
      * Triggered from Java or JavaScript when user completes an action.
      */
     public void showInterstitialAd() {
+        showInterstitialAd(false);
+    }
+
+    public void showInterstitialAd(boolean force) {
         long now = System.currentTimeMillis();
-        if (now - lastInterstitialShownTimestamp < 2500L) {
-            Log.d(TAG, "Skipping duplicate showInterstitialAd call within 2.5s window.");
+        long cooldownMs = interstitialCooldownSec * 1000L;
+        if (!force && (now - lastInterstitialShownTimestamp < cooldownMs)) {
+            Log.d(TAG, "Interstitial ad cooldown active (" + (now - lastInterstitialShownTimestamp) / 1000 + "s / " + interstitialCooldownSec + "s). Skipping ad.");
+            return;
+        }
+        if (now - lastInterstitialShownTimestamp < 3000L) {
+            Log.d(TAG, "Skipping duplicate showInterstitialAd call within 3s window.");
             return;
         }
         if (!isActivityResumed) {
@@ -937,12 +947,19 @@ public class MainActivity extends BridgeActivity {
                     @SuppressWarnings("unused")
                     public void notifyInAppBrowserOpened() {
                         runOnUiThread(() -> {
-                            pendingAdOnBrowserReturn = true;
-                            hasLeftActivityForBrowser = false;
-                            if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
-                                loadInterstitialAd();
+                            long now = System.currentTimeMillis();
+                            browserOpenedTimestamp = now;
+                            if (now - lastInterstitialShownTimestamp >= (interstitialCooldownSec * 1000L)) {
+                                pendingAdOnBrowserReturn = true;
+                                hasLeftActivityForBrowser = false;
+                                if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd == null && !isInterstitialLoading) {
+                                    loadInterstitialAd();
+                                }
+                                Log.d(TAG, "Custom In-App Browser opened: armed interstitial ad for return.");
+                            } else {
+                                pendingAdOnBrowserReturn = false;
+                                Log.d(TAG, "Custom In-App Browser opened: cooldown active, skipping return ad.");
                             }
-                            Log.d(TAG, "Custom In-App Browser opened: armed interstitial ad for return.");
                         });
                     }
 
@@ -1024,16 +1041,7 @@ public class MainActivity extends BridgeActivity {
                     @Keep
                     @SuppressWarnings("unused")
                     public void triggerNativeAdClick() {
-                        runOnUiThread(() -> {
-                            if (currentNativeAdView != null) {
-                                Button cta = currentNativeAdView.findViewById(R.id.ad_call_to_action);
-                                if (cta != null) {
-                                    cta.performClick();
-                                    return;
-                                }
-                            }
-                            MainActivity.this.setNativeAdVisibility(true, isCurrentThemeDark);
-                        });
+                        // Deprecated for policy compliance: programmatic performClick is prohibited by AdMob
                     }
 
                     @JavascriptInterface
@@ -1283,13 +1291,19 @@ public class MainActivity extends BridgeActivity {
         if (pendingAdOnBrowserReturn && hasLeftActivityForBrowser) {
             pendingAdOnBrowserReturn = false;
             hasLeftActivityForBrowser = false;
-            pendingBrowserReturnShowUntil = System.currentTimeMillis() + 2500L;
-            Log.d(TAG, "User returned from Custom In-App Browser (Cross/Back clicked). Scheduling Interstitial Ad...");
-            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-                if (isActivityResumed && !isFinishing() && !isDestroyed()) {
-                    showInterstitialAd();
-                }
-            }, 200);
+            long elapsedSinceOpen = System.currentTimeMillis() - browserOpenedTimestamp;
+            // Only show if user returned within 3 minutes of opening browser (preventing disruptive ads if phone was locked or switched)
+            if (elapsedSinceOpen <= 180000L) {
+                pendingBrowserReturnShowUntil = System.currentTimeMillis() + 2500L;
+                Log.d(TAG, "User returned from Custom In-App Browser (Cross/Back clicked). Scheduling Interstitial Ad...");
+                new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                    if (isActivityResumed && !isFinishing() && !isDestroyed()) {
+                        showInterstitialAd();
+                    }
+                }, 250);
+            } else {
+                Log.d(TAG, "User was away too long (" + elapsedSinceOpen + "ms). Discarding return ad to prevent disruptive resume ad.");
+            }
         }
     }
 

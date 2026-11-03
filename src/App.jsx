@@ -342,79 +342,27 @@ function App() {
     ['/home', '/feed', '/saved', '/notifications', '/profile'].includes(location.pathname)
   );
 
-  const isScrollBannerTabRoute = (
-    (location.pathname === '/' && hasSeenOnboarding) ||
-    ['/home', '/feed', '/saved', '/notifications'].includes(location.pathname)
-  );
-
   // ═══ Native Banner Ad Visibility Controller ═══
-  // Non-tab pages: always shown (unless admin/splash/exam)
-  // 4 Main Tab pages (Home, Feed, Saved, Notifications): shown ONLY when user scrolls down
-  // Profile, Splash, Onboarding, Admin & Live Exam Room: always hidden
+  // Play Store & AdMob Policy Compliance:
+  // 1. Tab pages (/home, /feed, /saved, /notifications, /profile) NEVER show banner ads
+  //    to prevent accidental clicks and navigation button overlap with BottomNav.
+  // 2. Non-tab content pages (JobDetails, ExamDetails, ResultDetails, Categories, Search, etc.)
+  //    show a clean, fixed bottom Adaptive Banner with dedicated bottom page padding.
+  // 3. Splash, Onboarding, Admin, and Live Exam Room always hide banner ads.
   useEffect(() => {
-    const isAlwaysHiddenPage = 
+    const isHiddenPage = 
       isAdminRoute || 
-      location.pathname === '/profile' ||
+      isTabRoute ||
       location.pathname === '/splash' || 
       location.pathname === '/onboarding' ||
       location.pathname.startsWith('/live-exam-room');
 
-    if (isAlwaysHiddenPage) {
+    if (isHiddenPage) {
       hideNativeBannerAd();
-      return;
-    }
-
-    if (!isScrollBannerTabRoute) {
-      // Non-tab pages (e.g. JobDetails, Categories, SearchFilter, etc.): show banner
+    } else {
       showNativeBannerAd(state.theme === 'dark');
-      return;
     }
-
-    // On Home, Feed, Saved, Notifications: Start hidden at top, show only when scrolling down
-    let isBannerVisible = false;
-    let lastScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-    hideNativeBannerAd();
-
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-          const diff = currentScrollY - lastScrollY;
-
-          if (currentScrollY <= 25) {
-            // Near top of page -> hide banner
-            if (isBannerVisible) {
-              hideNativeBannerAd();
-              isBannerVisible = false;
-            }
-          } else if (diff > 8 && currentScrollY > 45) {
-            // Scrolling down -> show banner
-            if (!isBannerVisible) {
-              showNativeBannerAd(state.theme === 'dark');
-              isBannerVisible = true;
-            }
-          } else if (diff < -8) {
-            // Scrolling up -> hide banner (to show bottom nav cleanly)
-            if (isBannerVisible) {
-              hideNativeBannerAd();
-              isBannerVisible = false;
-            }
-          }
-
-          lastScrollY = currentScrollY;
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      hideNativeBannerAd();
-    };
-  }, [location.pathname, isScrollBannerTabRoute, isAdminRoute, state.theme]);
+  }, [location.pathname, isTabRoute, isAdminRoute, state.theme]);
 
   // Log page view to Firebase Analytics on route change
   useEffect(() => {

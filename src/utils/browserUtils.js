@@ -76,10 +76,10 @@ export async function openInAppBrowser(url, onWebFallback) {
           activeBrowserFinishedSub.remove().catch(() => {});
           activeBrowserFinishedSub = null;
         }
-        // Trigger interstitial ad upon returning to the app from Custom In-App Browser
+        // Trigger interstitial ad upon returning to the app from Custom In-App Browser (respecting cooldown)
         setTimeout(() => {
-          showNativeInterstitialAd(true);
-        }, 180);
+          showNativeInterstitialAd(false);
+        }, 250);
       });
 
       await Browser.open({
