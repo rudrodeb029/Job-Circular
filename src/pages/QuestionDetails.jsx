@@ -13,6 +13,11 @@ import { preloadInterstitialAd, navigateWithAdOnReturn } from '../utils/admobUti
 export default function QuestionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const handleBack = () => {
+    const hasHistory = window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0;
+    navigateWithAdOnReturn(navigate, hasHistory ? -1 : '/questions-hub');
+  };
   const { state } = useAppContext();
   const { state: adminState, dispatch: adminDispatch } = useAdminContext();
   const isEn = state.language === 'en';
@@ -100,7 +105,7 @@ export default function QuestionDetails() {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
         <div className="page-header">
-          <button className="back-btn" onClick={() => navigate(-1)}>
+          <button type="button" className="back-btn" onClick={handleBack} aria-label="Back">
             <ArrowLeft size={22} />
           </button>
           <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
@@ -119,7 +124,7 @@ export default function QuestionDetails() {
       return (
         <div className="page" style={{ paddingBottom: '100px' }}>
           <div className="page-header">
-            <button className="back-btn" onClick={() => navigate(-1)}>
+            <button type="button" className="back-btn" onClick={handleBack} aria-label="Back">
               <ArrowLeft size={22} />
             </button>
             <h1 style={{ flex: 1 }}>{isEn ? 'Question Paper' : 'প্রশ্নপত্র'}</h1>
@@ -131,7 +136,7 @@ export default function QuestionDetails() {
     return (
       <div className="page" style={{ paddingBottom: '100px' }}>
         <div className="page-header">
-          <button className="back-btn" onClick={() => navigate(-1)}>
+          <button type="button" className="back-btn" onClick={handleBack} aria-label="Back">
             <ArrowLeft size={22} />
           </button>
           <h1 style={{ flex: 1 }}>{isEn ? 'Not Found' : 'পাওয়া যায়নি'}</h1>
@@ -165,7 +170,7 @@ export default function QuestionDetails() {
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
       {/* Header */}
       <div className="page-header">
-        <button className="back-btn" onClick={() => navigateWithAdOnReturn(navigate, -1)}>
+        <button type="button" className="back-btn" onClick={handleBack} aria-label="Back">
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>

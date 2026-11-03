@@ -1,5 +1,5 @@
 import React from 'react';
-import { showNativeInterstitialAd } from '../utils/admobUtils';
+import { preloadInterstitialAd } from '../utils/admobUtils';
 
 /**
  * Pixel-Perfect Question Grid Card Component
@@ -28,8 +28,8 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
   const activeIcon = categoryIcon || categoryIconMap[paper.category] || paper.icon || paper.categoryIcon;
 
   const handleCardClick = (e) => {
-    // Trigger Interstitial Ad when clicking question card
-    showNativeInterstitialAd();
+    // Preload Interstitial Ad so it is ready when user exits QuestionDetails
+    preloadInterstitialAd();
     if (onClick) onClick(e);
   };
 
