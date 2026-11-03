@@ -95,7 +95,7 @@ export default function SplashScreen() {
 
         {/* Bengali Subtitle */}
         <p style={{ fontFamily: '"Hind Siliguri", sans-serif', fontSize: '14px', fontWeight: 600, color: '#475569', marginTop: '8px', letterSpacing: '0.02em', margin: '8px 0 0 0' }}>
-          সকল চাকরির খবর, সর্বসময় আপনার সাথে
+          সকল চাকরির খবর, সবসময় আপনার সাথে
         </p>
       </div>
     </div>
