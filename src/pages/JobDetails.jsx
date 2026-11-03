@@ -21,7 +21,6 @@ export default function JobDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
-  const [showMore, setShowMore] = useState(false);
   const [showFullImage, setShowFullImage] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [downloading, setDownloading] = useState(false);
@@ -315,13 +314,7 @@ export default function JobDetails() {
           <h3 className="font-bold mb-xs" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
             {state.language === 'en' ? 'Job Description' : 'চাকরির বিবরণ'}
           </h3>
-          <FormattedText text={job.description} lineClamp={3} showMore={showMore} />
-          <button
-            onClick={() => setShowMore(!showMore)}
-            style={{ color: 'var(--primary)', fontWeight: 700, fontSize: '12px', marginTop: '8px', background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-          >
-            {showMore ? 'View Less ▲' : 'View More ▼'}
-          </button>
+          <FormattedText text={job.description} />
         </div>
 
         {/* AdMob Native Advanced Ad Card (Non-intrusive, dismissible) */}

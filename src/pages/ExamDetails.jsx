@@ -50,7 +50,6 @@ export default function ExamDetails() {
   const [modalType, setModalType] = useState('admit_card');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
-  const [showFullDescription, setShowFullDescription] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [pageLoading, setPageLoading] = useState(false);
 
@@ -258,26 +257,7 @@ export default function ExamDetails() {
           <h3 className="font-bold mb-xs" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
             {state.language === 'en' ? 'Description' : 'পরীক্ষার বিবরণ'}
           </h3>
-          <FormattedText text={job.description} lineClamp={3} showMore={showFullDescription} />
-          <button
-            onClick={() => setShowFullDescription(!showFullDescription)}
-            style={{
-              color: 'var(--primary)',
-              fontWeight: 700,
-              fontSize: '12px',
-              marginTop: '8px',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: 0
-            }}
-          >
-            {showFullDescription ? (state.language === 'en' ? 'View Less' : 'কম দেখুন') : (state.language === 'en' ? 'View More' : 'আরও দেখুন')}
-            <span style={{ transform: showFullDescription ? 'rotate(180deg)' : 'none', transition: 'transform 0.3s ease', display: 'inline-block' }}>▼</span>
-          </button>
+          <FormattedText text={job.description} />
         </div>
 
         {/* Instructions */}
