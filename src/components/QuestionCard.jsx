@@ -160,7 +160,7 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
       </div>
 
       {/* Bottom Content Body - Title & Meta Info */}
-      <div style={{ padding: '10px 8px 12px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', flex: 1, justifyContent: 'space-between' }}>
+      <div style={{ padding: '10px 5px 12px 5px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', flex: 1, justifyContent: 'space-between' }}>
         {/* Title */}
         <h3
           style={{
@@ -185,24 +185,24 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: '4px',
+          gap: '3px',
           flexWrap: 'nowrap',
           width: '100%',
-          fontSize: '9.5px',
+          fontSize: '8px',
           color: 'var(--text-secondary, #475569)',
           fontWeight: 600,
           whiteSpace: 'nowrap',
           overflow: 'hidden'
         }}>
           {dateStr && (
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap', flexShrink: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              <span role="img" aria-label="calendar">🗓️</span>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '1.5px', whiteSpace: 'nowrap', flexShrink: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span role="img" aria-label="calendar" style={{ fontSize: '7.5px', lineHeight: 1 }}>🗓️</span>
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{dateStr}</span>
             </span>
           )}
           
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap', flexShrink: 0 }}>
-            <span role="img" aria-label="paper">📝</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '1.5px', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            <span role="img" aria-label="paper" style={{ fontSize: '7.5px', lineHeight: 1 }}>📝</span>
             <span>{countText}</span>
           </span>
         </div>
