@@ -13,8 +13,8 @@ export default function FormattedText({
   const hasHtml = /<[a-z][\s\S]*>/i.test(text);
 
   const containerStyle = {
-    fontSize: '14px',
-    lineHeight: 1.8,
+    fontSize: '12px',
+    lineHeight: 1.65,
     fontWeight: 400,
     color: 'var(--text-primary)',
     fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',

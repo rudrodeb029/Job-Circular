@@ -1489,15 +1489,15 @@
 /* 1. Formatted Description Text & Marked Highlights */
 .formatted-text-content {
   color: var(--text-primary);
-  font-size: 14px;
-  line-height: 1.8;
+  font-size: 12px;
+  line-height: 1.65;
   font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif;
   word-break: break-word;
 }
 
 .formatted-text-content p {
   color: inherit;
-  line-height: 1.8;
+  line-height: 1.65;
 }
 
 .formatted-text-content span,
