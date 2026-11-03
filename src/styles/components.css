@@ -1489,15 +1489,32 @@
 /* 1. Formatted Description Text & Marked Highlights */
 .formatted-text-content {
   color: var(--text-primary);
-  font-size: 12px;
-  line-height: 1.65;
-  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif;
+  font-size: 11px !important;
+  line-height: 1.65 !important;
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif !important;
   word-break: break-word;
+}
+
+.formatted-text-content *,
+.formatted-text-content p,
+.formatted-text-content span,
+.formatted-text-content div,
+.formatted-text-content li,
+.formatted-text-content font {
+  font-size: 11px !important;
+  line-height: 1.65 !important;
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif !important;
+  color: inherit;
 }
 
 .formatted-text-content p {
   color: inherit;
-  line-height: 1.65;
+  line-height: 1.65 !important;
+  margin: 0 0 8px 0;
+}
+
+.formatted-text-content p:last-child {
+  margin-bottom: 0;
 }
 
 .formatted-text-content span,
@@ -1507,16 +1524,30 @@
 
 .formatted-text-content strong,
 .formatted-text-content b {
+  font-size: 11px !important;
   color: var(--text-primary);
-  font-weight: 700;
+  font-weight: 700 !important;
+}
+
+.formatted-text-content h1,
+.formatted-text-content h2,
+.formatted-text-content h3,
+.formatted-text-content h4,
+.formatted-text-content h5,
+.formatted-text-content h6 {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+  margin: 6px 0 4px 0 !important;
+  color: var(--text-primary);
 }
 
 .formatted-text-content a {
+  font-size: 11px !important;
   color: var(--primary);
   text-decoration: underline;
 }
 
-/* High-contrast and clean styling for HTML <mark> tags */
 .formatted-text-content mark,
 mark {
   background-color: rgba(234, 179, 8, 0.25) !important;

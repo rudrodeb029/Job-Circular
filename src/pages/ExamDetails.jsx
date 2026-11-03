@@ -259,7 +259,7 @@ export default function ExamDetails() {
             <h3 className="font-bold mb-xs" style={{ fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--chip-warning-color)' }}>
               ⚠️ Instructions / সাধারণ নির্দেশনাবলী
             </h3>
-            <p style={{ fontSize: '12px', color: 'var(--text-primary)', lineHeight: 1.6, marginTop: '10px', margin: '10px 0 0 0' }}>
+            <p style={{ fontSize: '11px', color: 'var(--text-primary)', lineHeight: 1.65, marginTop: '10px', margin: '10px 0 0 0' }}>
               {job.examInstructions}
             </p>
           </div>

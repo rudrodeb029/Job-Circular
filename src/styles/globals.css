@@ -664,9 +664,25 @@ html[data-lang="en"] {
 }
 
 /* Proper Bengali typography for rich descriptions (job/result/exam details) */
-.formatted-text-content, .formatted-text-content * { font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif !important; }
-.formatted-text-content p, .formatted-text-content li { line-height: 1.65; }
-.formatted-text-content strong, .formatted-text-content b { font-weight: 700; color: #1e293b; }
+/* Proper Bengali typography for rich descriptions (job/result/exam details) */
+.formatted-text-content,
+.formatted-text-content *,
+.formatted-text-content p,
+.formatted-text-content span,
+.formatted-text-content div,
+.formatted-text-content li,
+.formatted-text-content font,
+.formatted-text-content strong,
+.formatted-text-content b {
+  font-family: 'Noto Sans Bengali', 'Hind Siliguri', 'Inter', sans-serif !important;
+  font-size: 11px !important;
+  line-height: 1.65 !important;
+}
+.formatted-text-content strong,
+.formatted-text-content b {
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
 
 
 /* ==========================================================================
