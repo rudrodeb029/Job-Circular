@@ -251,7 +251,7 @@ function App() {
       }
 
       // Safe Interstitial on Back: Check if user is returning from a set of questions or finished exam
-      const isQuestionSet = location.pathname.startsWith('/question-details/') || location.pathname.startsWith('/questions/');
+      const isQuestionSet = location.pathname.startsWith('/question-details/');
       const isLiveExam = location.pathname.startsWith('/live-exam-room/');
 
       if (isQuestionSet || isLiveExam) {
