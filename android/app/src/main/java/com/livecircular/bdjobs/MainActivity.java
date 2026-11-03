@@ -894,6 +894,13 @@ public class MainActivity extends BridgeActivity {
                     @JavascriptInterface
                     @Keep
                     @SuppressWarnings("unused")
+                    public void loadInterstitial() {
+                        runOnUiThread(MainActivity.this::loadInterstitialAd);
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
                     public void showNativeAd() {
                         runOnUiThread(() -> MainActivity.this.setNativeAdVisibility(true, false));
                     }

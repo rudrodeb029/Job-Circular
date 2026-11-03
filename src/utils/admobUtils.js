@@ -325,3 +325,92 @@ export const preloadNativeAd = () => {
   } catch (err) {}
   return false;
 };
+
+/**
+ * Checks whether an Interstitial Ad is preloaded in memory and ready to show.
+ */
+export const isNativeInterstitialReady = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.isInterstitialReady === 'function') {
+      return Boolean(window.AndroidAds.isInterstitialReady());
+    }
+  } catch (err) {}
+  return false;
+};
+
+/**
+ * Preloads an Interstitial Ad in the background (using loadAd) with zero delay.
+ */
+export const preloadInterstitialAd = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.loadInterstitial === 'function') {
+      window.AndroidAds.loadInterstitial();
+      return true;
+    }
+  } catch (err) {}
+  return false;
+};
+
+/**
+ * Safe Back Navigation with Interstitial Ad Display.
+ * Used when a user returns to the main menu/list after finishing a set of questions
+ * (e.g. from a specific year or question bank) or submitting an exam.
+ * 
+ * Rules:
+ * - Checks readiness before display (isNativeInterstitialReady).
+ * - If ready and cooldown passed: Displays the preloaded ad, then continues navigation immediately upon dismissal.
+ * - If NOT ready: Proceeds directly to the target page with 0ms delay without interrupting the user.
+ * 
+ * @param {Function} navigate - React Router navigate function
+ * @param {string|number} fallbackPath - Navigation target (default: -1)
+ * @param {boolean} force - Whether to bypass cooldown (default: false)
+ */
+export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = false) => {
+  const isReady = isNativeInterstitialReady();
+  const now = Date.now();
+
+  // Refresh cooldown if available from Native
+  if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getInterstitialCooldownSec === 'function') {
+    try {
+      const nativeSec = window.AndroidAds.getInterstitialCooldownSec();
+      if (nativeSec > 0) dynamicCooldownMs = nativeSec * 1000;
+    } catch (e) {}
+  }
+
+  const cooldownPassed = force || (now - lastInterstitialTime >= dynamicCooldownMs);
+
+  const executeNavigation = () => {
+    if (typeof fallbackPath === 'number' || typeof fallbackPath === 'string') {
+      navigate(fallbackPath);
+    } else {
+      navigate(-1);
+    }
+  };
+
+  // Check readiness before display
+  if (isReady && cooldownPassed) {
+    let navigated = false;
+    const doNavigateOnce = () => {
+      if (!navigated) {
+        navigated = true;
+        window.removeEventListener('native_interstitial_dismissed', doNavigateOnce);
+        window.removeEventListener('native_interstitial_failed', doNavigateOnce);
+        executeNavigation();
+      }
+    };
+
+    window.addEventListener('native_interstitial_dismissed', doNavigateOnce, { once: true });
+    window.addEventListener('native_interstitial_failed', doNavigateOnce, { once: true });
+
+    // Safety fallback: if dismissed event doesn't fire within 600ms, proceed
+    setTimeout(doNavigateOnce, 600);
+
+    const shown = showNativeInterstitialAd(force);
+    if (!shown) {
+      doNavigateOnce();
+    }
+  } else {
+    // Not ready or in cooldown: Proceed directly without interrupting the user
+    executeNavigation();
+  }
+};

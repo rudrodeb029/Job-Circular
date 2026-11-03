@@ -8,7 +8,7 @@ import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, CO
 import { supabase } from '../services/supabaseClient';
 import ModernLoader from '../components/ModernLoader';
 import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult, getExamResult, saveLeaderboard, getLeaderboard, getExamFromSQLite, saveExamToSQLite } from '../services/sqliteService';
-import { showNativeInterstitialAd } from '../utils/admobUtils';
+import { showNativeInterstitialAd, preloadInterstitialAd, navigateWithAdOnReturn } from '../utils/admobUtils';
 import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
 
 export default function LiveExamRoom() {
@@ -569,6 +569,7 @@ export default function LiveExamRoom() {
         await clearLocalAnswers(id);
         
         setSubmitted(true);
+        preloadInterstitialAd();
         return;
       } else {
         throw new Error(result.error || 'Server returned false success');
@@ -670,7 +671,13 @@ export default function LiveExamRoom() {
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
       {/* Header */}
       <div className="page-header flex-between" style={{ borderBottom: 'none' }}>
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button className="back-btn" onClick={() => {
+          if (currentResult) {
+            navigateWithAdOnReturn(navigate, '/live-exams');
+          } else {
+            navigate(-1);
+          }
+        }}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>

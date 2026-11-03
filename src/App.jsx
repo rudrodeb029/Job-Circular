@@ -15,7 +15,7 @@ import { triggerDeltaSync } from './services/sqliteService'
 import { Capacitor } from '@capacitor/core'
 
 import BottomNav from './components/BottomNav'
-import { showNativeBannerAd, hideNativeBannerAd } from './utils/admobUtils'
+import { showNativeBannerAd, hideNativeBannerAd, navigateWithAdOnReturn } from './utils/admobUtils'
 import { logAnalyticsEvent } from './firebase'
 
 const CURRENT_VERSION = "1.0.0";
@@ -247,8 +247,17 @@ function App() {
       if (location.pathname === '/home' || location.pathname === '/' || location.pathname === '/onboarding') {
         // Exit app if on root pages
         CapacitorApp.exitApp();
+        return;
+      }
+
+      // Safe Interstitial on Back: Check if user is returning from a set of questions or finished exam
+      const isQuestionSet = location.pathname.startsWith('/question-details/') || location.pathname.startsWith('/questions/');
+      const isLiveExam = location.pathname.startsWith('/live-exam-room/');
+
+      if (isQuestionSet || isLiveExam) {
+        navigateWithAdOnReturn(navigate, -1);
       } else {
-        // Otherwise, navigate back in history
+        // Otherwise, navigate back in history immediately
         navigate(-1);
       }
     });

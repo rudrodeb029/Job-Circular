@@ -8,6 +8,7 @@ import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
 import { supabase } from '../services/supabaseClient';
 import { normalizeDoc } from '../services/supabaseService';
 import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
+import { preloadInterstitialAd, navigateWithAdOnReturn } from '../utils/admobUtils';
 
 export default function QuestionDetails() {
   const { id } = useParams();
@@ -20,6 +21,10 @@ export default function QuestionDetails() {
   const [isSwitchingMode, setIsSwitchingMode] = useState(false);
   const [paper, setPaper] = useState(null);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
+
+  useEffect(() => {
+    preloadInterstitialAd();
+  }, []);
 
   useEffect(() => {
     // 1. Check if we have it in adminState.questions and it has questions
@@ -160,7 +165,7 @@ export default function QuestionDetails() {
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
       {/* Header */}
       <div className="page-header">
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button className="back-btn" onClick={() => navigateWithAdOnReturn(navigate, -1)}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>

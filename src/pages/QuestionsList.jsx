@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { getQuestionsByCategory } from '../data/questionsData';
 import SearchBar from '../components/SearchBar';
 import QuestionCard from '../components/QuestionCard';
+import { navigateWithAdOnReturn } from '../utils/admobUtils';
 
 const categoryTitlesBn = {
   bcs: 'বিসিএস প্রিলিমিনারি প্রশ্নপত্র',
@@ -128,7 +129,7 @@ export default function QuestionsList() {
     <div className="page" style={{ paddingBottom: '100px' }}>
       {/* Header */}
       <div className="page-header">
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button className="back-btn" onClick={() => navigateWithAdOnReturn(navigate, -1)}>
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>{displayTitle}</h1>
