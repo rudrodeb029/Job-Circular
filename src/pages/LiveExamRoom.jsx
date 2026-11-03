@@ -426,6 +426,23 @@ export default function LiveExamRoom() {
     }
   }, [exam, id, currentResult, isCompleted]);
 
+  const handleRoomBack = () => {
+    const hasHistory = window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0;
+    if (currentResult) {
+      if (hasHistory) {
+        navigateWithAdOnReturn(navigate, -1);
+      } else {
+        navigateWithAdOnReturn(navigate, '/live-exams-list');
+      }
+    } else {
+      if (hasHistory) {
+        navigate(-1);
+      } else {
+        navigate('/live-exams-list');
+      }
+    }
+  };
+
   if (loadingExam) {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
@@ -665,22 +682,7 @@ export default function LiveExamRoom() {
     }
   }
 
-  const handleRoomBack = () => {
-    const hasHistory = window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0;
-    if (currentResult) {
-      if (hasHistory) {
-        navigateWithAdOnReturn(navigate, -1);
-      } else {
-        navigateWithAdOnReturn(navigate, '/live-exams-list');
-      }
-    } else {
-      if (hasHistory) {
-        navigate(-1);
-      } else {
-        navigate('/live-exams-list');
-      }
-    }
-  };
+
 
   const showQuestionsSheet = isRunning && !currentResult;
 
