@@ -459,23 +459,24 @@ function LiveExamCard({
             onClick={() => onViewResult && onViewResult(exam.id)}
             style={{
               width: '100%',
-              padding: '6px 10px',
-              borderRadius: '16px',
-              border: 'none',
-              background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
-              color: '#ffffff',
-              fontWeight: 800,
-              fontSize: '10px',
+              padding: '3px 6px',
+              borderRadius: '5px',
+              border: '1px solid rgba(226, 232, 240, 0.9)',
+              background: 'rgba(255, 255, 255, 0.96)',
+              color: '#1e293b',
+              fontWeight: 700,
+              fontSize: '8px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
-              boxShadow: '0 3px 8px rgba(37, 99, 235, 0.3)',
-              whiteSpace: 'nowrap'
+              gap: '3px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s ease'
             }}
           >
-            <span role="img" aria-label="trophy" style={{ fontSize: '11px' }}>🏆</span>
+            <span role="img" aria-label="trophy" style={{ fontSize: '8.5px' }}>🏆</span>
             <span>
               {result
                 ? (isEn ? `Score: ${result.score}/${result.total}` : `ফলাফল (${toBengaliNumber(result.score)}/${toBengaliNumber(result.total)})`)
