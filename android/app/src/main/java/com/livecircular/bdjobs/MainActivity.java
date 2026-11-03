@@ -76,7 +76,7 @@ public class MainActivity extends BridgeActivity {
     // ═══ Default Official Test Ad Unit IDs ═══
     private static final String DEFAULT_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111";
     private static final String DEFAULT_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
-    private static final String DEFAULT_NATIVE_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247690483";
+    private static final String DEFAULT_NATIVE_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110";
 
 
     // ═══ Ad State & Remote Config Configured Values ═══
@@ -603,10 +603,35 @@ public class MainActivity extends BridgeActivity {
                     }
                     currentNativeAd = nativeAd;
                     isNativeAdLoading = false;
-                    Log.d(TAG, "Native Advanced Ad loaded successfully into cache (" + nativeAdUnitId + ").");
-                    if (isNativeRequestedVisible) {
-                        displayNativeAdCard(isCurrentThemeDark);
-                    }
+                    Log.d(TAG, "Native Advanced Ad loaded successfully into cache (" + nativeAdUnitId + "): " + nativeAd.getHeadline());
+
+                    runOnUiThread(() -> {
+                        try {
+                            if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                                org.json.JSONObject adJson = new org.json.JSONObject();
+                                adJson.put("headline", nativeAd.getHeadline() != null ? nativeAd.getHeadline() : "Test Ad: Google");
+                                adJson.put("body", nativeAd.getBody() != null ? nativeAd.getBody() : "AdMob Native Advanced Test Ad");
+                                adJson.put("callToAction", nativeAd.getCallToAction() != null ? nativeAd.getCallToAction() : "Install");
+                                adJson.put("advertiser", nativeAd.getAdvertiser() != null ? nativeAd.getAdvertiser() : (nativeAd.getStore() != null ? nativeAd.getStore() : "Google"));
+                                adJson.put("price", nativeAd.getPrice() != null ? nativeAd.getPrice() : "Free");
+                                adJson.put("store", nativeAd.getStore() != null ? nativeAd.getStore() : "Google Play");
+                                if (nativeAd.getStarRating() != null) {
+                                    adJson.put("starRating", nativeAd.getStarRating());
+                                }
+                                if (nativeAd.getIcon() != null && nativeAd.getIcon().getUri() != null) {
+                                    adJson.put("iconUrl", nativeAd.getIcon().getUri().toString());
+                                }
+                                String script = "window.dispatchEvent(new CustomEvent('native_ad_loaded', { detail: " + adJson.toString() + " }));";
+                                MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Error notifying WebView of loaded native ad: " + e.getMessage());
+                        }
+
+                        if (isNativeRequestedVisible) {
+                            displayNativeAdCard(isCurrentThemeDark);
+                        }
+                    });
                 })
                 .withAdListener(new AdListener() {
                     @Override
@@ -913,6 +938,54 @@ public class MainActivity extends BridgeActivity {
                     @SuppressWarnings("unused")
                     public long getNativeAdCooldownSec() {
                         return nativeAdCooldownSec;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public String getNativeAdData() {
+                        if (currentNativeAd == null) return null;
+                        try {
+                            org.json.JSONObject adJson = new org.json.JSONObject();
+                            adJson.put("headline", currentNativeAd.getHeadline() != null ? currentNativeAd.getHeadline() : "Test Ad: Google");
+                            adJson.put("body", currentNativeAd.getBody() != null ? currentNativeAd.getBody() : "AdMob Native Advanced Test Ad");
+                            adJson.put("callToAction", currentNativeAd.getCallToAction() != null ? currentNativeAd.getCallToAction() : "Install");
+                            adJson.put("advertiser", currentNativeAd.getAdvertiser() != null ? currentNativeAd.getAdvertiser() : (currentNativeAd.getStore() != null ? currentNativeAd.getStore() : "Google"));
+                            adJson.put("price", currentNativeAd.getPrice() != null ? currentNativeAd.getPrice() : "Free");
+                            adJson.put("store", currentNativeAd.getStore() != null ? currentNativeAd.getStore() : "Google Play");
+                            if (currentNativeAd.getStarRating() != null) {
+                                adJson.put("starRating", currentNativeAd.getStarRating());
+                            }
+                            if (currentNativeAd.getIcon() != null && currentNativeAd.getIcon().getUri() != null) {
+                                adJson.put("iconUrl", currentNativeAd.getIcon().getUri().toString());
+                            }
+                            return adJson.toString();
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public void triggerNativeAdClick() {
+                        runOnUiThread(() -> {
+                            if (currentNativeAdView != null) {
+                                Button cta = currentNativeAdView.findViewById(R.id.ad_call_to_action);
+                                if (cta != null) {
+                                    cta.performClick();
+                                    return;
+                                }
+                            }
+                            MainActivity.this.setNativeAdVisibility(true, isCurrentThemeDark);
+                        });
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public void loadNativeAd() {
+                        runOnUiThread(MainActivity.this::loadNativeAd);
                     }
 
                     @JavascriptInterface

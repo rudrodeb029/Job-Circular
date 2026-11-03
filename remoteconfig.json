@@ -16,7 +16,7 @@
     },
     "admob_native_id": {
       "defaultValue": {
-        "value": "ca-app-pub-3940256099942544/2247690483"
+        "value": "ca-app-pub-3940256099942544/2247696110"
       },
       "description": "AdMob Native Advanced Ad Unit ID.",
       "valueType": "STRING"

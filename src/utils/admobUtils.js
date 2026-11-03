@@ -267,7 +267,7 @@ export const getNativeAdvancedAdUnitId = () => {
       return window.AndroidAds.getNativeAdUnitId();
     }
   } catch (err) {}
-  return 'ca-app-pub-3940256099942544/2247690483';
+  return 'ca-app-pub-3940256099942544/2247696110';
 };
 
 /**
@@ -280,4 +280,48 @@ export const getNativeAdvancedAdCooldownSec = () => {
     }
   } catch (err) {}
   return Math.round(dynamicNativeCooldownMs / 1000);
+};
+
+/**
+ * Gets loaded real AdMob Native Ad data (headline, body, cta, advertiser, iconUrl).
+ */
+export const getNativeAdData = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getNativeAdData === 'function') {
+      const raw = window.AndroidAds.getNativeAdData();
+      if (raw) return JSON.parse(raw);
+    }
+  } catch (err) {}
+  return null;
+};
+
+/**
+ * Triggers native click interaction on the loaded AdMob Native Ad.
+ */
+export const triggerNativeAdClick = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds) {
+      if (typeof window.AndroidAds.triggerNativeAdClick === 'function') {
+        window.AndroidAds.triggerNativeAdClick();
+        return true;
+      } else if (typeof window.AndroidAds.showNativeAd === 'function') {
+        window.AndroidAds.showNativeAd();
+        return true;
+      }
+    }
+  } catch (err) {}
+  return false;
+};
+
+/**
+ * Requests AdMob to preload a fresh native ad into memory.
+ */
+export const preloadNativeAd = () => {
+  try {
+    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.loadNativeAd === 'function') {
+      window.AndroidAds.loadNativeAd();
+      return true;
+    }
+  } catch (err) {}
+  return false;
 };
