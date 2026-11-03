@@ -296,7 +296,8 @@ const TABLE_COLUMNS = {
   [COLLECTIONS.JOBS]: [
     'id', 'title', 'titleEn', 'organization', 'organizationEn',
     'categoryId', 'category', 'description', 'salary', 'vacancy',
-    'deadline', 'applyLink', 'imageUrl', 'images', 'status',
+    'deadline', 'deadlineTime', 'examTime', 'resultDate', 'resultTime',
+    'applyLink', 'imageUrl', 'images', 'status',
     'views', 'createdAt', 'updatedAt'
   ],
   [COLLECTIONS.LIVE_EXAMS]: [
