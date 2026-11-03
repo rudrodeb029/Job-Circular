@@ -26,7 +26,17 @@ export default function LiveExamsPage() {
   return (
     <div className="page" style={{ background: 'var(--bg-secondary)' }}>
       <div className="page-header">
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button
+          type="button"
+          className="back-btn"
+          onClick={() => {
+            if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
+              navigate(-1);
+            } else {
+              navigate('/questions-hub');
+            }
+          }}
+        >
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>

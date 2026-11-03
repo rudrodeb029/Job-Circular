@@ -313,7 +313,15 @@ function PageShell({ pathname = '' }) {
         </div>
       ) : (
         <div className="page-header">
-          <button className="back-btn" aria-label="Back" onClick={() => window.history.back()}>
+          <button className="back-btn" aria-label="Back" type="button" onClick={() => {
+            if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
+              window.history.back();
+            } else if (pathname.startsWith('/live-exam')) {
+              window.location.href = '/questions-hub';
+            } else {
+              window.location.href = '/home';
+            }
+          }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
           </button>
           {title ? (

@@ -43,6 +43,20 @@ export default function LiveExams() {
     tabTimerRef.current = setTimeout(() => setIsTabLoading(false), 180);
   };
 
+  const handleBack = () => {
+    if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
+      navigate(-1);
+      const currentPath = window.location.pathname;
+      setTimeout(() => {
+        if (window.location.pathname === currentPath) {
+          navigate('/questions-hub');
+        }
+      }, 120);
+    } else {
+      navigate('/questions-hub');
+    }
+  };
+
   // Update exams and registrations
   useEffect(() => {
     if (Array.isArray(adminState.liveExams)) {
@@ -188,7 +202,13 @@ export default function LiveExams() {
     }}>
       {/* Header */}
       <div className="page-header" style={{ borderBottom: 'none' }}>
-        <button className="back-btn" onClick={() => navigate(-1)}>
+        <button
+          type="button"
+          className="back-btn"
+          onClick={handleBack}
+          aria-label="Back"
+          style={{ cursor: 'pointer', zIndex: 10 }}
+        >
           <ArrowLeft size={22} />
         </button>
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>

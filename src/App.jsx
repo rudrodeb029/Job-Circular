@@ -256,9 +256,16 @@ function App() {
 
       if (isQuestionSet || isLiveExam) {
         navigateWithAdOnReturn(navigate, -1);
-      } else {
-        // Otherwise, navigate back in history immediately
+      } else if (location.pathname.startsWith('/live-exam')) {
+        if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
+          navigate(-1);
+        } else {
+          navigate('/questions-hub');
+        }
+      } else if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
         navigate(-1);
+      } else {
+        navigate('/home');
       }
     });
 
