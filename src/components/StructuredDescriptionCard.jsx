@@ -1,10 +1,32 @@
 import React, { useMemo } from 'react';
-import { Menu, Briefcase, GraduationCap, MapPin, DollarSign, Info, Star, FileText } from './Icons';
+import { Menu, Briefcase, GraduationCap, MapPin, DollarSign, Info, Star, FileText, Users } from './Icons';
 
 /**
  * Keywords map to determine appropriate icon for a section heading
  */
 const SECTION_ICONS = [
+  {
+    keywords: [
+      'পদের নাম ও আসন সংখ্যা',
+      'পদের নাম ও পদসংখ্যা',
+      'পদের নাম ও পদ সংখ্যা',
+      'পদ ও আসন সংখ্যা',
+      'পদ ও পদসংখ্যা',
+      'পদের নাম',
+      'আসন সংখ্যা',
+      'পদসংখ্যা',
+      'শূন্য পদ',
+      'শূন্য পদের সংখ্যা',
+      'পদ বিবরণ',
+      'post name',
+      'designation',
+      'vacancies',
+      'vacancy',
+      'positions',
+      'seat count'
+    ],
+    getIcon: (color = '#2563eb') => <Users size={16} color={color} />
+  },
   {
     keywords: ['প্রধান দায়িত্ব', 'দায়িত্বসমূহ', 'কাজের দায়িত্ব', 'দায়িত্ব ও কর্তব্য', 'কর্তব্য', 'দায়িত্ব', 'responsibilities', 'duties', 'key responsibilities'],
     getIcon: (color = '#2563eb') => <Briefcase size={16} color={color} />
@@ -168,15 +190,58 @@ export default function StructuredDescriptionCard({
   title = 'চাকরির বিবরণ',
   titleEn = 'Job Description',
   language = 'bn',
-  theme = 'light'
+  theme = 'light',
+  postName,
+  vacancy
 }) {
   const isDark = theme === 'dark';
   const isEn = language === 'en';
   const displayTitle = isEn ? titleEn : title;
 
-  const sections = useMemo(() => parseStructuredSections(description), [description]);
+  const sections = useMemo(() => {
+    const list = parseStructuredSections(description);
 
-  if (!description || !sections || sections.length === 0) return null;
+    // Check if post/vacancy section already exists in parsed sections
+    const hasPostSection = list.some(s =>
+      s.heading && /পদ|আসন|vacancy|post|designation/i.test(s.heading)
+    );
+
+    if (!hasPostSection && (postName || vacancy)) {
+      const items = [];
+      if (postName) {
+        items.push({
+          type: 'listItem',
+          text: (isEn ? 'Post Name: ' : 'পদের নাম: ') + postName
+        });
+      }
+      if (vacancy) {
+        const vStr = String(vacancy).trim();
+        const formattedV = /\d+$/.test(vStr) ? `${vStr} জন` : vStr;
+        items.push({
+          type: 'listItem',
+          text: (isEn ? 'Vacancy / Seats: ' : 'আসন সংখ্যা: ') + formattedV
+        });
+      }
+
+      if (items.length > 0) {
+        const postSection = {
+          heading: isEn ? 'Post Name & Vacancy' : 'পদের নাম ও আসন সংখ্যা',
+          items
+        };
+
+        // If the first section is an intro paragraph (no heading), place right after it!
+        if (list.length > 0 && !list[0].heading) {
+          list.splice(1, 0, postSection);
+        } else {
+          list.unshift(postSection);
+        }
+      }
+    }
+
+    return list;
+  }, [description, postName, vacancy, isEn]);
+
+  if ((!description && (!sections || sections.length === 0)) || (!sections || sections.length === 0)) return null;
 
   return (
     <div

@@ -528,7 +528,10 @@ export default function ManageJobs() {
                    <button
                      type="button"
                      onClick={() => {
-                       const template = `<p>বিজ্ঞপ্তির সংক্ষিপ্ত সাধারণ ভূমিকা এখানে লিখুন...</p><h3>প্রধান দায়িত্বসমূহ</h3><ul><li>সার্বিক কার্যক্রম পরিচালনা ও ব্যবস্থাপনা করা।</li><li>কর্মীদের সাথে সমন্বয় রেখে কাজের গতি ও মান উন্নত করা।</li><li>প্রতিষ্ঠানের লক্ষ্য অর্জনে নেতৃত্ব প্রদান ও তদারকি করা।</li></ul><h3>শিক্ষাগত যোগ্যতা ও অভিজ্ঞতা</h3><p>স্বীকৃত বিশ্ববিদ্যালয় থেকে স্নাতক ডিগ্রি এবং সংশ্লিষ্ট ক্ষেত্রে অন্তত ২ বছরের অভিজ্ঞতা থাকতে হবে।</p><h3>কর্মস্থল</h3><p>ঢাকা, বাংলাদেশ</p>`;
+                       const titleText = formData.title ? formData.title.trim() : 'অফিসার';
+                        const vacancyText = formData.vacancy ? (String(formData.vacancy).includes('জন') ? formData.vacancy : `${formData.vacancy} জন`) : '১০ জন';
+                        const locationText = formData.location ? formData.location.trim() : 'ঢাকা, বাংলাদেশ';
+                        const template = `<p>বিজ্ঞপ্তির সংক্ষিপ্ত সাধারণ ভূমিকা এখানে লিখুন...</p><h3>পদের নাম ও আসন সংখ্যা</h3><ul><li>পদের নাম: ${titleText}</li><li>আসন সংখ্যা: ${vacancyText}</li></ul><h3>প্রধান দায়িত্বসমূহ</h3><ul><li>প্রতিষ্ঠানের সার্বিক কার্যক্রম পরিচালনা ও ব্যবস্থাপনা করা।</li><li>কর্মীদের সাথে সমন্বয় রেখে কাজের গতি ও মান উন্নত করা।</li><li>প্রতিষ্ঠানের লক্ষ্য অর্জনে নেতৃত্ব প্রদান ও কার্যক্রম তদারকি করা।</li></ul><h3>শিক্ষাগত যোগ্যতা ও অভিজ্ঞতা</h3><p>স্বীকৃত বিশ্ববিদ্যালয় থেকে স্নাতক ডিগ্রি এবং সংশ্লিষ্ট ক্ষেত্রে অন্তত ২ বছরের অভিজ্ঞতা থাকতে হবে।</p><h3>কর্মস্থল</h3><p>${locationText}</p>`;
                        if (formData.description && !window.confirm('বর্তমান বিবরণ মুছে নতুন স্ট্যান্ডার্ড টেমপ্লেট বসাতে চান?')) {
                          return;
                        }
@@ -581,7 +584,11 @@ export default function ManageJobs() {
                    <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                      অ্যাপে যেমন কার্ড দেখা যাবে (Live Preview):
                    </div>
-                   <StructuredDescriptionCard description={formData.description} />
+                   <StructuredDescriptionCard
+                      description={formData.description}
+                      postName={formData.title}
+                      vacancy={formData.vacancy}
+                    />
                  </div>
                )}
             </div>

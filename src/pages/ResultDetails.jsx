@@ -258,6 +258,8 @@ export default function ResultDetails() {
           titleEn="Result Description"
           language={state.language}
           theme={state.theme}
+          postName={job.title || job.titleEn}
+          vacancy={job.vacancy}
         />
 
         {/* AdMob Native Advanced Ad Card (Non-intrusive, dismissible) */}

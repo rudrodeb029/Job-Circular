@@ -249,6 +249,8 @@ export default function ExamDetails() {
           titleEn="Exam Description"
           language={state.language}
           theme={state.theme}
+          postName={job.title || job.titleEn}
+          vacancy={job.vacancy}
         />
 
         {/* Instructions */}
