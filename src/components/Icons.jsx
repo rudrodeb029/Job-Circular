@@ -295,6 +295,13 @@ export const Award = ({ size = 22, color = 'currentColor', className = '' }) => 
   </svg>
 );
 
+export const GraduationCap = ({ size = 22, color = 'currentColor', className = '' }) => (
+  <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
+    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+    <path d="M6 12v5c3 3 9 3 12 0v-5" />
+  </svg>
+);
+
 export const Zap = ({ size = 22, color = 'currentColor', className = '' }) => (
   <svg style={iconStyle(size, color)} className={className} viewBox="0 0 24 24">
     <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />

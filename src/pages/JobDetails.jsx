@@ -11,6 +11,7 @@ import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import ProgressiveImage from '../components/ProgressiveImage';
 import PortalWarningModal from '../components/PortalWarningModal';
 import FormattedText from '../components/FormattedText';
+import StructuredDescriptionCard from '../components/StructuredDescriptionCard';
 import FileDownloadModal from '../components/FileDownloadModal';
 import { stripHtmlTags } from '../utils/textUtils';
 import { showNativeInterstitialAd, showNativeBannerAd, hideNativeBannerAd } from '../utils/admobUtils';
@@ -280,22 +281,13 @@ export default function JobDetails() {
         />
 
         {/* Job Description Section */}
-        <div
-          className="card"
-          style={{
-            marginBottom: 'var(--space-lg)',
-            background: state.theme === 'dark' ? 'var(--card-bg, #1e293b)' : '#ffffff',
-            borderRadius: '20px',
-            border: state.theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.8)',
-            boxShadow: state.theme === 'dark' ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)' : '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
-            padding: '16px'
-          }}
-        >
-          <h3 className="font-bold mb-xs" style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-            {state.language === 'en' ? 'Job Description' : 'চাকরির বিবরণ'}
-          </h3>
-          <FormattedText text={job.description} />
-        </div>
+        <StructuredDescriptionCard
+          description={job.description}
+          title="চাকরির বিবরণ"
+          titleEn="Job Description"
+          language={state.language}
+          theme={state.theme}
+        />
 
         {/* AdMob Native Advanced Ad Card (Non-intrusive, dismissible) */}
 

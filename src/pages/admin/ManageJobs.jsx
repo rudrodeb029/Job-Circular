@@ -6,6 +6,7 @@ import { CLOUDINARY_CONFIG } from '../../cloudinary';
 import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
 import { normalizeMediaUrl, getGoogleDriveFileId } from '../../utils/mediaUtils';
 import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
+import StructuredDescriptionCard from '../../components/StructuredDescriptionCard';
 import { stripHtmlTags, sanitizeRichHtml } from '../../utils/textUtils';
 
 export default function ManageJobs() {
@@ -23,6 +24,7 @@ export default function ManageJobs() {
   const [deletingJobId, setDeletingJobId] = useState(null);
   
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+  const [showDescPreview, setShowDescPreview] = useState(false);
   
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -520,13 +522,68 @@ export default function ManageJobs() {
             </div>
 
             <div style={{ gridColumn: 'span 2' }} className="input-group">
-               <label>Description (বিবরণ - Rich Text Formatting)</label>
+               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                 <label style={{ margin: 0, fontWeight: 700 }}>Description (বিবরণ - Rich Text Formatting)</label>
+                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                   <button
+                     type="button"
+                     onClick={() => {
+                       const template = `<p>বিজ্ঞপ্তির সংক্ষিপ্ত সাধারণ ভূমিকা এখানে লিখুন...</p><h3>প্রধান দায়িত্বসমূহ</h3><ul><li>সার্বিক কার্যক্রম পরিচালনা ও ব্যবস্থাপনা করা।</li><li>কর্মীদের সাথে সমন্বয় রেখে কাজের গতি ও মান উন্নত করা।</li><li>প্রতিষ্ঠানের লক্ষ্য অর্জনে নেতৃত্ব প্রদান ও তদারকি করা।</li></ul><h3>শিক্ষাগত যোগ্যতা ও অভিজ্ঞতা</h3><p>স্বীকৃত বিশ্ববিদ্যালয় থেকে স্নাতক ডিগ্রি এবং সংশ্লিষ্ট ক্ষেত্রে অন্তত ২ বছরের অভিজ্ঞতা থাকতে হবে।</p><h3>কর্মস্থল</h3><p>ঢাকা, বাংলাদেশ</p>`;
+                       if (formData.description && !window.confirm('বর্তমান বিবরণ মুছে নতুন স্ট্যান্ডার্ড টেমপ্লেট বসাতে চান?')) {
+                         return;
+                       }
+                       setFormData(prev => ({ ...prev, description: template }));
+                     }}
+                     style={{
+                       background: '#eff6ff',
+                       color: '#2563eb',
+                       border: '1px solid #bfdbfe',
+                       borderRadius: '8px',
+                       padding: '4px 10px',
+                       fontSize: '11px',
+                       fontWeight: 700,
+                       cursor: 'pointer',
+                       display: 'inline-flex',
+                       alignItems: 'center',
+                       gap: '4px'
+                     }}
+                   >
+                     ✨ স্ট্যান্ডার্ড টেমপ্লেট যোগ করুন
+                   </button>
+                   <button
+                     type="button"
+                     onClick={() => setShowDescPreview(prev => !prev)}
+                     style={{
+                       background: showDescPreview ? '#2563eb' : '#f1f5f9',
+                       color: showDescPreview ? '#ffffff' : '#475569',
+                       border: '1px solid #cbd5e1',
+                       borderRadius: '8px',
+                       padding: '4px 10px',
+                       fontSize: '11px',
+                       fontWeight: 700,
+                       cursor: 'pointer'
+                     }}
+                   >
+                     {showDescPreview ? '✕ প্রিভিউ লুকান' : '👁️ প্রিভিউ দেখুন'}
+                   </button>
+                 </div>
+               </div>
+
                <RichTextEditor
                  value={formData.description}
                  onChange={(htmlValue) => setFormData(prev => ({ ...prev, description: htmlValue }))}
                  placeholder="এখানে আপনার বিজ্ঞপ্তির বিস্তারিত বিবরণ লিখুন (Bold, Italic, Alignment, Bullet list ব্যবহার করতে পারবেন)..."
                  minHeight="220px"
                />
+
+               {showDescPreview && formData.description && (
+                 <div style={{ marginTop: '12px', padding: '12px', background: '#f8fafc', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+                   <div style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                     অ্যাপে যেমন কার্ড দেখা যাবে (Live Preview):
+                   </div>
+                   <StructuredDescriptionCard description={formData.description} />
+                 </div>
+               )}
             </div>
 
             <div style={{ gridColumn: 'span 2' }} className="input-group">
