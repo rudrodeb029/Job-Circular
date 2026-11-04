@@ -281,6 +281,25 @@ function parseStructuredSections(rawContent) {
   return sections;
 }
 
+
+export function parsePostsFromDescription(content) {
+  if (!content) return [];
+  const sections = parseStructuredSections(content);
+  for (const s of sections) {
+    if (s.heading && /পদ|আসন|vacancy|post|designation/i.test(s.heading)) {
+      const formatted = formatPostSectionItems(s.items, false);
+      const postRows = formatted.filter(item => item.type === 'postRow');
+      if (postRows.length > 0) {
+        return postRows.map(p => ({
+          name: p.name || '',
+          vacancy: p.vacancy || ''
+        }));
+      }
+    }
+  }
+  return [];
+}
+
 export default function StructuredDescriptionCard({
   description,
   title = 'চাকরির বিবরণ',
@@ -288,7 +307,8 @@ export default function StructuredDescriptionCard({
   language = 'bn',
   theme = 'light',
   postName,
-  vacancy
+  vacancy,
+  posts = []
 }) {
   const isDark = theme === 'dark';
   const isEn = language === 'en';
@@ -313,8 +333,28 @@ export default function StructuredDescriptionCard({
       s.heading && /পদ|আসন|vacancy|post|designation/i.test(s.heading)
     );
 
-    if (!hasPostSection && (postName || vacancy)) {
+    const hasCustomPosts = Array.isArray(posts) && posts.some(p => p && (p.name || p.vacancy));
+
+    if (!hasPostSection && (hasCustomPosts || postName || vacancy)) {
       const items = [];
+
+      if (hasCustomPosts) {
+        for (const p of posts) {
+          if (!p) continue;
+          const pName = typeof p === 'string' ? p : (p.name || p.title || '');
+          let pVac = typeof p === 'string' ? '' : (p.vacancy || p.seats || '');
+          if (pVac && /^\d+$/.test(String(pVac).trim())) {
+            pVac = `${String(pVac).trim()} ${isEn ? '' : 'জন'}`.trim();
+          }
+          if (pName || pVac) {
+            items.push({
+              type: 'postRow',
+              name: pName.replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '').trim(),
+              vacancy: pVac
+            });
+          }
+        }
+      } else {
       const rawPostLines = String(postName || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
 
       if (rawPostLines.length > 1) {
@@ -338,6 +378,7 @@ export default function StructuredDescriptionCard({
           vacancy: vText
         });
       }
+      }
 
       if (items.length > 0) {
         const postSection = {
@@ -355,7 +396,7 @@ export default function StructuredDescriptionCard({
     }
 
     return list;
-  }, [description, postName, vacancy, isEn]);
+  }, [description, postName, vacancy, posts, isEn]);
 
   if ((!description && (!sections || sections.length === 0)) || (!sections || sections.length === 0)) return null;
 
@@ -599,7 +640,7 @@ export default function StructuredDescriptionCard({
                                   lineHeight: 1.65
                                 }}
                               >
-                                {item.name}
+                                {String(item.name || '').replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '').trim()}
                               </span>
                             </div>
 
@@ -621,7 +662,7 @@ export default function StructuredDescriptionCard({
                                 <span style={{ opacity: 0.85, fontWeight: 500 }}>
                                   {isEn ? 'Seats:' : 'আসন:'}
                                 </span>
-                                <span>{item.vacancy}</span>
+                                <span>{String(item.vacancy || '').replace(/^(?:আসন\s*সংখ্যা|পদসংখ্যা|শূন্য\s*পদ|আসন|seats?)\s*[:ঃ]?\s*/i, '').trim()}</span>
                               </div>
                             )}
                           </div>

@@ -289,6 +289,7 @@ export default function JobDetails() {
           theme={state.theme}
           postName={job.title || job.titleEn}
           vacancy={job.vacancy}
+          posts={job.posts}
         />
 
         {/* AdMob Native Advanced Ad Card (Non-intrusive, dismissible) */}

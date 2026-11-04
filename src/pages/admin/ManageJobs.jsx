@@ -6,7 +6,7 @@ import { CLOUDINARY_CONFIG } from '../../cloudinary';
 import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
 import { normalizeMediaUrl, getGoogleDriveFileId } from '../../utils/mediaUtils';
 import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
-import StructuredDescriptionCard from '../../components/StructuredDescriptionCard';
+import StructuredDescriptionCard, { parsePostsFromDescription } from '../../components/StructuredDescriptionCard';
 import { stripHtmlTags, sanitizeRichHtml } from '../../utils/textUtils';
 
 export default function ManageJobs() {
@@ -37,6 +37,7 @@ export default function ManageJobs() {
     jobType: '',
     location: '',
     vacancy: '',
+    posts: [{ name: '', vacancy: '' }],
     salary: '',
     deadline: '',
     deadlineTime: '23:59',
@@ -211,8 +212,32 @@ export default function ManageJobs() {
   const handleOpenForm = (job = null) => {
     if (job) {
       setEditingJob(job);
+
+      let jobPosts = [];
+      if (Array.isArray(job.posts) && job.posts.length > 0) {
+        jobPosts = job.posts.map(p => ({
+          name: p.name || p.title || '',
+          vacancy: p.vacancy || p.seats || ''
+        }));
+      } else if (job.description) {
+        const extracted = parsePostsFromDescription(job.description);
+        if (extracted.length > 0) {
+          jobPosts = extracted;
+        }
+      }
+
+      if (jobPosts.length === 0) {
+        jobPosts = [
+          {
+            name: job.title || '',
+            vacancy: job.vacancy ? (String(job.vacancy).includes('জন') ? String(job.vacancy) : `${job.vacancy} জন`) : ''
+          }
+        ];
+      }
+
       setFormData({
         ...job,
+        posts: jobPosts,
         organization: stripHtmlTags(job.organization || ''),
         organizationEn: stripHtmlTags(job.organizationEn || ''),
         showInExamDate: job.showInExamDate ?? !!job.examDate,
@@ -227,7 +252,10 @@ export default function ManageJobs() {
       });
     } else {
       setEditingJob(null);
-      setFormData(initialFormState);
+      setFormData({
+        ...initialFormState,
+        posts: [{ name: '', vacancy: '' }]
+      });
     }
     setShowForm(true);
   };
@@ -242,6 +270,79 @@ export default function ManageJobs() {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  const handleAddPost = () => {
+    setFormData(prev => ({
+      ...prev,
+      posts: [...(prev.posts || []), { name: '', vacancy: '' }]
+    }));
+  };
+
+  const handleUpdatePost = (index, field, value) => {
+    setFormData(prev => {
+      const updated = [...(prev.posts || [])];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, posts: updated };
+    });
+  };
+
+  const handleRemovePost = (index) => {
+    setFormData(prev => {
+      const current = prev.posts || [];
+      const updated = current.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        posts: updated.length > 0 ? updated : [{ name: '', vacancy: '' }]
+      };
+    });
+  };
+
+  const handleSyncPostsToDescription = () => {
+    const validPosts = (formData.posts || []).filter(p => p.name?.trim() || p.vacancy?.trim());
+    if (validPosts.length === 0) {
+      showToast('কোনো পদ বা আসন সংখ্যা নেই!', 'error');
+      return;
+    }
+
+    const postItemsHtml = validPosts.map(p => {
+      const name = p.name?.trim() || '';
+      let vac = p.vacancy?.trim() || '';
+      if (vac && /^\d+$/.test(vac)) {
+        vac = `${vac} জন`;
+      }
+      if (name && vac) {
+        return `<li>${name} - ${vac}</li>`;
+      }
+      return `<li>${name || vac}</li>`;
+    }).join('');
+
+    const newPostSectionHtml = `<h3>পদের নাম ও আসন সংখ্যা</h3><ul>${postItemsHtml}</ul>`;
+
+    setFormData(prev => {
+      let desc = prev.description || '';
+      const postSectionRegex = /<h3>(?:\s*<[^>]+>\s*)*(?:পদের?\s*নাম|পদ\s*ও\s*আসন|আসন\s*সংখ্যা|শূন্য\s*পদ|post|vacancy)[\s\S]*?<\/h3>\s*<[uo]l>[\s\S]*?<\/[uo]l>/i;
+
+      if (postSectionRegex.test(desc)) {
+        desc = desc.replace(postSectionRegex, newPostSectionHtml);
+      } else if (desc.trim()) {
+        const firstPRegex = /^(\s*<p>[\s\S]*?<\/p>)/i;
+        if (firstPRegex.test(desc)) {
+          desc = desc.replace(firstPRegex, `$1\n${newPostSectionHtml}`);
+        } else {
+          desc = `${newPostSectionHtml}\n${desc}`;
+        }
+      } else {
+        desc = `<p>বিজ্ঞপ্তির সংক্ষিপ্ত সাধারণ ভূমিকা এখানে লিখুন...</p>\n${newPostSectionHtml}\n<h3>প্রধান দায়িত্বসমূহ</h3><ul><li>প্রতিষ্ঠানের সার্বিক কার্যক্রম পরিচালনা ও ব্যবস্থাপনা করা।</li><li>কর্মীদের সাথে সমন্বয় রেখে কাজের গতি ও মান উন্নত করা।</li></ul><h3>শিক্ষাগত যোগ্যতা ও অভিজ্ঞতা</h3><p>স্বীকৃত বিশ্ববিদ্যালয় থেকে স্নাতক ডিগ্রি।</p><h3>কর্মস্থল</h3><p>${formData.location || 'ঢাকা, বাংলাদেশ'}</p>`;
+      }
+
+      return {
+        ...prev,
+        description: desc
+      };
+    });
+
+    showToast('পদের তালিকা বিবরণীতে সফলভাবে যুক্ত করা হয়েছে!');
+  };
+
 
   const handleSaveJob = (e) => {
     e.preventDefault();
@@ -266,9 +367,40 @@ export default function ManageJobs() {
     const jobTitle = cleanOrg || 'নিয়োগ বিজ্ঞপ্তি';
     const jobTitleEn = cleanOrgEn || jobTitle;
 
+    const cleanPosts = (formData.posts || [])
+      .filter(p => p && (p.name?.trim() || p.vacancy?.trim()))
+      .map(p => {
+        let vac = p.vacancy?.trim() || '';
+        if (vac && /^\d+$/.test(vac)) {
+          vac = `${vac} জন`;
+        }
+        return {
+          name: p.name?.trim() || '',
+          vacancy: vac
+        };
+      });
+
+    let autoVacancy = formData.vacancy;
+    if (!autoVacancy && cleanPosts.length > 0) {
+      let total = 0;
+      let hasCount = false;
+      for (const p of cleanPosts) {
+        const numMatch = String(p.vacancy).match(/\d+/);
+        if (numMatch) {
+          total += parseInt(numMatch[0], 10);
+          hasCount = true;
+        }
+      }
+      if (hasCount && total > 0) {
+        autoVacancy = total;
+      }
+    }
+
     const jobData = {
       ...formData,
       id: targetId,
+      vacancy: autoVacancy || formData.vacancy,
+      posts: cleanPosts,
       organization: cleanOrg,
       organizationEn: cleanOrgEn,
       title: jobTitle,
@@ -520,6 +652,172 @@ export default function ManageJobs() {
                  <input type="text" name="deadlineTime" className="modern-input" value={formData.deadlineTime || ''} onChange={handleInputChange} placeholder="e.g. 23:59 or রাত ১১:৫৯" />
               </div>
             </div>
+            {/* ── পদের নাম ও আসন সংখ্যা সেকশন (Multiple Posts Manager) ── */}
+            <div
+              style={{
+                gridColumn: 'span 2',
+                background: '#f8fafc',
+                border: '1.5px solid #e2e8f0',
+                borderRadius: '16px',
+                padding: '16px 20px',
+                marginTop: '10px'
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  marginBottom: '14px',
+                  flexWrap: 'wrap',
+                  gap: '10px'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '18px' }}>👥</span>
+                    <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: '#0f172a' }}>
+                      পদের নাম ও আসন সংখ্যা তালিকা (Designations & Vacancies)
+                    </h4>
+                    <span
+                      style={{
+                        background: '#dbeafe',
+                        color: '#1d4ed8',
+                        fontSize: '11px',
+                        fontWeight: 700,
+                        padding: '2px 8px',
+                        borderRadius: '999px'
+                      }}
+                    >
+                      {formData.posts ? formData.posts.length : 0} টি পদ
+                    </span>
+                  </div>
+                  <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#64748b' }}>
+                    বিজ্ঞপ্তিতে একাধিক পদ থাকলে প্রতিটি পদ ও আসন সংখ্যা নিচে যোগ করুন। এটি কার্ডের বামে পদের নাম এবং ডানে আসন সংখ্যা ফরম্যাটে দেখাবে।
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={handleSyncPostsToDescription}
+                    title="পদের তালিকা ফরম্যাট করে বিবরণীতে সিঙ্ক করুন"
+                    style={{
+                      background: '#ecfdf5',
+                      color: '#059669',
+                      border: '1px solid #a7f3d0',
+                      borderRadius: '8px',
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <span>🔄</span> বিবরণীতে সিঙ্ক করুন
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAddPost}
+                    style={{
+                      background: '#2563eb',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '6px 12px',
+                      fontSize: '12px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      boxShadow: '0 2px 4px rgba(37, 99, 235, 0.2)'
+                    }}
+                  >
+                    <span>+</span> পদ যোগ করুন
+                  </button>
+                </div>
+              </div>
+
+              {/* Post Rows */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {(formData.posts || []).map((post, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '28px 1fr 180px 36px',
+                      gap: '10px',
+                      alignItems: 'center',
+                      background: '#ffffff',
+                      border: '1px solid #e2e8f0',
+                      borderRadius: '10px',
+                      padding: '8px 12px'
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: 800,
+                        color: '#64748b',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {idx + 1}.
+                    </span>
+
+                    <div>
+                      <input
+                        type="text"
+                        className="modern-input"
+                        style={{ width: '100%', margin: 0, fontSize: '13px', padding: '8px 12px' }}
+                        placeholder="পদের নাম লিখুন (যেমন: সহকারী পরিচালক, অফিসার ক্যাশ)"
+                        value={post.name || ''}
+                        onChange={(e) => handleUpdatePost(idx, 'name', e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <input
+                        type="text"
+                        className="modern-input"
+                        style={{ width: '100%', margin: 0, fontSize: '13px', padding: '8px 12px' }}
+                        placeholder="আসন সংখ্যা (যেমন: ৫০ জন)"
+                        value={post.vacancy || ''}
+                        onChange={(e) => handleUpdatePost(idx, 'vacancy', e.target.value)}
+                      />
+                    </div>
+
+                    <div style={{ textAlign: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePost(idx)}
+                        title="এই পদ মুছে ফেলুন"
+                        style={{
+                          background: '#fef2f2',
+                          color: '#ef4444',
+                          border: '1px solid #fecaca',
+                          borderRadius: '8px',
+                          width: '32px',
+                          height: '32px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          fontWeight: 700
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
 
             <div style={{ gridColumn: 'span 2' }} className="input-group">
                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
@@ -528,10 +826,21 @@ export default function ManageJobs() {
                    <button
                      type="button"
                      onClick={() => {
-                       const titleText = formData.title ? formData.title.trim() : 'অফিসার';
-                        const vacancyText = formData.vacancy ? (String(formData.vacancy).includes('জন') ? formData.vacancy : `${formData.vacancy} জন`) : '১০ জন';
+                       const validPosts = (formData.posts || []).filter(p => p && (p.name?.trim() || p.vacancy?.trim()));
+                        const postsToRender = validPosts.length > 0
+                          ? validPosts
+                          : [{ name: formData.title ? formData.title.trim() : 'অফিসার', vacancy: formData.vacancy ? (String(formData.vacancy).includes('জন') ? formData.vacancy : `${formData.vacancy} জন`) : '১০ জন' }];
+
+                        const postItemsHtml = postsToRender.map(p => {
+                          const name = p.name ? p.name.trim() : '';
+                          let vac = p.vacancy ? p.vacancy.trim() : '';
+                          if (vac && /^\d+$/.test(vac)) vac = `${vac} জন`;
+                          if (name && vac) return `<li>${name} - ${vac}</li>`;
+                          return `<li>${name || vac}</li>`;
+                        }).join('');
+
                         const locationText = formData.location ? formData.location.trim() : 'ঢাকা, বাংলাদেশ';
-                        const template = `<p>বিজ্ঞপ্তির সংক্ষিপ্ত সাধারণ ভূমিকা এখানে লিখুন...</p><h3>পদের নাম ও আসন সংখ্যা</h3><ul><li>পদের নাম: ${titleText}</li><li>আসন সংখ্যা: ${vacancyText}</li></ul><h3>প্রধান দায়িত্বসমূহ</h3><ul><li>প্রতিষ্ঠানের সার্বিক কার্যক্রম পরিচালনা ও ব্যবস্থাপনা করা।</li><li>কর্মীদের সাথে সমন্বয় রেখে কাজের গতি ও মান উন্নত করা।</li><li>প্রতিষ্ঠানের লক্ষ্য অর্জনে নেতৃত্ব প্রদান ও কার্যক্রম তদারকি করা।</li></ul><h3>শিক্ষাগত যোগ্যতা ও অভিজ্ঞতা</h3><p>স্বীকৃত বিশ্ববিদ্যালয় থেকে স্নাতক ডিগ্রি এবং সংশ্লিষ্ট ক্ষেত্রে অন্তত ২ বছরের অভিজ্ঞতা থাকতে হবে।</p><h3>কর্মস্থল</h3><p>${locationText}</p>`;
+                        const template = `<p>বিজ্ঞপ্তির সংক্ষিপ্ত সাধারণ ভূমিকা এখানে লিখুন...</p><h3>পদের নাম ও আসন সংখ্যা</h3><ul>${postItemsHtml}</ul><h3>প্রধান দায়িত্বসমূহ</h3><ul><li>প্রতিষ্ঠানের সার্বিক কার্যক্রম পরিচালনা ও ব্যবস্থাপনা করা।</li><li>কর্মীদের সাথে সমন্বয় রেখে কাজের গতি ও মান উন্নত করা।</li><li>প্রতিষ্ঠানের লক্ষ্য অর্জনে নেতৃত্ব প্রদান ও কার্যক্রম তদারকি করা।</li></ul><h3>শিক্ষাগত যোগ্যতা ও অভিজ্ঞতা</h3><p>স্বীকৃত বিশ্ববিদ্যালয় থেকে স্নাতক ডিগ্রি এবং সংশ্লিষ্ট ক্ষেত্রে অন্তত ২ বছরের অভিজ্ঞতা থাকতে হবে।</p><h3>কর্মস্থল</h3><p>${locationText}</p>`;
                        if (formData.description && !window.confirm('বর্তমান বিবরণ মুছে নতুন স্ট্যান্ডার্ড টেমপ্লেট বসাতে চান?')) {
                          return;
                        }
@@ -588,6 +897,7 @@ export default function ManageJobs() {
                       description={formData.description}
                       postName={formData.title}
                       vacancy={formData.vacancy}
+                       posts={formData.posts}
                     />
                  </div>
                )}

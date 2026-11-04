@@ -251,6 +251,7 @@ export default function ExamDetails() {
           theme={state.theme}
           postName={job.title || job.titleEn}
           vacancy={job.vacancy}
+          posts={job.posts}
         />
 
         {/* Instructions */}
