@@ -1,6 +1,6 @@
 {
   "appId": "com.livecircular.app",
-  "appName": "LiveCircular: Job & Exam",
+  "appName": "Live Circular",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {
