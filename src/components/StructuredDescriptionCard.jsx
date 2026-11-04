@@ -182,6 +182,7 @@ export default function StructuredDescriptionCard({
   return (
     <div
       style={{
+        position: 'relative',
         background: isDark ? 'var(--card-bg, #1e293b)' : '#ffffff',
         borderRadius: '20px',
         border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.5px solid rgba(219, 234, 254, 0.8)',
@@ -192,9 +193,48 @@ export default function StructuredDescriptionCard({
         overflow: 'hidden'
       }}
     >
+      {/* Bottom-Right Fluid Curved Graphic Backdrop (matching DetailsHeaderCard) */}
+      <svg
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: '165px',
+          height: '115px',
+          pointerEvents: 'none',
+          zIndex: 1
+        }}
+        viewBox="0 0 160 110"
+        fill="none"
+      >
+        <path
+          d="M160 110 C100 105 45 88 38 48 C32 20 60 8 160 4 Z"
+          fill="url(#descCardWaveBR)"
+          opacity={isDark ? 0.25 : 0.52}
+        />
+        <path
+          d="M160 110 C120 108 75 96 70 65 C65 42 85 30 160 25 Z"
+          fill="url(#descCardWaveBR2)"
+          opacity={isDark ? 0.15 : 0.28}
+        />
+        <defs>
+          <linearGradient id="descCardWaveBR" x1="1" y1="1" x2="0" y2="0">
+            <stop offset="0%" stopColor="#3b82f6" />
+            <stop offset="60%" stopColor="#60a5fa" />
+            <stop offset="100%" stopColor="#bfdbfe" />
+          </linearGradient>
+          <linearGradient id="descCardWaveBR2" x1="1" y1="1" x2="0.2" y2="0.2">
+            <stop offset="0%" stopColor="#2563eb" />
+            <stop offset="100%" stopColor="#93c5fd" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       {/* ── Top Header Bar ── */}
       <div
         style={{
+          position: 'relative',
+          zIndex: 2,
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
@@ -250,7 +290,7 @@ export default function StructuredDescriptionCard({
       </div>
 
       {/* ── Content Body ── */}
-      <div style={{ padding: '16px' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: '16px' }}>
         {sections.map((section, sIdx) => {
           const isFirstIntro = sIdx === 0 && !section.heading;
           const isLastSection = sIdx === sections.length - 1;
