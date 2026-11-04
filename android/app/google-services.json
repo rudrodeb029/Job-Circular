@@ -10,18 +10,63 @@
       "client_info": {
         "mobilesdk_app_id": "1:67566831458:android:c7378853de23db5bb10e3b",
         "android_client_info": {
-          "package_name": "com.livecircular.app"
+          "package_name": "com.jobcircular.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "67566831458-k0ilm4qg0bsk84i8eicd9k172usethjt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBLmoEX3swczLz4ZNOs4C1slyXs5U-ZbgI"
+        },
+        {
+          "current_key": "AIzaSyDKWgWLT7np_gafdsFNUl1O8K2EGGZcSNE"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "67566831458-k0ilm4qg0bsk84i8eicd9k172usethjt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:67566831458:android:6450a0f2dae2c5e6b10e3b",
+        "android_client_info": {
+          "package_name": "com.livecircular.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "67566831458-k0ilm4qg0bsk84i8eicd9k172usethjt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLmoEX3swczLz4ZNOs4C1slyXs5U-ZbgI"
+        },
+        {
+          "current_key": "AIzaSyDKWgWLT7np_gafdsFNUl1O8K2EGGZcSNE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "67566831458-k0ilm4qg0bsk84i8eicd9k172usethjt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
