@@ -327,7 +327,7 @@ const AdminSettings = () => {
           <form onSubmit={handleSaveAppInfo} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
             <div>
               <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>SUPPORT EMAIL ADDRESS</label>
-              <input className="modern-input" type="email" placeholder="e.g. support@jobcircularbd.app" value={appInfo.contactEmail || ''} onChange={e => setAppInfo({ ...appInfo, contactEmail: e.target.value })} />
+              <input className="modern-input" type="email" placeholder="e.g. livecirculars@gmail.com" value={appInfo.contactEmail || ''} onChange={e => setAppInfo({ ...appInfo, contactEmail: e.target.value })} />
             </div>
 
             <div>

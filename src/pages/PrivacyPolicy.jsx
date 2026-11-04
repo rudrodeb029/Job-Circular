@@ -103,7 +103,7 @@ export default function PrivacyPolicy() {
                 <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>
                   যেকোনো প্রশ্ন, অভিযোগ বা কপিরাইট কন্টেন্ট অপসারণের অনুরোধের জন্য সরাসরি আমাদের সাথে ইমেইলে যোগাযোগ করুন:
                   <br />
-                  📩 ইমেইল: <a href="mailto:rudrodeb029@gmail.com" style={{ color: 'var(--primary)', fontWeight: 800 }}>rudrodeb029@gmail.com</a>
+                  📩 ইমেইল: <a href="mailto:livecirculars@gmail.com" style={{ color: 'var(--primary)', fontWeight: 800 }}>livecirculars@gmail.com</a>
                 </p>
               </section>
             </div>
@@ -182,7 +182,7 @@ export default function PrivacyPolicy() {
                 <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>
                   For any queries, copyright notices, or takedown requests, please contact us at:
                   <br />
-                  📩 Email: <a href="mailto:rudrodeb029@gmail.com" style={{ color: 'var(--primary)', fontWeight: 800 }}>rudrodeb029@gmail.com</a>
+                  📩 Email: <a href="mailto:livecirculars@gmail.com" style={{ color: 'var(--primary)', fontWeight: 800 }}>livecirculars@gmail.com</a>
                 </p>
               </section>
             </div>

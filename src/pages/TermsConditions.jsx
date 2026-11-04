@@ -57,7 +57,7 @@ export default function TermsConditions() {
                   ৩. কপিরাইট নীতি ও কন্টেন্ট অপসারণ (Copyright Policy & Takedown)
                 </h3>
                 <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-                  বিগত সালের পরীক্ষার মূল প্রশ্নপত্রের কপিরাইট সংশ্লিষ্ট পরীক্ষা কর্তৃপক্ষের। আমরা কোনো বাণিজ্যিক বই বা প্রকাশনীর কপিরাইট কন্টেন্ট অনুমোদন করি না। আপনার কোনো কপিরাইট কন্টেন্ট অপসারণ করতে <strong>rudrodeb029@gmail.com</strong> ইমেইলে যোগাযোগ করুন, আমরা ২৪-৪৮ ঘণ্টার মধ্যে ব্যবস্থা নেব।
+                  বিগত সালের পরীক্ষার মূল প্রশ্নপত্রের কপিরাইট সংশ্লিষ্ট পরীক্ষা কর্তৃপক্ষের। আমরা কোনো বাণিজ্যিক বই বা প্রকাশনীর কপিরাইট কন্টেন্ট অনুমোদন করি না। আপনার কোনো কপিরাইট কন্টেন্ট অপসারণ করতে <strong>livecirculars@gmail.com</strong> ইমেইলে যোগাযোগ করুন, আমরা ২৪-৪৮ ঘণ্টার মধ্যে ব্যবস্থা নেব।
                 </p>
               </section>
 
@@ -75,7 +75,7 @@ export default function TermsConditions() {
                   ৫. শর্তাবলীর সম্মতি (Acceptance of Terms)
                 </h3>
                 <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>
-                  লাইভ সার্কুলার ব্যবহার করার মাধ্যমে আপনি আমাদের শর্তাবলী ও নীতি মেনে নিচ্ছেন। যেকোনো প্রশ্ন থাকলে আমাদের ইমেইল করুন: <strong>rudrodeb029@gmail.com</strong>।
+                  লাইভ সার্কুলার ব্যবহার করার মাধ্যমে আপনি আমাদের শর্তাবলী ও নীতি মেনে নিচ্ছেন। যেকোনো প্রশ্ন থাকলে আমাদের ইমেইল করুন: <strong>livecirculars@gmail.com</strong>।
                 </p>
               </section>
             </div>
@@ -117,7 +117,7 @@ export default function TermsConditions() {
                   3. Copyright & Takedown Policy
                 </h3>
                 <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-                  Original exam question copyrights belong to their respective conducting authorities. We do not publish scanned copyrighted material from commercial guidebooks. For takedown requests, contact <strong>rudrodeb029@gmail.com</strong> (processed within 24-48 hours).
+                  Original exam question copyrights belong to their respective conducting authorities. We do not publish scanned copyrighted material from commercial guidebooks. For takedown requests, contact <strong>livecirculars@gmail.com</strong> (processed within 24-48 hours).
                 </p>
               </section>
 
@@ -135,7 +135,7 @@ export default function TermsConditions() {
                   5. Acceptance of Terms
                 </h3>
                 <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', lineHeight: 1.65, margin: 0 }}>
-                  By accessing or using the Live Circular app, you acknowledge and agree to these terms. For support, email: <strong>rudrodeb029@gmail.com</strong>.
+                  By accessing or using the Live Circular app, you acknowledge and agree to these terms. For support, email: <strong>livecirculars@gmail.com</strong>.
                 </p>
               </section>
             </div>

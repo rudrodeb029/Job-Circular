@@ -90,7 +90,7 @@ export default function Disclaimer() {
               </div>
 
               <div style={{ paddingTop: '8px', borderTop: '1px solid var(--border-light)' }}>
-                📩 <strong>যোগাযোগ & কন্টেন্ট রিমুভাল:</strong> <a href="mailto:rudrodeb029@gmail.com" style={{ color: 'var(--primary)', fontWeight: 700 }}>rudrodeb029@gmail.com</a>
+                📩 <strong>যোগাযোগ & কন্টেন্ট রিমুভাল:</strong> <a href="mailto:livecirculars@gmail.com" style={{ color: 'var(--primary)', fontWeight: 700 }}>livecirculars@gmail.com</a>
               </div>
             </div>
           ) : (
@@ -121,7 +121,7 @@ export default function Disclaimer() {
               </div>
 
               <div style={{ paddingTop: '8px', borderTop: '1px solid var(--border-light)' }}>
-                📩 <strong>Contact & Takedown Email:</strong> <a href="mailto:rudrodeb029@gmail.com" style={{ color: 'var(--primary)', fontWeight: 700 }}>rudrodeb029@gmail.com</a>
+                📩 <strong>Contact & Takedown Email:</strong> <a href="mailto:livecirculars@gmail.com" style={{ color: 'var(--primary)', fontWeight: 700 }}>livecirculars@gmail.com</a>
               </div>
             </div>
           )}

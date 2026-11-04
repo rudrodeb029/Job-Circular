@@ -192,10 +192,10 @@ export default function ClayDisclaimerCard({ style = {} }) {
               ? 'All logos and brand assets belong to their respective authorities and are used strictly under fair-use informational grounds. For any copyright inquiries or immediate content removal:'
               : 'সকল লোগো ও ট্রেডমার্ক সংশ্লিষ্ট কর্তৃপক্ষের নিজস্ব সম্পত্তি এবং তথ্য প্রদানের উদ্দেশ্যে ব্যবহৃত। কন্টেন্ট অপসারণ বা যেকোনো আইনি প্রয়োজনে যোগাযোগ করুন:'}{' '}
             <a
-              href="mailto:rudrodeb029@gmail.com"
+              href="mailto:livecirculars@gmail.com"
               style={{ color: 'var(--primary)', fontWeight: 700, textDecoration: 'none' }}
             >
-              rudrodeb029@gmail.com
+              livecirculars@gmail.com
             </a>
           </div>
         </div>
