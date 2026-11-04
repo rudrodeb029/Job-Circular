@@ -115,23 +115,53 @@ export default function QuestionsHub() {
           </div>
 
           <div
+            className="clay-live-card"
             onClick={() => navigate('/live-exams-list')}
-            style={{
-              background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-              borderRadius: '16px',
-              padding: '14px 16px',
-              color: 'white',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
           >
-            <div>
-              <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700 }}>{isEn ? 'Participate in Live Exams' : 'লাইভ পরীক্ষায় অংশ নিন'}</h4>
-              <p style={{ margin: '4px 0 0 0', fontSize: '11px', opacity: 0.9 }}>{isEn ? 'Daily routine mock tests' : 'প্রতিদিনের রুটিন ভিত্তিক লাইভ পরীক্ষা'}</p>
+            {/* Left Content: Clay Pill typography & Live Indicator */}
+            <div style={{ position: 'relative', zIndex: 2, minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '3px' }}>
+                <span
+                  style={{
+                    display: 'inline-block',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #4ade80 0%, #22c55e 100%)',
+                    boxShadow: '0 0 10px #4ade80, inset 0 1px 1px #ffffff, inset 0 -1px 1px #15803d',
+                    flexShrink: 0
+                  }}
+                />
+                <h4
+                  style={{
+                    margin: 0,
+                    fontSize: '13.5px',
+                    fontWeight: 800,
+                    color: '#ffffff',
+                    letterSpacing: '-0.1px',
+                    textShadow: '0 1.5px 3px rgba(0, 0, 0, 0.3)'
+                  }}
+                >
+                  {isEn ? 'Participate in Live Exams' : 'লাইভ পরীক্ষায় অংশ নিন'}
+                </h4>
+              </div>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  color: 'rgba(255, 255, 255, 0.94)',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.25)'
+                }}
+              >
+                {isEn ? 'Daily routine mock tests' : 'প্রতিদিনের রুটিন ভিত্তিক লাইভ পরীক্ষা'}
+              </p>
             </div>
-            <Clock size={20} color="white" />
+
+            {/* Right Content: 3D Clay Dial Button */}
+            <div className="clay-dial-btn">
+              <Clock size={20} color="#ffffff" style={{ filter: 'drop-shadow(0 1.5px 2px rgba(0, 0, 0, 0.35))' }} />
+            </div>
           </div>
         </div>
 
