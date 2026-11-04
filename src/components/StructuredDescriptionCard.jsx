@@ -570,11 +570,7 @@ export default function StructuredDescriptionCard({
                               alignItems: 'center',
                               justifyContent: 'space-between',
                               gap: '12px',
-                              padding: '8px 12px',
-                              marginBottom: iIdx === section.items.length - 1 ? 0 : '6px',
-                              background: isDark ? 'rgba(30, 41, 59, 0.6)' : '#f8faff',
-                              borderRadius: '10px',
-                              border: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #eff6ff',
+                              marginBottom: iIdx === section.items.length - 1 ? 0 : '8px'
                             }}
                           >
                             {/* Left Side: Checkmark + Post Name */}
@@ -596,36 +592,33 @@ export default function StructuredDescriptionCard({
                               </svg>
                               <span
                                 style={{
-                                  fontSize: '11.5px',
-                                  fontWeight: 700,
-                                  color: isDark ? '#f8fafc' : '#0f172a',
+                                  fontSize: '11px',
+                                  fontWeight: 600,
+                                  color: isDark ? '#cbd5e1' : '#1e293b',
                                   fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
-                                  lineHeight: 1.4
+                                  lineHeight: 1.65
                                 }}
                               >
                                 {item.name}
                               </span>
                             </div>
 
-                            {/* Right Side: Seat Count / Vacancy Badge */}
+                            {/* Right Side: Seat Count / Vacancy (no background color) */}
                             {item.vacancy && (
                               <div
                                 style={{
                                   display: 'inline-flex',
                                   alignItems: 'center',
                                   gap: '4px',
-                                  padding: '3px 9px',
-                                  borderRadius: '6px',
-                                  background: isDark ? 'rgba(37, 99, 235, 0.25)' : '#eff6ff',
-                                  border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid #dbeafe',
-                                  color: isDark ? '#93c5fd' : '#1d4ed8',
+                                  color: isDark ? '#93c5fd' : '#2563eb',
                                   fontSize: '11px',
                                   fontWeight: 700,
                                   whiteSpace: 'nowrap',
-                                  flexShrink: 0
+                                  flexShrink: 0,
+                                  fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif'
                                 }}
                               >
-                                <span style={{ fontSize: '10px', opacity: 0.8 }}>
+                                <span style={{ opacity: 0.85, fontWeight: 500 }}>
                                   {isEn ? 'Seats:' : 'আসন:'}
                                 </span>
                                 <span>{item.vacancy}</span>
