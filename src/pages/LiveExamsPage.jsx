@@ -44,11 +44,11 @@ export default function LiveExamsPage() {
         </h1>
       </div>
 
-      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+      <div className="page-content animate-fade-in" style={{ padding: '8px 12px' }}>
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '12px'
+          gap: '8px'
         }}>
           {exams.map(exam => {
             const status = getStatus(exam.startTime, exam.duration);

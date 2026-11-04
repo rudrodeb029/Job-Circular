@@ -92,7 +92,7 @@ export default function SavedJobs() {
 
       <div className="page-content">
         {/* Search Bar for Saved Jobs */}
-        <div style={{ marginBottom: 'var(--space-md)' }}>
+        <div style={{ marginBottom: '8px' }}>
           <SearchBar
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -101,14 +101,14 @@ export default function SavedJobs() {
         </div>
 
         {/* Filter Tabs */}
-        <div style={{ marginBottom: 'var(--space-lg)' }}>
+        <div style={{ marginBottom: '8px' }}>
           <TabBar tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
         </div>
 
         {/* Job List or Empty State */}
         <TabContent activeTab={activeTab} tabs={tabs}>
           {filteredJobs.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {filteredJobs.map(job => {
               if (activeTab === 'result') {
                 const { icon: displayIcon } = getJobIconAndStyle(job);

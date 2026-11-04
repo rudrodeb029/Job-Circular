@@ -192,7 +192,7 @@ export default function AllCirculars() {
       <PullToRefresh onRefresh={refreshData}>
         <div className="page-content animate-fade-in">
         {/* Polished Modern Search Bar */}
-        <div style={{ marginBottom: 'var(--space-md)' }}>
+        <div style={{ marginBottom: '8px' }}>
           <SearchBar
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -201,7 +201,7 @@ export default function AllCirculars() {
         </div>
 
         {/* Jobs List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           {paginatedJobs.length > 0 ? (
             paginatedJobs.map(item => {
               if (item.feedType === 'job') {

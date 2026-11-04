@@ -85,7 +85,7 @@ export default function AdmitCardResult() {
 
       <div className="page-content">
         {/* Modern Search Bar */}
-        <div style={{ marginBottom: 'var(--space-md)' }}>
+        <div style={{ marginBottom: '8px' }}>
           <SearchBar
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -98,7 +98,7 @@ export default function AdmitCardResult() {
         </div>
 
         {/* Tab Switcher */}
-        <div style={{ marginBottom: 'var(--space-lg)' }}>
+        <div style={{ marginBottom: '8px' }}>
           <TabBar 
             tabs={tabs} 
             activeTab={activeTab} 
@@ -111,7 +111,7 @@ export default function AdmitCardResult() {
 
         <TabContent activeTab={activeTab} tabs={tabs}>
           {searchedItems.length > 0 ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {searchedItems.map(item => {
               const { icon: displayIcon } = getJobIconAndStyle(item);
               const orgName = stripHtmlTags(isEn ? (item.organizationEn || item.organization) : item.organization);

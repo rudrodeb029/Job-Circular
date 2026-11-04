@@ -50,13 +50,13 @@
   --shadow-xl: 0 20px 30px -6px rgba(26, 86, 219, 0.16);
 
   /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 14px;
-  --space-lg: 18px;
-  --space-xl: 24px;
-  --space-2xl: 32px;
-  --space-3xl: 40px;
+  --space-xs: 3px;
+  --space-sm: 6px;
+  --space-md: 9px;
+  --space-lg: 13px;
+  --space-xl: 18px;
+  --space-2xl: 24px;
+  --space-3xl: 32px;
 
   /* Border Radius */
   --radius-sm: 6px;
@@ -301,7 +301,7 @@ ul, ol {
 }
 
 .page-content {
-  padding: 12px 14px;
+  padding: 8px 12px;
 }
 
 .flex-between {

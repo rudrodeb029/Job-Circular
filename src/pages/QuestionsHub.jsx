@@ -101,7 +101,7 @@ export default function QuestionsHub() {
       </div>
 
       <PullToRefresh onRefresh={refreshData}>
-        <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+        <div className="page-content animate-fade-in" style={{ padding: '8px 12px' }}>
         
         {/* Live MCQ Section */}
         <div style={{ marginBottom: '24px' }}>

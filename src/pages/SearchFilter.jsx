@@ -82,12 +82,12 @@ export default function SearchFilter() {
       </div>
 
       <div className="page-content animate-fade-in">
-        <div style={{ marginBottom: 'var(--space-md)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+        <div style={{ marginBottom: '8px', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
           {isEn ? `Showing ${filteredJobs.length} results` : `${filteredJobs.length}টি ফলাফল দেখানো হচ্ছে`}
         </div>
 
         {filteredJobs.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {filteredJobs.map(job => (
               <JobCard key={job.id} job={job} />
             ))}

@@ -136,7 +136,7 @@ export default function QuestionsList() {
 
       <div className="page-content animate-fade-in">
         {/* Search */}
-        <div style={{ marginBottom: 'var(--space-md)' }}>
+        <div style={{ marginBottom: '8px' }}>
           <SearchBar
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -148,7 +148,7 @@ export default function QuestionsList() {
         <div style={{
           display: filteredPapers.length > 0 ? 'grid' : 'flex',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '12px'
+          gap: '8px'
         }}>
           {filteredPapers.length > 0 ? (
             filteredPapers.map(paper => (
