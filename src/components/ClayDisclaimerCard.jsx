@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { openInAppBrowser } from '../utils/browserUtils';
 
 /**
  * ClayDisclaimerCard
@@ -10,8 +9,9 @@ import { openInAppBrowser } from '../utils/browserUtils';
  * 
  * Features:
  * - 3D Claymorphic soft-curved surface with dual outer elevation & tactile inner bevel highlights
- * - Prominent non-government affiliation declaration
- * - Direct official verification links (bangladesh.gov.bd, bpsc.gov.bd, alljobs.teletalk.com.bd, mopa.gov.bd)
+ * - Clear non-government affiliation declaration
+ * - Stated official government sources in text (without external link buttons)
+ * - Candidate advisory note
  * - Expandable full legal & copyright takedown terms
  * - Full light & dark mode compatibility
  */
@@ -22,17 +22,12 @@ export default function ClayDisclaimerCard({ style = {} }) {
   const isDark = state.theme === 'dark';
   const isEn = state.language === 'en';
 
-  const handleLinkClick = (e, url) => {
-    e.preventDefault();
-    openInAppBrowser(url);
-  };
-
   return (
     <div
       className="clay-disclaimer-card"
       style={{
         position: 'relative',
-        borderRadius: '20px',
+        borderRadius: '18px',
         background: isDark
           ? 'linear-gradient(145deg, #1e293b 0%, #131d2e 100%)'
           : 'linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%)',
@@ -40,88 +35,16 @@ export default function ClayDisclaimerCard({ style = {} }) {
           ? '1px solid rgba(255, 255, 255, 0.08)'
           : '1.5px solid rgba(255, 255, 255, 0.95)',
         boxShadow: isDark
-          ? '0 10px 24px -4px rgba(0, 0, 0, 0.5), 0 4px 8px -2px rgba(0, 0, 0, 0.3), inset 0 1.5px 2px rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.5)'
-          : '0 10px 24px -4px rgba(30, 64, 175, 0.08), 0 4px 8px -2px rgba(15, 23, 42, 0.04), inset 0 2px 4px rgba(255, 255, 255, 0.95), inset 0 -2px 4px rgba(30, 64, 175, 0.04)',
-        padding: '14px 16px',
+          ? '0 8px 20px -4px rgba(0, 0, 0, 0.5), 0 3px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1.5px 2px rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.5)'
+          : '0 8px 20px -4px rgba(30, 64, 175, 0.07), 0 3px 6px -2px rgba(15, 23, 42, 0.03), inset 0 2px 4px rgba(255, 255, 255, 0.95), inset 0 -2px 4px rgba(30, 64, 175, 0.04)',
+        padding: '13px 15px',
         marginBottom: 'var(--space-lg, 16px)',
         overflow: 'hidden',
         transition: 'all 0.25s ease',
         ...style
       }}
     >
-      {/* Top Header Row with Clay 3D Icon Badge */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: 0 }}>
-          {/* Clay 3D Badge */}
-          <div
-            style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '10px',
-              background: isDark
-                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(180, 83, 9, 0.35) 100%)'
-                : 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-              border: isDark
-                ? '1px solid rgba(245, 158, 11, 0.3)'
-                : '1px solid rgba(255, 255, 255, 0.9)',
-              boxShadow: isDark
-                ? '0 3px 8px rgba(0, 0, 0, 0.4), inset 0 1px 1.5px rgba(255, 255, 255, 0.15), inset 0 -1.5px 2px rgba(0, 0, 0, 0.4)'
-                : '0 4px 10px rgba(217, 119, 6, 0.18), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(180, 83, 9, 0.18)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '16px',
-              flexShrink: 0
-            }}
-          >
-            🛡️
-          </div>
-
-          <div style={{ minWidth: 0 }}>
-            <h4
-              style={{
-                fontSize: '12px',
-                fontWeight: 800,
-                color: isDark ? '#f1f5f9' : '#1e293b',
-                margin: 0,
-                lineHeight: 1.25,
-                letterSpacing: '-0.1px'
-              }}
-            >
-              {isEn ? 'Government Non-Affiliation Notice' : 'সরকারি সম্পৃক্ততাহীন সতর্কবার্তা'}
-            </h4>
-            <span
-              style={{
-                fontSize: '9.5px',
-                color: isDark ? '#94a3b8' : '#64748b',
-                fontWeight: 600,
-                display: 'block'
-              }}
-            >
-              {isEn ? 'Google Play Policy Disclosures & Sources' : 'তথ্যের উৎস ও আইনি দাবিত্যাগ'}
-            </span>
-          </div>
-        </div>
-
-        {/* Small Verified Badge */}
-        <span
-          style={{
-            fontSize: '9px',
-            fontWeight: 700,
-            color: isDark ? '#38bdf8' : '#0284c7',
-            background: isDark ? 'rgba(56, 189, 248, 0.12)' : '#e0f2fe',
-            border: isDark ? '1px solid rgba(56, 189, 248, 0.25)' : '1px solid #bae6fd',
-            padding: '2px 7px',
-            borderRadius: '12px',
-            flexShrink: 0,
-            whiteSpace: 'nowrap'
-          }}
-        >
-          {isEn ? 'Official Sources' : 'সোর্স তথ্য'}
-        </span>
-      </div>
-
-      {/* Prominent Core Disclaimer Box (Tactile Clay Inset) */}
+      {/* Disclaimer Notice Text (Tactile Clay Inset Box) */}
       <div
         style={{
           borderRadius: '12px',
@@ -135,7 +58,7 @@ export default function ClayDisclaimerCard({ style = {} }) {
             ? 'inset 0 1px 2px rgba(255, 255, 255, 0.05), inset 0 -1.5px 2px rgba(0, 0, 0, 0.3)'
             : '0 2px 6px rgba(245, 158, 11, 0.06), inset 0 1.5px 2px #ffffff, inset 0 -1px 2px rgba(217, 119, 6, 0.1)',
           padding: '10px 12px',
-          marginBottom: '10px'
+          marginBottom: '9px'
         }}
       >
         <p
@@ -149,7 +72,7 @@ export default function ClayDisclaimerCard({ style = {} }) {
         >
           {isEn ? (
             <>
-              <strong>Disclaimer:</strong> Live Circular is a private educational and career information platform. It is <strong>NOT an official app of the Government of Bangladesh</strong> and does NOT represent any government entity or ministry.
+              <strong>Disclaimer:</strong> Live Circular is an independent educational and job information platform. It is <strong>NOT an official app of the Government of Bangladesh</strong> and does NOT represent any government entity or ministry.
             </>
           ) : (
             <>
@@ -159,61 +82,26 @@ export default function ClayDisclaimerCard({ style = {} }) {
         </p>
       </div>
 
-      {/* Sources Verification Section with Clay Pills */}
-      <div style={{ marginBottom: '8px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
-          <span style={{ fontSize: '11px' }}>🌐</span>
-          <span
-            style={{
-              fontSize: '10px',
-              fontWeight: 700,
-              color: isDark ? '#cbd5e1' : '#475569'
-            }}
-          >
-            {isEn ? 'Information verified from official government portals:' : 'সকল তথ্য সরকারি অফিশিয়াল পোর্টাল থেকে সংগৃহীত:'}
-          </span>
-        </div>
-
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-          {[
-            { label: 'bangladesh.gov.bd', url: 'https://bangladesh.gov.bd' },
-            { label: 'bpsc.gov.bd', url: 'https://bpsc.gov.bd' },
-            { label: 'alljobs.teletalk.com.bd', url: 'http://alljobs.teletalk.com.bd' },
-            { label: 'mopa.gov.bd', url: 'https://mopa.gov.bd' }
-          ].map((portal) => (
-            <button
-              key={portal.label}
-              type="button"
-              onClick={(e) => handleLinkClick(e, portal.url)}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px',
-                padding: '4px 8px',
-                borderRadius: '14px',
-                fontSize: '9.5px',
-                fontWeight: 600,
-                color: isDark ? '#93c5fd' : '#1d4ed8',
-                background: isDark
-                  ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%)'
-                  : 'linear-gradient(135deg, #ffffff 0%, #eff6ff 100%)',
-                border: isDark
-                  ? '1px solid rgba(59, 130, 246, 0.25)'
-                  : '1px solid rgba(191, 219, 254, 0.8)',
-                boxShadow: isDark
-                  ? '0 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.08), inset 0 -1px 2px rgba(0, 0, 0, 0.4)'
-                  : '0 2px 4px rgba(37, 99, 235, 0.06), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(37, 99, 235, 0.1)',
-                cursor: 'pointer',
-                transition: 'all 0.15s ease',
-                textDecoration: 'none'
-              }}
-            >
-              <span>🔗</span>
-              <span>{portal.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Sources Stated in Text (No link buttons) */}
+      <p
+        style={{
+          fontSize: '10.5px',
+          lineHeight: '1.5',
+          color: isDark ? '#cbd5e1' : '#475569',
+          margin: '0 0 7px 0',
+          fontWeight: 500
+        }}
+      >
+        {isEn ? (
+          <>
+            <strong>Information Sources:</strong> All circulars and notices are compiled from official government portals (such as bangladesh.gov.bd, bpsc.gov.bd, alljobs.teletalk.com.bd, mopa.gov.bd) and national dailies for educational purposes.
+          </>
+        ) : (
+          <>
+            <strong>তথ্যের উৎস:</strong> প্রদর্শিত সকল সার্কুলার ও পরীক্ষার তথ্য বিভিন্ন সরকারি অফিশিয়াল পোর্টাল (যেমন: bangladesh.gov.bd, bpsc.gov.bd, alljobs.teletalk.com.bd, mopa.gov.bd) এবং জাতীয় দৈনিক থেকে সংগৃহীত।
+          </>
+        )}
+      </p>
 
       {/* Verification Advisory Note */}
       <p
@@ -221,7 +109,7 @@ export default function ClayDisclaimerCard({ style = {} }) {
           fontSize: '10px',
           color: isDark ? '#94a3b8' : '#64748b',
           lineHeight: '1.45',
-          margin: '0 0 10px 0',
+          margin: '0 0 9px 0',
           fontStyle: 'italic'
         }}
       >
@@ -267,15 +155,15 @@ export default function ClayDisclaimerCard({ style = {} }) {
         <div
           className="animate-fade-in"
           style={{
-            marginTop: '10px',
-            paddingTop: '10px',
+            marginTop: '9px',
+            paddingTop: '9px',
             borderTop: isDark ? '1px dashed rgba(255, 255, 255, 0.1)' : '1px dashed rgba(203, 213, 225, 0.8)',
             fontSize: '10px',
             color: isDark ? '#94a3b8' : '#64748b',
             lineHeight: '1.55',
             display: 'flex',
             flexDirection: 'column',
-            gap: '8px'
+            gap: '7px'
           }}
         >
           <div>
