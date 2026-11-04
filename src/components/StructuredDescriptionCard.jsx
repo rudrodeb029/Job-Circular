@@ -243,22 +243,22 @@ export default function StructuredDescriptionCard({
           padding: '14px 16px 12px 16px'
         }}
       >
-        {/* Blue Square with Hamburger/Menu Icon */}
+        {/* Blue Square with Hamburger/Menu Icon - reduced size */}
         <div
           style={{
-            width: '28px',
-            height: '28px',
-            borderRadius: '7px',
+            width: '20px',
+            height: '20px',
+            borderRadius: '5px',
             background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
-            marginRight: '10px'
+            boxShadow: '0 2px 5px rgba(37, 99, 235, 0.2)',
+            marginRight: '8px'
           }}
         >
-          <Menu size={16} color="#ffffff" />
+          <Menu size={12} color="#ffffff" />
         </div>
 
         {/* Card Title */}
@@ -307,24 +307,20 @@ export default function StructuredDescriptionCard({
 
           return (
             <div key={sIdx}>
-              {/* If it's a first intro section without a heading, render with Info Circle badge */}
+              {/* If it's a first intro section without a heading, render with plain Info icon (no bg color) */}
               {isFirstIntro ? (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', paddingTop: '4px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', paddingTop: '2px' }}>
                   <div
                     style={{
-                      width: '22px',
-                      height: '22px',
-                      borderRadius: '50%',
-                      background: '#2563eb',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       flexShrink: 0,
                       marginTop: '2px',
-                      boxShadow: '0 2px 5px rgba(37, 99, 235, 0.25)'
+                      color: '#2563eb'
                     }}
                   >
-                    <Info size={13} color="#ffffff" />
+                    <Info size={15} color="#2563eb" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     {section.items.map((item, iIdx) => (
