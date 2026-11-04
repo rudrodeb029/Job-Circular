@@ -67,6 +67,102 @@ function resolveSectionIcon(headingText = '', color = '#2563eb') {
 /**
  * Robust HTML / Plain Text parser that extracts structured sections
  */
+
+function parseSinglePostText(text, isEn) {
+  if (!text) return null;
+  let str = String(text).trim();
+
+  let name = '';
+  let vacancy = '';
+
+  const postNameMatch = str.match(/পদের\s*নাম\s*[:ঃ]\s*([^,|–—\n]+)/i);
+  const vacancyMatch = str.match(/(?:আসন\s*সংখ্যা|পদসংখ্যা|শূন্য\s*পদ|আসন|vacancy|seats|seat\s*count)\s*[:ঃ]?\s*([^,|–—\n\(\)]+)/i);
+
+  if (postNameMatch && vacancyMatch) {
+    name = postNameMatch[1].trim();
+    vacancy = vacancyMatch[1].trim();
+  } else if (vacancyMatch) {
+    vacancy = vacancyMatch[1].trim();
+    name = str.replace(vacancyMatch[0], '').replace(/^[-–—|:,;\s]+|[-–—|:,;\s]+$/g, '').trim();
+    name = name.replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '');
+  } else {
+    const parenMatch = str.match(/^(.*?)\s*[\(（]([^\)）]+)[\)）]$/);
+    if (parenMatch && /\d+|জন|পদ|post|seat/i.test(parenMatch[2])) {
+      name = parenMatch[1].trim();
+      vacancy = parenMatch[2].trim();
+    } else {
+      const sepMatch = str.split(/\s*[-–—|]\s*/);
+      if (sepMatch.length >= 2 && /\d+|জন|পদ|post|seat/i.test(sepMatch[sepMatch.length - 1])) {
+        vacancy = sepMatch.pop().trim();
+        name = sepMatch.join(' - ').trim();
+      } else {
+        name = str;
+      }
+    }
+  }
+
+  name = name.replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '').trim();
+  if (vacancy) {
+    vacancy = vacancy.replace(/^(?:আসন\s*সংখ্যা|পদসংখ্যা|শূন্য\s*পদ|আসন|vacancy|seats)\s*[:ঃ]?\s*/i, '').trim();
+    if (/^\d+$/.test(vacancy)) {
+      vacancy = vacancy + (isEn ? '' : ' জন');
+    }
+  }
+
+  return { name: name || str, vacancy };
+}
+
+function formatPostSectionItems(rawItems, isEn) {
+  const result = [];
+  let pendingName = null;
+
+  for (let i = 0; i < rawItems.length; i++) {
+    const item = rawItems[i];
+    const text = (item.text || '').trim();
+
+    const onlyPostNameMatch = text.match(/^পদের\s*নাম\s*[:ঃ]\s*(.+)$/i);
+    const onlyVacancyMatch = text.match(/^(?:আসন\s*সংখ্যা|পদসংখ্যা|শূন্য\s*পদ|আসন)\s*[:ঃ]\s*(.+)$/i);
+
+    if (onlyPostNameMatch && !onlyVacancyMatch) {
+      if (pendingName) {
+        result.push({ type: 'postRow', name: pendingName, vacancy: '' });
+      }
+      pendingName = onlyPostNameMatch[1].trim();
+      continue;
+    }
+
+    if (onlyVacancyMatch) {
+      const vStr = onlyVacancyMatch[1].trim();
+      const formattedV = /^\d+$/.test(vStr) ? `${vStr} জন` : vStr;
+      if (pendingName) {
+        result.push({ type: 'postRow', name: pendingName, vacancy: formattedV });
+        pendingName = null;
+      } else {
+        result.push({ type: 'postRow', name: isEn ? 'Post' : 'পদ', vacancy: formattedV });
+      }
+      continue;
+    }
+
+    if (pendingName) {
+      result.push({ type: 'postRow', name: pendingName, vacancy: '' });
+      pendingName = null;
+    }
+
+    const parsed = parseSinglePostText(text, isEn);
+    if (parsed) {
+      result.push({ type: 'postRow', name: parsed.name, vacancy: parsed.vacancy });
+    } else {
+      result.push(item);
+    }
+  }
+
+  if (pendingName) {
+    result.push({ type: 'postRow', name: pendingName, vacancy: '' });
+  }
+
+  return result;
+}
+
 function parseStructuredSections(rawContent) {
   if (!rawContent) return [];
   const text = String(rawContent).trim();
@@ -199,27 +295,47 @@ export default function StructuredDescriptionCard({
   const displayTitle = isEn ? titleEn : title;
 
   const sections = useMemo(() => {
-    const list = parseStructuredSections(description);
+    let list = parseStructuredSections(description);
 
-    // Check if post/vacancy section already exists in parsed sections
+    // Format any existing post/vacancy sections
+    list = list.map(s => {
+      if (s.heading && /পদ|আসন|vacancy|post|designation/i.test(s.heading)) {
+        return {
+          ...s,
+          items: formatPostSectionItems(s.items, isEn)
+        };
+      }
+      return s;
+    });
+
+    // Check if post/vacancy section exists
     const hasPostSection = list.some(s =>
       s.heading && /পদ|আসন|vacancy|post|designation/i.test(s.heading)
     );
 
     if (!hasPostSection && (postName || vacancy)) {
       const items = [];
-      if (postName) {
+      const rawPostLines = String(postName || '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+
+      if (rawPostLines.length > 1) {
+        for (const line of rawPostLines) {
+          const parsed = parseSinglePostText(line, isEn);
+          items.push({
+            type: 'postRow',
+            name: parsed.name,
+            vacancy: parsed.vacancy || (rawPostLines.length === 1 ? vacancy : '')
+          });
+        }
+      } else {
+        const pName = postName ? String(postName).replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '').trim() : (isEn ? 'General' : 'পদ');
+        let vText = vacancy ? String(vacancy).replace(/^(?:আসন\s*সংখ্যা|পদসংখ্যা|শূন্য\s*পদ|আসন)\s*[:ঃ]?\s*/i, '').trim() : '';
+        if (vText && /^\d+$/.test(vText)) {
+          vText = `${vText} জন`;
+        }
         items.push({
-          type: 'listItem',
-          text: (isEn ? 'Post Name: ' : 'পদের নাম: ') + postName
-        });
-      }
-      if (vacancy) {
-        const vStr = String(vacancy).trim();
-        const formattedV = /\d+$/.test(vStr) ? `${vStr} জন` : vStr;
-        items.push({
-          type: 'listItem',
-          text: (isEn ? 'Vacancy / Seats: ' : 'আসন সংখ্যা: ') + formattedV
+          type: 'postRow',
+          name: pName,
+          vacancy: vText
         });
       }
 
@@ -445,6 +561,80 @@ export default function StructuredDescriptionCard({
                   {/* Section items */}
                   <div style={{ paddingLeft: section.heading ? '24px' : '0' }}>
                     {section.items.map((item, iIdx) => {
+                      if (item.type === 'postRow') {
+                        return (
+                          <div
+                            key={iIdx}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '12px',
+                              padding: '8px 12px',
+                              marginBottom: iIdx === section.items.length - 1 ? 0 : '6px',
+                              background: isDark ? 'rgba(30, 41, 59, 0.6)' : '#f8faff',
+                              borderRadius: '10px',
+                              border: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #eff6ff',
+                            }}
+                          >
+                            {/* Left Side: Checkmark + Post Name */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                              <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                style={{ flexShrink: 0 }}
+                              >
+                                <path
+                                  d="M3 8.5L6.5 12L13 4"
+                                  stroke="#2563eb"
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              <span
+                                style={{
+                                  fontSize: '11.5px',
+                                  fontWeight: 700,
+                                  color: isDark ? '#f8fafc' : '#0f172a',
+                                  fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
+                                  lineHeight: 1.4
+                                }}
+                              >
+                                {item.name}
+                              </span>
+                            </div>
+
+                            {/* Right Side: Seat Count / Vacancy Badge */}
+                            {item.vacancy && (
+                              <div
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '4px',
+                                  padding: '3px 9px',
+                                  borderRadius: '6px',
+                                  background: isDark ? 'rgba(37, 99, 235, 0.25)' : '#eff6ff',
+                                  border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid #dbeafe',
+                                  color: isDark ? '#93c5fd' : '#1d4ed8',
+                                  fontSize: '11px',
+                                  fontWeight: 700,
+                                  whiteSpace: 'nowrap',
+                                  flexShrink: 0
+                                }}
+                              >
+                                <span style={{ fontSize: '10px', opacity: 0.8 }}>
+                                  {isEn ? 'Seats:' : 'আসন:'}
+                                </span>
+                                <span>{item.vacancy}</span>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+
                       if (item.type === 'listItem') {
                         return (
                           <div
