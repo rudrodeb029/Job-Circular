@@ -161,9 +161,9 @@ export default function Home() {
     <div className="page">
       <AppHeader />
       <PullToRefresh onRefresh={refreshData}>
-        <div className="page-content" style={{ paddingTop: 0 }}>
+        <div className="page-content" style={{ paddingTop: '6px' }}>
 
-        <div style={{ marginBottom: '8px', cursor: 'pointer' }} onClick={() => navigate('/search')}>
+        <div style={{ marginBottom: '14px', cursor: 'pointer' }} onClick={() => navigate('/search')}>
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />
         </div>
 
@@ -175,7 +175,7 @@ export default function Home() {
           borderRadius: '24px',
           padding: '12px 18px',
           position: 'relative',
-          marginBottom: '10px',
+          marginBottom: '16px',
           overflow: 'hidden',
           boxShadow: '0 8px 22px rgba(26, 86, 219, 0.16)',
           minHeight: '120px',
@@ -322,8 +322,8 @@ export default function Home() {
           }}></div>
         </div>
 
-        <div style={{ marginBottom: '8px' }}>
-          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '4px', border: 'none', boxShadow: 'none' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '8px', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'hidden', border: 'none' }}>
               <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
@@ -395,7 +395,7 @@ export default function Home() {
         </div>
 
         <div>
-          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '6px', border: 'none', boxShadow: 'none' }}>
+          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '10px', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'hidden', border: 'none' }}>
               <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
@@ -407,7 +407,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
             {paginatedFeed.map(item => {
               if (item.feedType === 'job') {
                 return <JobCard key={item.id} job={item} />;
