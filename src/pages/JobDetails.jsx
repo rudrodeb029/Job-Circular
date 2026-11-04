@@ -18,6 +18,7 @@ import { showNativeInterstitialAd, showNativeBannerAd, hideNativeBannerAd } from
 import { openInAppBrowser } from '../utils/browserUtils';
 
 import DetailsHeaderCard from '../components/DetailsHeaderCard';
+import ClayDisclaimerCard from '../components/ClayDisclaimerCard';
 
 export default function JobDetails() {
   const { id } = useParams();
@@ -593,6 +594,9 @@ export default function JobDetails() {
             </div>
           </div>
         )}
+      
+        {/* Google Play Compliant Claymorphism Disclaimer Card */}
+        <ClayDisclaimerCard />
       </div>
       <PortalWarningModal
         isOpen={isModalOpen}

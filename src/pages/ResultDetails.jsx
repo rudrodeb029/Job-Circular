@@ -19,6 +19,7 @@ import { showNativeInterstitialAd } from '../utils/admobUtils';
 import { openInAppBrowser } from '../utils/browserUtils';
 
 import DetailsHeaderCard from '../components/DetailsHeaderCard';
+import ClayDisclaimerCard from '../components/ClayDisclaimerCard';
 
 const orgIconsMap = {
   'শিক্ষা মন্ত্রণালয়': '🏛️',
@@ -497,6 +498,9 @@ export default function ResultDetails() {
             </button>
           </div>
         </div>
+      
+        {/* Google Play Compliant Claymorphism Disclaimer Card */}
+        <ClayDisclaimerCard />
       </div>
 
       <PortalWarningModal
