@@ -775,12 +775,12 @@ export default function LiveExamRoom() {
             background: 'var(--white)',
             border: isDidNotAttend ? '1.5px solid #cbd5e1' : '1.5px solid var(--primary)',
             borderRadius: '20px',
-            padding: '20px',
-            marginBottom: '20px',
+            padding: '14px 16px',
+            marginBottom: '12px',
             boxShadow: '0 4px 18px rgba(0,0,0,0.03)',
             textAlign: 'center'
           }}>
-            <span style={{ fontSize: '40px', display: 'block', marginBottom: '8px' }}>
+            <span style={{ fontSize: '32px', display: 'block', marginBottom: '4px' }}>
               {isDidNotAttend ? '📝' : '🏆'}
             </span>
             <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>
@@ -788,7 +788,7 @@ export default function LiveExamRoom() {
                 ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
-            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '16px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '10px', lineHeight: 1.5 }}>
               {isDidNotAttend
                 ? (isEn 
                     ? 'You did not participate in this live exam. However, you can review all correct answers and detailed solutions below.' 
@@ -803,7 +803,7 @@ export default function LiveExamRoom() {
               gridTemplateColumns: '1fr 1fr',
               gap: '12px',
               background: 'var(--bg-secondary)',
-              padding: '14px',
+              padding: '10px 12px',
               borderRadius: '16px'
             }}>
               <div>
@@ -830,7 +830,7 @@ export default function LiveExamRoom() {
 
         {/* 1. Questions View Tab (Solutions or Live Taking) */}
         {(!currentResult || activeRoomTab === 'solutions') && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
             {(exam.questions || []).map((qn, qIndex) => {
               if (!qn) return null;
               const userSelections = (currentResult && currentResult.answers) ? currentResult.answers : (selectedAnswers || {});
@@ -844,8 +844,8 @@ export default function LiveExamRoom() {
                   style={{
                     background: 'var(--white)',
                     border: '1px solid var(--border-light)',
-                    borderRadius: '20px',
-                    padding: '20px',
+                    borderRadius: '16px',
+                    padding: '12px 14px',
                     boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
                   }}
                 >
@@ -854,7 +854,7 @@ export default function LiveExamRoom() {
                     fontSize: '12.5px',
                     fontWeight: 600,
                     color: 'var(--text-secondary)',
-                    marginBottom: '14px',
+                    marginBottom: '10px',
                     lineHeight: '1.45',
                     display: 'flex',
                     gap: '8px',
@@ -865,7 +865,7 @@ export default function LiveExamRoom() {
                   </h4>
 
                   {/* Option Choices */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {qOptions.map((option, oIndex) => {
                       const optText = cleanOptionText(isEn ? (qOptionsEn[oIndex] || option) : option);
                       const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
@@ -918,7 +918,7 @@ export default function LiveExamRoom() {
                           style={{
                             display: 'flex',
                             alignItems: 'center',
-                            padding: '9px 12px',
+                            padding: '8px 11px',
                             borderRadius: '10px',
                             background: bg,
                             color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
@@ -954,8 +954,8 @@ export default function LiveExamRoom() {
                   {/* Explanations */}
                   {currentResult && (qn.explanation || qn.explanationEn) && (
                     <div style={{
-                      marginTop: '16px',
-                      padding: '14px',
+                      marginTop: '10px',
+                      padding: '10px 12px',
                       borderRadius: '12px',
                       background: 'var(--primary-lightest)',
                       borderLeft: '4px solid var(--primary)'

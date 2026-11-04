@@ -104,8 +104,8 @@ export default function QuestionsHub() {
         <div className="page-content animate-fade-in" style={{ padding: '8px 12px' }}>
         
         {/* Live MCQ Section */}
-        <div style={{ marginBottom: '24px' }}>
-          <div className="section-header" style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <div className="section-header" style={{ marginBottom: '8px' }}>
             <h3 className="section-title" style={{ margin: 0 }}>
               {isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}
             </h3>
@@ -119,7 +119,7 @@ export default function QuestionsHub() {
             style={{
               background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
               borderRadius: '16px',
-              padding: '20px',
+              padding: '14px 16px',
               color: 'white',
               cursor: 'pointer',
               display: 'flex',
@@ -136,11 +136,11 @@ export default function QuestionsHub() {
         </div>
 
         {/* Categories Section */}
-        <div style={{ marginBottom: '24px' }}>
-          <h3 className="section-title" style={{ marginBottom: '14px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <h3 className="section-title" style={{ marginBottom: '8px' }}>
             {isEn ? 'Question Bank Categories' : 'প্রশ্নব্যাংক ক্যাটাগরি'}
           </h3>
-          <div className="category-grid">
+          <div className="category-grid" style={{ marginBottom: 0 }}>
             <div
               className="category-grid-item"
               style={{
@@ -178,7 +178,7 @@ export default function QuestionsHub() {
 
         {/* List Section */}
         <div>
-          <div style={{ marginBottom: '14px' }}>
+          <div style={{ marginBottom: '10px' }}>
             <SearchBar value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder={isEn ? "Search questions..." : "প্রশ্নব্যাংকে খুঁজুন..."} />
           </div>
 
@@ -186,7 +186,7 @@ export default function QuestionsHub() {
             display: (isFiltering || filteredPapers.length === 0) ? 'flex' : 'grid',
             gridTemplateColumns: 'repeat(2, 1fr)',
             flexDirection: 'column',
-            gap: '12px',
+            gap: '10px',
             minHeight: '180px'
           }}>
             {isFiltering ? (

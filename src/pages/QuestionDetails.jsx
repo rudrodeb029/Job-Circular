@@ -184,14 +184,14 @@ export default function QuestionDetails() {
           background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
           color: '#ffffff',
           borderRadius: '18px',
-          padding: '20px',
-          marginBottom: '20px',
+          padding: '14px 16px',
+          marginBottom: '12px',
           boxShadow: '0 8px 24px rgba(26, 86, 219, 0.2)'
         }}>
           <h2 style={{ fontSize: '14.5px', fontWeight: 700, marginBottom: '8px', lineHeight: '1.4' }}>
             {isEn ? (paper.titleEn || paper.title) : paper.title}
           </h2>
-          <div style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.9, marginBottom: '16px' }}>
+          <div style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.9, marginBottom: '12px' }}>
             <span>📅 {isEn ? (paper.dateEn || paper.date) : paper.date}</span>
             <span>📝 {isEn ? `${totalCount} Questions` : `${toBengaliNumber(totalCount)}টি প্রশ্ন`}</span>
             <span>🕒 {isEn ? (paper.timeLimitEn || paper.timeLimit) : paper.timeLimit}</span>
@@ -281,8 +281,8 @@ export default function QuestionDetails() {
             background: 'var(--white)',
             border: '1px solid var(--border-light)',
             borderRadius: '16px',
-            padding: '16px',
-            marginBottom: '20px',
+            padding: '12px 14px',
+            marginBottom: '12px',
             boxShadow: 'var(--shadow-sm)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -297,7 +297,7 @@ export default function QuestionDetails() {
             </div>
             
             {/* Progress Bar */}
-            <div style={{ width: '100%', height: '8px', background: 'var(--bg-secondary)', borderRadius: '4px', overflow: 'hidden', marginBottom: '12px' }}>
+            <div style={{ width: '100%', height: '8px', background: 'var(--bg-secondary)', borderRadius: '4px', overflow: 'hidden', marginBottom: '8px' }}>
               <div style={{
                 width: `${(attemptedCount / totalCount) * 100}%`,
                 height: '100%',
@@ -329,7 +329,7 @@ export default function QuestionDetails() {
         )}
 
         {/* Questions List */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {paper.questions.map((qn, qIndex) => {
             const hasAnswered = selectedAnswers[qn.id] !== undefined;
             const chosenIndex = selectedAnswers[qn.id];
@@ -340,8 +340,8 @@ export default function QuestionDetails() {
                 style={{
                   background: 'var(--white)',
                   border: '1px solid var(--border-light)',
-                  borderRadius: '18px',
-                  padding: '20px',
+                  borderRadius: '16px',
+                  padding: '12px 14px',
                   boxShadow: 'var(--shadow-sm)'
                 }}
               >
@@ -350,7 +350,7 @@ export default function QuestionDetails() {
                     fontSize: '12.5px',
                     fontWeight: 600,
                     color: 'var(--text-secondary)',
-                    marginBottom: '14px',
+                    marginBottom: '10px',
                     lineHeight: '1.45',
                     display: 'flex',
                     gap: '8px',
@@ -361,7 +361,7 @@ export default function QuestionDetails() {
                   </h4>
 
                 {/* Option Choices */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {qn.options.map((option, oIndex) => {
                     const optText = cleanOptionText((isEn && qn.optionsEn && qn.optionsEn[oIndex]) ? qn.optionsEn[oIndex] : option);
 
@@ -404,7 +404,7 @@ export default function QuestionDetails() {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          padding: '9px 12px',
+                          padding: '8px 11px',
                           borderRadius: '10px',
                           background: bg,
                           color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
@@ -440,8 +440,8 @@ export default function QuestionDetails() {
                 {/* Explanation Card (shows when answered in practice mode, or always in read mode) */}
                 {((mode === 'practice' && hasAnswered) || mode === 'read') && (
                   <div style={{
-                    marginTop: '16px',
-                    padding: '14px',
+                    marginTop: '10px',
+                    padding: '10px 12px',
                     borderRadius: '12px',
                     background: 'var(--primary-lightest)',
                     borderLeft: '4px solid var(--primary)',
