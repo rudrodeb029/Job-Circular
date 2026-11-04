@@ -75,7 +75,9 @@ function parseSinglePostText(text, isEn) {
   let name = '';
   let vacancy = '';
 
-  const postNameMatch = str.match(/পদের\s*নাম\s*[:ঃ]\s*([^,|–—\n]+)/i);
+  const cleanStr = str.replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '').trim();
+
+  const postNameMatch = str.match(/পদের\s*নাম\s*[:ঃ]\s*([^,|–—\n\-]+)/i);
   const vacancyMatch = str.match(/(?:আসন\s*সংখ্যা|পদসংখ্যা|শূন্য\s*পদ|আসন|vacancy|seats|seat\s*count)\s*[:ঃ]?\s*([^,|–—\n\(\)]+)/i);
 
   if (postNameMatch && vacancyMatch) {
@@ -86,17 +88,17 @@ function parseSinglePostText(text, isEn) {
     name = str.replace(vacancyMatch[0], '').replace(/^[-–—|:,;\s]+|[-–—|:,;\s]+$/g, '').trim();
     name = name.replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '');
   } else {
-    const parenMatch = str.match(/^(.*?)\s*[\(（]([^\)）]+)[\)）]$/);
-    if (parenMatch && /\d+|জন|পদ|post|seat/i.test(parenMatch[2])) {
+    const parenMatch = cleanStr.match(/^(.*?)\s*[\(（]([^\)）]+)[\)）]$/);
+    if (parenMatch && /[\d\u09E6-\u09EF]+|জন|পদ|post|seat/i.test(parenMatch[2])) {
       name = parenMatch[1].trim();
       vacancy = parenMatch[2].trim();
     } else {
-      const sepMatch = str.split(/\s*[-–—|]\s*/);
-      if (sepMatch.length >= 2 && /\d+|জন|পদ|post|seat/i.test(sepMatch[sepMatch.length - 1])) {
+      const sepMatch = cleanStr.split(/\s*[-–—|:ঃ]\s*/);
+      if (sepMatch.length >= 2 && /[\d\u09E6-\u09EF]+|জন|পদ|post|seat/i.test(sepMatch[sepMatch.length - 1])) {
         vacancy = sepMatch.pop().trim();
         name = sepMatch.join(' - ').trim();
       } else {
-        name = str;
+        name = cleanStr;
       }
     }
   }
@@ -104,7 +106,7 @@ function parseSinglePostText(text, isEn) {
   name = name.replace(/^পদের\s*নাম\s*[:ঃ]\s*/i, '').trim();
   if (vacancy) {
     vacancy = vacancy.replace(/^(?:আসন\s*সংখ্যা|পদসংখ্যা|শূন্য\s*পদ|আসন|vacancy|seats)\s*[:ঃ]?\s*/i, '').trim();
-    if (/^\d+$/.test(vacancy)) {
+    if (/^[\d\u09E6-\u09EF]+$/.test(vacancy)) {
       vacancy = vacancy + (isEn ? '' : ' জন');
     }
   }
