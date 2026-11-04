@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Menu, Briefcase, GraduationCap, MapPin, DollarSign, Info, Star, FileText, CheckCircle } from './Icons';
+import { Menu, Briefcase, GraduationCap, MapPin, DollarSign, Info, Star, FileText } from './Icons';
 
 /**
  * Keywords map to determine appropriate icon for a section heading
@@ -140,7 +140,6 @@ function parseStructuredSections(rawContent) {
   };
 
   for (const line of lines) {
-    // Check if line looks like a header (e.g. ends with ':' or starts with '#' or matches section keywords)
     const isBullet = /^[•\-\*✓✔\d+\.]\s+/.test(line);
     const isHeaderLine = !isBullet && (
       /^#+\s+/.test(line) ||
@@ -185,47 +184,51 @@ export default function StructuredDescriptionCard({
         position: 'relative',
         background: isDark ? 'var(--card-bg, #1e293b)' : '#ffffff',
         borderRadius: '20px',
-        border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.5px solid rgba(219, 234, 254, 0.8)',
+        border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.5px solid #dbeafe',
         boxShadow: isDark
           ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)'
-          : '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
+          : '0 4px 20px -2px rgba(37, 99, 235, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04)',
         marginBottom: 'var(--space-lg)',
         overflow: 'hidden'
       }}
     >
-      {/* Bottom-Right Fluid Curved Graphic Backdrop (matching DetailsHeaderCard) */}
+      {/* ── Bottom-Right Fluid Wave Ramp (Pixel-Perfect from Reference Design) ── */}
       <svg
         style={{
           position: 'absolute',
           bottom: 0,
           right: 0,
-          width: '165px',
-          height: '115px',
+          width: '260px',
+          height: '80px',
           pointerEvents: 'none',
           zIndex: 1
         }}
-        viewBox="0 0 160 110"
+        viewBox="0 0 260 80"
         fill="none"
+        preserveAspectRatio="none"
       >
+        {/* Layer 1: Outer soft lighter blue curve */}
         <path
-          d="M160 110 C100 105 45 88 38 48 C32 20 60 8 160 4 Z"
-          fill="url(#descCardWaveBR)"
-          opacity={isDark ? 0.25 : 0.52}
+          d="M0 80 C80 80 150 54 260 22 L260 80 Z"
+          fill="url(#descRampLayer1)"
+          opacity={isDark ? 0.35 : 0.65}
         />
+        {/* Layer 2: Inner gradient blue curve */}
         <path
-          d="M160 110 C120 108 75 96 70 65 C65 42 85 30 160 25 Z"
-          fill="url(#descCardWaveBR2)"
-          opacity={isDark ? 0.15 : 0.28}
+          d="M60 80 C130 79 180 50 260 26 L260 80 Z"
+          fill="url(#descRampLayer2)"
+          opacity={isDark ? 0.45 : 0.85}
         />
         <defs>
-          <linearGradient id="descCardWaveBR" x1="1" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor="#3b82f6" />
-            <stop offset="60%" stopColor="#60a5fa" />
-            <stop offset="100%" stopColor="#bfdbfe" />
-          </linearGradient>
-          <linearGradient id="descCardWaveBR2" x1="1" y1="1" x2="0.2" y2="0.2">
-            <stop offset="0%" stopColor="#2563eb" />
+          <linearGradient id="descRampLayer1" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stopColor="#dbeafe" />
+            <stop offset="60%" stopColor="#bfdbfe" />
             <stop offset="100%" stopColor="#93c5fd" />
+          </linearGradient>
+          <linearGradient id="descRampLayer2" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stopColor="#bfdbfe" />
+            <stop offset="50%" stopColor="#93c5fd" />
+            <stop offset="100%" stopColor="#60a5fa" />
           </linearGradient>
         </defs>
       </svg>
@@ -237,12 +240,7 @@ export default function StructuredDescriptionCard({
           zIndex: 2,
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
-          padding: '12px 16px',
-          borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.7)',
-          background: isDark
-            ? 'linear-gradient(90deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.6) 100%)'
-            : 'linear-gradient(90deg, #f8faff 0%, #ffffff 100%)'
+          padding: '14px 16px 12px 16px'
         }}
       >
         {/* Blue Square with Hamburger/Menu Icon */}
@@ -256,7 +254,8 @@ export default function StructuredDescriptionCard({
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)'
+            boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)',
+            marginRight: '10px'
           }}
         >
           <Menu size={16} color="#ffffff" />
@@ -269,28 +268,39 @@ export default function StructuredDescriptionCard({
             fontWeight: 800,
             color: isDark ? '#f8fafc' : '#0f172a',
             margin: 0,
-            letterSpacing: '-0.2px'
+            letterSpacing: '-0.2px',
+            whiteSpace: 'nowrap'
           }}
         >
           {displayTitle}
         </h3>
 
-        {/* Three Slanted Accent Bars on the Right (///) matching reference image */}
+        {/* Connecting horizontal gray line matching reference design */}
+        <div
+          style={{
+            flex: 1,
+            height: '1px',
+            background: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+            margin: '0 12px'
+          }}
+        />
+
+        {/* 3 Diagonal Slashes on the Right (///) matching reference design */}
         <svg
-          width="26"
-          height="14"
-          viewBox="0 0 30 16"
+          width="24"
+          height="15"
+          viewBox="0 0 28 18"
           fill="none"
-          style={{ marginLeft: 'auto', flexShrink: 0 }}
+          style={{ flexShrink: 0 }}
         >
-          <path d="M4 16L9 0H13L8 16H4Z" fill="#1d4ed8" />
-          <path d="M12 16L17 0H21L16 16H12Z" fill="#2563eb" />
-          <path d="M20 16L25 0H29L24 16H20Z" fill="#60a5fa" />
+          <path d="M4 18L10 0H14L8 18H4Z" fill="#2563eb" />
+          <path d="M11 18L17 0H21L15 18H11Z" fill="#2563eb" />
+          <path d="M18 18L24 0H28L22 18H18Z" fill="#2563eb" />
         </svg>
       </div>
 
       {/* ── Content Body ── */}
-      <div style={{ position: 'relative', zIndex: 2, padding: '16px' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: '0 16px 16px 16px' }}>
         {sections.map((section, sIdx) => {
           const isFirstIntro = sIdx === 0 && !section.heading;
           const isLastSection = sIdx === sections.length - 1;
@@ -299,11 +309,11 @@ export default function StructuredDescriptionCard({
             <div key={sIdx}>
               {/* If it's a first intro section without a heading, render with Info Circle badge */}
               {isFirstIntro ? (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', paddingTop: '4px' }}>
                   <div
                     style={{
-                      width: '24px',
-                      height: '24px',
+                      width: '22px',
+                      height: '22px',
                       borderRadius: '50%',
                       background: '#2563eb',
                       display: 'flex',
@@ -314,7 +324,7 @@ export default function StructuredDescriptionCard({
                       boxShadow: '0 2px 5px rgba(37, 99, 235, 0.25)'
                     }}
                   >
-                    <Info size={14} color="#ffffff" />
+                    <Info size={13} color="#ffffff" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     {section.items.map((item, iIdx) => (
@@ -322,8 +332,8 @@ export default function StructuredDescriptionCard({
                         key={iIdx}
                         style={{
                           fontSize: '11px',
-                          lineHeight: 1.7,
-                          color: isDark ? '#cbd5e1' : '#334155',
+                          lineHeight: 1.65,
+                          color: isDark ? '#cbd5e1' : '#1e293b',
                           margin: iIdx === section.items.length - 1 ? 0 : '0 0 6px 0',
                           fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
                           fontWeight: 500
@@ -396,7 +406,7 @@ export default function StructuredDescriptionCard({
                               <path
                                 d="M3 8.5L6.5 12L13 4"
                                 stroke="#2563eb"
-                                strokeWidth="2.4"
+                                strokeWidth="2.5"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                               />
@@ -405,7 +415,7 @@ export default function StructuredDescriptionCard({
                               style={{
                                 fontSize: '11px',
                                 lineHeight: 1.65,
-                                color: isDark ? '#cbd5e1' : '#334155',
+                                color: isDark ? '#cbd5e1' : '#1e293b',
                                 fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
                                 fontWeight: 500
                               }}
@@ -422,7 +432,7 @@ export default function StructuredDescriptionCard({
                           style={{
                             fontSize: '11px',
                             lineHeight: 1.65,
-                            color: isDark ? '#cbd5e1' : '#475569',
+                            color: isDark ? '#cbd5e1' : '#1e293b',
                             margin: iIdx === section.items.length - 1 ? 0 : '0 0 6px 0',
                             fontFamily: '"Noto Sans Bengali", "Hind Siliguri", "Inter", sans-serif',
                             fontWeight: 500
@@ -441,8 +451,8 @@ export default function StructuredDescriptionCard({
                 <div
                   style={{
                     height: '1px',
-                    background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(219, 234, 254, 0.7)',
-                    margin: '12px 0'
+                    background: isDark ? 'rgba(255, 255, 255, 0.08)' : '#e2e8f0',
+                    margin: '14px 0'
                   }}
                 />
               )}
