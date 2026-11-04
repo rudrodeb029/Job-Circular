@@ -1,4 +1,4 @@
-package com.livecircular.bdjobs;
+package com.livecircular.app;
 
 import android.app.DownloadManager;
 import android.graphics.Color;
