@@ -1778,26 +1778,35 @@ mark {
 .feed-action-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid var(--border-light, #e2e8f0);
-  border-radius: 20px;
-  padding: 4px 10px;
+  gap: 5px;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: 8px;
+  padding: 4px 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: none;
+  box-shadow: none !important;
+  position: relative;
+}
+
+.feed-action-pill:focus,
+.feed-action-pill:active {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .feed-action-pill .feed-pill-count {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--text-secondary, #475569);
   transition: color 0.2s ease;
 }
 
 .feed-action-pill.is-liked {
-  background: transparent;
-  border-color: #fca5a5;
+  background: transparent !important;
+  border: none !important;
 }
 
 .feed-action-pill.is-liked .feed-pill-count {
@@ -1805,8 +1814,8 @@ mark {
 }
 
 .feed-action-pill.comments-active {
-  background: transparent;
-  border-color: #bfdbfe;
+  background: transparent !important;
+  border: none !important;
 }
 
 .feed-action-pill.comments-active .feed-pill-count {
@@ -1816,7 +1825,7 @@ mark {
 /* Feed Action Pills - Dark Mode Support */
 [data-theme='dark'] .feed-action-pill {
   background: transparent !important;
-  border-color: #334155 !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
@@ -1826,7 +1835,7 @@ mark {
 
 [data-theme='dark'] .feed-action-pill.is-liked {
   background: transparent !important;
-  border-color: rgba(239, 68, 68, 0.45) !important;
+  border: none !important;
 }
 
 [data-theme='dark'] .feed-action-pill.is-liked .feed-pill-count {
@@ -1835,11 +1844,123 @@ mark {
 
 [data-theme='dark'] .feed-action-pill.comments-active {
   background: transparent !important;
-  border-color: rgba(59, 130, 246, 0.45) !important;
+  border: none !important;
 }
 
 [data-theme='dark'] .feed-action-pill.comments-active .feed-pill-count {
   color: #93c5fd !important;
+}
+
+/* Heart Blast Pop & Particle Burst Animation */
+.heart-icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heart-icon-pop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  line-height: 1;
+  user-select: none;
+  transform-origin: center center;
+}
+
+.heart-icon-pop.blasting {
+  animation: heartBlastPop 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes heartBlastPop {
+  0% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(0.7);
+  }
+  50% {
+    transform: scale(1.65);
+    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.65));
+  }
+  70% {
+    transform: scale(1.3) rotate(-6deg);
+  }
+  85% {
+    transform: scale(1.1) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: none;
+  }
+}
+
+.heart-burst-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  margin-top: -7px;
+  margin-left: -7px;
+  border-radius: 50%;
+  border: 2.5px solid #ef4444;
+  pointer-events: none;
+  animation: ringBlast 0.65s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes ringBlast {
+  0% {
+    transform: scale(0.4);
+    opacity: 1;
+    border-width: 3px;
+  }
+  50% {
+    opacity: 0.9;
+    border-color: #ec4899;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+    border-width: 0.5px;
+  }
+}
+
+.heart-burst-sparks {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.heart-burst-sparks span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color, #ef4444);
+  transform: translate(-50%, -50%);
+  animation: sparkBlast 0.65s cubic-bezier(0.15, 0.9, 0.25, 1) forwards;
+}
+
+@keyframes sparkBlast {
+  0% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) translateY(0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--rot)) translateY(calc(-1 * var(--dist))) scale(1.4);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--rot)) translateY(calc(-1.2 * var(--dist))) scale(0);
+    opacity: 0;
+  }
 }
 
 /* Job Card Title Category Mark / Icon */

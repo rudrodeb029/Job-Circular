@@ -314,7 +314,7 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
   const handleLike = () => {
     setLikeAnimating(true);
     onToggleLike();
-    setTimeout(() => setLikeAnimating(false), 600);
+    setTimeout(() => setLikeAnimating(false), 700);
   };
 
   const handleAddComment = async (e) => {
@@ -600,31 +600,56 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
         background: 'var(--card-bg, #ffffff)',
         borderTop: '1px solid var(--border-light)'
       }}>
-        {/* Love Reaction Button & Counter Pill [❤️ 2] */}
+        {/* Love Reaction Button & Counter [❤️ 14] */}
         <button
           onClick={handleLike}
           className={`feed-action-pill ${isLiked ? 'is-liked' : ''}`}
           style={{
-            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)',
             background: 'transparent',
-            boxShadow: 'none'
+            boxShadow: 'none',
+            border: 'none',
+            outline: 'none',
+            padding: '4px 6px'
           }}
+          aria-label="Like post"
         >
-          <span style={{ fontSize: '15px', lineHeight: 1, display: 'inline-flex', alignItems: 'center' }}>
-            ❤️
-          </span>
+          <div className="heart-icon-wrapper">
+            <span className={`heart-icon-pop ${likeAnimating ? 'blasting' : ''}`}>
+              ❤️
+            </span>
+            {likeAnimating && (
+              <>
+                <div className="heart-burst-ring" />
+                <div className="heart-burst-sparks">
+                  <span style={{ '--rot': '0deg', '--dist': '18px', '--color': '#ef4444' }} />
+                  <span style={{ '--rot': '45deg', '--dist': '20px', '--color': '#f59e0b' }} />
+                  <span style={{ '--rot': '90deg', '--dist': '18px', '--color': '#ec4899' }} />
+                  <span style={{ '--rot': '135deg', '--dist': '20px', '--color': '#8b5cf6' }} />
+                  <span style={{ '--rot': '180deg', '--dist': '18px', '--color': '#ef4444' }} />
+                  <span style={{ '--rot': '225deg', '--dist': '20px', '--color': '#f59e0b' }} />
+                  <span style={{ '--rot': '270deg', '--dist': '18px', '--color': '#ec4899' }} />
+                  <span style={{ '--rot': '315deg', '--dist': '20px', '--color': '#8b5cf6' }} />
+                </div>
+              </>
+            )}
+          </div>
           <span className="feed-pill-count">
             {likesCount}
           </span>
         </button>
 
+        {/* Comment Button & Counter [💬 18] */}
         <button
           onClick={() => setShowComments(!showComments)}
           className={`feed-action-pill ${showComments ? 'comments-active' : ''}`}
           style={{
             background: 'transparent',
-            boxShadow: 'none'
+            boxShadow: 'none',
+            border: 'none',
+            outline: 'none',
+            padding: '4px 6px'
           }}
+          aria-label="Comments"
         >
           <span style={{ fontSize: '15px', lineHeight: 1, display: 'inline-flex', alignItems: 'center' }}>
             💬
