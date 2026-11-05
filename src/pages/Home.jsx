@@ -172,7 +172,7 @@ export default function Home() {
         {/* COMPACT HERO STATS CARD - REDUCED HEIGHT & TEXT SIZE */}
         <div style={{
           background: 'linear-gradient(135deg, #3b82f6 0%, #1a56db 100%)',
-          borderRadius: '24px',
+          borderRadius: '14px',
           padding: '12px 18px',
           position: 'relative',
           marginBottom: '16px',
@@ -346,7 +346,7 @@ export default function Home() {
                       border: '1px solid rgba(226, 232, 240, 0.9)',
                       boxShadow: 'none',
                       background: 'var(--white)',
-                      borderRadius: '12px',
+                      borderRadius: '8px',
                       minWidth: '72px',
                       flexShrink: 0
                     }}
@@ -366,7 +366,7 @@ export default function Home() {
                 border: '1px solid rgba(226, 232, 240, 0.9)',
                 boxShadow: 'none',
                 background: 'var(--white)',
-                borderRadius: '12px',
+                borderRadius: '8px',
                 minWidth: '72px',
                 flexShrink: 0,
                 zIndex: 5
@@ -450,9 +450,9 @@ export default function Home() {
 
           {totalPages > 1 && (
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '24px', marginBottom: '10px', padding: '12px 0', borderTop: '1px solid var(--border-light)' }}>
-              <button disabled={currentPage === 1} onClick={() => { setCurrentPage(prev => Math.max(prev - 1, 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ padding: '10px 20px', borderRadius: '12px', border: 'none', background: currentPage === 1 ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)', color: currentPage === 1 ? '#94a3b8' : '#ffffff', fontWeight: 700, fontSize: '13px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', boxShadow: currentPage === 1 ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '4px' }}>◀ {isEn ? 'Previous' : 'পূর্ববর্তী'}</button>
+              <button disabled={currentPage === 1} onClick={() => { setCurrentPage(prev => Math.max(prev - 1, 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: currentPage === 1 ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)', color: currentPage === 1 ? '#94a3b8' : '#ffffff', fontWeight: 700, fontSize: '13px', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', boxShadow: currentPage === 1 ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '4px' }}>◀ {isEn ? 'Previous' : 'পূর্ববর্তী'}</button>
               <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>{isEn ? `Page ${currentPage} of ${totalPages}` : `পৃষ্ঠা ${toBengaliNumber(currentPage)} / ${toBengaliNumber(totalPages)}`}</span>
-              <button disabled={currentPage === totalPages} onClick={() => { setCurrentPage(prev => Math.min(prev + 1, totalPages)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ padding: '10px 20px', borderRadius: '12px', border: 'none', background: currentPage === totalPages ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)', color: currentPage === totalPages ? '#94a3b8' : '#ffffff', fontWeight: 700, fontSize: '13px', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', boxShadow: currentPage === totalPages ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '4px' }}>{isEn ? 'Next' : 'পরবর্তী'} ▶</button>
+              <button disabled={currentPage === totalPages} onClick={() => { setCurrentPage(prev => Math.min(prev + 1, totalPages)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: currentPage === totalPages ? '#f1f5f9' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)', color: currentPage === totalPages ? '#94a3b8' : '#ffffff', fontWeight: 700, fontSize: '13px', cursor: currentPage === totalPages ? 'not-allowed' : 'pointer', boxShadow: currentPage === totalPages ? 'none' : '0 4px 12px rgba(26, 86, 219, 0.15)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '4px' }}>{isEn ? 'Next' : 'পরবর্তী'} ▶</button>
             </div>
           )}
         </div>
