@@ -214,7 +214,7 @@ export default function Feed() {
   );
 }
 
-function UserAvatar({ name, avatar, size = 32 }) {
+function UserAvatar({ name, avatar, size = 24 }) {
   const [imgError, setImgError] = useState(false);
   const initialLetter = (name && name.trim()) ? name.trim()[0].toUpperCase() : 'U';
 
@@ -689,7 +689,7 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '12px' }}>
               {localComments.map((comment, index) => (
                 <div key={comment.id || index} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                  <UserAvatar name={comment.userName} avatar={comment.userAvatar} size={32} />
+                  <UserAvatar name={comment.userName} avatar={comment.userAvatar} size={24} />
 
                   <div style={{
                     background: 'var(--card-bg, #ffffff)',
@@ -725,7 +725,7 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
 
           {/* Facebook-style Modern Comment Form */}
           <form onSubmit={handleAddComment} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-            <UserAvatar name={activeUser.name} avatar={activeUser.avatar} size={36} />
+            <UserAvatar name={activeUser.name} avatar={activeUser.avatar} size={28} />
 
             <div style={{
               flex: 1,
