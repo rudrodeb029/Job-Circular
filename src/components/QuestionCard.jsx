@@ -22,6 +22,7 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
     primary: '🏫',
     ministry: '🏛️',
     recent: '⏱️',
+    admission: '⏱️',
     subjectwise: '🗂️'
   };
 

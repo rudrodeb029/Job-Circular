@@ -25,7 +25,7 @@ const categoryConfig = {
   ntrca: { name: 'NTRCA', nameEn: 'NTRCA', color: 'rgba(139, 92, 246, 0.08)', icon: <NtrcaIcon size={20} color="#8b5cf6" /> },
   primary: { name: 'প্রাইমারি', nameEn: 'Primary', color: 'rgba(236, 72, 153, 0.08)', icon: <PrimaryIcon size={20} color="#ec4899" /> },
   ministry: { name: 'মন্ত্রণালয়', nameEn: 'Ministries', color: 'rgba(6, 182, 212, 0.08)', icon: <GovIcon size={20} color="#0891b2" /> },
-  recent: { name: 'রিসেন্ট', nameEn: 'Recent', color: 'rgba(245, 158, 11, 0.08)', icon: <RecentQuestionsIcon size={20} color="#f59e0b" /> },
+  recent: { name: 'Admission', nameEn: 'Admission', color: 'rgba(245, 158, 11, 0.08)', icon: <RecentQuestionsIcon size={20} color="#f59e0b" /> },
   subjectwise: { name: 'বিষয়ভিত্তিক', nameEn: 'Subjectwise', color: 'rgba(16, 185, 129, 0.08)', icon: <SubjectwiseIcon size={20} color="#10b981" /> }
 };
 
@@ -62,6 +62,7 @@ export default function QuestionsHub() {
     const config = { ...categoryConfig };
     papers.forEach(p => {
       if (p.category && !config[p.category]) {
+        if (p.category === 'admission') return;
         config[p.category] = {
           name: p.categoryName || p.category,
           nameEn: p.categoryNameEn || p.category,
@@ -76,7 +77,7 @@ export default function QuestionsHub() {
   const filteredPapers = useMemo(() => {
     let list = papers;
     if (activeCategory !== 'all') {
-      list = list.filter(p => p.category === activeCategory);
+      list = list.filter(p => p.category === activeCategory || (activeCategory === 'recent' && p.category === 'admission') || (activeCategory === 'admission' && p.category === 'recent'));
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();

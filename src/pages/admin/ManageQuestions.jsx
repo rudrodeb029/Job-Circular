@@ -256,7 +256,8 @@ export default function ManageQuestions() {
       ntrca: 'NTRCA',
       primary: 'Primary',
       ministry: 'Ministries',
-      recent: 'Recent Questions',
+      recent: 'Admission',
+      admission: 'Admission',
       subjectwise: 'Subjectwise Questions'
     };
     return labels[cat] || cat.toUpperCase();

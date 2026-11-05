@@ -8,7 +8,7 @@ let cachedQuestionsData = [];
 
 export const getQuestionsByCategory = (category) => {
   const all = getQuestionsData();
-  return all.filter(q => q.category === category);
+  return all.filter(q => q.category === category || (category === 'recent' && q.category === 'admission') || (category === 'admission' && q.category === 'recent'));
 };
 
 export const getQuestionById = (id) => {

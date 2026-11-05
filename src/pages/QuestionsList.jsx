@@ -12,7 +12,8 @@ const categoryTitlesBn = {
   ntrca: 'NTRCA শিক্ষক নিবন্ধন প্রশ্নপত্র',
   primary: 'প্রাইমারি শিক্ষক নিয়োগ প্রশ্নপত্র',
   ministry: 'বিভিন্ন মন্ত্রনালয় নিয়োগ প্রশ্নপত্র',
-  recent: 'রিসেন্ট প্রশ্নপত্র',
+  recent: 'Admission প্রশ্নপত্র',
+  admission: 'Admission প্রশ্নপত্র',
   subjectwise: 'বিষয়ভিত্তিক প্রশ্নপত্র'
 };
 
@@ -22,7 +23,8 @@ const categoryTitlesEn = {
   ntrca: 'NTRCA Registration Questions',
   primary: 'Primary Teacher Recruitment Questions',
   ministry: 'Various Ministries Exam Questions',
-  recent: 'Recent Questions Papers',
+  recent: 'Admission Questions Papers',
+  admission: 'Admission Questions Papers',
   subjectwise: 'Subjectwise Questions Papers'
 };
 
@@ -71,6 +73,7 @@ const renderCategoryIcon = (category) => {
         </svg>
       );
     case 'recent':
+    case 'admission':
       return (
         <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={strokeColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10"></circle>

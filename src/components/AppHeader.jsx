@@ -353,11 +353,11 @@ const AppHeader = React.memo(function AppHeader() {
                       { id: 'ntrca', label: 'NTRCA', labelEn: 'NTRCA', icon: '📜' },
                       { id: 'primary', label: 'প্রাইমারি', labelEn: 'Primary', icon: '🏫' },
                       { id: 'ministry', label: 'মন্ত্রণালয়', labelEn: 'Ministries', icon: '🏛️' },
-                      { id: 'recent', label: 'রিসেন্ট', labelEn: 'Recent Questions', icon: '⏱️' },
+                      { id: 'recent', label: 'Admission', labelEn: 'Admission', icon: '⏱️' },
                       { id: 'subjectwise', label: 'বিষয়ভিত্তিক', labelEn: 'Subjectwise Questions', icon: '🗂️' }
                     ].map(cat => {
                       const isExpanded = expandedCategory === cat.id;
-                      const papers = getQuestionsData().filter(p => p.category === cat.id);
+                      const papers = getQuestionsData().filter(p => p.category === cat.id || (cat.id === 'recent' && p.category === 'admission'));
 
                       return (
                         <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>

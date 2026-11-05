@@ -269,6 +269,7 @@ export const getCategoryIconComponent = (catId, props = {}) => {
     case 'primary':
       return <PrimaryIcon {...props} />;
     case 'recent':
+    case 'admission':
       return <RecentQuestionsIcon {...props} />;
     case 'subjectwise':
       return <SubjectwiseIcon {...props} />;
