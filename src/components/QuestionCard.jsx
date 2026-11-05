@@ -37,20 +37,11 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
   return (
     <div
       onClick={handleCardClick}
+      className="question-card question-grid-card-hover"
       style={{
-        background: 'var(--card-bg, #ffffff)',
-        borderRadius: '10px',
-        border: '1px solid var(--border-light, rgba(203, 213, 225, 0.6))',
-        boxShadow: '0 6px 16px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
-        overflow: 'hidden',
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'all 0.2s ease-in-out',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent'
       }}
-      className="question-grid-card-hover"
     >
       {/* Top Header - Soft Sky Blue Gradient with Cloud & Icon / Illustration */}
       <div

@@ -117,16 +117,7 @@ export default function QuestionsHub() {
 
           <div
             onClick={() => navigate('/live-exams-list')}
-            style={{
-              background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-              borderRadius: '12px',
-              padding: '14px 16px',
-              color: 'white',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
+            className="clay-live-exam-banner"
           >
             <div>
               <h4 style={{ margin: 0, fontSize: '13.5px', fontWeight: 700 }}>{isEn ? 'Participate in Live Exams' : 'লাইভ পরীক্ষায় অংশ নিন'}</h4>
