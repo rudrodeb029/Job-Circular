@@ -9,7 +9,7 @@ export default function Disclaimer() {
   return (
     <div style={{
       border: '1px solid var(--border-light)',
-      borderRadius: '20px',
+      borderRadius: '12px',
       padding: '16px',
       marginTop: '24px',
       background: 'var(--card-bg, #ffffff)',
@@ -65,7 +65,7 @@ export default function Disclaimer() {
           {!isEn ? (
             /* 🇧🇩 Bangla Disclaimer Mode */
             <div style={{ fontSize: '11.5px', lineHeight: '1.65', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: '12px', padding: '10px 12px', color: '#873800', fontWeight: 600 }}>
+              <div style={{ background: '#fffbe6', border: '1px solid #ffe58f', borderRadius: '8px', padding: '10px 12px', color: '#873800', fontWeight: 600 }}>
                 📢 <strong>জরুরি সতর্কবার্তা:</strong> এই অ্যাপটি বাংলাদেশ সরকার বা কোনো সরকারি কর্তৃপক্ষের অফিশিয়াল অ্যাপ্লিকেশন নয়।
               </div>
 
@@ -96,7 +96,7 @@ export default function Disclaimer() {
           ) : (
             /* 🇬🇧 English Disclaimer Mode */
             <div style={{ fontSize: '11.5px', lineHeight: '1.65', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '10px 12px', color: '#1e40af', fontWeight: 600 }}>
+              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '10px 12px', color: '#1e40af', fontWeight: 600 }}>
                 📢 <strong>Important Notice:</strong> Live Circular is an independent platform and does NOT represent any government entity.
               </div>
 

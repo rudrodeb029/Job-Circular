@@ -183,7 +183,7 @@ export default function QuestionDetails() {
         <div style={{
           background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
           color: '#ffffff',
-          borderRadius: '18px',
+          borderRadius: '12px',
           padding: '14px 16px',
           marginBottom: '12px',
           boxShadow: '0 8px 24px rgba(26, 86, 219, 0.2)'
@@ -202,15 +202,15 @@ export default function QuestionDetails() {
             display: 'flex',
             background: 'rgba(255, 255, 255, 0.15)',
             padding: '4px',
-            borderRadius: '12px',
+            borderRadius: '8px',
             gap: '4px'
           }}>
             <button
               onClick={() => handleModeChange('practice')}
               style={{
                 flex: 1,
-                padding: '10px',
-                borderRadius: '10px',
+                padding: '8px 10px',
+                borderRadius: '6px',
                 border: 'none',
                 background: mode === 'practice' ? '#ffffff' : 'transparent',
                 color: mode === 'practice' ? 'var(--primary)' : '#ffffff',
@@ -226,8 +226,8 @@ export default function QuestionDetails() {
               onClick={() => handleModeChange('read')}
               style={{
                 flex: 1,
-                padding: '10px',
-                borderRadius: '10px',
+                padding: '8px 10px',
+                borderRadius: '6px',
                 border: 'none',
                 background: mode === 'read' ? '#ffffff' : 'transparent',
                 color: mode === 'read' ? 'var(--primary)' : '#ffffff',
@@ -247,7 +247,7 @@ export default function QuestionDetails() {
             <ModernLoader size="md" icon={mode === 'practice' ? '🎯' : '📖'} />
           </div>
         ) : !paper.questions || paper.questions.length === 0 ? (
-          <div className="card" style={{ padding: '40px 20px', textAlign: 'center', borderRadius: '16px' }}>
+          <div className="card" style={{ padding: '40px 20px', textAlign: 'center', borderRadius: '10px' }}>
             <span style={{ fontSize: '40px', display: 'block', marginBottom: '12px' }}>📶</span>
             <h3 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' }}>
               {isEn ? 'Offline Mode' : 'আপনি অফলাইনে আছেন'}
@@ -280,7 +280,7 @@ export default function QuestionDetails() {
           <div style={{
             background: 'var(--white)',
             border: '1px solid var(--border-light)',
-            borderRadius: '16px',
+            borderRadius: '10px',
             padding: '12px 14px',
             marginBottom: '12px',
             boxShadow: 'var(--shadow-sm)'
@@ -340,7 +340,7 @@ export default function QuestionDetails() {
                 style={{
                   background: 'var(--white)',
                   border: '1px solid var(--border-light)',
-                  borderRadius: '16px',
+                  borderRadius: '10px',
                   padding: '12px 14px',
                   boxShadow: 'var(--shadow-sm)'
                 }}
@@ -405,7 +405,7 @@ export default function QuestionDetails() {
                           display: 'flex',
                           alignItems: 'center',
                           padding: '8px 11px',
-                          borderRadius: '10px',
+                          borderRadius: '8px',
                           background: bg,
                           color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
                           border: border,
@@ -442,7 +442,7 @@ export default function QuestionDetails() {
                   <div style={{
                     marginTop: '10px',
                     padding: '10px 12px',
-                    borderRadius: '12px',
+                    borderRadius: '8px',
                     background: 'var(--primary-lightest)',
                     borderLeft: '4px solid var(--primary)',
                     animation: 'fadeIn 0.3s ease'

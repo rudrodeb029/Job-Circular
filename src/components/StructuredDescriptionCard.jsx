@@ -407,7 +407,7 @@ export default function StructuredDescriptionCard({
       style={{
         position: 'relative',
         background: isDark ? 'var(--card-bg, #1e293b)' : '#ffffff',
-        borderRadius: '20px',
+        borderRadius: '12px',
         border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.5px solid #dbeafe',
         boxShadow: isDark
           ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)'
