@@ -408,20 +408,33 @@
 }
 
 
-/* Job Card - Modern Facelift */
+/* Job Card - Tactile Claymorphism Style */
 .job-card {
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: var(--card-bg, var(--white));
+  background: linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%);
   border-radius: 10px;
-  border: var(--card-border);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: 1.2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 6px 16px -2px rgba(30, 64, 175, 0.08),
+    0 2px 6px -1px rgba(15, 23, 42, 0.03),
+    inset 0 2px 3px #ffffff,
+    inset 0 -2px 3px rgba(30, 64, 175, 0.04);
+  transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: pointer;
   position: relative;
   overflow: hidden;
+}
+[data-theme='dark'] .job-card {
+  background: linear-gradient(145deg, #1e293b 0%, #131d2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 8px 20px -4px rgba(0, 0, 0, 0.5),
+    0 3px 6px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5);
 }
 .job-card::before {
   content: '';
@@ -435,9 +448,19 @@
   transition: opacity 0.3s ease;
 }
 .job-card:hover {
-  transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 14px 28px -4px rgba(26, 86, 219, 0.15), 0 4px 12px -2px rgba(15, 23, 42, 0.06);
-  border-color: rgba(26, 86, 219, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 22px -3px rgba(30, 64, 175, 0.13),
+    0 4px 8px -1px rgba(15, 23, 42, 0.05),
+    inset 0 2px 3px #ffffff,
+    inset 0 -2px 3px rgba(30, 64, 175, 0.05);
+}
+[data-theme='dark'] .job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 26px -3px rgba(0, 0, 0, 0.6),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.12),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5);
 }
 .job-card:hover::before {
   opacity: 1;
@@ -772,24 +795,45 @@
   gap: 10px;
   margin-bottom: var(--space-lg);
 }
+/* ═══ Tactile Claymorphism Category Card ═══ */
 .category-grid-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 5px 3px;
-  background: var(--white);
+  gap: 3px;
+  padding: 6px 4px;
+  background: linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%);
   border-radius: 8px;
-  border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: none;
+  border: 1.2px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 4px 10px -2px rgba(26, 86, 219, 0.08),
+    0 1.5px 4px -1px rgba(15, 23, 42, 0.03),
+    inset 0 1.5px 2px #ffffff,
+    inset 0 -1.5px 2px rgba(26, 86, 219, 0.04);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
+[data-theme='dark'] .category-grid-item {
+  background: linear-gradient(145deg, #1e293b 0%, #131d2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 4px 12px -2px rgba(0, 0, 0, 0.4),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.4);
+}
 .category-grid-item:hover {
   transform: translateY(-2px);
-  border-color: rgba(26, 86, 219, 0.25);
-  box-shadow: none;
-  background: var(--primary-bg);
+  box-shadow: 
+    0 6px 14px -2px rgba(26, 86, 219, 0.14),
+    0 2px 6px -1px rgba(15, 23, 42, 0.05),
+    inset 0 1.5px 2px #ffffff,
+    inset 0 -1.5px 2px rgba(26, 86, 219, 0.06);
+}
+[data-theme='dark'] .category-grid-item:hover {
+  box-shadow: 
+    0 6px 14px -2px rgba(0, 0, 0, 0.55),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.12),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.45);
 }
 .category-grid-icon {
   width: 30px;
@@ -799,7 +843,10 @@
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  box-shadow: none;
+  box-shadow: 
+    0 2px 5px rgba(0, 0, 0, 0.04),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 1.5px rgba(0, 0, 0, 0.03);
 }
 .category-grid-label {
   font-size: 9.5px;

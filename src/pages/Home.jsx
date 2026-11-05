@@ -324,7 +324,7 @@ export default function Home() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Scrolling part - 5 Categories only */}
-            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '1px 0' }}>
+            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '4px 0' }}>
               <div className="scrolling-content" style={{ gap: '8px' }}>
                 {[
                   { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={20} />, color: 'rgba(26, 86, 219, 0.08)' },
@@ -410,7 +410,7 @@ export default function Home() {
                 const descriptionSentence = isEn ? `Exam date published for the post of ${postTitle}.` : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
                 const displayDesc = item.description || descriptionSentence;
                 return (
-                  <div key={item.id} className="job-card" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '10px 12px', gap: '10px', border: '1px solid rgba(16, 185, 129, 0.12)', boxShadow: '0 4px 18px rgba(16, 185, 129, 0.04)' }}>
+                  <div key={item.id} className="job-card" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '10px 12px', gap: '10px' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #10b981, #34d399)', borderRadius: '4px 0 0 4px' }}></div>
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="job-card-title-icon job-card-title-icon-exam" style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669', '--card-icon-color': '#059669', '--card-icon-color-dark': '#34d399' }}>{displayIcon}</span><span>{orgName}</span></h4>
@@ -430,7 +430,7 @@ export default function Home() {
               const descriptionSentence = isEn ? `Written/Viva exam result published for the post of ${postTitle}. View result now!` : `${postTitle} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
               const displayDesc = item.description || descriptionSentence;
               return (
-                <div key={item.id} className="job-card" onClick={() => navigate(`/result-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(124, 58, 237, 0.12)', boxShadow: '0 4px 18px rgba(124, 58, 237, 0.04)' }}>
+                <div key={item.id} className="job-card" onClick={() => navigate(`/result-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #7c3aed, #a78bfa)', borderRadius: '4px 0 0 4px' }}></div>
                   <div className="job-card-content">
                     <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="job-card-title-icon job-card-title-icon-result" style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed', '--card-icon-color': '#7c3aed', '--card-icon-color-dark': '#c084fc' }}>{displayIcon}</span><span>{orgName}</span></h4>
