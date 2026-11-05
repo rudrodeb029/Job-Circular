@@ -222,7 +222,7 @@ export default function Home() {
               className="clay-hero-btn"
             >
               {isEn ? 'View All Jobs' : 'সবগুলো দেখুন'}
-              <ChevronRight size={12} />
+              <ChevronRight size={10} />
             </button>
           </div>
 
