@@ -219,20 +219,7 @@ export default function Home() {
 
             <button
               onClick={() => navigate('/all-circulars')}
-              style={{
-                background: '#ffffff',
-                color: '#1e40af',
-                padding: '6px 14px',
-                borderRadius: '8px',
-                fontSize: '11px',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.06)',
-                border: 'none',
-                cursor: 'pointer'
-              }}
+              className="clay-hero-btn"
             >
               {isEn ? 'View All Jobs' : 'সবগুলো দেখুন'}
               <ChevronRight size={12} />
@@ -324,7 +311,7 @@ export default function Home() {
 
         <div style={{ marginBottom: '16px' }}>
           <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '8px', border: 'none', boxShadow: 'none' }}>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'hidden', border: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'visible', border: 'none' }}>
               <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
               </h3>
@@ -396,7 +383,7 @@ export default function Home() {
 
         <div>
           <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '10px', border: 'none', boxShadow: 'none' }}>
-            <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'hidden', border: 'none' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'visible', border: 'none' }}>
               <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
               </h3>

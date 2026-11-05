@@ -938,53 +938,135 @@
   align-items: center;
   margin-bottom: 8px;
 }
+
+/* ═══ Claymorphism Section Title Badge ═══ */
 .section-title {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   font-size: 11.5px;
   font-weight: 700;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   letter-spacing: -0.2px;
-  padding: 2.5px 8px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition-fast);
+  padding: 4px 11px;
+  background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 
+    0 4px 10px -2px rgba(30, 64, 175, 0.08),
+    0 2px 4px -1px rgba(15, 23, 42, 0.04),
+    inset 0 1.5px 2px #ffffff,
+    inset 0 -1.5px 2px rgba(30, 64, 175, 0.06);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+[data-theme="dark"] .section-title {
+  background: linear-gradient(145deg, #1e293b 0%, #131d2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 4px 12px -2px rgba(0, 0, 0, 0.5),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.5);
+  color: #f1f5f9;
+}
+
 .section-title::before {
   content: '';
   display: inline-block;
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
-  box-shadow: 0 0 8px rgba(26, 86, 219, 0.4);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  box-shadow: 0 1px 3px rgba(29, 78, 216, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.7);
   flex-shrink: 0;
 }
+
+/* ═══ Claymorphism Section Link Pill ═══ */
 .section-link {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   font-size: 10.5px;
-  color: var(--primary);
+  color: #1a56db;
   font-weight: 700;
   cursor: pointer;
-  padding: 4px 10px;
-  border-radius: var(--radius-md);
-  background: var(--primary-bg);
-  border: 1px solid var(--chip-primary-border);
-  box-shadow: 0 2px 6px rgba(26, 86, 219, 0.06);
+  padding: 4px 11px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 4px 10px -2px rgba(26, 86, 219, 0.14),
+    0 2px 4px -1px rgba(26, 86, 219, 0.05),
+    inset 0 1.5px 2px #ffffff,
+    inset 0 -1.5px 2px rgba(26, 86, 219, 0.1);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   text-decoration: none;
 }
+
+[data-theme="dark"] .section-link {
+  background: linear-gradient(145deg, rgba(30, 58, 138, 0.55) 0%, rgba(30, 58, 138, 0.28) 100%);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  box-shadow: 
+    0 4px 10px -2px rgba(0, 0, 0, 0.4),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.4);
+  color: #93c5fd;
+}
+
 .section-link:hover {
-  background: linear-gradient(135deg, var(--primary) 0%, #2563eb 100%);
-  color: #ffffff;
-  border-color: transparent;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(26, 86, 219, 0.2);
+  box-shadow: 
+    0 6px 14px -2px rgba(26, 86, 219, 0.22),
+    0 2px 6px -1px rgba(26, 86, 219, 0.08),
+    inset 0 2px 3px #ffffff,
+    inset 0 -1.5px 2px rgba(26, 86, 219, 0.12);
+  color: #1e40af;
+}
+
+.section-link:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: 
+    0 2px 4px -1px rgba(26, 86, 219, 0.1),
+    inset 0 2px 4px rgba(26, 86, 219, 0.2);
+}
+
+/* ═══ Claymorphism Hero Banner Button ═══ */
+.clay-hero-btn {
+  background: linear-gradient(145deg, #ffffff 0%, #edf4ff 100%);
+  color: #1e40af;
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1.5px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 6px 16px -2px rgba(10, 37, 107, 0.25),
+    0 2px 6px -1px rgba(0, 0, 0, 0.1),
+    inset 0 2px 3px #ffffff,
+    inset 0 -2px 3px rgba(30, 64, 175, 0.14);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+}
+
+.clay-hero-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 8px 20px -2px rgba(10, 37, 107, 0.3),
+    0 3px 8px -1px rgba(0, 0, 0, 0.12),
+    inset 0 2.5px 3.5px #ffffff,
+    inset 0 -2px 3px rgba(30, 64, 175, 0.16);
+  color: #1d4ed8;
+}
+
+.clay-hero-btn:active {
+  transform: scale(0.96) translateY(1px);
+  box-shadow: 
+    0 2px 6px rgba(10, 37, 107, 0.15),
+    inset 0 2px 4px rgba(30, 64, 175, 0.22);
 }
 
 /* Back Button */
