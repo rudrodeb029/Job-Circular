@@ -202,28 +202,59 @@
   padding-right: 40px;
 }
 
-/* Advanced & Modern Professional Search Bar */
+/* ═══ Search Bar - Tactile Claymorphism Style (Increased Height) ═══ */
 .search-bar {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: var(--white);
-  border: 1.5px solid var(--border);
+  background: linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%);
+  border: 1.2px solid rgba(255, 255, 255, 0.95);
   border-radius: 10px;
-  padding: 5px 10px;
-  box-shadow: 0 4px 20px -2px rgba(26, 86, 219, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+  padding: 9px 12px;
+  min-height: 44px;
+  box-shadow: 
+    0 6px 16px -2px rgba(30, 64, 175, 0.08),
+    0 2px 6px -1px rgba(15, 23, 42, 0.03),
+    inset 0 2px 3px #ffffff,
+    inset 0 -2px 3px rgba(30, 64, 175, 0.04);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+[data-theme='dark'] .search-bar {
+  background: linear-gradient(145deg, #1e293b 0%, #131d2e 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 
+    0 8px 20px -4px rgba(0, 0, 0, 0.5),
+    0 3px 6px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
 .search-bar:focus-within,
 .search-bar.is-focused {
-  border-color: var(--primary) !important;
-  box-shadow: 0 0 0 4px rgba(26, 86, 219, 0.12), 0 8px 24px -4px rgba(26, 86, 219, 0.15) !important;
-  background: var(--white) !important;
+  border-color: rgba(26, 86, 219, 0.45) !important;
+  box-shadow: 
+    0 0 0 3px rgba(26, 86, 219, 0.15),
+    0 8px 24px -3px rgba(26, 86, 219, 0.16),
+    inset 0 2px 3px #ffffff,
+    inset 0 -2px 3px rgba(30, 64, 175, 0.05) !important;
+  background: linear-gradient(145deg, #ffffff 0%, #f8faff 100%) !important;
 }
+
+[data-theme='dark'] .search-bar:focus-within,
+[data-theme='dark'] .search-bar.is-focused {
+  border-color: rgba(96, 165, 250, 0.5) !important;
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.25),
+    0 10px 26px -3px rgba(0, 0, 0, 0.6),
+    inset 0 1.5px 2px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
 .search-bar-icon-box {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   background: var(--primary-bg);
   color: var(--primary);
   display: flex;
@@ -231,7 +262,9 @@
   justify-content: center;
   flex-shrink: 0;
   transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+  box-shadow: 0 2px 5px rgba(26, 86, 219, 0.08), inset 0 1px 1.5px #ffffff;
 }
+
 .search-bar-icon-box svg {
   transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
@@ -801,15 +834,15 @@
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  padding: 6px 4px;
+  padding: 7px 5px;
   background: linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%);
   border-radius: 8px;
   border: 1.2px solid rgba(255, 255, 255, 0.95);
   box-shadow: 
-    0 4px 10px -2px rgba(26, 86, 219, 0.08),
-    0 1.5px 4px -1px rgba(15, 23, 42, 0.03),
-    inset 0 1.5px 2px #ffffff,
-    inset 0 -1.5px 2px rgba(26, 86, 219, 0.04);
+    0 5px 14px -2px rgba(26, 86, 219, 0.12),
+    0 2px 5px -1px rgba(15, 23, 42, 0.04),
+    inset 0 2px 2.5px #ffffff,
+    inset 0 -2px 2.5px rgba(26, 86, 219, 0.06);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }

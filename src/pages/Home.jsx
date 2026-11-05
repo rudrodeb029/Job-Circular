@@ -324,7 +324,7 @@ export default function Home() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Scrolling part - 5 Categories only */}
-            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '4px 0' }}>
+            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '6px 0' }}>
               <div className="scrolling-content" style={{ gap: '8px' }}>
                 {[
                   { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={20} />, color: 'rgba(26, 86, 219, 0.08)' },
@@ -343,10 +343,6 @@ export default function Home() {
                     key={`${cat.id}-${idx}`}
                     className="category-grid-item"
                     style={{
-                      border: '1px solid rgba(226, 232, 240, 0.9)',
-                      boxShadow: 'none',
-                      background: 'var(--white)',
-                      borderRadius: '8px',
                       minWidth: '72px',
                       flexShrink: 0
                     }}
@@ -363,10 +359,6 @@ export default function Home() {
             <div
               className="category-grid-item"
               style={{
-                border: '1px solid rgba(226, 232, 240, 0.9)',
-                boxShadow: 'none',
-                background: 'var(--white)',
-                borderRadius: '8px',
                 minWidth: '72px',
                 flexShrink: 0,
                 zIndex: 5

@@ -5,11 +5,7 @@ export default function SearchBar({ value, onChange, placeholder, onFilterClick,
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <div className={`search-bar ${isFocused ? 'is-focused' : ''} ${value ? 'has-value' : ''}`} style={{
-      border: '1px solid rgba(37, 99, 235, 0.12)',
-      boxShadow: '0 4px 18px rgba(37, 99, 235, 0.04)',
-      background: 'var(--white)'
-    }}>
+    <div className={`search-bar ${isFocused ? 'is-focused' : ''} ${value ? 'has-value' : ''}`}>
       <div className="search-bar-icon-box">
         <Search size={18} />
       </div>
