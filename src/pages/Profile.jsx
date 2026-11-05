@@ -35,7 +35,7 @@ export default function Profile() {
         padding: 'calc(var(--safe-area-top) + 16px) 16px 20px 16px',
         color: 'white',
         textAlign: 'center',
-        borderRadius: '0 0 28px 28px',
+        borderRadius: '0 0 12px 12px',
         position: 'relative',
         boxShadow: '0 8px 24px -4px rgba(26, 86, 219, 0.22)',
         overflow: 'hidden'

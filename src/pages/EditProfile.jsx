@@ -408,7 +408,7 @@ export default function EditProfile() {
         padding: 'calc(var(--safe-area-top) + 10px) 16px 40px 16px',
         color: 'white',
         textAlign: 'center',
-        borderRadius: '0 0 24px 24px',
+        borderRadius: '0 0 12px 12px',
         position: 'relative',
         boxShadow: '0 8px 25px -4px rgba(26, 86, 219, 0.3)',
         overflow: 'hidden'
@@ -561,7 +561,7 @@ export default function EditProfile() {
         <form onSubmit={handleSubmit}>
 
           {/* Form Fields Card */}
-          <div className="card" style={{ padding: '16px 16px 6px 16px', borderRadius: '18px', boxShadow: '0 4px 18px rgba(0, 0, 0, 0.04)', border: '1px solid var(--border)' }}>
+          <div className="card" style={{ padding: '16px 16px 6px 16px', borderRadius: '12px', boxShadow: '0 4px 18px rgba(0, 0, 0, 0.04)', border: '1px solid var(--border)' }}>
             <FormInput
               label={isEn ? 'Full name' : 'পূর্ণ নাম'}
               icon={<User size={16} />}
