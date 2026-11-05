@@ -109,9 +109,9 @@ function NotificationItem({ notification }) {
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        padding: '10px 12px 10px 16px',
-        marginBottom: '8px',
-        borderRadius: '16px',
+        padding: '8px 12px 8px 14px',
+        marginBottom: '7px',
+        borderRadius: '10px',
         background: 'var(--white)',
         border: isRead ? '1px solid var(--border-light)' : '1px solid #bfdbfe',
         boxShadow: isRead ? '0 2px 8px rgba(15, 23, 42, 0.03)' : '0 4px 14px rgba(26, 86, 219, 0.08)',
@@ -132,7 +132,7 @@ function NotificationItem({ notification }) {
       }}></div>
 
       {/* Header Row: Inline Icon + Title */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', gap: '8px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px', gap: '8px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
           {/* Inline Icon directly before Title */}
           {notification.imageUrl ? (
@@ -150,8 +150,8 @@ function NotificationItem({ notification }) {
           )}
 
           <h4 style={{
-            fontSize: '15px',
-            fontWeight: isRead ? 700 : 800,
+            fontSize: '13px',
+            fontWeight: isRead ? 600 : 700,
             color: 'var(--text-primary)',
             margin: 0,
             overflow: 'hidden',
@@ -165,10 +165,10 @@ function NotificationItem({ notification }) {
 
       {/* Notification Message */}
       <p style={{
-        fontSize: '12.5px',
+        fontSize: '11.5px',
         color: 'var(--text-secondary)',
-        lineHeight: 1.5,
-        margin: '0 0 10px 0',
+        lineHeight: 1.4,
+        margin: '0 0 6px 0',
         display: '-webkit-box',
         WebkitLineClamp: 2,
         WebkitBoxOrient: 'vertical',
