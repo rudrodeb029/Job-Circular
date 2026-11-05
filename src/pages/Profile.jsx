@@ -91,9 +91,9 @@ export default function Profile() {
         {/* Avatar with Ring & Edit Camera Trigger Badge */}
         <div style={{
           position: 'relative',
-          width: '72px',
-          height: '72px',
-          margin: '0 auto 14px auto'
+          width: '54px',
+          height: '54px',
+          margin: '0 auto 10px auto'
         }}>
           {state.user.avatar ? (
             <img
@@ -104,8 +104,8 @@ export default function Profile() {
                 height: '100%',
                 borderRadius: '50%',
                 objectFit: 'cover',
-                border: '3.5px solid rgba(255, 255, 255, 0.85)',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)'
+                border: '2.5px solid rgba(255, 255, 255, 0.9)',
+                boxShadow: '0 6px 18px rgba(0, 0, 0, 0.18)'
               }}
             />
           ) : (
@@ -118,10 +118,10 @@ export default function Profile() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '26px',
+              fontSize: '20px',
               fontWeight: 800,
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.2)',
-              border: '3.5px solid rgba(255, 255, 255, 0.85)'
+              boxShadow: '0 6px 18px rgba(0, 0, 0, 0.18)',
+              border: '2.5px solid rgba(255, 255, 255, 0.9)'
             }}>
               {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
             </div>
@@ -133,10 +133,10 @@ export default function Profile() {
             title="Edit Profile & Picture"
             style={{
               position: 'absolute',
-              bottom: '0px',
-              right: '0px',
-              width: '26px',
-              height: '26px',
+              bottom: '-2px',
+              right: '-2px',
+              width: '20px',
+              height: '20px',
               borderRadius: '50%',
               background: 'var(--primary)',
               color: 'white',
@@ -144,15 +144,15 @@ export default function Profile() {
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              border: '2.5px solid white',
-              boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+              border: '2px solid white',
+              boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
             }}
           >
-            <Edit size={12} />
+            <Edit size={10} />
           </div>
         </div>
         {/* User Info */}
-        <h2 style={{ fontSize: '17px', fontWeight: 800, letterSpacing: '-0.3px', marginBottom: '4px' }}>
+        <h2 style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.2px', marginBottom: '2px' }}>
           {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
         </h2>
         {(state.user.qualification || state.user.location) && (
@@ -173,43 +173,43 @@ export default function Profile() {
           justifyContent: 'space-around',
           alignItems: 'center',
           background: 'var(--white)',
-          padding: '12px 10px',
-          borderRadius: '18px',
-          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.1)',
-          marginTop: '16px'
+          padding: '7px 8px',
+          borderRadius: '10px',
+          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.08)',
+          marginTop: '12px'
         }}>
           <div
             onClick={() => navigate('/saved')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)', margin: 0 }}>
+            <p style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--primary)', margin: 0 }}>
               {state.savedJobs.length}
             </p>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+            <p style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
               Saved Jobs
             </p>
           </div>
-          <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
+          <div style={{ width: '1px', height: '18px', background: 'var(--border-light)' }}></div>
           <div
             onClick={() => navigate('/saved?tab=applied')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669', margin: 0 }}>
+            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#059669', margin: 0 }}>
               {state.appliedJobs.length}
             </p>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+            <p style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
               Applied
             </p>
           </div>
-          <div style={{ width: '1px', height: '24px', background: 'var(--border-light)' }}></div>
+          <div style={{ width: '1px', height: '18px', background: 'var(--border-light)' }}></div>
           <div
             onClick={() => navigate('/notifications')}
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
           >
-            <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c', margin: 0 }}>
+            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#ea580c', margin: 0 }}>
               {unreadNotifCount}
             </p>
-            <p style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
+            <p style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
               Notified
             </p>
           </div>
