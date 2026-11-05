@@ -1127,7 +1127,6 @@ export default function LiveExamRoom() {
               gap: '12px'
             }}>
               {leaderboardData.map((user, idx) => {
-                const rank = idx + 1;
                 const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
                 const displayScore = toSafeString(user.score, '0');
                 const displayTotal = toSafeString(user.total, (exam && Array.isArray(exam.questions) ? exam.questions.length : 100));
@@ -1147,24 +1146,6 @@ export default function LiveExamRoom() {
                       transition: 'all 0.2s'
                     }}
                   >
-                    {/* Rank Circle */}
-                    <div style={{
-                      width: '32px',
-                      height: '32px',
-                      borderRadius: '50%',
-                      border: '1.5px solid var(--border-light)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '12px',
-                      fontWeight: 800,
-                      color: 'var(--text-secondary)',
-                      flexShrink: 0,
-                      background: 'var(--bg-secondary)'
-                    }}>
-                      {isEn ? rank : toBengaliNumber(rank)}
-                    </div>
-
                     {/* Avatar */}
                     <div style={{ position: 'relative', width: '42px', height: '42px', flexShrink: 0 }}>
                       {isValidAvatar(user.avatar) ? (
