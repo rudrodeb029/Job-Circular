@@ -105,20 +105,7 @@ function NotificationItem({ notification }) {
   return (
     <div
       onClick={handleClick}
-      style={{
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        padding: '8px 12px 8px 14px',
-        marginBottom: '7px',
-        borderRadius: '10px',
-        background: 'var(--white)',
-        border: isRead ? '1px solid var(--border-light)' : '1px solid #bfdbfe',
-        boxShadow: isRead ? '0 2px 8px rgba(15, 23, 42, 0.03)' : '0 4px 14px rgba(26, 86, 219, 0.08)',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        overflow: 'hidden'
-      }}
+      className={`clay-notification-card ${isRead ? 'read' : 'unread'}`}
     >
       {/* Left Blue Accent Bar (Matching Image 1) */}
       <div style={{
@@ -187,7 +174,9 @@ function NotificationItem({ notification }) {
               gap: '4px',
               padding: '2px 8px',
               borderRadius: '6px',
-              background: '#eff6ff',
+              background: 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
+              border: '1px solid rgba(191, 219, 254, 0.8)',
+              boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(30, 64, 175, 0.05)',
               color: '#1d4ed8',
               fontSize: '11px',
               fontWeight: 700
