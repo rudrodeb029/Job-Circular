@@ -7,8 +7,9 @@
   --primary-lighter: #3b82f6;
   --primary-lightest: #eff6ff;
   --primary-bg: #f4f8ff;
-  --bg: #ffffff;
-  --bg-secondary: #f8fafc;
+  --bg: #F3F4F9;
+  --bg-primary: #F3F4F9;
+  --bg-secondary: #eef1f6;
   --white: #ffffff;
   --text-primary: #1e293b;
   --text-secondary: #475569;
@@ -93,6 +94,7 @@
   --primary-light: #60a5fa;
   --primary-lighter: #93c5fd;
   --bg: #0b0f19; /* soft deep slate-navy */
+  --bg-primary: #0b0f19;
   --bg-secondary: #111827; /* dark slate secondary background */
   --white: #1f2937; /* soft dark container background */
   --text-primary: #f8fafc; /* crisp soft white for 100% readability */
@@ -155,7 +157,7 @@ html {
 
 body {
   font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
-  background: #e2e8f0;
+  background: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
   overflow-x: clip;
@@ -253,6 +255,7 @@ ul, ol {
 }
 
 .page {
+  background: var(--bg);
   padding-bottom: calc(72px + var(--safe-area-bottom));
   min-height: 100vh;
   min-height: 100dvh;
@@ -396,7 +399,7 @@ ul, ol {
   min-height: 100dvh;
   position: relative;
   overflow-x: clip;
-  background: var(--bg-primary);
+  background: var(--bg);
 }
 
 /* Forward Navigation: Right-to-Left Slide (Y locked strictly at 0) */
@@ -438,7 +441,7 @@ ul, ol {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-primary);
+  background: var(--bg);
 }
 
 .deferred-page-loader-inner {
@@ -451,7 +454,7 @@ ul, ol {
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
-  background: var(--bg-primary);
+  background: var(--bg);
 }
 
 .page-shell-appbar {
