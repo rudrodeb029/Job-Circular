@@ -756,7 +756,7 @@ export default function LiveExamRoom() {
               transition: 'all 0.2s'
             }}
           >
-            🏆 {isEn ? 'Daily Leaderboard' : 'আজকের লিডারবোর্ড'}
+            🏆 {isEn ? 'Leaderboard' : 'লিডারবোর্ড'}
           </button>
         </div>
       )}
@@ -783,7 +783,7 @@ export default function LiveExamRoom() {
             <span style={{ fontSize: '32px', display: 'block', marginBottom: '4px' }}>
               {isDidNotAttend ? '📝' : '🏆'}
             </span>
-            <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '4px' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
               {isDidNotAttend 
                 ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
