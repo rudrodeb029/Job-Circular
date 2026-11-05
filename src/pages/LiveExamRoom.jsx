@@ -703,7 +703,7 @@ export default function LiveExamRoom() {
             background: remainingSeconds < 60 ? '#fee2e2' : 'var(--primary-bg)',
             color: remainingSeconds < 60 ? 'var(--danger)' : 'var(--primary)',
             padding: '6px 12px',
-            borderRadius: '20px',
+            borderRadius: '10px',
             fontSize: '12px',
             fontWeight: 800,
             display: 'flex',
@@ -774,7 +774,7 @@ export default function LiveExamRoom() {
           <div style={{
             background: 'var(--white)',
             border: isDidNotAttend ? '1.5px solid #cbd5e1' : '1.5px solid var(--primary)',
-            borderRadius: '20px',
+            borderRadius: '12px',
             padding: '14px 16px',
             marginBottom: '12px',
             boxShadow: '0 4px 18px rgba(0,0,0,0.03)',
@@ -804,7 +804,7 @@ export default function LiveExamRoom() {
               gap: '12px',
               background: 'var(--bg-secondary)',
               padding: '10px 12px',
-              borderRadius: '16px'
+              borderRadius: '10px'
             }}>
               <div>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
@@ -844,7 +844,7 @@ export default function LiveExamRoom() {
                   style={{
                     background: 'var(--white)',
                     border: '1px solid var(--border-light)',
-                    borderRadius: '16px',
+                    borderRadius: '10px',
                     padding: '12px 14px',
                     boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
                   }}
@@ -983,7 +983,7 @@ export default function LiveExamRoom() {
             {leaderboardData.length > 0 && (
               <div style={{
                 background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-                borderRadius: '28px',
+                borderRadius: '12px',
                 padding: '24px 10px 20px 10px',
                 position: 'relative',
                 overflow: 'hidden',
@@ -999,7 +999,7 @@ export default function LiveExamRoom() {
                   color: '#166534',
                   background: '#ffffff',
                   padding: '4px 14px',
-                  borderRadius: '20px',
+                  borderRadius: '10px',
                   marginBottom: '24px',
                   border: '1px solid #b9f6ca',
                   zIndex: 1,
@@ -1140,7 +1140,7 @@ export default function LiveExamRoom() {
                       alignItems: 'center',
                       gap: '14px',
                       padding: '14px 16px',
-                      borderRadius: '20px',
+                      borderRadius: '10px',
                       background: 'var(--white)',
                       border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.03)',

@@ -118,7 +118,7 @@ export default function QuestionsHub() {
             onClick={() => navigate('/live-exams-list')}
             style={{
               background: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-              borderRadius: '16px',
+              borderRadius: '12px',
               padding: '14px 16px',
               color: 'white',
               cursor: 'pointer',
@@ -146,7 +146,7 @@ export default function QuestionsHub() {
               style={{
                 background: activeCategory === 'all' ? 'var(--primary-lightest)' : 'var(--white)',
                 border: activeCategory === 'all' ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
-                borderRadius: '14px'
+                borderRadius: '8px'
               }}
               onClick={() => handleCategorySelect('all')}
             >
@@ -164,7 +164,7 @@ export default function QuestionsHub() {
                   style={{
                     background: isActive ? 'var(--primary-lightest)' : 'var(--white)',
                     border: isActive ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
-                    borderRadius: '14px'
+                    borderRadius: '8px'
                   }}
                   onClick={() => handleCategorySelect(key)}
                 >

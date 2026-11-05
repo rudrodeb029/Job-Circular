@@ -172,7 +172,7 @@ export default function Home() {
         {/* COMPACT HERO STATS CARD - REDUCED HEIGHT & TEXT SIZE */}
         <div style={{
           background: 'linear-gradient(135deg, #3b82f6 0%, #1a56db 100%)',
-          borderRadius: '14px',
+          borderRadius: '12px',
           padding: '12px 18px',
           position: 'relative',
           marginBottom: '16px',

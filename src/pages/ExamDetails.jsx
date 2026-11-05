@@ -280,7 +280,7 @@ export default function ExamDetails() {
           style={{
             marginBottom: 'var(--space-lg)',
             background: state.theme === 'dark' ? 'var(--card-bg, #1e293b)' : '#ffffff',
-            borderRadius: '20px',
+            borderRadius: '12px',
             border: state.theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.8)',
             boxShadow: state.theme === 'dark' ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)' : '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
             padding: '16px'
@@ -329,7 +329,7 @@ export default function ExamDetails() {
           </div>
 
           {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
-          <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
+          <div style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-light)', marginTop: '12px', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
             {circularImages.length === 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', textAlign: 'center', gap: '12px', background: 'var(--bg-secondary)', borderRadius: '12px', border: '1px dashed var(--border-light)' }}>
                 <div style={{ fontSize: '32px' }}>📄</div>
@@ -409,7 +409,7 @@ export default function ExamDetails() {
                 gap: '6px',
                 background: 'rgba(15, 23, 42, 0.45)',
                 padding: '6px 10px',
-                borderRadius: '20px',
+                borderRadius: '10px',
                 backdropFilter: 'blur(4px)',
                 zIndex: 12
               }}>

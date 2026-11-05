@@ -246,7 +246,7 @@ export default function DetailsHeaderCard({
     <div
       style={{
         background: '#ffffff',
-        borderRadius: '20px',
+        borderRadius: '12px',
         border: '1px solid rgba(219, 234, 254, 0.8)',
         boxShadow: '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
         padding: shouldShowBottomSection ? '22px 14px 18px 14px' : '20px 14px 16px 14px',
@@ -303,7 +303,7 @@ export default function DetailsHeaderCard({
           style={{
             width: '44px',
             height: '44px',
-            borderRadius: '13px',
+            borderRadius: '10px',
             background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
             boxShadow: '0 6px 14px rgba(37, 99, 235, 0.3)',
             display: 'flex',
@@ -387,7 +387,7 @@ export default function DetailsHeaderCard({
               style={{
                 background: 'linear-gradient(90deg, #1d4ed8 0%, #2563eb 100%)',
                 color: '#ffffff',
-                borderRadius: '20px',
+                borderRadius: '10px',
                 fontSize: '10.5px',
                 fontWeight: 800,
                 padding: '3.5px 16px',

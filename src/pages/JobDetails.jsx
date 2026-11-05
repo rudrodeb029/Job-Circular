@@ -211,7 +211,7 @@ export default function JobDetails() {
             <span style={{ color: 'white', fontSize: '14px', fontWeight: 800 }}>Page {activeImageIndex + 1} / {circularImages.length}</span>
             <button
               onClick={() => setShowFullImage(false)}
-              style={{ color: 'white', background: 'rgba(255,255,255,0.2)', padding: '8px 16px', borderRadius: '20px', fontSize: '12px', fontWeight: 800 }}
+              style={{ color: 'white', background: 'rgba(255,255,255,0.2)', padding: '8px 16px', borderRadius: '10px', fontSize: '12px', fontWeight: 800 }}
             >
               CLOSE ✕
             </button>
@@ -303,7 +303,7 @@ export default function JobDetails() {
           style={{
             marginBottom: 'var(--space-lg)',
             background: state.theme === 'dark' ? 'var(--card-bg, #1e293b)' : '#ffffff',
-            borderRadius: '20px',
+            borderRadius: '12px',
             border: state.theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.8)',
             boxShadow: state.theme === 'dark' ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)' : '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
             padding: '16px'
@@ -354,7 +354,7 @@ export default function JobDetails() {
             </div>
 
             {/* Main Image Viewer Container with Prev/Next Overlay Buttons */}
-            <div style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
+            <div style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border-light)', boxShadow: '0 4px 16px rgba(15, 23, 42, 0.06)' }}>
               <ProgressiveImage
                 src={circularImages[activeImageIndex]}
                 alt={`Circular Notice Page ${activeImageIndex + 1}`}
@@ -420,7 +420,7 @@ export default function JobDetails() {
                   gap: '6px',
                   background: 'rgba(15, 23, 42, 0.45)',
                   padding: '6px 10px',
-                  borderRadius: '20px',
+                  borderRadius: '10px',
                   backdropFilter: 'blur(4px)',
                   zIndex: 12
                 }}>
@@ -514,7 +514,7 @@ export default function JobDetails() {
           style={{
             marginBottom: 'var(--space-lg)',
             background: state.theme === 'dark' ? 'var(--card-bg, #1e293b)' : '#ffffff',
-            borderRadius: '20px',
+            borderRadius: '12px',
             border: state.theme === 'dark' ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.8)',
             boxShadow: state.theme === 'dark' ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)' : '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
             padding: '16px'

@@ -38,7 +38,7 @@ export default function QuestionCard({ paper, categoryIcon, onClick, isEn = fals
       onClick={handleCardClick}
       style={{
         background: 'var(--card-bg, #ffffff)',
-        borderRadius: '16px',
+        borderRadius: '10px',
         border: '1px solid var(--border-light, rgba(203, 213, 225, 0.6))',
         boxShadow: '0 6px 16px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
         overflow: 'hidden',

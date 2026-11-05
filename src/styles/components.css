@@ -65,7 +65,7 @@
 /* Cards - General */
 .card {
   background: var(--card-bg, var(--white));
-  border-radius: 20px;
+  border-radius: 12px;
   padding: var(--space-lg);
   box-shadow: var(--shadow-md);
   border: var(--card-border);
@@ -209,7 +209,7 @@
   gap: 12px;
   background: var(--white);
   border: 1.5px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: 10px;
   padding: 8px 12px;
   box-shadow: 0 4px 20px -2px rgba(26, 86, 219, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -445,7 +445,7 @@
 .job-card-icon {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -515,7 +515,7 @@
   gap: 16px;
   padding: 16px 18px;
   background: var(--card-bg, var(--white));
-  border-radius: 18px;
+  border-radius: 10px;
   margin-bottom: 12px;
   border: var(--card-border);
   box-shadow: var(--shadow-sm);
@@ -531,7 +531,7 @@
 .category-icon {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -549,7 +549,7 @@
   gap: 16px;
   padding: 16px 18px;
   background: var(--card-bg, var(--white));
-  border-radius: 18px;
+  border-radius: 10px;
   margin-bottom: 12px;
   border: var(--card-border);
   box-shadow: var(--shadow-sm);
@@ -649,7 +649,7 @@
 .skeleton-circle { border-radius: 50%; }
 .skeleton-text { height: 14px; margin-bottom: 8px; }
 .skeleton-text-sm { height: 10px; width: 60%; }
-.skeleton-card { height: 76px; margin-bottom: 12px; border-radius: var(--radius-xl); }
+.skeleton-card { height: 76px; margin-bottom: 12px; border-radius: 10px; }
 
 /* Empty State */
 .empty-state {
@@ -683,7 +683,7 @@
 /* Stats Card (Home Dashboard) - Glossy Modern Design */
 .stats-card {
   background: linear-gradient(135deg, #1d4ed8 0%, #1a56db 50%, #2563eb 100%);
-  border-radius: var(--radius-xl);
+  border-radius: 10px;
   padding: 20px 22px;
   color: white;
   margin-bottom: var(--space-lg);
@@ -909,7 +909,7 @@
   padding: 12px 14px;
   background: var(--white);
   border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: var(--radius-xl);
+  border-radius: 10px;
   font-size: var(--text-xs);
   box-shadow: 0 3px 10px rgba(15, 23, 42, 0.03);
 }

@@ -296,7 +296,7 @@ export default function LiveExams() {
               <div style={{
                 background: 'var(--primary-bg)',
                 border: '1px solid var(--chip-primary-border)',
-                borderRadius: '14px',
+                borderRadius: '10px',
                 padding: '12px 14px',
                 marginBottom: '14px',
                 boxShadow: 'var(--shadow-sm)'
@@ -322,7 +322,7 @@ export default function LiveExams() {
               <div style={{
                 background: 'var(--primary-bg)',
                 border: '1px solid var(--chip-primary-border)',
-                borderRadius: '14px',
+                borderRadius: '10px',
                 padding: '12px 14px',
                 marginBottom: '14px',
                 boxShadow: 'var(--shadow-sm)'

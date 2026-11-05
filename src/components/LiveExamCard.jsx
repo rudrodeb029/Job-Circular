@@ -43,7 +43,7 @@ function LiveExamCard({
     <div
       style={{
         background: 'linear-gradient(135deg, #dbeafe 0%, #eff6ff 45%, #e0f2fe 100%)',
-        borderRadius: '16px',
+        borderRadius: '12px',
         border: '1.5px solid rgba(255, 255, 255, 0.9)',
         boxShadow: '0 4px 14px -3px rgba(37, 99, 235, 0.1), 0 2px 5px -2px rgba(15, 23, 42, 0.04)',
         padding: '10px 8px 10px 8px',
@@ -396,7 +396,7 @@ function LiveExamCard({
             style={{
               width: '100%',
               padding: '6px 10px',
-              borderRadius: '16px',
+              borderRadius: '10px',
               border: isRegistered ? '1px solid #10b981' : 'none',
               background: isRegistered ? '#ecfdf5' : 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
               color: isRegistered ? '#065f46' : '#ffffff',
@@ -434,7 +434,7 @@ function LiveExamCard({
             style={{
               width: '100%',
               padding: '6px 10px',
-              borderRadius: '16px',
+              borderRadius: '10px',
               border: 'none',
               background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
               color: '#ffffff',
@@ -512,7 +512,7 @@ function LiveExamCard({
             style={{
               background: 'var(--white, #ffffff)',
               color: 'var(--text-primary, #0f172a)',
-              borderRadius: '20px',
+              borderRadius: '12px',
               width: '100%',
               maxWidth: '380px',
               maxHeight: '82vh',

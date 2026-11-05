@@ -27,7 +27,7 @@ export default function ClayDisclaimerCard({ style = {} }) {
       className="clay-disclaimer-card"
       style={{
         position: 'relative',
-        borderRadius: '18px',
+        borderRadius: '8px',
         background: isDark
           ? 'linear-gradient(145deg, #1e293b 0%, #131d2e 100%)'
           : 'linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%)',
