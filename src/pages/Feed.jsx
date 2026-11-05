@@ -88,9 +88,9 @@ export default function Feed() {
         {/* Search Bar Row with App Icon */}
         <div style={{
           background: 'var(--card-bg, #ffffff)',
-          padding: '10px 14px',
+          padding: '6px 12px',
           borderBottom: '1px solid var(--border-light)',
-          marginBottom: '8px',
+          marginBottom: '6px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
           display: 'flex',
           alignItems: 'center',
@@ -101,11 +101,11 @@ export default function Feed() {
             src="/app-logo.png"
             alt="Live Circular Logo"
             style={{
-              width: '38px',
-              height: '38px',
+              width: '30px',
+              height: '30px',
               borderRadius: '50%',
               objectFit: 'contain',
-              padding: '4px',
+              padding: '2px',
               background: '#ffffff',
               border: '1.5px solid var(--primary, #1877f2)',
               boxShadow: '0 2px 8px rgba(24, 119, 242, 0.15)',
@@ -605,24 +605,14 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
           onClick={handleLike}
           className={`feed-action-pill ${isLiked ? 'is-liked' : ''}`}
           style={{
-            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)'
+            transform: likeAnimating ? 'scale(1.15)' : 'scale(1)',
+            background: 'transparent',
+            boxShadow: 'none'
           }}
         >
-          <div style={{
-            width: '20px',
-            height: '20px',
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '11px',
-            fontWeight: 800,
-            boxShadow: '0 2px 6px rgba(239, 68, 68, 0.3)'
-          }}>
+          <span style={{ fontSize: '15px', lineHeight: 1, display: 'inline-flex', alignItems: 'center' }}>
             ❤️
-          </div>
+          </span>
           <span className="feed-pill-count">
             {likesCount}
           </span>
@@ -631,21 +621,14 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
         <button
           onClick={() => setShowComments(!showComments)}
           className={`feed-action-pill ${showComments ? 'comments-active' : ''}`}
+          style={{
+            background: 'transparent',
+            boxShadow: 'none'
+          }}
         >
-          <div style={{
-            width: '20px',
-            height: '20px',
-            borderRadius: '50%',
-            background: '#10b981',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '11px',
-            fontWeight: 800
-          }}>
+          <span style={{ fontSize: '15px', lineHeight: 1, display: 'inline-flex', alignItems: 'center' }}>
             💬
-          </div>
+          </span>
           <span className="feed-pill-count">
             {commentsCount}
           </span>
@@ -697,7 +680,7 @@ const FacebookPostCard = React.memo(function FacebookPostCard({ post, isEn, isLi
                       gap: '8px',
                       marginBottom: '2px'
                     }}>
-                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--primary, #1877f2)' }}>
                         {comment.userName || (isEn ? 'Candidate User' : 'ইউজার')}
                       </span>
                       {comment.createdAt && (

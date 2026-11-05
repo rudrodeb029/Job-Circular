@@ -134,7 +134,7 @@ function StoryCard({ job, index, isEn, onClick }) {
         width: '112px',
         minWidth: '112px',
         height: '172px',
-        borderRadius: '14px',
+        borderRadius: '8px',
         position: 'relative',
         overflow: 'hidden',
         cursor: 'pointer',

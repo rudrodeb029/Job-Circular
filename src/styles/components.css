@@ -206,11 +206,11 @@
 .search-bar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: var(--white);
   border: 1.5px solid var(--border);
   border-radius: 10px;
-  padding: 8px 12px;
+  padding: 5px 10px;
   box-shadow: 0 4px 20px -2px rgba(26, 86, 219, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -221,9 +221,9 @@
   background: var(--white) !important;
 }
 .search-bar-icon-box {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   background: var(--primary-bg);
   color: var(--primary);
   display: flex;
@@ -1779,24 +1779,24 @@ mark {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--bg-secondary, #f8fafc);
-  border: 1px solid var(--border, #cbd5e1);
+  background: transparent;
+  border: 1px solid var(--border-light, #e2e8f0);
   border-radius: 20px;
-  padding: 4px 12px 4px 6px;
+  padding: 4px 10px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  box-shadow: none;
 }
 
 .feed-action-pill .feed-pill-count {
   font-size: 12px;
-  font-weight: 800;
-  color: var(--text-primary, #1e293b);
+  font-weight: 700;
+  color: var(--text-secondary, #475569);
   transition: color 0.2s ease;
 }
 
 .feed-action-pill.is-liked {
-  background: #fef2f2;
+  background: transparent;
   border-color: #fca5a5;
 }
 
@@ -1805,7 +1805,7 @@ mark {
 }
 
 .feed-action-pill.comments-active {
-  background: #eff6ff;
+  background: transparent;
   border-color: #bfdbfe;
 }
 
@@ -1815,17 +1815,17 @@ mark {
 
 /* Feed Action Pills - Dark Mode Support */
 [data-theme='dark'] .feed-action-pill {
-  background: #1e293b !important;
+  background: transparent !important;
   border-color: #334155 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: none !important;
 }
 
 [data-theme='dark'] .feed-action-pill .feed-pill-count {
-  color: #f8fafc !important;
+  color: #94a3b8 !important;
 }
 
 [data-theme='dark'] .feed-action-pill.is-liked {
-  background: rgba(239, 68, 68, 0.2) !important;
+  background: transparent !important;
   border-color: rgba(239, 68, 68, 0.45) !important;
 }
 
@@ -1834,7 +1834,7 @@ mark {
 }
 
 [data-theme='dark'] .feed-action-pill.comments-active {
-  background: rgba(59, 130, 246, 0.2) !important;
+  background: transparent !important;
   border-color: rgba(59, 130, 246, 0.45) !important;
 }
 
