@@ -42,10 +42,6 @@ function LiveExamCard({
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #dbeafe 0%, #eff6ff 45%, #e0f2fe 100%)',
-        borderRadius: '12px',
-        border: '1.5px solid rgba(255, 255, 255, 0.9)',
-        boxShadow: '0 4px 14px -3px rgba(37, 99, 235, 0.1), 0 2px 5px -2px rgba(15, 23, 42, 0.04)',
         padding: '10px 8px 10px 8px',
         position: 'relative',
         overflow: 'hidden',
@@ -62,7 +58,7 @@ function LiveExamCard({
         contentVisibility: 'auto',
         containIntrinsicSize: '0 190px'
       }}
-      className="live-exam-card-hover"
+      className="live-exam-card live-exam-card-hover"
     >
       {/* Top Left Organic Wave SVG Blob Accent */}
       <svg
@@ -153,7 +149,8 @@ function LiveExamCard({
           gap: '2px',
           position: 'relative',
           zIndex: 2,
-          boxShadow: '0 1px 2px rgba(0,0,0,0.02)'
+          boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+          border: '1px solid rgba(226, 232, 240, 0.8)'
         }}>
           <span style={{ fontSize: '6.8px', color: '#1e293b', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
             <span role="img" aria-label="calendar" style={{ fontSize: '7px' }}>🗓️</span>
@@ -196,8 +193,9 @@ function LiveExamCard({
         <div
           onClick={() => setShowSyllabusModal(true)}
           style={{
-            background: 'rgba(255, 255, 255, 0.65)',
-            border: '1px solid rgba(255, 255, 255, 0.9)',
+            background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+            border: '1px solid rgba(226, 232, 240, 0.85)',
+            boxShadow: 'inset 0 1px 2px #ffffff, inset 0 -1px 2px rgba(30, 64, 175, 0.02)',
             borderRadius: '8px',
             padding: '5px 6px',
             marginBottom: '8px',
@@ -462,8 +460,9 @@ function LiveExamCard({
               padding: '3px 6px',
               borderRadius: '5px',
               border: '1px solid rgba(226, 232, 240, 0.9)',
-              background: 'rgba(255, 255, 255, 0.96)',
+              background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
               color: '#1e293b',
+              boxShadow: '0 2px 4px -1px rgba(30, 64, 175, 0.06), inset 0 1.5px 2px #ffffff, inset 0 -1px 2px rgba(30, 64, 175, 0.03)',
               fontWeight: 700,
               fontSize: '8px',
               cursor: 'pointer',
@@ -471,7 +470,6 @@ function LiveExamCard({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '3px',
-              boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
               whiteSpace: 'nowrap',
               transition: 'all 0.15s ease'
             }}

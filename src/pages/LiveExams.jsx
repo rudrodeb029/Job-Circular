@@ -319,13 +319,10 @@ export default function LiveExams() {
 
             {/* Sleek, Matching History Overview Card (History tab) */}
             {activeTab === 'history' && (
-              <div style={{
-                background: 'var(--primary-bg)',
-                border: '1px solid var(--chip-primary-border)',
-                borderRadius: '10px',
+              <div className="clay-details-card" style={{
+                borderRadius: '12px',
                 padding: '12px 14px',
-                marginBottom: '14px',
-                boxShadow: 'var(--shadow-sm)'
+                marginBottom: '14px'
               }}>
                 <h3 style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
