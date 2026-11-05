@@ -244,11 +244,8 @@ export default function DetailsHeaderCard({
 
   return (
     <div
+      className="clay-details-card details-header-card"
       style={{
-        background: '#ffffff',
-        borderRadius: '12px',
-        border: '1px solid rgba(219, 234, 254, 0.8)',
-        boxShadow: '0 8px 24px -4px rgba(37, 99, 235, 0.08), 0 2px 6px -2px rgba(15, 23, 42, 0.04)',
         padding: shouldShowBottomSection ? '22px 14px 18px 14px' : '20px 14px 16px 14px',
         position: 'relative',
         overflow: 'hidden',
@@ -327,7 +324,7 @@ export default function DetailsHeaderCard({
           style={{
             fontSize: '15.5px',
             fontWeight: 800,
-            color: '#0f172a',
+            color: 'var(--text-primary)',
             textAlign: 'center',
             lineHeight: 1.35,
             margin: '0 0 12px 0',
@@ -354,17 +351,17 @@ export default function DetailsHeaderCard({
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
             <Calendar size={18} color="#2563eb" />
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, textAlign: 'left' }}>
-              <span style={{ fontSize: '9px', fontWeight: 600, color: '#64748b', lineHeight: 1.2 }}>
+              <span style={{ fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1.2 }}>
                 {resolvedDateLabel}
               </span>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {formattedDateVal}
               </span>
             </div>
           </div>
 
           {/* Vertical Divider */}
-          <div style={{ width: '1px', height: '24px', background: '#cbd5e1', flexShrink: 0 }} />
+          <div style={{ width: '1px', height: '24px', background: 'var(--border)', flexShrink: 0 }} />
 
           {/* Right Column: Time */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
@@ -415,13 +412,10 @@ export default function DetailsHeaderCard({
                 extraStats.map((stat, idx) => (
                   <div
                     key={idx}
+                    className="clay-stat-box"
                     style={{
-                      background: 'linear-gradient(180deg, #f0f7ff 0%, #e0effe 100%)',
-                      border: '1px solid rgba(191, 219, 254, 0.8)',
-                      borderRadius: '10px',
                       padding: '6px 2px 7px 2px',
-                      textAlign: 'center',
-                      boxShadow: '0 1px 3px rgba(37, 99, 235, 0.04)'
+                      textAlign: 'center'
                     }}
                   >
                     <div style={{ fontSize: '16px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15 }}>
@@ -442,13 +436,10 @@ export default function DetailsHeaderCard({
                 ].map((box, idx) => (
                   <div
                     key={idx}
+                    className="clay-stat-box"
                     style={{
-                      background: 'linear-gradient(180deg, #f0f7ff 0%, #e0effe 100%)',
-                      border: '1px solid rgba(191, 219, 254, 0.8)',
-                      borderRadius: '10px',
                       padding: '6px 2px 7px 2px',
-                      textAlign: 'center',
-                      boxShadow: '0 1px 3px rgba(37, 99, 235, 0.04)'
+                      textAlign: 'center'
                     }}
                   >
                     <div style={{ fontSize: '17px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15, fontFamily: '"Poppins", sans-serif' }}>

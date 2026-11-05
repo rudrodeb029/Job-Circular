@@ -404,14 +404,9 @@ export default function StructuredDescriptionCard({
 
   return (
     <div
+      className="clay-details-card structured-desc-card"
       style={{
         position: 'relative',
-        background: isDark ? 'var(--card-bg, #1e293b)' : '#ffffff',
-        borderRadius: '12px',
-        border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.5px solid #dbeafe',
-        boxShadow: isDark
-          ? '0 8px 24px -4px rgba(0, 0, 0, 0.4)'
-          : '0 4px 20px -2px rgba(37, 99, 235, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04)',
         marginBottom: 'var(--space-lg)',
         overflow: 'hidden'
       }}
