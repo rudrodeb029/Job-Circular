@@ -254,8 +254,8 @@ function LiveExamCard({
                     }}>
                       {displayedTopics.map((t, tIdx) => (
                         <span key={tIdx} style={{
-                          fontSize: '7px',
-                          fontWeight: 700,
+                          fontSize: '5.8px',
+                          fontWeight: 600,
                           background: '#ffffff',
                           border: '1px solid rgba(226, 232, 240, 0.8)',
                           color: '#1e293b',
@@ -278,8 +278,8 @@ function LiveExamCard({
                             setShowSyllabusModal(true);
                           }}
                           style={{
-                            fontSize: '6.8px',
-                            fontWeight: 800,
+                            fontSize: '5.8px',
+                            fontWeight: 700,
                             background: '#eff6ff',
                             border: '1px solid #bfdbfe',
                             color: '#2563eb',
@@ -338,8 +338,8 @@ function LiveExamCard({
                 }}>
                   {displayedFallbackTopics.map((t, idx) => (
                     <span key={idx} style={{
-                      fontSize: '7px',
-                      fontWeight: 700,
+                      fontSize: '5.8px',
+                      fontWeight: 600,
                       background: '#ffffff',
                       border: '1px solid rgba(226, 232, 240, 0.8)',
                       color: '#1e293b',
@@ -362,8 +362,8 @@ function LiveExamCard({
                         setShowSyllabusModal(true);
                       }}
                       style={{
-                        fontSize: '6.8px',
-                        fontWeight: 800,
+                        fontSize: '5.8px',
+                        fontWeight: 700,
                         background: '#eff6ff',
                         border: '1px solid #bfdbfe',
                         color: '#2563eb',
