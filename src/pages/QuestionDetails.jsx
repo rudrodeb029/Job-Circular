@@ -179,44 +179,47 @@ export default function QuestionDetails() {
       </div>
 
       <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
-        {/* Info & Mode Selector Header Card */}
+        {/* Info & Mode Selector Header Card - Tactile Claymorphism Style */}
         <div style={{
-          background: 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
+          background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
           color: '#ffffff',
-          borderRadius: '12px',
-          padding: '14px 16px',
-          marginBottom: '12px',
-          boxShadow: '0 8px 24px rgba(26, 86, 219, 0.2)'
+          borderRadius: '16px',
+          padding: '16px 18px',
+          marginBottom: '14px',
+          border: '1.2px solid rgba(255, 255, 255, 0.35)',
+          boxShadow: '0 10px 25px -4px rgba(26, 86, 219, 0.3), inset 0 2.5px 3.5px rgba(255, 255, 255, 0.35), inset 0 -2.5px 3.5px rgba(10, 37, 107, 0.3)'
         }}>
-          <h2 style={{ fontSize: '14.5px', fontWeight: 700, marginBottom: '8px', lineHeight: '1.4' }}>
+          <h2 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '8px', lineHeight: '1.4' }}>
             {isEn ? (paper.titleEn || paper.title) : paper.title}
           </h2>
-          <div style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.9, marginBottom: '12px' }}>
+          <div style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.92, marginBottom: '14px', flexWrap: 'wrap' }}>
             <span>📅 {isEn ? (paper.dateEn || paper.date) : paper.date}</span>
             <span>📝 {isEn ? `${totalCount} Questions` : `${toBengaliNumber(totalCount)}টি প্রশ্ন`}</span>
             <span>🕒 {isEn ? (paper.timeLimitEn || paper.timeLimit) : paper.timeLimit}</span>
           </div>
 
-          {/* Mode Switcher Buttons */}
+          {/* Mode Switcher Buttons - Tactile Claymorphism Style */}
           <div style={{
             display: 'flex',
-            background: 'rgba(255, 255, 255, 0.15)',
+            background: 'rgba(15, 23, 42, 0.22)',
             padding: '4px',
-            borderRadius: '8px',
-            gap: '4px'
+            borderRadius: '10px',
+            gap: '6px',
+            boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.2)'
           }}>
             <button
               onClick={() => handleModeChange('practice')}
               style={{
                 flex: 1,
                 padding: '8px 10px',
-                borderRadius: '6px',
-                border: 'none',
-                background: mode === 'practice' ? '#ffffff' : 'transparent',
-                color: mode === 'practice' ? 'var(--primary)' : '#ffffff',
+                borderRadius: '8px',
+                border: mode === 'practice' ? '1px solid rgba(255, 255, 255, 0.95)' : 'none',
+                background: mode === 'practice' ? 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)' : 'transparent',
+                color: mode === 'practice' ? '#1d4ed8' : 'rgba(255, 255, 255, 0.9)',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
+                boxShadow: mode === 'practice' ? '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)' : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -227,13 +230,14 @@ export default function QuestionDetails() {
               style={{
                 flex: 1,
                 padding: '8px 10px',
-                borderRadius: '6px',
-                border: 'none',
-                background: mode === 'read' ? '#ffffff' : 'transparent',
-                color: mode === 'read' ? 'var(--primary)' : '#ffffff',
+                borderRadius: '8px',
+                border: mode === 'read' ? '1px solid rgba(255, 255, 255, 0.95)' : 'none',
+                background: mode === 'read' ? 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)' : 'transparent',
+                color: mode === 'read' ? '#1d4ed8' : 'rgba(255, 255, 255, 0.9)',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
+                boxShadow: mode === 'read' ? '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)' : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -275,21 +279,30 @@ export default function QuestionDetails() {
           </div>
         ) : (
           <>
-            {/* Score & Progress Tracker Card (Only in Practice Mode) */}
+            {/* Score & Progress Tracker Card (Only in Practice Mode) - Tactile Claymorphism Style */}
         {mode === 'practice' && (
           <div style={{
-            background: 'var(--white)',
-            border: '1px solid var(--border-light)',
-            borderRadius: '10px',
-            padding: '12px 14px',
-            marginBottom: '12px',
-            boxShadow: 'var(--shadow-sm)'
+            background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+            border: '1.2px solid rgba(255, 255, 255, 0.95)',
+            borderRadius: '14px',
+            padding: '14px 16px',
+            marginBottom: '14px',
+            boxShadow: '0 6px 18px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
                 {isEn ? 'Practice Progress' : 'অনুশীলন অগ্রগতি'}
               </span>
-              <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)' }}>
+              <span style={{
+                fontSize: '12px',
+                fontWeight: 800,
+                color: 'var(--primary)',
+                background: 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
+                padding: '3px 10px',
+                borderRadius: '8px',
+                border: '1px solid rgba(191, 219, 254, 0.8)',
+                boxShadow: 'inset 0 1px 1.5px #ffffff, inset 0 -1px 1.5px rgba(37, 99, 235, 0.08)'
+              }}>
                 {isEn 
                   ? `Attempted: ${attemptedCount}/${totalCount} | Score: ${score}`
                   : `উত্তর দিয়েছেন: ${toBengaliNumber(attemptedCount)}/${toBengaliNumber(totalCount)} | স্কোর: ${toBengaliNumber(score)}`}
@@ -297,12 +310,13 @@ export default function QuestionDetails() {
             </div>
             
             {/* Progress Bar */}
-            <div style={{ width: '100%', height: '8px', background: 'var(--bg-secondary)', borderRadius: '4px', overflow: 'hidden', marginBottom: '8px' }}>
+            <div style={{ width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '6px', overflow: 'hidden', marginBottom: attemptedCount > 0 ? '12px' : '0', boxShadow: 'inset 0 1.5px 2px rgba(0, 0, 0, 0.08)' }}>
               <div style={{
                 width: `${(attemptedCount / totalCount) * 100}%`,
                 height: '100%',
-                background: 'var(--primary)',
-                borderRadius: '4px',
+                background: 'linear-gradient(90deg, #2563eb, #3b82f6)',
+                borderRadius: '6px',
+                boxShadow: '0 2px 6px rgba(37, 99, 235, 0.3)',
                 transition: 'width 0.3s ease'
               }} />
             </div>
@@ -314,12 +328,13 @@ export default function QuestionDetails() {
                   width: '100%',
                   padding: '8px',
                   borderRadius: '10px',
-                  border: '1px solid var(--border)',
-                  background: 'transparent',
+                  border: '1px solid rgba(254, 202, 202, 0.8)',
+                  background: 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)',
                   color: 'var(--danger)',
                   fontSize: '12px',
                   fontWeight: 700,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.06)'
                 }}
               >
                 🔄 {isEn ? 'Reset Answers' : 'আবার শুরু করুন'}
@@ -338,11 +353,11 @@ export default function QuestionDetails() {
               <div
                 key={qn.id}
                 style={{
-                  background: 'var(--white)',
-                  border: '1px solid var(--border-light)',
-                  borderRadius: '10px',
-                  padding: '12px 14px',
-                  boxShadow: 'var(--shadow-sm)'
+                  background: 'linear-gradient(145deg, #ffffff 0%, #f9fbfd 100%)',
+                  border: '1.2px solid rgba(255, 255, 255, 0.95)',
+                  borderRadius: '14px',
+                  padding: '14px 16px',
+                  boxShadow: '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
                 }}
               >
                 {/* Question Label */}
@@ -365,9 +380,10 @@ export default function QuestionDetails() {
                   {qn.options.map((option, oIndex) => {
                     const optText = cleanOptionText((isEn && qn.optionsEn && qn.optionsEn[oIndex]) ? qn.optionsEn[oIndex] : option);
 
-                    let bg = 'var(--bg)';
+                    let bg = 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
                     let color = 'var(--text-primary)';
-                    let border = '1px solid var(--border)';
+                    let border = '1.2px solid rgba(255, 255, 255, 0.95)';
+                    let boxShadow = '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
                     let prefixIcon = '';
 
                     const bengaliOptionPrefixes = ['ক', 'খ', 'গ', 'ঘ'];
@@ -376,23 +392,26 @@ export default function QuestionDetails() {
 
                     if (mode === 'read') {
                       if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
-                        bg = '#d1fae5';
+                        bg = 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
                         color = '#065f46';
-                        border = '1px solid #34d399';
+                        border = '1.2px solid rgba(134, 239, 172, 0.8)';
+                        boxShadow = '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
                         prefixIcon = '✅';
                       }
                     } else if (mode === 'practice' && hasAnswered) {
                       if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
                         // Highlight correct answer in green
-                        bg = '#d1fae5';
+                        bg = 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
                         color = '#065f46';
-                        border = '1px solid #34d399';
+                        border = '1.2px solid rgba(134, 239, 172, 0.8)';
+                        boxShadow = '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
                         prefixIcon = '✅';
                       } else if (oIndex === chosenIndex) {
                         // Highlight wrong selection in red
-                        bg = '#fee2e2';
+                        bg = 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
                         color = '#991b1b';
-                        border = '1px solid #f87171';
+                        border = '1.2px solid rgba(252, 165, 165, 0.8)';
+                        boxShadow = '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
                         prefixIcon = '❌';
                       }
                     }
@@ -409,6 +428,7 @@ export default function QuestionDetails() {
                           background: bg,
                           color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
                           border: border,
+                          boxShadow: boxShadow,
                           cursor: (mode === 'practice' && !hasAnswered) ? 'pointer' : 'default',
                           fontSize: '12px',
                           fontWeight: 500,
@@ -417,10 +437,12 @@ export default function QuestionDetails() {
                         }}
                       >
                         <span style={{
-                          width: '21px',
-                          height: '21px',
-                          borderRadius: '50%',
-                          background: 'rgba(0,0,0,0.05)',
+                          width: '22px',
+                          height: '22px',
+                          borderRadius: '7px',
+                          background: 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
+                          border: '1px solid rgba(255, 255, 255, 0.95)',
+                          boxShadow: '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -441,10 +463,12 @@ export default function QuestionDetails() {
                 {((mode === 'practice' && hasAnswered) || mode === 'read') && (
                   <div style={{
                     marginTop: '10px',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    background: 'var(--primary-lightest)',
+                    padding: '12px 14px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
+                    border: '1.2px solid rgba(191, 219, 254, 0.8)',
                     borderLeft: '4px solid var(--primary)',
+                    boxShadow: '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)',
                     animation: 'fadeIn 0.3s ease'
                   }}>
                     <h5 style={{
