@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AppProvider } from './context/AppContext'
 import { AdminProvider } from './context/AdminContext'
+import ErrorBoundary from './components/ErrorBoundary'
 import App from './App'
 import '@fontsource/noto-sans-bengali/bengali-400.css'
 import '@fontsource/noto-sans-bengali/bengali-500.css'
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AppProvider>
         <AdminProvider>
-          <App />
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
         </AdminProvider>
       </AppProvider>
     </BrowserRouter>

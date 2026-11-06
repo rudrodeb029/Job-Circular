@@ -75,6 +75,11 @@ function App() {
   const location = useLocation()
   const navigate = useNavigate()
 
+  // Check if current route is an admin route
+  const isAdminRoute = location.pathname.startsWith('/admin')
+  const hasBootedRef = useRef(false)
+  const isNotificationProcessingRef = useRef(false)
+
   const [updateInfo, setUpdateInfo] = useState(null)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
   const [exitToast, setExitToast] = useState(null)
@@ -97,11 +102,6 @@ function App() {
       isAdminRoute
     }
   }, [location, navigate, showUpdateModal, state, isAdminRoute])
-
-  // Check if current route is an admin route
-  const isAdminRoute = location.pathname.startsWith('/admin')
-  const hasBootedRef = useRef(false)
-  const isNotificationProcessingRef = useRef(false)
 
   // ═══ Phase 3: Native Network Monitoring (Offline Guard) ═══
   const [isOffline, setIsOffline] = useState(false)
