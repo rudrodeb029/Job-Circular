@@ -271,20 +271,42 @@ export default function LiveExams() {
       {toastMessage && (
         <div style={{
           position: 'fixed',
-          top: '80px',
+          top: '75px',
           left: '50%',
           transform: 'translateX(-50%)',
-          background: 'var(--primary)',
-          color: 'white',
-          padding: '12px 24px',
-          borderRadius: '30px',
-          boxShadow: '0 8px 30px rgba(26, 86, 219, 0.3)',
-          fontSize: '12px',
+          background: 'rgba(255, 255, 255, 0.96)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          borderRadius: '5px',
+          border: '1px solid rgba(226, 232, 240, 0.8)',
+          boxShadow: 'inset 0 1px 1.5px #ffffff, 0 4px 14px rgba(15, 23, 42, 0.08)',
+          padding: '5px 12px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          color: '#1e293b',
+          fontSize: '10.5px',
           fontWeight: 700,
           zIndex: 9999,
-          animation: 'slideDown 0.3s ease'
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none'
         }}>
-          {toastMessage}
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '16px',
+            height: '16px',
+            borderRadius: '4px',
+            background: toastMessage.includes('বাতিল') || toastMessage.includes('cancelled') ? '#fef2f2' : '#ecfdf5',
+            color: toastMessage.includes('বাতিল') || toastMessage.includes('cancelled') ? '#dc2626' : '#059669',
+            fontSize: '9.5px',
+            fontWeight: 800,
+            flexShrink: 0
+          }}>
+            {toastMessage.includes('বাতিল') || toastMessage.includes('cancelled') ? '✕' : '✓'}
+          </span>
+          <span>{toastMessage}</span>
         </div>
       )}
 
