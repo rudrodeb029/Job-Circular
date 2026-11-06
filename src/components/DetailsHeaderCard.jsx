@@ -349,7 +349,7 @@ export default function DetailsHeaderCard({
         >
           {/* Left Column: Date */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-            <Calendar size={18} color="#2563eb" />
+            <Calendar size={18} color="var(--primary, #2563eb)" />
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, textAlign: 'left' }}>
               <span style={{ fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1.2 }}>
                 {resolvedDateLabel}
@@ -365,12 +365,12 @@ export default function DetailsHeaderCard({
 
           {/* Right Column: Time */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
-            <Clock size={18} color="#2563eb" />
+            <Clock size={18} color="var(--primary, #2563eb)" />
             <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, textAlign: 'left' }}>
-              <span style={{ fontSize: '9px', fontWeight: 600, color: '#64748b', lineHeight: 1.2 }}>
+              <span style={{ fontSize: '9px', fontWeight: 600, color: 'var(--text-muted)', lineHeight: 1.2 }}>
                 {resolvedTimeLabel}
               </span>
-              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {formattedTimeVal}
               </span>
             </div>
@@ -418,10 +418,10 @@ export default function DetailsHeaderCard({
                       textAlign: 'center'
                     }}
                   >
-                    <div style={{ fontSize: '16px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15 }}>
+                    <div style={{ fontSize: '16px', fontWeight: 900, color: 'var(--primary)', lineHeight: 1.15 }}>
                       {stat.value}
                     </div>
-                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', marginTop: '3px' }}>
+                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '3px' }}>
                       {stat.label}
                     </div>
                   </div>
@@ -442,10 +442,10 @@ export default function DetailsHeaderCard({
                       textAlign: 'center'
                     }}
                   >
-                    <div style={{ fontSize: '17px', fontWeight: 900, color: '#1d4ed8', lineHeight: 1.15, fontFamily: '"Poppins", sans-serif' }}>
+                    <div style={{ fontSize: '17px', fontWeight: 900, color: 'var(--primary)', lineHeight: 1.15, fontFamily: '"Poppins", sans-serif' }}>
                       {box.val}
                     </div>
-                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: '#475569', marginTop: '3px' }}>
+                    <div style={{ fontSize: '9.5px', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '3px' }}>
                       {box.label}
                     </div>
                   </div>
