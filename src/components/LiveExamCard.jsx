@@ -70,6 +70,24 @@ function LiveExamCard({
       </svg>
 
       <div>
+        {/* Exam Title */}
+        <h3 style={{
+          fontSize: '11.5px',
+          fontWeight: 800,
+          color: '#0f172a',
+          margin: '0 0 5px 0',
+          lineHeight: '1.25',
+          fontFamily: '"Hind Siliguri", "Poppins", sans-serif',
+          position: 'relative',
+          zIndex: 2,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden'
+        }}>
+          {title}
+        </h3>
+
         {/* Row 1: Badges (Status Pill + Duration Pill) - Removed in History tab section */}
         {!isHistorySection && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '3px', marginBottom: '5px', position: 'relative', zIndex: 2 }}>
@@ -170,24 +188,6 @@ function LiveExamCard({
             </>
           )}
         </div>
-
-        {/* Exam Title */}
-        <h3 style={{
-          fontSize: '11.5px',
-          fontWeight: 800,
-          color: '#0f172a',
-          margin: '0 0 5px 0',
-          lineHeight: '1.25',
-          fontFamily: '"Hind Siliguri", "Poppins", sans-serif',
-          position: 'relative',
-          zIndex: 2,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden'
-        }}>
-          {title}
-        </h3>
 
         {/* Subjects & Topics Container */}
         <div
