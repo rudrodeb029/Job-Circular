@@ -686,13 +686,8 @@ export default function LiveExamRoom() {
 
   const showQuestionsSheet = isRunning && !currentResult;
 
-  const totalQuestions = useMemo(() => {
-    return Array.isArray(exam?.questions) ? exam.questions.length : 0;
-  }, [exam?.questions]);
-
-  const answeredCount = useMemo(() => {
-    return Object.keys(selectedAnswers || {}).filter(k => selectedAnswers[k] !== undefined && selectedAnswers[k] !== null).length;
-  }, [selectedAnswers]);
+  const totalQuestions = Array.isArray(exam?.questions) ? exam.questions.length : 0;
+  const answeredCount = Object.keys(selectedAnswers || {}).filter(k => selectedAnswers[k] !== undefined && selectedAnswers[k] !== null).length;
 
   const unansweredCount = Math.max(0, totalQuestions - answeredCount);
 
