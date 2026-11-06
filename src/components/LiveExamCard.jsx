@@ -393,33 +393,33 @@ function LiveExamCard({
             onClick={() => onRegister && onRegister(exam.id)}
             style={{
               width: '100%',
-              padding: '6px 10px',
-              borderRadius: '10px',
-              border: isRegistered ? '1px solid #10b981' : 'none',
-              background: isRegistered ? '#ecfdf5' : 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #3b82f6 100%)',
-              color: isRegistered ? '#065f46' : '#ffffff',
+              padding: '3px 6px',
+              borderRadius: '5px',
+              border: '1px solid rgba(226, 232, 240, 0.8)',
+              background: isRegistered ? '#ecfdf5' : 'rgba(255, 255, 255, 0.96)',
+              color: isRegistered ? '#059669' : '#2563eb',
               fontWeight: 800,
-              fontSize: '10px',
+              fontSize: '8.5px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
-              boxShadow: isRegistered ? 'none' : '0 3px 8px rgba(37, 99, 235, 0.3)',
-              transition: 'all 0.2s ease',
+              gap: '3px',
+              boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+              transition: 'all 0.15s ease',
               whiteSpace: 'nowrap'
             }}
           >
             {isRegistered ? (
               <>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
                 <span>{isEn ? 'Enrolled' : 'অংশগ্রহণ করছেন'}</span>
               </>
             ) : (
               <>
-                <span role="img" aria-label="star" style={{ fontSize: '11px' }}>⭐</span>
+                <span role="img" aria-label="star" style={{ fontSize: '9px' }}>⭐</span>
                 <span>{isEn ? 'Participate' : 'অংশগ্রহণ করুন'}</span>
               </>
             )}
@@ -431,23 +431,24 @@ function LiveExamCard({
             onClick={() => onEnter && onEnter(exam.id)}
             style={{
               width: '100%',
-              padding: '6px 10px',
-              borderRadius: '10px',
-              border: 'none',
-              background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-              color: '#ffffff',
+              padding: '3px 6px',
+              borderRadius: '5px',
+              border: '1px solid rgba(226, 232, 240, 0.8)',
+              background: 'rgba(255, 255, 255, 0.96)',
+              color: '#dc2626',
               fontWeight: 800,
-              fontSize: '10px',
+              fontSize: '8.5px',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
-              boxShadow: '0 3px 8px rgba(239, 68, 68, 0.3)',
+              gap: '3px',
+              boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+              transition: 'all 0.15s ease',
               whiteSpace: 'nowrap'
             }}
           >
-            <span role="img" aria-label="fire" style={{ fontSize: '11px' }}>⚡</span>
+            <span role="img" aria-label="fire" style={{ fontSize: '9px' }}>⚡</span>
             <span>{isEn ? 'Enter Exam' : 'পরীক্ষায় অংশ নিন'}</span>
           </button>
         )}
@@ -459,11 +460,11 @@ function LiveExamCard({
               width: '100%',
               padding: '3px 6px',
               borderRadius: '5px',
-              border: '1px solid rgba(226, 232, 240, 0.9)',
-              background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
+              border: '1px solid rgba(226, 232, 240, 0.8)',
+              background: 'rgba(255, 255, 255, 0.96)',
               color: '#1e293b',
-              boxShadow: '0 2px 4px -1px rgba(30, 64, 175, 0.06), inset 0 1.5px 2px #ffffff, inset 0 -1px 2px rgba(30, 64, 175, 0.03)',
-              fontWeight: 700,
+              boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+              fontWeight: 800,
               fontSize: '8px',
               cursor: 'pointer',
               display: 'flex',
