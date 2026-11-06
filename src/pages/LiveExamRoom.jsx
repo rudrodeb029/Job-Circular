@@ -887,20 +887,20 @@ export default function LiveExamRoom() {
             background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
             border: isDidNotAttend ? '1.2px solid rgba(255, 255, 255, 0.95)' : '1.5px solid rgba(37, 99, 235, 0.25)',
             borderRadius: '14px',
-            padding: '16px 18px',
-            marginBottom: '14px',
+            padding: '12px 14px',
+            marginBottom: '12px',
             boxShadow: '0 8px 24px -3px rgba(30, 64, 175, 0.08), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(30, 64, 175, 0.05)',
             textAlign: 'center'
           }}>
-            <span style={{ fontSize: '32px', display: 'block', marginBottom: '4px' }}>
+            <span style={{ fontSize: '24px', display: 'block', marginBottom: '2px' }}>
               {isDidNotAttend ? '📝' : '🏆'}
             </span>
-            <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+            <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '2px' }}>
               {isDidNotAttend 
                 ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
-            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.35 }}>
               {isDidNotAttend
                 ? (isEn 
                     ? 'You did not participate in this live exam. However, you can review all correct answers and detailed solutions below.' 
@@ -913,36 +913,44 @@ export default function LiveExamRoom() {
             <div style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
-              gap: '12px',
+              gap: '8px',
               padding: '0'
             }}>
               <div style={{
                 background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
                 border: '1.2px solid rgba(255, 255, 255, 0.95)',
-                borderRadius: '10px',
-                padding: '9px 12px',
-                boxShadow: '0 3px 8px -1px rgba(0,0,0,0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0,0,0,0.04)'
+                borderRadius: '8px',
+                padding: '5px 8px',
+                boxShadow: '0 2px 6px -1px rgba(0,0,0,0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0,0,0,0.04)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
+                <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
                   {isEn ? 'Total Questions' : 'মোট প্রশ্ন'}
                 </span>
-                <strong style={{ fontSize: '18px', color: 'var(--text-primary)', fontWeight: 800 }}>
+                <strong style={{ fontSize: '15px', color: 'var(--text-primary)', fontWeight: 800, lineHeight: 1.1 }}>
                   {isEn ? toSafeString(currentResult.total, '100') : toBengaliNumber(currentResult.total)}
                 </strong>
               </div>
               <div style={{
                 background: isDidNotAttend ? 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)',
                 border: isDidNotAttend ? '1.2px solid rgba(254, 202, 202, 0.7)' : '1.2px solid rgba(187, 247, 208, 0.8)',
-                borderRadius: '10px',
-                padding: '9px 12px',
+                borderRadius: '8px',
+                padding: '5px 8px',
                 boxShadow: isDidNotAttend 
-                  ? '0 3px 8px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.08)'
-                  : '0 3px 8px -1px rgba(34, 197, 94, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.08)'
+                  ? '0 2px 6px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.08)'
+                  : '0 2px 6px -1px rgba(34, 197, 94, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.08)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
-                <span style={{ fontSize: '11px', color: isDidNotAttend ? '#991b1b' : '#166534', display: 'block', fontWeight: 600 }}>
+                <span style={{ fontSize: '10.5px', color: isDidNotAttend ? '#991b1b' : '#166534', display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
                   {isDidNotAttend ? (isEn ? 'Status' : 'অবস্থা') : (isEn ? 'Your Score' : 'প্রাপ্ত নম্বর')}
                 </span>
-                <strong style={{ fontSize: isDidNotAttend ? '12.5px' : '18px', color: isDidNotAttend ? '#ef4444' : 'var(--success)', fontWeight: 800 }}>
+                <strong style={{ fontSize: isDidNotAttend ? '12px' : '15px', color: isDidNotAttend ? '#ef4444' : 'var(--success)', fontWeight: 800, lineHeight: 1.1 }}>
                   {isDidNotAttend 
                     ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                     : (isEn ? toSafeString(currentResult.score, '0') : toBengaliNumber(currentResult.score))}
