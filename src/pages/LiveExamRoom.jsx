@@ -17,6 +17,7 @@ export default function LiveExamRoom() {
   const { state } = useAppContext();
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
+  const isDark = state.theme === 'dark';
   const roomEntryTime = useRef(Date.now());
 
   const [exam, setExam] = useState(null);
@@ -705,8 +706,8 @@ export default function LiveExamRoom() {
         {/* Ticking Timer Badge */}
         {showQuestionsSheet && (
           <div style={{
-            background: remainingSeconds < 60 ? '#fee2e2' : 'var(--primary-bg)',
-            color: remainingSeconds < 60 ? 'var(--danger)' : 'var(--primary)',
+            background: remainingSeconds < 60 ? (isDark ? 'rgba(239, 68, 68, 0.2)' : '#fee2e2') : (isDark ? 'rgba(37, 99, 235, 0.2)' : 'var(--primary-bg)'),
+            color: remainingSeconds < 60 ? (isDark ? '#f87171' : 'var(--danger)') : (isDark ? '#60a5fa' : 'var(--primary)'),
             padding: '6px 12px',
             borderRadius: '10px',
             fontSize: '12px',
@@ -714,7 +715,7 @@ export default function LiveExamRoom() {
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            border: remainingSeconds < 60 ? '1px solid #f87171' : 'none'
+            border: remainingSeconds < 60 ? '1px solid #f87171' : (isDark ? '1px solid rgba(96, 165, 250, 0.3)' : 'none')
           }}>
             🔴 {formatTimer(remainingSeconds)}
           </div>
@@ -884,23 +885,29 @@ export default function LiveExamRoom() {
         {/* Result Header Panel - Tactile Claymorphism Style */}
         {currentResult && activeRoomTab === 'solutions' && (
           <div style={{
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
-            border: isDidNotAttend ? '1.2px solid rgba(255, 255, 255, 0.95)' : '1.5px solid rgba(37, 99, 235, 0.25)',
+            background: isDark
+              ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.1)'
+              : (isDidNotAttend ? '1.2px solid rgba(255, 255, 255, 0.95)' : '1.5px solid rgba(37, 99, 235, 0.25)'),
             borderRadius: '14px',
             padding: '12px 14px',
             marginBottom: '12px',
-            boxShadow: '0 8px 24px -3px rgba(30, 64, 175, 0.08), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(30, 64, 175, 0.05)',
+            boxShadow: isDark
+              ? '0 8px 24px -3px rgba(0, 0, 0, 0.6), inset 0 1.5px 2px rgba(255, 255, 255, 0.08)'
+              : '0 8px 24px -3px rgba(30, 64, 175, 0.08), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(30, 64, 175, 0.05)',
             textAlign: 'center'
           }}>
             <span style={{ fontSize: '24px', display: 'block', marginBottom: '2px' }}>
               {isDidNotAttend ? '📝' : '🏆'}
             </span>
-            <h2 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '2px' }}>
+            <h2 style={{ fontSize: '14px', fontWeight: 700, color: isDark ? '#f8fafc' : 'var(--text-primary)', marginBottom: '2px' }}>
               {isDidNotAttend 
                 ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
-            <p style={{ fontSize: '11.5px', color: 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.35 }}>
+            <p style={{ fontSize: '11.5px', color: isDark ? '#94a3b8' : 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.35 }}>
               {isDidNotAttend
                 ? (isEn 
                     ? 'You did not participate in this live exam. However, you can review all correct answers and detailed solutions below.' 
@@ -917,40 +924,50 @@ export default function LiveExamRoom() {
               padding: '0'
             }}>
               <div style={{
-                background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
-                border: '1.2px solid rgba(255, 255, 255, 0.95)',
+                background: isDark
+                  ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+                  : 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)',
                 borderRadius: '8px',
                 padding: '5px 8px',
-                boxShadow: '0 2px 6px -1px rgba(0,0,0,0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0,0,0,0.04)',
+                boxShadow: isDark
+                  ? '0 2px 6px -1px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.06)'
+                  : '0 2px 6px -1px rgba(0,0,0,0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0,0,0,0.04)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <span style={{ fontSize: '10.5px', color: 'var(--text-muted)', display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
+                <span style={{ fontSize: '10.5px', color: isDark ? '#94a3b8' : 'var(--text-muted)', display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
                   {isEn ? 'Total Questions' : 'মোট প্রশ্ন'}
                 </span>
-                <strong style={{ fontSize: '15px', color: 'var(--text-primary)', fontWeight: 800, lineHeight: 1.1 }}>
+                <strong style={{ fontSize: '15px', color: isDark ? '#f8fafc' : 'var(--text-primary)', fontWeight: 800, lineHeight: 1.1 }}>
                   {isEn ? toSafeString(currentResult.total, '100') : toBengaliNumber(currentResult.total)}
                 </strong>
               </div>
               <div style={{
-                background: isDidNotAttend ? 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)',
-                border: isDidNotAttend ? '1.2px solid rgba(254, 202, 202, 0.7)' : '1.2px solid rgba(187, 247, 208, 0.8)',
+                background: isDidNotAttend 
+                  ? (isDark ? 'rgba(239, 68, 68, 0.18)' : 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)')
+                  : (isDark ? 'rgba(16, 185, 129, 0.18)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)'),
+                border: isDidNotAttend 
+                  ? (isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1.2px solid rgba(254, 202, 202, 0.7)')
+                  : (isDark ? '1px solid rgba(16, 185, 129, 0.35)' : '1.2px solid rgba(187, 247, 208, 0.8)'),
                 borderRadius: '8px',
                 padding: '5px 8px',
-                boxShadow: isDidNotAttend 
-                  ? '0 2px 6px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.08)'
-                  : '0 2px 6px -1px rgba(34, 197, 94, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.08)',
+                boxShadow: isDark
+                  ? '0 2px 6px -1px rgba(0, 0, 0, 0.3)'
+                  : (isDidNotAttend 
+                      ? '0 2px 6px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.08)'
+                      : '0 2px 6px -1px rgba(34, 197, 94, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.08)'),
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <span style={{ fontSize: '10.5px', color: isDidNotAttend ? '#991b1b' : '#166534', display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
+                <span style={{ fontSize: '10.5px', color: isDidNotAttend ? (isDark ? '#fca5a5' : '#991b1b') : (isDark ? '#86efac' : '#166534'), display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
                   {isDidNotAttend ? (isEn ? 'Status' : 'অবস্থা') : (isEn ? 'Your Score' : 'প্রাপ্ত নম্বর')}
                 </span>
-                <strong style={{ fontSize: isDidNotAttend ? '12px' : '15px', color: isDidNotAttend ? '#ef4444' : 'var(--success)', fontWeight: 800, lineHeight: 1.1 }}>
+                <strong style={{ fontSize: isDidNotAttend ? '12px' : '15px', color: isDidNotAttend ? (isDark ? '#f87171' : '#ef4444') : (isDark ? '#34d399' : 'var(--success)'), fontWeight: 800, lineHeight: 1.1 }}>
                   {isDidNotAttend 
                     ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                     : (isEn ? toSafeString(currentResult.score, '0') : toBengaliNumber(currentResult.score))}
@@ -974,26 +991,32 @@ export default function LiveExamRoom() {
                 <div
                   key={qIndex}
                   style={{
-                    background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
-                    border: '1.2px solid rgba(255, 255, 255, 0.95)',
+                    background: isDark
+                      ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+                      : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+                    border: isDark
+                      ? '1px solid rgba(255, 255, 255, 0.08)'
+                      : '1.2px solid rgba(255, 255, 255, 0.95)',
                     borderRadius: '12px',
                     padding: '14px 16px',
-                    boxShadow: '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
+                    boxShadow: isDark
+                      ? '0 6px 18px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.06)'
+                      : '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
                   }}
                 >
                   {/* Question Text */}
                   <h4 style={{
                     fontSize: '12.5px',
                     fontWeight: 600,
-                    color: 'var(--text-secondary)',
+                    color: isDark ? '#f1f5f9' : 'var(--text-secondary)',
                     marginBottom: '10px',
                     lineHeight: '1.45',
                     display: 'flex',
                     gap: '8px',
                     alignItems: 'baseline'
                   }}>
-                    <span style={{ flexShrink: 0 }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                    <QuestionContent content={isEn ? (qn.questionEn || qn.question) : qn.question} style={{ flex: 1 }} />
+                    <span style={{ flexShrink: 0, color: isDark ? '#94a3b8' : 'inherit' }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
+                    <QuestionContent content={isEn ? (qn.questionEn || qn.question) : qn.question} style={{ flex: 1, color: isDark ? '#f1f5f9' : 'inherit' }} />
                   </h4>
 
                   {/* Option Choices */}
@@ -1003,31 +1026,37 @@ export default function LiveExamRoom() {
                       const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
                       const prefix = optionPrefixes[oIndex];
 
-                      let bg = 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
-                      let color = 'var(--text-primary)';
-                      let border = '1.2px solid rgba(255, 255, 255, 0.95)';
-                      let boxShadow = '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
+                      let bg = isDark
+                        ? 'rgba(30, 41, 59, 0.7)'
+                        : 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
+                      let color = isDark ? '#e2e8f0' : 'var(--text-primary)';
+                      let border = isDark
+                        ? '1px solid rgba(255, 255, 255, 0.08)'
+                        : '1.2px solid rgba(255, 255, 255, 0.95)';
+                      let boxShadow = isDark
+                        ? '0 2px 4px rgba(0, 0, 0, 0.2)'
+                        : '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
                       let trailingIcon = null;
 
                       // Styling based on state
                       if (currentResult) {
                         if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
-                          bg = 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
-                          color = '#065f46';
-                          border = '1.2px solid rgba(134, 239, 172, 0.8)';
-                          boxShadow = '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
+                          bg = isDark ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
+                          color = isDark ? '#34d399' : '#065f46';
+                          border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1.2px solid rgba(134, 239, 172, 0.8)';
+                          boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
                           trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#34d399" : "#059669"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
                           );
                         } else if (oIndex === chosenIndex) {
-                          bg = 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
-                          color = '#991b1b';
-                          border = '1.2px solid rgba(252, 165, 165, 0.8)';
-                          boxShadow = '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
+                          bg = isDark ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
+                          color = isDark ? '#f87171' : '#991b1b';
+                          border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1.2px solid rgba(252, 165, 165, 0.8)';
+                          boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
                           trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#f87171" : "#dc2626"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <line x1="18" y1="6" x2="6" y2="18" />
                               <line x1="6" y1="6" x2="18" y2="18" />
                             </svg>
@@ -1035,12 +1064,12 @@ export default function LiveExamRoom() {
                         }
                       } else {
                         if (oIndex === chosenIndex) {
-                          bg = 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)';
-                          color = 'var(--primary)';
-                          border = '1.2px solid rgba(147, 197, 253, 0.9)';
-                          boxShadow = '0 3px 8px -1px rgba(37, 99, 235, 0.14), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(37, 99, 235, 0.1)';
+                          bg = isDark ? 'rgba(37, 99, 235, 0.25)' : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)';
+                          color = isDark ? '#60a5fa' : 'var(--primary)';
+                          border = isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1.2px solid rgba(147, 197, 253, 0.9)';
+                          boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(37, 99, 235, 0.14), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(37, 99, 235, 0.1)';
                           trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#60a5fa" : "var(--primary)"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
                           );
@@ -1071,9 +1100,10 @@ export default function LiveExamRoom() {
                             width: '22px',
                             height: '22px',
                             borderRadius: '7px',
-                            background: 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
-                            border: '1px solid rgba(255, 255, 255, 0.95)',
-                            boxShadow: '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
+                            background: isDark ? 'rgba(15, 23, 42, 0.8)' : 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
+                            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.95)',
+                            boxShadow: isDark ? '0 1.5px 4px rgba(0,0,0,0.3)' : '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
+                            color: isDark ? '#e2e8f0' : 'inherit',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -1096,17 +1126,21 @@ export default function LiveExamRoom() {
                       marginTop: '10px',
                       padding: '12px 14px',
                       borderRadius: '12px',
-                      background: 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
-                      border: '1.2px solid rgba(191, 219, 254, 0.8)',
-                      borderLeft: '4px solid var(--primary)',
-                      boxShadow: '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)'
+                      background: isDark
+                        ? 'rgba(30, 41, 59, 0.7)'
+                        : 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(191, 219, 254, 0.8)',
+                      borderLeft: isDark ? '4px solid #60a5fa' : '4px solid var(--primary)',
+                      boxShadow: isDark
+                        ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)'
+                        : '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)'
                     }}>
-                      <h5 style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)', marginBottom: '4px' }}>
+                      <h5 style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#60a5fa' : 'var(--primary)', marginBottom: '4px' }}>
                         💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
                       </h5>
                       <ExplanationContent
                         content={isEn ? (qn.explanationEn || qn.explanation) : qn.explanation}
-                        style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
+                        style={{ fontSize: '12px', color: isDark ? '#cbd5e1' : 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
                       />
                     </div>
                   )}
@@ -1123,28 +1157,32 @@ export default function LiveExamRoom() {
             {/* NEW PREMIUM PODIUM DESIGN - CLAYMORPHISM STYLE */}
             {leaderboardData.length > 0 && (
               <div style={{
-                background: 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)',
+                background: isDark
+                  ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+                  : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)',
                 borderRadius: '16px',
                 padding: '24px 10px 20px 10px',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 8px 24px -3px rgba(22, 163, 74, 0.12), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(22, 163, 74, 0.15)',
+                boxShadow: isDark
+                  ? '0 8px 24px -3px rgba(0, 0, 0, 0.6), inset 0 1.5px 2px rgba(255, 255, 255, 0.08)'
+                  : '0 8px 24px -3px rgba(22, 163, 74, 0.12), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(22, 163, 74, 0.15)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                border: '1.2px solid rgba(255, 255, 255, 0.95)'
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1.2px solid rgba(255, 255, 255, 0.95)'
               }}>
                 <div style={{
                   fontSize: '11px',
                   fontWeight: 700,
-                  color: '#166534',
-                  background: 'linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%)',
+                  color: isDark ? '#34d399' : '#166534',
+                  background: isDark ? 'rgba(16, 185, 129, 0.15)' : 'linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%)',
                   padding: '5px 16px',
                   borderRadius: '10px',
                   marginBottom: '24px',
-                  border: '1px solid rgba(255, 255, 255, 0.95)',
+                  border: isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid rgba(255, 255, 255, 0.95)',
                   zIndex: 1,
-                  boxShadow: '0 3px 8px -1px rgba(22, 163, 74, 0.1), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(22, 163, 74, 0.08)'
+                  boxShadow: isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(22, 163, 74, 0.1), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(22, 163, 74, 0.08)'
                 }}>
                   {isEn ? 'Daily Top Performers' : 'আজকের সেরা অংশগ্রহণকারী'}
                 </div>
@@ -1163,7 +1201,7 @@ export default function LiveExamRoom() {
                   {/* RANK 2 */}
                   {leaderboardData[1] && (
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ color: '#4b5563', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
+                      <div style={{ color: isDark ? '#94a3b8' : '#4b5563', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>2</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
                         {isValidAvatar(leaderboardData[1].avatar) ? (
                           <img
@@ -1174,17 +1212,17 @@ export default function LiveExamRoom() {
                           />
                         ) : null}
                         <div style={{
-                          width: '100%', height: '100%', borderRadius: '50%', background: '#ffffff', color: '#16a34a',
+                          width: '100%', height: '100%', borderRadius: '50%', background: isDark ? '#334155' : '#ffffff', color: isDark ? '#34d399' : '#16a34a',
                           display: isValidAvatar(leaderboardData[1].avatar) ? 'none' : 'flex',
-                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid #ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: isDark ? '2.5px solid rgba(255, 255, 255, 0.2)' : '2.5px solid #ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                         }}>
                           {getInitials(leaderboardData[1].name)}
                         </div>
                       </div>
-                      <div style={{ color: '#166534', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                      <div style={{ color: isDark ? '#f1f5f9' : '#166534', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[1].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: '#15803d', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: isDark ? '#34d399' : '#15803d', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
                         {isEn ? leaderboardData[1].score : toBengaliNumber(leaderboardData[1].score)}
                       </div>
                     </div>
@@ -1215,10 +1253,10 @@ export default function LiveExamRoom() {
                           {getInitials(leaderboardData[0].name)}
                         </div>
                       </div>
-                      <div style={{ color: '#166534', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
+                      <div style={{ color: isDark ? '#f8fafc' : '#166534', fontSize: '13px', fontWeight: 800, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>
                         {leaderboardData[0].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: '#fbbf24', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: isDark ? '#fde047' : '#fbbf24', fontSize: '14px', fontWeight: 900, marginTop: '2px' }}>
                         {isEn ? leaderboardData[0].score : toBengaliNumber(leaderboardData[0].score)}
                       </div>
                     </div>
@@ -1227,7 +1265,7 @@ export default function LiveExamRoom() {
                   {/* RANK 3 */}
                   {leaderboardData[2] && (
                     <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                      <div style={{ color: '#4b5563', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
+                      <div style={{ color: isDark ? '#94a3b8' : '#4b5563', fontSize: '12px', fontWeight: 800, marginBottom: '6px' }}>3</div>
                       <div style={{ position: 'relative', width: '56px', height: '56px', marginBottom: '8px' }}>
                         {isValidAvatar(leaderboardData[2].avatar) ? (
                           <img
@@ -1238,17 +1276,17 @@ export default function LiveExamRoom() {
                           />
                         ) : null}
                         <div style={{
-                          width: '100%', height: '100%', borderRadius: '50%', background: '#ffffff', color: '#16a34a',
+                          width: '100%', height: '100%', borderRadius: '50%', background: isDark ? '#334155' : '#ffffff', color: isDark ? '#34d399' : '#16a34a',
                           display: isValidAvatar(leaderboardData[2].avatar) ? 'none' : 'flex',
-                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: '2.5px solid #ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
+                          alignItems: 'center', justifyContent: 'center', fontSize: '20px', fontWeight: 800, border: isDark ? '2.5px solid rgba(255, 255, 255, 0.2)' : '2.5px solid #ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
                         }}>
                           {getInitials(leaderboardData[2].name)}
                         </div>
                       </div>
-                      <div style={{ color: '#166534', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
+                      <div style={{ color: isDark ? '#f1f5f9' : '#166534', fontSize: '11px', fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80px' }}>
                         {leaderboardData[2].name.split(' ')[0]}
                       </div>
-                      <div style={{ color: '#15803d', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
+                      <div style={{ color: isDark ? '#34d399' : '#15803d', fontSize: '11px', fontWeight: 900, marginTop: '2px' }}>
                         {isEn ? leaderboardData[2].score : toBengaliNumber(leaderboardData[2].score)}
                       </div>
                     </div>
@@ -1281,11 +1319,15 @@ export default function LiveExamRoom() {
                       gap: '14px',
                       padding: '14px 16px',
                       borderRadius: '12px',
-                      background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
-                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1.2px solid rgba(255, 255, 255, 0.95)',
+                      background: isDark
+                        ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+                        : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+                      border: user.isCurrentUser 
+                        ? (isDark ? '1.5px solid #3b82f6' : '1.5px solid var(--primary)') 
+                        : (isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)'),
                       boxShadow: user.isCurrentUser
-                        ? '0 6px 18px -2px rgba(26, 86, 219, 0.15), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(26, 86, 219, 0.08)'
-                        : '0 6px 16px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)',
+                        ? (isDark ? '0 6px 18px -2px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08)' : '0 6px 18px -2px rgba(26, 86, 219, 0.15), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(26, 86, 219, 0.08)')
+                        : (isDark ? '0 6px 16px -2px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.06)' : '0 6px 16px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)'),
                       transition: 'all 0.2s'
                     }}
                   >
@@ -1301,12 +1343,12 @@ export default function LiveExamRoom() {
                       ) : null}
                       <div style={{
                         width: '100%', height: '100%', borderRadius: '50%',
-                        background: 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)',
-                        color: 'var(--primary)',
+                        background: isDark ? 'linear-gradient(145deg, #1e293b 0%, #334155 100%)' : 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)',
+                        color: isDark ? '#60a5fa' : 'var(--primary)',
                         display: isValidAvatar(user.avatar) ? 'none' : 'flex',
                         alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800,
-                        border: '1.5px solid rgba(255, 255, 255, 0.95)',
-                        boxShadow: '0 3px 8px -1px rgba(26, 86, 219, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.1)'
+                        border: isDark ? '1.5px solid rgba(255, 255, 255, 0.15)' : '1.5px solid rgba(255, 255, 255, 0.95)',
+                        boxShadow: isDark ? '0 3px 8px -1px rgba(0,0,0,0.3)' : '0 3px 8px -1px rgba(26, 86, 219, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.1)'
                       }}>
                         {getInitials(displayName)}
                       </div>
@@ -1314,14 +1356,14 @@ export default function LiveExamRoom() {
 
                     {/* Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <h4 style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#f8fafc' : 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {displayName}
                       </h4>
                       <div style={{ display: 'flex', gap: '10px', marginTop: '3px' }}>
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#059669', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#34d399' : '#059669', display: 'flex', alignItems: 'center', gap: '3px' }}>
                            <span style={{ fontSize: '12px' }}>✓</span> {isEn ? `${user.score} Correct` : `${toBengaliNumber(user.score)} সঠিক`}
                         </span>
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#ef4444', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#f87171' : '#ef4444', display: 'flex', alignItems: 'center', gap: '3px' }}>
                            <span style={{ fontSize: '12px' }}>✗</span> {isEn ? `${user.total - user.score} Wrong` : `${toBengaliNumber(user.total - user.score)} ভুল`}
                         </span>
                       </div>
@@ -1329,10 +1371,10 @@ export default function LiveExamRoom() {
 
                     {/* Score */}
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '14px', fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>
+                      <div style={{ fontSize: '14px', fontWeight: 900, color: isDark ? '#f8fafc' : 'var(--text-primary)', lineHeight: 1 }}>
                         {isEn ? displayScore : toBengaliNumber(displayScore)}
                       </div>
-                      <div style={{ fontSize: '9px', fontWeight: 800, color: 'var(--text-muted)', marginTop: '2px' }}>{isEn ? 'SCORE' : 'নম্বর'}</div>
+                      <div style={{ fontSize: '9px', fontWeight: 800, color: isDark ? '#94a3b8' : 'var(--text-muted)', marginTop: '2px' }}>{isEn ? 'SCORE' : 'নম্বর'}</div>
                     </div>
                   </div>
                 );

@@ -21,6 +21,7 @@ export default function QuestionDetails() {
   const { state } = useAppContext();
   const { state: adminState, dispatch: adminDispatch } = useAdminContext();
   const isEn = state.language === 'en';
+  const isDark = state.theme === 'dark';
 
   const [pageLoading, setPageLoading] = useState(true);
   const [isSwitchingMode, setIsSwitchingMode] = useState(false);
@@ -213,13 +214,13 @@ export default function QuestionDetails() {
                 flex: 1,
                 padding: '8px 10px',
                 borderRadius: '8px',
-                border: mode === 'practice' ? '1px solid rgba(255, 255, 255, 0.95)' : 'none',
-                background: mode === 'practice' ? 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)' : 'transparent',
-                color: mode === 'practice' ? '#1d4ed8' : 'rgba(255, 255, 255, 0.9)',
+                border: mode === 'practice' ? (isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(255, 255, 255, 0.95)') : 'none',
+                background: mode === 'practice' ? (isDark ? '#1e293b' : 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)') : 'transparent',
+                color: mode === 'practice' ? (isDark ? '#60a5fa' : '#1d4ed8') : 'rgba(255, 255, 255, 0.9)',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
-                boxShadow: mode === 'practice' ? '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)' : 'none',
+                boxShadow: mode === 'practice' ? (isDark ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)') : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -231,13 +232,13 @@ export default function QuestionDetails() {
                 flex: 1,
                 padding: '8px 10px',
                 borderRadius: '8px',
-                border: mode === 'read' ? '1px solid rgba(255, 255, 255, 0.95)' : 'none',
-                background: mode === 'read' ? 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)' : 'transparent',
-                color: mode === 'read' ? '#1d4ed8' : 'rgba(255, 255, 255, 0.9)',
+                border: mode === 'read' ? (isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(255, 255, 255, 0.95)') : 'none',
+                background: mode === 'read' ? (isDark ? '#1e293b' : 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)') : 'transparent',
+                color: mode === 'read' ? (isDark ? '#60a5fa' : '#1d4ed8') : 'rgba(255, 255, 255, 0.9)',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
-                boxShadow: mode === 'read' ? '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)' : 'none',
+                boxShadow: mode === 'read' ? (isDark ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)') : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -282,26 +283,30 @@ export default function QuestionDetails() {
             {/* Score & Progress Tracker Card (Only in Practice Mode) - Tactile Claymorphism Style */}
         {mode === 'practice' && (
           <div style={{
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
-            border: '1.2px solid rgba(255, 255, 255, 0.95)',
+            background: isDark
+              ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)',
             borderRadius: '14px',
             padding: '14px 16px',
             marginBottom: '14px',
-            boxShadow: '0 6px 18px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)'
+            boxShadow: isDark
+              ? '0 6px 18px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.06)'
+              : '0 6px 18px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text-secondary)' }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f1f5f9' : 'var(--text-secondary)' }}>
                 {isEn ? 'Practice Progress' : 'অনুশীলন অগ্রগতি'}
               </span>
               <span style={{
                 fontSize: '12px',
                 fontWeight: 800,
-                color: 'var(--primary)',
-                background: 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
+                color: isDark ? '#60a5fa' : 'var(--primary)',
+                background: isDark ? 'rgba(37, 99, 235, 0.2)' : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
                 padding: '3px 10px',
                 borderRadius: '8px',
-                border: '1px solid rgba(191, 219, 254, 0.8)',
-                boxShadow: 'inset 0 1px 1.5px #ffffff, inset 0 -1px 1.5px rgba(37, 99, 235, 0.08)'
+                border: isDark ? '1px solid rgba(96, 165, 250, 0.35)' : '1px solid rgba(191, 219, 254, 0.8)',
+                boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : 'inset 0 1px 1.5px #ffffff, inset 0 -1px 1.5px rgba(37, 99, 235, 0.08)'
               }}>
                 {isEn 
                   ? `Attempted: ${attemptedCount}/${totalCount} | Score: ${score}`
@@ -310,7 +315,7 @@ export default function QuestionDetails() {
             </div>
             
             {/* Progress Bar */}
-            <div style={{ width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '6px', overflow: 'hidden', marginBottom: attemptedCount > 0 ? '12px' : '0', boxShadow: 'inset 0 1.5px 2px rgba(0, 0, 0, 0.08)' }}>
+            <div style={{ width: '100%', height: '8px', background: isDark ? 'rgba(51, 65, 85, 0.6)' : '#e2e8f0', borderRadius: '6px', overflow: 'hidden', marginBottom: attemptedCount > 0 ? '12px' : '0', boxShadow: isDark ? 'inset 0 1.5px 2px rgba(0, 0, 0, 0.3)' : 'inset 0 1.5px 2px rgba(0, 0, 0, 0.08)' }}>
               <div style={{
                 width: `${(attemptedCount / totalCount) * 100}%`,
                 height: '100%',
@@ -328,13 +333,13 @@ export default function QuestionDetails() {
                   width: '100%',
                   padding: '8px',
                   borderRadius: '10px',
-                  border: '1px solid rgba(254, 202, 202, 0.8)',
-                  background: 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)',
-                  color: 'var(--danger)',
+                  border: isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid rgba(254, 202, 202, 0.8)',
+                  background: isDark ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)',
+                  color: isDark ? '#f87171' : 'var(--danger)',
                   fontSize: '12px',
                   fontWeight: 700,
                   cursor: 'pointer',
-                  boxShadow: '0 2px 6px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.06)'
+                  boxShadow: isDark ? '0 2px 6px -1px rgba(0, 0, 0, 0.3)' : '0 2px 6px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.06)'
                 }}
               >
                 🔄 {isEn ? 'Reset Answers' : 'আবার শুরু করুন'}
@@ -353,26 +358,30 @@ export default function QuestionDetails() {
               <div
                 key={qn.id}
                 style={{
-                  background: 'linear-gradient(145deg, #ffffff 0%, #f9fbfd 100%)',
-                  border: '1.2px solid rgba(255, 255, 255, 0.95)',
+                  background: isDark
+                    ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+                    : 'linear-gradient(145deg, #ffffff 0%, #f9fbfd 100%)',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)',
                   borderRadius: '14px',
                   padding: '14px 16px',
-                  boxShadow: '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
+                  boxShadow: isDark
+                    ? '0 6px 18px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.06)'
+                    : '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
                 }}
               >
                 {/* Question Label */}
                   <h4 style={{
                     fontSize: '12.5px',
                     fontWeight: 600,
-                    color: 'var(--text-secondary)',
+                    color: isDark ? '#f1f5f9' : 'var(--text-secondary)',
                     marginBottom: '10px',
                     lineHeight: '1.45',
                     display: 'flex',
                     gap: '8px',
                     alignItems: 'baseline'
                   }}>
-                    <span style={{ flexShrink: 0 }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                    <QuestionContent content={(isEn && qn.questionEn) ? qn.questionEn : qn.question} style={{ flex: 1 }} />
+                    <span style={{ flexShrink: 0, color: isDark ? '#94a3b8' : 'inherit' }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
+                    <QuestionContent content={(isEn && qn.questionEn) ? qn.questionEn : qn.question} style={{ flex: 1, color: isDark ? '#f1f5f9' : 'inherit' }} />
                   </h4>
 
                 {/* Option Choices */}
@@ -380,10 +389,10 @@ export default function QuestionDetails() {
                   {qn.options.map((option, oIndex) => {
                     const optText = cleanOptionText((isEn && qn.optionsEn && qn.optionsEn[oIndex]) ? qn.optionsEn[oIndex] : option);
 
-                    let bg = 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
-                    let color = 'var(--text-primary)';
-                    let border = '1.2px solid rgba(255, 255, 255, 0.95)';
-                    let boxShadow = '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
+                    let bg = isDark ? 'rgba(30, 41, 59, 0.7)' : 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
+                    let color = isDark ? '#e2e8f0' : 'var(--text-primary)';
+                    let border = isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)';
+                    let boxShadow = isDark ? '0 2px 4px rgba(0, 0, 0, 0.2)' : '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
                     let prefixIcon = '';
 
                     const bengaliOptionPrefixes = ['ক', 'খ', 'গ', 'ঘ'];
@@ -392,26 +401,26 @@ export default function QuestionDetails() {
 
                     if (mode === 'read') {
                       if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
-                        bg = 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
-                        color = '#065f46';
-                        border = '1.2px solid rgba(134, 239, 172, 0.8)';
-                        boxShadow = '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
+                        bg = isDark ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
+                        color = isDark ? '#34d399' : '#065f46';
+                        border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1.2px solid rgba(134, 239, 172, 0.8)';
+                        boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
                         prefixIcon = '✅';
                       }
                     } else if (mode === 'practice' && hasAnswered) {
                       if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
                         // Highlight correct answer in green
-                        bg = 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
-                        color = '#065f46';
-                        border = '1.2px solid rgba(134, 239, 172, 0.8)';
-                        boxShadow = '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
+                        bg = isDark ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
+                        color = isDark ? '#34d399' : '#065f46';
+                        border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1.2px solid rgba(134, 239, 172, 0.8)';
+                        boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
                         prefixIcon = '✅';
                       } else if (oIndex === chosenIndex) {
                         // Highlight wrong selection in red
-                        bg = 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
-                        color = '#991b1b';
-                        border = '1.2px solid rgba(252, 165, 165, 0.8)';
-                        boxShadow = '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
+                        bg = isDark ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
+                        color = isDark ? '#f87171' : '#991b1b';
+                        border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1.2px solid rgba(252, 165, 165, 0.8)';
+                        boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
                         prefixIcon = '❌';
                       }
                     }
@@ -440,9 +449,10 @@ export default function QuestionDetails() {
                           width: '22px',
                           height: '22px',
                           borderRadius: '7px',
-                          background: 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
-                          border: '1px solid rgba(255, 255, 255, 0.95)',
-                          boxShadow: '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
+                          background: isDark ? 'rgba(15, 23, 42, 0.8)' : 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
+                          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.95)',
+                          boxShadow: isDark ? '0 1.5px 4px rgba(0,0,0,0.3)' : '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
+                          color: isDark ? '#e2e8f0' : 'inherit',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
