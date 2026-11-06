@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
+import { useBackInterceptor } from '../../utils/backButtonManager';
 import { Plus, Trash2, Edit2, PlayCircle, Type, ImageIcon, Heart } from '../../components/Icons';
 import RichTextEditor, { RichTextToolbar } from '../../components/RichTextEditor';
 
@@ -23,6 +24,12 @@ export default function ManageFeed() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
+
+  // Close modal on Android back button press
+  useBackInterceptor(() => {
+    setIsModalOpen(false);
+    return true;
+  }, isModalOpen);
 
   // Form state
   const [mediaType, setMediaType] = useState('youtube'); // 'youtube' | 'image' | 'text'

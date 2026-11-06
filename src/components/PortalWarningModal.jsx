@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppContext } from '../context/AppContext';
 import { sanitizePortalUrl, openInAppBrowser } from '../utils/browserUtils';
+import { useBackInterceptor } from '../utils/backButtonManager';
 
 export { sanitizePortalUrl };
 
@@ -10,6 +11,12 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
   const isEn = appState?.language === 'en';
   const [copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Close modal on Android hardware & gesture back button press
+  useBackInterceptor(() => {
+    if (typeof onClose === 'function') onClose();
+    return true;
+  }, isOpen);
 
   if (!isOpen) return null;
 

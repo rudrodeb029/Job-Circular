@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsData } from '../data/questionsData';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
+import { useBackInterceptor } from '../utils/backButtonManager';
 
 const AppHeader = React.memo(function AppHeader() {
   const navigate = useNavigate();
@@ -34,6 +35,12 @@ const AppHeader = React.memo(function AppHeader() {
       }
     }, 300);
   };
+
+  // Intercept Android hardware & gesture back button to close drawer when open
+  useBackInterceptor(() => {
+    handleCloseDrawer();
+    return true;
+  }, drawerOpen);
 
   return (
     <>

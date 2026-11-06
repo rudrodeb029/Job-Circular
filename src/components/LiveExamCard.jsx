@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { stripHtmlTags } from '../utils/textUtils';
+import { useBackInterceptor } from '../utils/backButtonManager';
 
 /**
  * 1:1 Pixel-Perfect Live Exam & History Card Component
@@ -21,10 +22,17 @@ function LiveExamCard({
   onViewResult,
   isEn = false
 }) {
+  const [showSyllabusModal, setShowSyllabusModal] = useState(false);
+
+  // Close syllabus modal on Android hardware & gesture back button press
+  useBackInterceptor(() => {
+    setShowSyllabusModal(false);
+    return true;
+  }, showSyllabusModal);
+
   if (!exam) return null;
 
   const isHistorySection = isHistory || status === 'completed';
-  const [showSyllabusModal, setShowSyllabusModal] = useState(false);
 
   const title = isEn ? (exam.titleEn || exam.title) : exam.title;
   const durationText = isEn ? `${exam.duration || 10} Mins` : `${toBengaliNumber(exam.duration || 10)} মিনিট`;

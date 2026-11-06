@@ -16,6 +16,7 @@ import { Capacitor } from '@capacitor/core'
 
 import BottomNav from './components/BottomNav'
 import { showNativeBannerAd, hideNativeBannerAd, navigateWithAdOnReturn } from './utils/admobUtils'
+import { handleAppBackButton } from './utils/backButtonManager'
 import { logAnalyticsEvent } from './firebase'
 
 const CURRENT_VERSION = "1.0.0";
@@ -76,6 +77,26 @@ function App() {
 
   const [updateInfo, setUpdateInfo] = useState(null)
   const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [exitToast, setExitToast] = useState(null)
+
+  // Context Ref for zero-stale back button navigation
+  const backNavContextRef = useRef({
+    location,
+    navigate,
+    showUpdateModal,
+    state,
+    isAdminRoute
+  })
+
+  useEffect(() => {
+    backNavContextRef.current = {
+      location,
+      navigate,
+      showUpdateModal,
+      state,
+      isAdminRoute
+    }
+  }, [location, navigate, showUpdateModal, state, isAdminRoute])
 
   // Check if current route is an admin route
   const isAdminRoute = location.pathname.startsWith('/admin')
@@ -111,7 +132,10 @@ function App() {
 
   // App Resume Sync — catches background → foreground transitions
   useEffect(() => {
-    const resumeListener = CapacitorApp.addListener('appStateChange', async ({ isActive }) => {
+    let handle = null;
+    let isSubscribed = true;
+
+    CapacitorApp.addListener('appStateChange', async ({ isActive }) => {
       if (isActive && !isAdminRoute) {
         console.log('📱 App resumed! Checking for updates...');
         const status = await Network.getStatus().catch(() => ({ connected: navigator.onLine }));
@@ -120,8 +144,18 @@ function App() {
           triggerDeltaSync().catch(console.error);
         }
       }
-    });
-    return () => { resumeListener.remove(); };
+    }).then(h => {
+      if (!isSubscribed) {
+        h.remove();
+      } else {
+        handle = h;
+      }
+    }).catch(console.error);
+
+    return () => {
+      isSubscribed = false;
+      handle?.remove();
+    };
   }, [isAdminRoute]);
 
   // STRICT ONCE-PER-BOOT INITIALIZATION (Protected against React 18 StrictMode Double-Mount)
@@ -241,34 +275,57 @@ function App() {
         // StatusBar plugin not available on web
       }
     }
+  }, [isAdminRoute, state.theme]);
 
-    // 3. Handle Android Hardware Back Button
-    const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
-      if (location.pathname === '/home' || location.pathname === '/' || location.pathname === '/onboarding') {
-        // Exit app if on root pages
-        CapacitorApp.exitApp();
-        return;
+  // ═══ Global Android Hardware & Gesture Back Button Handler ═══
+  useEffect(() => {
+    let isMounted = true;
+    let listenerHandle = null;
+
+    const setupBackButton = async () => {
+      try {
+        listenerHandle = await CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+          const ctx = backNavContextRef.current;
+          handleAppBackButton({
+            canGoBack,
+            location: ctx.location,
+            navigate: ctx.navigate,
+            showUpdateModal: ctx.showUpdateModal,
+            closeUpdateModal: () => setShowUpdateModal(false),
+            language: ctx.state?.language || 'bn',
+            onShowExitToast: () => {
+              const msg = ctx.state?.language === 'en'
+                ? 'Press back again to exit'
+                : 'অ্যাপ থেকে বের হতে আবার ব্যাক প্রেস করুন';
+              setExitToast({ message: msg });
+              setTimeout(() => {
+                setExitToast(null);
+              }, 2000);
+            },
+            onExitApp: () => {
+              CapacitorApp.exitApp();
+            },
+            navigateWithAdOnReturn
+          });
+        });
+
+        if (!isMounted && listenerHandle) {
+          listenerHandle.remove();
+        }
+      } catch (err) {
+        console.warn('Capacitor backButton setup error:', err);
       }
+    };
 
-      // Safe Interstitial on Back: Check if user is returning from a set of questions or finished exam
-      const isQuestionSet = location.pathname.startsWith('/question-details/');
-      const isLiveExam = location.pathname.startsWith('/live-exam-room/');
-
-      if (isQuestionSet || isLiveExam) {
-        navigateWithAdOnReturn(navigate, -1);
-      } else if (location.pathname === '/live-exams' || location.pathname === '/live-exams-list') {
-        navigate('/questions-hub');
-      } else if (window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0) {
-        navigate(-1);
-      } else {
-        navigate('/home');
-      }
-    });
+    setupBackButton();
 
     return () => {
-      backButtonListener.remove();
+      isMounted = false;
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
     };
-  }, [isAdminRoute, location.pathname, navigate, state.theme]);
+  }, []);
 
   useEffect(() => {
     const checkVersion = async () => {
@@ -481,6 +538,34 @@ function App() {
           currentVersion={CURRENT_VERSION}
           onClose={() => setShowUpdateModal(false)}
         />
+
+        {/* ═══ Android Back-to-Exit Floating Claymorphism Toast ═══ */}
+        {exitToast && (
+          <div style={{
+            position: 'fixed',
+            bottom: isTabRoute ? '76px' : '24px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            background: 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)',
+            color: '#ffffff',
+            padding: '10px 20px',
+            borderRadius: '14px',
+            border: '1.2px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 8px 24px -2px rgba(0, 0, 0, 0.35), inset 0 1.5px 2px rgba(255, 255, 255, 0.3), inset 0 -1.5px 2px rgba(0, 0, 0, 0.4)',
+            fontSize: '13px',
+            fontWeight: 600,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            animation: 'fadeIn 0.2s ease-out',
+            pointerEvents: 'none',
+            whiteSpace: 'nowrap'
+          }}>
+            <span>📱</span>
+            <span>{exitToast.message}</span>
+          </div>
+        )}
       </div>
     </GlobalLoaderProvider>
   </ErrorBoundary>

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
+import { useBackInterceptor } from '../../utils/backButtonManager';
 import { formatTimeAgo } from '../../utils/timeUtils';
 import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
 
@@ -12,6 +13,12 @@ export default function ManageNotifications() {
 
   // Modals state
   const [isNotifModalOpen, setIsNotifModalOpen] = useState(false);
+
+  // Close modal on Android back button press
+  useBackInterceptor(() => {
+    setIsNotifModalOpen(false);
+    return true;
+  }, isNotifModalOpen);
   const [notifFormData, setNotifFormData] = useState({
     title: '', organization: '', message: '', type: 'new_job', jobId: '', time: ''
   });

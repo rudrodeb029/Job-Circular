@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink, RefreshCw } from '../components/Icons';
 import { ButtonSpinner } from '../components/ModernLoader';
 import { useAppContext } from '../context/AppContext';
 import { openInAppBrowser } from '../utils/browserUtils';
+import { useBackInterceptor } from '../utils/backButtonManager';
 
 // Smart URL Formatter: BD Govt / Teletalk subdomains fail on HTTPS with ERR_CERT_AUTHORITY_INVALID, but work on HTTP
 export function sanitizePortalUrl(inputUrl) {
@@ -70,6 +71,12 @@ export default function CircularWebViewScreen() {
   const [loading, setLoading] = useState(false);
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // Close warning modal on Android back button press
+  useBackInterceptor(() => {
+    setShowWarningModal(false);
+    return true;
+  }, showWarningModal);
 
   const copyLink = () => {
     try {

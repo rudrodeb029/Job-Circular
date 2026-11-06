@@ -1,12 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Outlet, Link } from 'react-router-dom';
 import { useAdminContext } from '../../context/AdminContext';
+import { useBackInterceptor } from '../../utils/backButtonManager';
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { state: adminState, authChecked } = useAdminContext() || { state: {}, authChecked: false };
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Intercept Android back button to close drawer when open
+  useBackInterceptor(() => {
+    setDrawerOpen(false);
+    return true;
+  }, drawerOpen);
 
   // Protect route: Redirect to login if not authenticated
   React.useEffect(() => {

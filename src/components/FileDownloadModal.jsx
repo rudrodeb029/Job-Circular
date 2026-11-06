@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ExternalLink, ImageIcon, Lightbulb, Folder, MoreVertical } from './Icons';
 import { downloadSecurely } from '../utils/downloadUtils';
 import { normalizeMediaUrl } from '../utils/mediaUtils';
+import { useBackInterceptor } from '../utils/backButtonManager';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 
@@ -14,6 +15,12 @@ export default function FileDownloadModal({
 }) {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('downloading'); // 'downloading' | 'completed' | 'error'
+
+  // Close download modal on Android hardware & gesture back button press
+  useBackInterceptor(() => {
+    if (typeof onClose === 'function') onClose();
+    return true;
+  }, isOpen);
 
   useEffect(() => {
     let progressTimer;
