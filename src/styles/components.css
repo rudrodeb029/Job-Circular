@@ -243,12 +243,50 @@
 
 [data-theme='dark'] .search-bar:focus-within,
 [data-theme='dark'] .search-bar.is-focused {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%) !important;
   border-color: rgba(96, 165, 250, 0.5) !important;
   box-shadow: 
     0 0 0 3px rgba(59, 130, 246, 0.25),
     0 10px 26px -3px rgba(0, 0, 0, 0.6),
     inset 0 1.5px 2px rgba(255, 255, 255, 0.15),
     inset 0 -2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme='dark'] .search-bar input {
+  color: #f8fafc !important;
+  background: transparent !important;
+}
+
+[data-theme='dark'] .search-bar input::placeholder {
+  color: #94a3b8 !important;
+  opacity: 0.75;
+}
+
+[data-theme='dark'] .search-bar-icon-box {
+  background: rgba(37, 99, 235, 0.25) !important;
+  color: #60a5fa !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme='dark'] .search-bar:focus-within .search-bar-icon-box,
+[data-theme='dark'] .search-bar.is-focused .search-bar-icon-box,
+[data-theme='dark'] .search-bar.has-value .search-bar-icon-box {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
+}
+
+[data-theme='dark'] .search-bar-filter-btn {
+  background: rgba(30, 41, 59, 0.8) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-theme='dark'] .search-bar-filter-btn:hover,
+[data-theme='dark'] .search-bar-filter-btn.active {
+  background: rgba(37, 99, 235, 0.3) !important;
+  color: #60a5fa !important;
+  border-color: rgba(96, 165, 250, 0.4) !important;
 }
 
 .search-bar-icon-box {
