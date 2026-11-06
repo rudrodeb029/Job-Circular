@@ -7,9 +7,9 @@
   --primary-lighter: #3b82f6;
   --primary-lightest: #eff6ff;
   --primary-bg: #f4f8ff;
-  --bg: #F3F4F9;
-  --bg-primary: #F3F4F9;
-  --bg-secondary: #eef1f6;
+  --bg: rgba(243, 244, 249, 0.5);
+  --bg-primary: rgba(243, 244, 249, 0.5);
+  --bg-secondary: rgba(243, 244, 249, 0.5);
   --white: #ffffff;
   --text-primary: #1e293b;
   --text-secondary: #475569;
@@ -136,7 +136,12 @@
   --header-bg: rgba(17, 24, 39, 0.95);
 }
 
+[data-theme='dark'] html,
 [data-theme='dark'] body {
+  background: #0b0f19;
+}
+
+[data-theme='dark'] .container {
   background: #0b0f19;
 }
 
@@ -148,6 +153,7 @@
 }
 
 html {
+  background: #ffffff;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -248,7 +254,7 @@ ul, ol {
   max-width: 430px;
   margin: 0 auto;
   position: relative;
-  background: var(--bg);
+  background: #ffffff;
   min-height: inherit;
   box-shadow: 0 0 30px rgba(0,0,0,0.12);
   overflow-x: clip;
