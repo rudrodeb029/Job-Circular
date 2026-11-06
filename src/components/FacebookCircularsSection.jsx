@@ -272,7 +272,7 @@ function StoryCard({ job, index, isEn, onClick }) {
           inset: 0,
           background: hasImage
             ? 'linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.05) 30%, rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0.96) 100%)'
-            : 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 35%, rgba(255, 255, 255, 0.85) 65%, rgba(255, 255, 255, 0.98) 100%)',
+            : 'linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 40%, rgba(255, 255, 255, 0.15) 75%, rgba(255, 255, 255, 0.25) 100%)',
           zIndex: 2
         }}
       />
@@ -404,12 +404,9 @@ export default function FacebookCircularsSection({ jobs = [], isEn = false }) {
   return (
     <div
       style={{
-        background: 'var(--card-bg, #ffffff)',
-        borderBottom: '1px solid var(--border-light, #e2e8f0)',
-        borderTop: '1px solid var(--border-light, #e2e8f0)',
+        background: 'transparent',
         marginBottom: '8px',
-        padding: '10px 0',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+        padding: '4px 0'
       }}
     >
       {/* Horizontal Story Cards Carousel */}
