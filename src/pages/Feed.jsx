@@ -88,8 +88,8 @@ export default function Feed() {
         {/* Search Bar Row with App Icon */}
         <div style={{
           background: 'transparent',
-          padding: '6px 12px',
-          marginBottom: '6px',
+          padding: '4px 12px',
+          marginBottom: '4px',
           display: 'flex',
           alignItems: 'center',
           gap: '10px'
@@ -99,8 +99,8 @@ export default function Feed() {
             src="/app-logo.png"
             alt="Live Circular Logo"
             style={{
-              width: '30px',
-              height: '30px',
+              width: '28px',
+              height: '28px',
               borderRadius: '50%',
               objectFit: 'contain',
               padding: '2px',

@@ -7,7 +7,7 @@ export default function SearchBar({ value, onChange, placeholder, onFilterClick,
   return (
     <div className={`search-bar ${isFocused ? 'is-focused' : ''} ${value ? 'has-value' : ''}`}>
       <div className="search-bar-icon-box">
-        <Search size={18} />
+        <Search size={16} />
       </div>
       <input
         type="text"
@@ -24,7 +24,7 @@ export default function SearchBar({ value, onChange, placeholder, onFilterClick,
           aria-label="Filter"
           title="Filter Jobs"
         >
-          <SlidersHorizontal size={18} />
+          <SlidersHorizontal size={16} />
         </button>
       )}
     </div>
