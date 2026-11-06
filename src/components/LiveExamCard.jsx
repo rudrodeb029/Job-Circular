@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { stripHtmlTags } from '../utils/textUtils';
 import { useBackInterceptor } from '../utils/backButtonManager';
+import { useAppContext } from '../context/AppContext';
 
 /**
  * 1:1 Pixel-Perfect Live Exam & History Card Component
@@ -22,6 +23,8 @@ function LiveExamCard({
   onViewResult,
   isEn = false
 }) {
+  const { state: appState } = useAppContext();
+  const isDark = appState?.theme === 'dark';
   const [showSyllabusModal, setShowSyllabusModal] = useState(false);
 
   // Close syllabus modal on Android hardware & gesture back button press
@@ -70,7 +73,7 @@ function LiveExamCard({
     >
       {/* Top Left Organic Wave SVG Blob Accent */}
       <svg
-        style={{ position: 'absolute', top: '-10px', left: '-10px', width: '80px', height: '65px', opacity: 0.15, pointerEvents: 'none' }}
+        style={{ position: 'absolute', top: '-10px', left: '-10px', width: '80px', height: '65px', opacity: isDark ? 0.08 : 0.15, pointerEvents: 'none' }}
         viewBox="0 0 120 100"
         fill="none"
       >
@@ -82,7 +85,7 @@ function LiveExamCard({
         <h3 style={{
           fontSize: '11.5px',
           fontWeight: 800,
-          color: '#0f172a',
+          color: isDark ? '#f8fafc' : '#0f172a',
           margin: '0 0 5px 0',
           lineHeight: '1.25',
           fontFamily: '"Hind Siliguri", "Poppins", sans-serif',
@@ -98,7 +101,7 @@ function LiveExamCard({
 
         {/* Row 2: Scheduled Date & Countdown Bar */}
         <div style={{
-          background: 'rgba(255, 255, 255, 0.96)',
+          background: isDark ? 'rgba(30, 41, 59, 0.75)' : 'rgba(255, 255, 255, 0.96)',
           borderRadius: '5px',
           padding: '2px 5px',
           marginBottom: '5px',
@@ -109,21 +112,21 @@ function LiveExamCard({
           gap: '2px',
           position: 'relative',
           zIndex: 2,
-          boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
-          border: '1px solid rgba(226, 232, 240, 0.8)'
+          boxShadow: isDark ? 'inset 0 1px 1px rgba(255, 255, 255, 0.06)' : 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(226, 232, 240, 0.8)'
         }}>
-          <span style={{ fontSize: '6.8px', color: '#1e293b', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: '6.8px', color: isDark ? '#e2e8f0' : '#1e293b', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
             <span role="img" aria-label="calendar" style={{ fontSize: '7px' }}>🗓️</span>
             <span>{dateFormatted}</span>
           </span>
 
           {!isHistorySection && countdownStr && (
             <>
-              <span style={{ color: 'rgba(203, 213, 225, 0.8)', margin: '0 1px', fontSize: '6.8px' }}>|</span>
+              <span style={{ color: isDark ? 'rgba(148, 163, 184, 0.4)' : 'rgba(203, 213, 225, 0.8)', margin: '0 1px', fontSize: '6.8px' }}>|</span>
 
-              <span style={{ fontSize: '6.8px', color: '#475569', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '6.8px', color: isDark ? '#94a3b8' : '#475569', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '2px', whiteSpace: 'nowrap' }}>
                 <span>{isEn ? 'Left:' : 'বাকি:'}</span>
-                <span style={{ color: '#d97706', fontWeight: 800 }}>
+                <span style={{ color: isDark ? '#fbbf24' : '#d97706', fontWeight: 800 }}>
                   {countdownStr}
                 </span>
               </span>
@@ -135,9 +138,9 @@ function LiveExamCard({
         <div
           onClick={() => setShowSyllabusModal(true)}
           style={{
-            background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            border: '1px solid rgba(226, 232, 240, 0.85)',
-            boxShadow: 'inset 0 1px 2px #ffffff, inset 0 -1px 2px rgba(30, 64, 175, 0.02)',
+            background: isDark ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)' : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(226, 232, 240, 0.85)',
+            boxShadow: isDark ? 'inset 0 1px 1.5px rgba(255, 255, 255, 0.06), 0 2px 5px rgba(0, 0, 0, 0.2)' : 'inset 0 1px 2px #ffffff, inset 0 -1px 2px rgba(30, 64, 175, 0.02)',
             borderRadius: '8px',
             padding: '5px 6px',
             marginBottom: '8px',
@@ -172,11 +175,11 @@ function LiveExamCard({
                   <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
                     <span style={{
                       fontSize: '8.5px',
-                      color: '#2563eb',
+                      color: isDark ? '#60a5fa' : '#2563eb',
                       fontWeight: 800,
                       textTransform: 'uppercase',
                       letterSpacing: '0.2px',
-                      borderLeft: '2px solid #2563eb',
+                      borderLeft: isDark ? '2px solid #60a5fa' : '2px solid #2563eb',
                       paddingLeft: '4px',
                       lineHeight: '1.2',
                       whiteSpace: 'nowrap',
@@ -198,12 +201,12 @@ function LiveExamCard({
                         <span key={tIdx} style={{
                           fontSize: '5.8px',
                           fontWeight: 600,
-                          background: '#ffffff',
-                          border: '1px solid rgba(226, 232, 240, 0.8)',
-                          color: '#1e293b',
+                          background: isDark ? 'rgba(30, 41, 59, 0.95)' : '#ffffff',
+                          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)',
+                          color: isDark ? '#f1f5f9' : '#1e293b',
                           padding: '1px 4.5px',
                           borderRadius: '3px',
-                          boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                          boxShadow: isDark ? '0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.02)',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
@@ -222,14 +225,14 @@ function LiveExamCard({
                           style={{
                             fontSize: '5.8px',
                             fontWeight: 700,
-                            background: '#eff6ff',
-                            border: '1px solid #bfdbfe',
-                            color: '#2563eb',
+                            background: isDark ? 'rgba(37, 99, 235, 0.25)' : '#eff6ff',
+                            border: isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid #bfdbfe',
+                            color: isDark ? '#93c5fd' : '#2563eb',
                             padding: '1px 4px',
                             borderRadius: '3px',
                             whiteSpace: 'nowrap',
                             cursor: 'pointer',
-                            boxShadow: '0 1px 3px rgba(37,99,235,0.1)',
+                            boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(37,99,235,0.1)',
                             flexShrink: 0
                           }}
                           title={isEn ? "View all topics" : "সকল টপিক দেখুন"}
@@ -257,11 +260,11 @@ function LiveExamCard({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
                 <span style={{
                   fontSize: '8.5px',
-                  color: '#2563eb',
+                  color: isDark ? '#60a5fa' : '#2563eb',
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '0.2px',
-                  borderLeft: '2px solid #2563eb',
+                  borderLeft: isDark ? '2px solid #60a5fa' : '2px solid #2563eb',
                   paddingLeft: '4px',
                   lineHeight: '1.2',
                   whiteSpace: 'nowrap',
@@ -282,12 +285,12 @@ function LiveExamCard({
                     <span key={idx} style={{
                       fontSize: '5.8px',
                       fontWeight: 600,
-                      background: '#ffffff',
-                      border: '1px solid rgba(226, 232, 240, 0.8)',
-                      color: '#1e293b',
+                      background: isDark ? 'rgba(30, 41, 59, 0.95)' : '#ffffff',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)',
+                      color: isDark ? '#f1f5f9' : '#1e293b',
                       padding: '1px 4.5px',
                       borderRadius: '3px',
-                      boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                      boxShadow: isDark ? '0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.02)',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
@@ -306,14 +309,14 @@ function LiveExamCard({
                       style={{
                         fontSize: '5.8px',
                         fontWeight: 700,
-                        background: '#eff6ff',
-                        border: '1px solid #bfdbfe',
-                        color: '#2563eb',
+                        background: isDark ? 'rgba(37, 99, 235, 0.25)' : '#eff6ff',
+                        border: isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid #bfdbfe',
+                        color: isDark ? '#93c5fd' : '#2563eb',
                         padding: '1px 4px',
                         borderRadius: '3px',
                         whiteSpace: 'nowrap',
                         cursor: 'pointer',
-                        boxShadow: '0 1px 3px rgba(37,99,235,0.1)',
+                        boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(37,99,235,0.1)',
                         flexShrink: 0
                       }}
                       title={isEn ? "View all topics" : "সকল টপিক দেখুন"}
@@ -337,9 +340,15 @@ function LiveExamCard({
               width: '100%',
               padding: '3px 6px',
               borderRadius: '5px',
-              border: '1px solid rgba(226, 232, 240, 0.8)',
-              background: isRegistered ? '#ecfdf5' : 'rgba(255, 255, 255, 0.96)',
-              color: isRegistered ? '#059669' : '#2563eb',
+              border: isRegistered
+                ? (isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #a7f3d0')
+                : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)'),
+              background: isRegistered
+                ? (isDark ? 'rgba(5, 150, 105, 0.25)' : '#ecfdf5')
+                : (isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.96)'),
+              color: isRegistered
+                ? (isDark ? '#34d399' : '#059669')
+                : (isDark ? '#60a5fa' : '#2563eb'),
               fontWeight: 800,
               fontSize: '8.5px',
               cursor: 'pointer',
@@ -347,7 +356,7 @@ function LiveExamCard({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '3px',
-              boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+              boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
               transition: 'all 0.15s ease',
               whiteSpace: 'nowrap'
             }}
@@ -375,9 +384,9 @@ function LiveExamCard({
               width: '100%',
               padding: '3px 6px',
               borderRadius: '5px',
-              border: '1px solid rgba(226, 232, 240, 0.8)',
-              background: 'rgba(255, 255, 255, 0.96)',
-              color: '#dc2626',
+              border: isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(226, 232, 240, 0.8)',
+              background: isDark ? 'rgba(220, 38, 38, 0.25)' : 'rgba(255, 255, 255, 0.96)',
+              color: isDark ? '#f87171' : '#dc2626',
               fontWeight: 800,
               fontSize: '8.5px',
               cursor: 'pointer',
@@ -385,7 +394,7 @@ function LiveExamCard({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '3px',
-              boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+              boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
               transition: 'all 0.15s ease',
               whiteSpace: 'nowrap'
             }}
@@ -402,10 +411,10 @@ function LiveExamCard({
               width: '100%',
               padding: '3px 6px',
               borderRadius: '5px',
-              border: '1px solid rgba(226, 232, 240, 0.8)',
-              background: 'rgba(255, 255, 255, 0.96)',
-              color: '#1e293b',
-              boxShadow: 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)',
+              background: isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.96)',
+              color: isDark ? '#f1f5f9' : '#1e293b',
+              boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : 'inset 0 1px 1.5px #ffffff, 0 1px 2px rgba(0,0,0,0.02)',
               fontWeight: 800,
               fontSize: '8px',
               cursor: 'pointer',
@@ -437,7 +446,7 @@ function LiveExamCard({
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backgroundColor: isDark ? 'rgba(0, 0, 0, 0.75)' : 'rgba(15, 23, 42, 0.65)',
             backdropFilter: 'blur(5px)',
             WebkitBackdropFilter: 'blur(5px)',
             display: 'flex',
@@ -451,27 +460,27 @@ function LiveExamCard({
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: 'var(--white, #ffffff)',
-              color: 'var(--text-primary, #0f172a)',
+              background: isDark ? '#0f172a' : 'var(--white, #ffffff)',
+              color: isDark ? '#f8fafc' : 'var(--text-primary, #0f172a)',
               borderRadius: '12px',
               width: '100%',
               maxWidth: '380px',
               maxHeight: '82vh',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '0 20px 30px -10px rgba(0, 0, 0, 0.25)',
-              border: '1px solid var(--border, #e2e8f0)',
+              boxShadow: isDark ? '0 20px 30px -10px rgba(0, 0, 0, 0.6)' : '0 20px 30px -10px rgba(0, 0, 0, 0.25)',
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid var(--border, #e2e8f0)',
               overflow: 'hidden'
             }}
           >
             {/* Modal Header */}
             <div style={{
               padding: '14px 16px',
-              borderBottom: '1px solid var(--border-light, #f1f5f9)',
+              borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid var(--border-light, #f1f5f9)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'
+              background: isDark ? 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' : 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{
@@ -493,13 +502,13 @@ function LiveExamCard({
                     margin: 0,
                     fontSize: '14px',
                     fontWeight: 800,
-                    color: '#0f172a',
+                    color: isDark ? '#f8fafc' : '#0f172a',
                     lineHeight: 1.25,
                     fontFamily: '"Hind Siliguri", "Poppins", sans-serif'
                   }}>
                     {title}
                   </h3>
-                  <span style={{ fontSize: '11px', color: '#2563eb', fontWeight: 700 }}>
+                  <span style={{ fontSize: '11px', color: isDark ? '#60a5fa' : '#2563eb', fontWeight: 700 }}>
                     {isEn ? 'Exam Syllabus & Topics' : 'সিলেবাস ও বিষয়ভিত্তিক টপিক'}
                   </span>
                 </div>
@@ -510,8 +519,8 @@ function LiveExamCard({
                 type="button"
                 onClick={() => setShowSyllabusModal(false)}
                 style={{
-                  background: '#ffffff',
-                  border: '1px solid rgba(203, 213, 225, 0.8)',
+                  background: isDark ? 'rgba(30, 41, 59, 0.9)' : '#ffffff',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(203, 213, 225, 0.8)',
                   borderRadius: '50%',
                   width: '30px',
                   height: '30px',
@@ -519,10 +528,10 @@ function LiveExamCard({
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: '#64748b',
+                  color: isDark ? '#e2e8f0' : '#64748b',
                   fontSize: '14px',
                   fontWeight: 700,
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+                  boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.05)'
                 }}
               >
                 ✕
@@ -558,8 +567,8 @@ function LiveExamCard({
                       <div
                         key={idx}
                         style={{
-                          background: 'var(--bg-secondary, #f8fafc)',
-                          border: '1px solid var(--border, #e2e8f0)',
+                          background: isDark ? 'rgba(30, 41, 59, 0.5)' : 'var(--bg-secondary, #f8fafc)',
+                          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid var(--border, #e2e8f0)',
                           borderRadius: '12px',
                           padding: '10px 12px',
                           display: 'flex',
@@ -570,11 +579,11 @@ function LiveExamCard({
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <span style={{
                             fontSize: '12px',
-                            color: '#2563eb',
+                            color: isDark ? '#60a5fa' : '#2563eb',
                             fontWeight: 800,
                             textTransform: 'uppercase',
                             letterSpacing: '0.3px',
-                            borderLeft: '3px solid #2563eb',
+                            borderLeft: isDark ? '3px solid #60a5fa' : '3px solid #2563eb',
                             paddingLeft: '6px'
                           }}>
                             {subjText}
@@ -582,8 +591,8 @@ function LiveExamCard({
                           <span style={{
                             fontSize: '10px',
                             fontWeight: 700,
-                            color: '#64748b',
-                            background: 'rgba(100, 116, 139, 0.1)',
+                            color: isDark ? '#94a3b8' : '#64748b',
+                            background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(100, 116, 139, 0.1)',
                             padding: '2px 7px',
                             borderRadius: '10px'
                           }}>
@@ -598,12 +607,12 @@ function LiveExamCard({
                               style={{
                                 fontSize: '11px',
                                 fontWeight: 600,
-                                background: 'var(--white, #ffffff)',
-                                border: '1px solid var(--border-light, #e2e8f0)',
-                                color: 'var(--text-primary, #1e293b)',
+                                background: isDark ? '#1e293b' : 'var(--white, #ffffff)',
+                                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid var(--border-light, #e2e8f0)',
+                                color: isDark ? '#f1f5f9' : 'var(--text-primary, #1e293b)',
                                 padding: '4px 10px',
                                 borderRadius: '6px',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                                boxShadow: isDark ? '0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.03)'
                               }}
                             >
                               {t}
@@ -632,8 +641,8 @@ function LiveExamCard({
                 return (
                   <div
                     style={{
-                      background: 'var(--bg-secondary, #f8fafc)',
-                      border: '1px solid var(--border, #e2e8f0)',
+                      background: isDark ? 'rgba(30, 41, 59, 0.5)' : 'var(--bg-secondary, #f8fafc)',
+                      border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid var(--border, #e2e8f0)',
                       borderRadius: '12px',
                       padding: '10px 12px',
                       display: 'flex',
@@ -644,11 +653,11 @@ function LiveExamCard({
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span style={{
                         fontSize: '12px',
-                        color: '#2563eb',
+                        color: isDark ? '#60a5fa' : '#2563eb',
                         fontWeight: 800,
                         textTransform: 'uppercase',
                         letterSpacing: '0.3px',
-                        borderLeft: '3px solid #2563eb',
+                        borderLeft: isDark ? '3px solid #60a5fa' : '3px solid #2563eb',
                         paddingLeft: '6px'
                       }}>
                         {subjName}
@@ -656,8 +665,8 @@ function LiveExamCard({
                       <span style={{
                         fontSize: '10px',
                         fontWeight: 700,
-                        color: '#64748b',
-                        background: 'rgba(100, 116, 139, 0.1)',
+                        color: isDark ? '#94a3b8' : '#64748b',
+                        background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(100, 116, 139, 0.1)',
                         padding: '2px 7px',
                         borderRadius: '10px'
                       }}>
@@ -692,13 +701,13 @@ function LiveExamCard({
             {/* Modal Footer */}
             <div style={{
               padding: '12px 16px',
-              borderTop: '1px solid var(--border-light, #f1f5f9)',
-              background: 'var(--bg-secondary, #f8fafc)',
+              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid var(--border-light, #f1f5f9)',
+              background: isDark ? 'rgba(15, 23, 42, 0.85)' : 'var(--bg-secondary, #f8fafc)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between'
             }}>
-              <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+              <span style={{ fontSize: '11px', color: isDark ? '#94a3b8' : '#64748b', fontWeight: 600 }}>
                 ⏱️ {durationText}
               </span>
               <button

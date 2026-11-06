@@ -14,6 +14,7 @@ export default function LiveExams() {
   const { state } = useAppContext();
   const { state: adminState, refreshData } = useAdminContext();
   const isEn = state.language === 'en';
+  const isDark = state.theme === 'dark';
   
   const [exams, setExams] = useState([]);
   const [now, setNow] = useState(Date.now());
@@ -274,17 +275,17 @@ export default function LiveExams() {
           top: '75px',
           left: '50%',
           transform: 'translateX(-50%)',
-          background: 'rgba(255, 255, 255, 0.96)',
+          background: isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.96)',
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
           borderRadius: '5px',
-          border: '1px solid rgba(226, 232, 240, 0.8)',
-          boxShadow: 'inset 0 1px 1.5px #ffffff, 0 4px 14px rgba(15, 23, 42, 0.08)',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)',
+          boxShadow: isDark ? '0 4px 14px rgba(0, 0, 0, 0.5)' : 'inset 0 1px 1.5px #ffffff, 0 4px 14px rgba(15, 23, 42, 0.08)',
           padding: '5px 12px',
           display: 'inline-flex',
           alignItems: 'center',
           gap: '6px',
-          color: '#1e293b',
+          color: isDark ? '#f8fafc' : '#1e293b',
           fontSize: '10.5px',
           fontWeight: 700,
           zIndex: 9999,
