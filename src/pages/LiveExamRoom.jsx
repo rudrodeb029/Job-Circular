@@ -767,7 +767,7 @@ export default function LiveExamRoom() {
         </div>
       )}
 
-      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+      <div className="page-content" style={{ padding: '16px' }}>
         {tabLoading ? (
           <div style={{ padding: '80px 20px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '300px' }}>
             <ModernLoader size="md" icon="📄" />
@@ -1155,7 +1155,7 @@ export default function LiveExamRoom() {
 
         {/* 2. Leaderboard Tab view */}
         {currentResult && activeRoomTab === 'leaderboard' && (
-          <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
             {/* NEW PREMIUM PODIUM DESIGN - CLAYMORPHISM STYLE */}
             {leaderboardData.length > 0 && (
@@ -1317,6 +1317,8 @@ export default function LiveExamRoom() {
                   <div
                     key={user.id || idx}
                     style={{
+                      contentVisibility: 'auto',
+                      containIntrinsicSize: '1px 70px',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '14px',

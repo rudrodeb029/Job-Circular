@@ -137,7 +137,7 @@ export default function QuestionsList() {
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>{displayTitle}</h1>
       </div>
 
-      <div className="page-content animate-fade-in">
+      <div className="page-content">
         {/* Search */}
         <div style={{ marginBottom: '8px' }}>
           <SearchBar
