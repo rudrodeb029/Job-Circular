@@ -187,7 +187,7 @@ function StoryCard({ job, index, isEn, onClick }) {
             justifyContent: 'center'
           }}
         >
-          {/* App Logo Emblem in Card's Middle - Tactile Claymorphism Badge */}
+          {/* App Logo in Card's Middle */}
           <div
             style={{
               position: 'absolute',
@@ -200,35 +200,20 @@ function StoryCard({ job, index, isEn, onClick }) {
               pointerEvents: 'none'
             }}
           >
-            <div
+            <img
+              src="/app-logo.png"
+              alt="Live Circular Logo"
               style={{
                 width: '54px',
                 height: '54px',
-                borderRadius: '14px',
-                background: 'linear-gradient(145deg, #ffffff 0%, rgba(255, 255, 255, 0.75) 100%)',
-                border: '1.2px solid rgba(255, 255, 255, 0.95)',
-                boxShadow: `0 6px 14px -2px rgba(15, 23, 42, 0.08), inset 0 2px 3px #ffffff, inset 0 -2px 3px ${theme.borderColor ? theme.borderColor + '40' : 'rgba(0,0,0,0.06)'}`,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '6px'
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 4px 10px rgba(0, 0, 0, 0.08))'
               }}
-            >
-              <img
-                src="/app-logo.png"
-                alt="Live Circular Logo"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.06))'
-                }}
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.style.display = 'none';
-                }}
-              />
-            </div>
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+              }}
+            />
           </div>
         </div>
       )}
