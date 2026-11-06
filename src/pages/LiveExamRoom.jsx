@@ -686,6 +686,16 @@ export default function LiveExamRoom() {
 
   const showQuestionsSheet = isRunning && !currentResult;
 
+  const totalQuestions = useMemo(() => {
+    return Array.isArray(exam?.questions) ? exam.questions.length : 0;
+  }, [exam?.questions]);
+
+  const answeredCount = useMemo(() => {
+    return Object.keys(selectedAnswers || {}).filter(k => selectedAnswers[k] !== undefined && selectedAnswers[k] !== null).length;
+  }, [selectedAnswers]);
+
+  const unansweredCount = Math.max(0, totalQuestions - answeredCount);
+
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
       {/* Header */}
@@ -768,6 +778,113 @@ export default function LiveExamRoom() {
           </div>
         ) : (
           <>
+        {/* Claymorphism Live Question Answering Stats Card */}
+        {showQuestionsSheet && (
+          <div className="clay-live-stats-bar" style={{
+            position: 'sticky',
+            top: 'calc(54px + var(--safe-area-top, 0px))',
+            zIndex: 90
+          }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '6px'
+            }}>
+              {/* Answered Card */}
+              <div className="clay-live-stat-card answered">
+                <span style={{
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  color: 'var(--success, #15803d)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>{isEn ? 'Answered' : 'উত্তর দিয়েছেন'}</span>
+                </span>
+                <span style={{
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  color: 'var(--success, #15803d)',
+                  lineHeight: 1.1
+                }}>
+                  {isEn ? answeredCount : toBengaliNumber(answeredCount)}
+                </span>
+              </div>
+
+              {/* Unanswered Card */}
+              <div className="clay-live-stat-card unanswered">
+                <span style={{
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  color: '#dc2626',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <span style={{ fontSize: '9px', lineHeight: 1 }}>○</span>
+                  <span>{isEn ? 'Unanswered' : 'উত্তর দেননি'}</span>
+                </span>
+                <span style={{
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  color: '#dc2626',
+                  lineHeight: 1.1
+                }}>
+                  {isEn ? unansweredCount : toBengaliNumber(unansweredCount)}
+                </span>
+              </div>
+
+              {/* Total Questions Card */}
+              <div className="clay-live-stat-card total">
+                <span style={{
+                  fontSize: '9px',
+                  fontWeight: 700,
+                  color: '#0284c7',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '3px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <span style={{ fontSize: '9px', lineHeight: 1 }}>📋</span>
+                  <span>{isEn ? 'Total' : 'মোট প্রশ্ন'}</span>
+                </span>
+                <span style={{
+                  fontSize: '15px',
+                  fontWeight: 800,
+                  color: '#0284c7',
+                  lineHeight: 1.1
+                }}>
+                  {isEn ? totalQuestions : toBengaliNumber(totalQuestions)}
+                </span>
+              </div>
+            </div>
+
+            {/* Subtle Progress Bar */}
+            <div style={{
+              width: '100%',
+              height: '3.5px',
+              background: 'rgba(226, 232, 240, 0.8)',
+              borderRadius: '4px',
+              overflow: 'hidden',
+              marginTop: '6px',
+              boxShadow: 'inset 0 1px 1.5px rgba(0, 0, 0, 0.05)'
+            }}>
+              <div style={{
+                width: `${totalQuestions > 0 ? (answeredCount / totalQuestions) * 100 : 0}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #10b981 0%, #059669 100%)',
+                borderRadius: '4px',
+                transition: 'width 0.25s ease'
+              }} />
+            </div>
+          </div>
+        )}
         
         {/* Result Header Panel */}
         {currentResult && activeRoomTab === 'solutions' && (
