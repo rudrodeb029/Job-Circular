@@ -179,7 +179,7 @@ export default function QuestionDetails() {
         </h1>
       </div>
 
-      <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
+      <div className="page-content" style={{ padding: '16px' }}>
         {/* Info & Mode Selector Header Card - Tactile Claymorphism Style */}
         <div style={{
           background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
@@ -356,8 +356,11 @@ export default function QuestionDetails() {
             
             return (
               <div
-                key={qn.id}
+                key={qn.id || `q-${qIndex}`}
+                className="question-item-card"
                 style={{
+                  contentVisibility: 'auto',
+                  containIntrinsicSize: '1px 220px',
                   background: isDark
                     ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
                     : 'linear-gradient(145deg, #ffffff 0%, #f9fbfd 100%)',

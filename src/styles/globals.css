@@ -642,7 +642,12 @@ ul, ol {
 .animate-slide-up,
 .animate-slide-in-right {
   opacity: 1;
-  will-change: transform;
+}
+
+/* Question Card Virtualization & GPU Optimization (Prevents Texture Clamping on Long Lists) */
+.question-item-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 220px;
 }
 
 @keyframes scaleIn {
