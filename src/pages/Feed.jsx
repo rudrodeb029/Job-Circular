@@ -87,11 +87,9 @@ export default function Feed() {
         <div style={{ padding: 0 }}>
         {/* Search Bar Row with App Icon */}
         <div style={{
-          background: 'var(--card-bg, #ffffff)',
+          background: 'transparent',
           padding: '6px 12px',
-          borderBottom: '1px solid var(--border-light)',
           marginBottom: '6px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.02)',
           display: 'flex',
           alignItems: 'center',
           gap: '10px'
