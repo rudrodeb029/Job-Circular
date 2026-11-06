@@ -94,26 +94,37 @@ export default function Feed() {
           alignItems: 'center',
           gap: '10px'
         }}>
-          {/* App Logo Icon */}
-          <img
-            src="/app-logo.png"
-            alt="Live Circular Logo"
+          {/* App Logo Icon - Tactile Claymorphism Style */}
+          <div
             style={{
-              width: '28px',
-              height: '28px',
+              width: '32px',
+              height: '32px',
               borderRadius: '50%',
-              objectFit: 'contain',
-              padding: '2px',
-              background: '#ffffff',
-              border: '1.5px solid var(--primary, #1877f2)',
-              boxShadow: '0 2px 8px rgba(24, 119, 242, 0.15)',
-              flexShrink: 0
+              background: 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)',
+              border: '1.2px solid rgba(255, 255, 255, 0.95)',
+              boxShadow: '0 4px 10px -1px rgba(24, 119, 242, 0.22), 0 2px 4px rgba(15, 23, 42, 0.05), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(24, 119, 242, 0.18)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              padding: '2.5px'
             }}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.style.display = 'none';
-            }}
-          />
+          >
+            <img
+              src="/app-logo.png"
+              alt="Live Circular Logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                borderRadius: '50%'
+              }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+              }}
+            />
+          </div>
           <div style={{ flex: 1 }}>
             <SearchBar
               value={searchQuery}

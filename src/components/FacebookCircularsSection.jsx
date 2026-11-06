@@ -134,12 +134,12 @@ function StoryCard({ job, index, isEn, onClick }) {
         width: '112px',
         minWidth: '112px',
         height: '172px',
-        borderRadius: '8px',
+        borderRadius: '12px',
         position: 'relative',
         overflow: 'hidden',
         cursor: 'pointer',
-        border: `1.5px solid ${theme.borderColor}`,
-        boxShadow: `0 4px 16px rgba(0, 0, 0, 0.05), ${theme.borderGlow}`,
+        border: '1.2px solid rgba(255, 255, 255, 0.95)',
+        boxShadow: `0 6px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 5px -1px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff, inset 0 -2px 3px ${theme.accent ? theme.accent + '18' : 'rgba(0,0,0,0.06)'}`,
         flexShrink: 0,
         userSelect: 'none',
         transition: 'transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.18s ease',
@@ -147,11 +147,11 @@ function StoryCard({ job, index, isEn, onClick }) {
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.boxShadow = `0 8px 24px rgba(0, 0, 0, 0.1), ${theme.borderGlow}`;
+        e.currentTarget.style.boxShadow = `0 10px 22px -3px rgba(15, 23, 42, 0.12), 0 4px 8px -1px rgba(15, 23, 42, 0.06), inset 0 2px 3px #ffffff, inset 0 -2px 3px ${theme.accent ? theme.accent + '25' : 'rgba(0,0,0,0.08)'}`;
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = `0 4px 16px rgba(0, 0, 0, 0.05), ${theme.borderGlow}`;
+        e.currentTarget.style.boxShadow = `0 6px 16px -2px rgba(15, 23, 42, 0.08), 0 2px 5px -1px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff, inset 0 -2px 3px ${theme.accent ? theme.accent + '18' : 'rgba(0,0,0,0.06)'}`;
       }}
       onMouseDown={(e) => {
         e.currentTarget.style.transform = 'scale(0.96)';
@@ -187,7 +187,7 @@ function StoryCard({ job, index, isEn, onClick }) {
             justifyContent: 'center'
           }}
         >
-          {/* App Transparent Icon in the Card's Middle (Seamless Multiply Blend) */}
+          {/* App Logo Emblem in Card's Middle - Tactile Claymorphism Badge */}
           <div
             style={{
               position: 'absolute',
@@ -200,25 +200,40 @@ function StoryCard({ job, index, isEn, onClick }) {
               pointerEvents: 'none'
             }}
           >
-            <img
-              src="/app-logo.png"
-              alt="Live Circular Logo"
+            <div
               style={{
-                width: '52px',
-                height: '52px',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 3px 8px rgba(0, 0, 0, 0.08))'
+                width: '54px',
+                height: '54px',
+                borderRadius: '14px',
+                background: 'linear-gradient(145deg, #ffffff 0%, rgba(255, 255, 255, 0.75) 100%)',
+                border: '1.2px solid rgba(255, 255, 255, 0.95)',
+                boxShadow: `0 6px 14px -2px rgba(15, 23, 42, 0.08), inset 0 2px 3px #ffffff, inset 0 -2px 3px ${theme.borderColor ? theme.borderColor + '40' : 'rgba(0,0,0,0.06)'}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px'
               }}
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.style.display = 'none';
-              }}
-            />
+            >
+              <img
+                src="/app-logo.png"
+                alt="Live Circular Logo"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.06))'
+                }}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
           </div>
         </div>
       )}
 
-      {/* ── Top-Left Frosted Play Badge ── */}
+      {/* ── Top-Left Frosted Play Badge - Claymorphism ── */}
       <div
         style={{
           position: 'absolute',
@@ -227,11 +242,9 @@ function StoryCard({ job, index, isEn, onClick }) {
           width: '24px',
           height: '24px',
           borderRadius: '7px',
-          background: 'rgba(255, 255, 255, 0.92)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
+          background: 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)',
           border: '1px solid rgba(255, 255, 255, 0.95)',
-          boxShadow: '0 2px 6px rgba(0, 0, 0, 0.08)',
+          boxShadow: '0 3px 8px -1px rgba(0, 0, 0, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.05)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -324,14 +337,14 @@ function StoryCard({ job, index, isEn, onClick }) {
               width: '24px',
               height: '24px',
               borderRadius: '50%',
-              border: `2px solid ${theme.avatarRing}`,
-              boxShadow: '0 1px 4px rgba(0, 0, 0, 0.1)',
+              border: `1.5px solid ${theme.avatarRing}`,
+              boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1), inset 0 1px 1.5px #ffffff, inset 0 -1px 1.5px rgba(0, 0, 0, 0.08)',
               overflow: 'hidden',
               flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: '#ffffff',
+              background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
               color: theme.avatarRing
             }}
           >
