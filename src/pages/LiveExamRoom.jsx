@@ -881,26 +881,26 @@ export default function LiveExamRoom() {
           </div>
         )}
         
-        {/* Result Header Panel */}
+        {/* Result Header Panel - Tactile Claymorphism Style */}
         {currentResult && activeRoomTab === 'solutions' && (
           <div style={{
-            background: 'var(--white)',
-            border: isDidNotAttend ? '1.5px solid #cbd5e1' : '1.5px solid var(--primary)',
-            borderRadius: '12px',
-            padding: '14px 16px',
-            marginBottom: '12px',
-            boxShadow: '0 4px 18px rgba(0,0,0,0.03)',
+            background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+            border: isDidNotAttend ? '1.2px solid rgba(255, 255, 255, 0.95)' : '1.5px solid rgba(37, 99, 235, 0.25)',
+            borderRadius: '14px',
+            padding: '16px 18px',
+            marginBottom: '14px',
+            boxShadow: '0 8px 24px -3px rgba(30, 64, 175, 0.08), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(30, 64, 175, 0.05)',
             textAlign: 'center'
           }}>
             <span style={{ fontSize: '32px', display: 'block', marginBottom: '4px' }}>
               {isDidNotAttend ? '📝' : '🏆'}
             </span>
-            <h2 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>
+            <h2 style={{ fontSize: '15px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
               {isDidNotAttend 
                 ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
-            <p style={{ fontSize: '12.5px', color: 'var(--text-secondary)', marginBottom: '10px', lineHeight: 1.5 }}>
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: 1.5 }}>
               {isDidNotAttend
                 ? (isEn 
                     ? 'You did not participate in this live exam. However, you can review all correct answers and detailed solutions below.' 
@@ -914,11 +914,15 @@ export default function LiveExamRoom() {
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
               gap: '12px',
-              background: 'var(--bg-secondary)',
-              padding: '10px 12px',
-              borderRadius: '10px'
+              padding: '0'
             }}>
-              <div>
+              <div style={{
+                background: 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
+                border: '1.2px solid rgba(255, 255, 255, 0.95)',
+                borderRadius: '10px',
+                padding: '9px 12px',
+                boxShadow: '0 3px 8px -1px rgba(0,0,0,0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0,0,0,0.04)'
+              }}>
                 <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
                   {isEn ? 'Total Questions' : 'মোট প্রশ্ন'}
                 </span>
@@ -926,11 +930,19 @@ export default function LiveExamRoom() {
                   {isEn ? toSafeString(currentResult.total, '100') : toBengaliNumber(currentResult.total)}
                 </strong>
               </div>
-              <div>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', fontWeight: 600 }}>
+              <div style={{
+                background: isDidNotAttend ? 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)',
+                border: isDidNotAttend ? '1.2px solid rgba(254, 202, 202, 0.7)' : '1.2px solid rgba(187, 247, 208, 0.8)',
+                borderRadius: '10px',
+                padding: '9px 12px',
+                boxShadow: isDidNotAttend 
+                  ? '0 3px 8px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.08)'
+                  : '0 3px 8px -1px rgba(34, 197, 94, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.08)'
+              }}>
+                <span style={{ fontSize: '11px', color: isDidNotAttend ? '#991b1b' : '#166534', display: 'block', fontWeight: 600 }}>
                   {isDidNotAttend ? (isEn ? 'Status' : 'অবস্থা') : (isEn ? 'Your Score' : 'প্রাপ্ত নম্বর')}
                 </span>
-                <strong style={{ fontSize: isDidNotAttend ? '13px' : '18px', color: isDidNotAttend ? '#ef4444' : 'var(--success)', fontWeight: 800 }}>
+                <strong style={{ fontSize: isDidNotAttend ? '12.5px' : '18px', color: isDidNotAttend ? '#ef4444' : 'var(--success)', fontWeight: 800 }}>
                   {isDidNotAttend 
                     ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                     : (isEn ? toSafeString(currentResult.score, '0') : toBengaliNumber(currentResult.score))}
@@ -954,11 +966,11 @@ export default function LiveExamRoom() {
                 <div
                   key={qIndex}
                   style={{
-                    background: 'var(--white)',
-                    border: '1px solid var(--border-light)',
-                    borderRadius: '10px',
-                    padding: '12px 14px',
-                    boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
+                    background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+                    border: '1.2px solid rgba(255, 255, 255, 0.95)',
+                    borderRadius: '12px',
+                    padding: '14px 16px',
+                    boxShadow: '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
                   }}
                 >
                   {/* Question Text */}
@@ -983,26 +995,29 @@ export default function LiveExamRoom() {
                       const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
                       const prefix = optionPrefixes[oIndex];
 
-                      let bg = 'var(--bg-secondary)';
+                      let bg = 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
                       let color = 'var(--text-primary)';
-                      let border = '1px solid var(--border-light)';
+                      let border = '1.2px solid rgba(255, 255, 255, 0.95)';
+                      let boxShadow = '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
                       let trailingIcon = null;
 
                       // Styling based on state
                       if (currentResult) {
                         if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
-                          bg = '#d1fae5';
+                          bg = 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
                           color = '#065f46';
-                          border = '1px solid #34d399';
+                          border = '1.2px solid rgba(134, 239, 172, 0.8)';
+                          boxShadow = '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
                           trailingIcon = (
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
                           );
                         } else if (oIndex === chosenIndex) {
-                          bg = '#fee2e2';
+                          bg = 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
                           color = '#991b1b';
-                          border = '1px solid #f87171';
+                          border = '1.2px solid rgba(252, 165, 165, 0.8)';
+                          boxShadow = '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
                           trailingIcon = (
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <line x1="18" y1="6" x2="6" y2="18" />
@@ -1012,9 +1027,10 @@ export default function LiveExamRoom() {
                         }
                       } else {
                         if (oIndex === chosenIndex) {
-                          bg = 'var(--primary-lightest)';
+                          bg = 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)';
                           color = 'var(--primary)';
-                          border = '1.5px solid var(--primary)';
+                          border = '1.2px solid rgba(147, 197, 253, 0.9)';
+                          boxShadow = '0 3px 8px -1px rgba(37, 99, 235, 0.14), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(37, 99, 235, 0.1)';
                           trailingIcon = (
                             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                               <polyline points="20 6 9 17 4 12" />
@@ -1035,6 +1051,7 @@ export default function LiveExamRoom() {
                             background: bg,
                             color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
                             border: border,
+                            boxShadow: boxShadow,
                             cursor: !currentResult ? 'pointer' : 'default',
                             fontSize: '12px',
                             fontWeight: 500,
@@ -1043,10 +1060,12 @@ export default function LiveExamRoom() {
                           }}
                         >
                           <span style={{
-                            width: '21px',
-                            height: '21px',
-                            borderRadius: '50%',
-                            background: 'rgba(0,0,0,0.04)',
+                            width: '22px',
+                            height: '22px',
+                            borderRadius: '7px',
+                            background: 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
+                            border: '1px solid rgba(255, 255, 255, 0.95)',
+                            boxShadow: '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -1067,10 +1086,12 @@ export default function LiveExamRoom() {
                   {currentResult && (qn.explanation || qn.explanationEn) && (
                     <div style={{
                       marginTop: '10px',
-                      padding: '10px 12px',
+                      padding: '12px 14px',
                       borderRadius: '12px',
-                      background: 'var(--primary-lightest)',
-                      borderLeft: '4px solid var(--primary)'
+                      background: 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
+                      border: '1.2px solid rgba(191, 219, 254, 0.8)',
+                      borderLeft: '4px solid var(--primary)',
+                      boxShadow: '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)'
                     }}>
                       <h5 style={{ fontSize: '12px', fontWeight: 800, color: 'var(--primary)', marginBottom: '4px' }}>
                         💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
@@ -1091,31 +1112,31 @@ export default function LiveExamRoom() {
         {currentResult && activeRoomTab === 'leaderboard' && (
           <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
-            {/* NEW PREMIUM PODIUM DESIGN - SOFT GREEN STYLE */}
+            {/* NEW PREMIUM PODIUM DESIGN - CLAYMORPHISM STYLE */}
             {leaderboardData.length > 0 && (
               <div style={{
-                background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
-                borderRadius: '12px',
+                background: 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)',
+                borderRadius: '16px',
                 padding: '24px 10px 20px 10px',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: '0 10px 30px rgba(22, 163, 74, 0.05)',
+                boxShadow: '0 8px 24px -3px rgba(22, 163, 74, 0.12), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(22, 163, 74, 0.15)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                border: '1px solid #b9f6ca'
+                border: '1.2px solid rgba(255, 255, 255, 0.95)'
               }}>
                 <div style={{
                   fontSize: '11px',
                   fontWeight: 700,
                   color: '#166534',
-                  background: '#ffffff',
-                  padding: '4px 14px',
+                  background: 'linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%)',
+                  padding: '5px 16px',
                   borderRadius: '10px',
                   marginBottom: '24px',
-                  border: '1px solid #b9f6ca',
+                  border: '1px solid rgba(255, 255, 255, 0.95)',
                   zIndex: 1,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+                  boxShadow: '0 3px 8px -1px rgba(22, 163, 74, 0.1), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(22, 163, 74, 0.08)'
                 }}>
                   {isEn ? 'Daily Top Performers' : 'আজকের সেরা অংশগ্রহণকারী'}
                 </div>
@@ -1251,10 +1272,12 @@ export default function LiveExamRoom() {
                       alignItems: 'center',
                       gap: '14px',
                       padding: '14px 16px',
-                      borderRadius: '10px',
-                      background: 'var(--white)',
-                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1px solid var(--border-light)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+                      border: user.isCurrentUser ? '1.5px solid var(--primary)' : '1.2px solid rgba(255, 255, 255, 0.95)',
+                      boxShadow: user.isCurrentUser
+                        ? '0 6px 18px -2px rgba(26, 86, 219, 0.15), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(26, 86, 219, 0.08)'
+                        : '0 6px 16px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)',
                       transition: 'all 0.2s'
                     }}
                   >
@@ -1265,13 +1288,17 @@ export default function LiveExamRoom() {
                           src={user.avatar}
                           alt={displayName}
                           onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                          style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                          style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(255, 255, 255, 0.95)', boxShadow: '0 3px 8px -1px rgba(0,0,0,0.1), inset 0 1px 2px #ffffff' }}
                         />
                       ) : null}
                       <div style={{
-                        width: '100%', height: '100%', borderRadius: '50%', background: 'var(--primary-bg)', color: 'var(--primary)',
+                        width: '100%', height: '100%', borderRadius: '50%',
+                        background: 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)',
+                        color: 'var(--primary)',
                         display: isValidAvatar(user.avatar) ? 'none' : 'flex',
-                        alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800, border: '2px solid var(--white)', boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                        alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800,
+                        border: '1.5px solid rgba(255, 255, 255, 0.95)',
+                        boxShadow: '0 3px 8px -1px rgba(26, 86, 219, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.1)'
                       }}>
                         {getInitials(displayName)}
                       </div>
