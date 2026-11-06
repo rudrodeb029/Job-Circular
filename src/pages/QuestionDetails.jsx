@@ -181,31 +181,32 @@ export default function QuestionDetails() {
       <div className="page-content animate-fade-in" style={{ padding: '16px' }}>
         {/* Info & Mode Selector Header Card - Tactile Claymorphism Style */}
         <div style={{
-          background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #60a5fa 100%)',
           color: '#ffffff',
           borderRadius: '16px',
           padding: '16px 18px',
           marginBottom: '14px',
-          border: '1.2px solid rgba(255, 255, 255, 0.35)',
-          boxShadow: '0 10px 25px -4px rgba(26, 86, 219, 0.3), inset 0 2.5px 3.5px rgba(255, 255, 255, 0.35), inset 0 -2.5px 3.5px rgba(10, 37, 107, 0.3)'
+          border: '1.2px solid rgba(255, 255, 255, 0.4)',
+          boxShadow: '0 8px 24px -3px rgba(37, 99, 235, 0.22), inset 0 2px 3px rgba(255, 255, 255, 0.4)'
         }}>
           <h2 style={{ fontSize: '15px', fontWeight: 700, marginBottom: '8px', lineHeight: '1.4' }}>
             {isEn ? (paper.titleEn || paper.title) : paper.title}
           </h2>
-          <div style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.92, marginBottom: '14px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '14px', fontSize: '12px', opacity: 0.95, marginBottom: '14px', flexWrap: 'wrap' }}>
             <span>📅 {isEn ? (paper.dateEn || paper.date) : paper.date}</span>
             <span>📝 {isEn ? `${totalCount} Questions` : `${toBengaliNumber(totalCount)}টি প্রশ্ন`}</span>
             <span>🕒 {isEn ? (paper.timeLimitEn || paper.timeLimit) : paper.timeLimit}</span>
           </div>
 
-          {/* Mode Switcher Buttons - Tactile Claymorphism Style */}
+          {/* Mode Switcher Buttons - Soft Frosted Glass Style */}
           <div style={{
             display: 'flex',
-            background: 'rgba(15, 23, 42, 0.22)',
+            background: 'rgba(255, 255, 255, 0.2)',
             padding: '4px',
             borderRadius: '10px',
             gap: '6px',
-            boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.2)'
+            border: '1px solid rgba(255, 255, 255, 0.28)',
+            boxShadow: 'inset 0 1px 2px rgba(255, 255, 255, 0.25)'
           }}>
             <button
               onClick={() => handleModeChange('practice')}
@@ -214,12 +215,12 @@ export default function QuestionDetails() {
                 padding: '8px 10px',
                 borderRadius: '8px',
                 border: mode === 'practice' ? '1px solid rgba(255, 255, 255, 0.95)' : 'none',
-                background: mode === 'practice' ? 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)' : 'transparent',
-                color: mode === 'practice' ? '#1d4ed8' : 'rgba(255, 255, 255, 0.9)',
+                background: mode === 'practice' ? 'linear-gradient(145deg, #ffffff 0%, #f0f7ff 100%)' : 'transparent',
+                color: mode === 'practice' ? '#2563eb' : '#ffffff',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
-                boxShadow: mode === 'practice' ? '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)' : 'none',
+                boxShadow: mode === 'practice' ? '0 3px 8px rgba(0, 0, 0, 0.08), inset 0 1.5px 2px #ffffff' : 'none',
                 transition: 'all 0.2s'
               }}
             >
@@ -232,12 +233,12 @@ export default function QuestionDetails() {
                 padding: '8px 10px',
                 borderRadius: '8px',
                 border: mode === 'read' ? '1px solid rgba(255, 255, 255, 0.95)' : 'none',
-                background: mode === 'read' ? 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)' : 'transparent',
-                color: mode === 'read' ? '#1d4ed8' : 'rgba(255, 255, 255, 0.9)',
+                background: mode === 'read' ? 'linear-gradient(145deg, #ffffff 0%, #f0f7ff 100%)' : 'transparent',
+                color: mode === 'read' ? '#2563eb' : '#ffffff',
                 fontWeight: 700,
                 fontSize: '13px',
                 cursor: 'pointer',
-                boxShadow: mode === 'read' ? '0 4px 12px rgba(10, 37, 107, 0.2), inset 0 2px 3px #ffffff, inset 0 -1.5px 2px rgba(30, 64, 175, 0.12)' : 'none',
+                boxShadow: mode === 'read' ? '0 3px 8px rgba(0, 0, 0, 0.08), inset 0 1.5px 2px #ffffff' : 'none',
                 transition: 'all 0.2s'
               }}
             >
