@@ -159,19 +159,22 @@ export default function LiveExams() {
     navigate(`/live-exam-room/${id}`);
   }, [navigate]);
 
-  const getExamResult = (examId) => {
+  const examResultsMap = React.useMemo(() => {
     try {
-      const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
-      const res = results[examId];
-      if (!res || res.didNotAttend) return null;
-      const answersObj = res.answers || {};
-      if (Object.keys(answersObj).length === 0 && !res.submittedAt && !res.score) {
-        return null;
-      }
-      return res;
+      return JSON.parse(localStorage.getItem('live_exam_results')) || {};
     } catch (e) {
+      return {};
+    }
+  }, [exams, activeTab]);
+
+  const getExamResult = (examId) => {
+    const res = examResultsMap[examId];
+    if (!res || res.didNotAttend) return null;
+    const answersObj = res.answers || {};
+    if (Object.keys(answersObj).length === 0 && !res.submittedAt && !res.score) {
       return null;
     }
+    return res;
   };
 
   // Filter exams based on selected Tab
@@ -400,9 +403,7 @@ export default function LiveExams() {
                 display: 'grid',
                 gridTemplateColumns: 'repeat(2, 1fr)',
                 gap: '10px',
-                alignItems: 'start',
-                contain: 'content',
-                WebkitOverflowScrolling: 'touch'
+                alignItems: 'start'
               }}>
                 {filteredExams.map(exam => {
                   const status = getExamStatus(exam);

@@ -42,7 +42,7 @@
   --card-border: 1px solid rgba(219, 234, 254, 0.8);
 
   /* Glassmorphism Header variables */
-  --header-bg: rgba(255, 255, 255, 0.92);
+  --header-bg: rgba(255, 255, 255, 0.97);
 
   /* Shadows */
   --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
@@ -133,7 +133,7 @@
   --card-border: 1px solid rgba(255, 255, 255, 0.08);
 
   /* Glassmorphism Header variables */
-  --header-bg: rgba(17, 24, 39, 0.95);
+  --header-bg: rgba(17, 24, 39, 0.98);
 }
 
 [data-theme='dark'] html,
@@ -274,8 +274,6 @@ ul, ol {
   position: sticky !important;
   top: 0 !important;
   background: var(--header-bg) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
   z-index: 100 !important;
   padding: calc(var(--safe-area-top) + 4px) 14px 6px 14px;
   min-height: calc(52px + var(--safe-area-top));
@@ -566,18 +564,14 @@ ul, ol {
 .tab-pane-content {
   width: 100%;
   position: relative;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .tab-slide-forward {
-  animation: tabSlideForward 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  will-change: transform, opacity;
+  animation: tabSlideForward 0.22s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .tab-slide-back {
-  animation: tabSlideBack 0.24s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  will-change: transform, opacity;
+  animation: tabSlideBack 0.22s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Modern GPU-Accelerated Tab Bar & Toggle Bar */
@@ -644,11 +638,6 @@ ul, ol {
   opacity: 1;
 }
 
-/* Question Card Virtualization & GPU Optimization (Prevents Texture Clamping on Long Lists) */
-.question-item-card {
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 220px;
-}
 
 @keyframes scaleIn {
   0% { opacity: 0.95; transform: scale3d(0.98, 0.98, 1); }
@@ -656,14 +645,7 @@ ul, ol {
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.18s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-  will-change: transform, opacity;
-}
-
-/* GPU Acceleration & Performance Tuning */
-.job-card, .category-card, .notification-item {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
+  animation: scaleIn 0.18s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* English Mode Text Scaling to Prevent Layout Wrappings */

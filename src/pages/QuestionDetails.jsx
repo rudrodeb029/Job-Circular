@@ -9,6 +9,7 @@ import { supabase } from '../services/supabaseClient';
 import { normalizeDoc } from '../services/supabaseService';
 import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
 import { preloadInterstitialAd, navigateWithAdOnReturn } from '../utils/admobUtils';
+import useProgressiveList from '../hooks/useProgressiveList';
 
 export default function QuestionDetails() {
   const { id } = useParams();
@@ -101,6 +102,10 @@ export default function QuestionDetails() {
       setIsSwitchingMode(false);
     }, 180);
   };
+
+  // Progressive rendering: keeps DOM small on frame 0 and pre-warms in background frames
+  const totalQuestionsCount = Array.isArray(paper?.questions) ? paper.questions.length : 0;
+  const { count: visibleCount, hasMore, sentinelRef } = useProgressiveList(totalQuestionsCount, { resetKey: paper?.id });
 
   if (pageLoading) {
     return (
@@ -350,17 +355,14 @@ export default function QuestionDetails() {
 
         {/* Questions List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          {paper.questions.map((qn, qIndex) => {
+          {paper.questions.slice(0, visibleCount).map((qn, qIndex) => {
             const hasAnswered = selectedAnswers[qn.id] !== undefined;
             const chosenIndex = selectedAnswers[qn.id];
             
             return (
               <div
                 key={qn.id || `q-${qIndex}`}
-                className="question-item-card"
                 style={{
-                  contentVisibility: 'auto',
-                  containIntrinsicSize: '1px 220px',
                   background: isDark
                     ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
                     : 'linear-gradient(145deg, #ffffff 0%, #f9fbfd 100%)',
@@ -478,16 +480,15 @@ export default function QuestionDetails() {
                     marginTop: '10px',
                     padding: '12px 14px',
                     borderRadius: '12px',
-                    background: 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
-                    border: '1.2px solid rgba(191, 219, 254, 0.8)',
-                    borderLeft: '4px solid var(--primary)',
-                    boxShadow: '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)',
-                    animation: 'fadeIn 0.3s ease'
+                    background: isDark ? 'rgba(30, 41, 59, 0.7)' : 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
+                    border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(191, 219, 254, 0.8)',
+                    borderLeft: isDark ? '4px solid #60a5fa' : '4px solid var(--primary)',
+                    boxShadow: isDark ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)' : '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)'
                   }}>
                     <h5 style={{
                       fontSize: '12px',
                       fontWeight: 800,
-                      color: 'var(--primary)',
+                      color: isDark ? '#60a5fa' : 'var(--primary)',
                       marginBottom: '6px',
                       textTransform: 'uppercase',
                       letterSpacing: '0.5px'
@@ -496,13 +497,16 @@ export default function QuestionDetails() {
                     </h5>
                     <ExplanationContent
                       content={(isEn && qn.explanationEn) ? qn.explanationEn : qn.explanation}
-                      style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
+                      style={{ fontSize: '12px', color: isDark ? '#cbd5e1' : 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
                     />
                   </div>
                 )}
               </div>
             );
           })}
+          {hasMore && (
+            <div ref={sentinelRef} style={{ height: '1px' }} aria-hidden="true" />
+          )}
         </div>
           </>
         )}

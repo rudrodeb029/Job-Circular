@@ -10,6 +10,7 @@ import ModernLoader from '../components/ModernLoader';
 import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult, getExamResult, saveLeaderboard, getLeaderboard, getExamFromSQLite, saveExamToSQLite } from '../services/sqliteService';
 import { showNativeInterstitialAd, preloadInterstitialAd, navigateWithAdOnReturn } from '../utils/admobUtils';
 import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
+import useProgressiveList from '../hooks/useProgressiveList';
 
 export default function LiveExamRoom() {
   const { id } = useParams();
@@ -443,6 +444,10 @@ export default function LiveExamRoom() {
       }
     }
   };
+
+  // Progressive rendering: keeps DOM small on frame 0 and pre-warms in background frames
+  const examQuestionsCount = Array.isArray(exam?.questions) ? exam.questions.length : 0;
+  const { count: visibleCount, hasMore, sentinelRef } = useProgressiveList(examQuestionsCount, { resetKey: exam?.id });
 
   if (loadingExam) {
     return (
@@ -980,7 +985,7 @@ export default function LiveExamRoom() {
         {/* 1. Questions View Tab (Solutions or Live Taking) */}
         {(!currentResult || activeRoomTab === 'solutions') && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
-            {(exam.questions || []).map((qn, qIndex) => {
+            {(exam.questions || []).slice(0, visibleCount).map((qn, qIndex) => {
               if (!qn) return null;
               const userSelections = (currentResult && currentResult.answers) ? currentResult.answers : (selectedAnswers || {});
               const chosenIndex = userSelections[qIndex];
@@ -990,10 +995,7 @@ export default function LiveExamRoom() {
               return (
                 <div
                   key={qn.id || `exam-q-${qIndex}`}
-                  className="question-item-card"
                   style={{
-                    contentVisibility: 'auto',
-                    containIntrinsicSize: '1px 220px',
                     background: isDark
                       ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
                       : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
@@ -1150,6 +1152,9 @@ export default function LiveExamRoom() {
                 </div>
               );
             })}
+            {hasMore && (
+              <div ref={sentinelRef} style={{ height: '1px' }} aria-hidden="true" />
+            )}
           </div>
         )}
 
@@ -1317,8 +1322,6 @@ export default function LiveExamRoom() {
                   <div
                     key={user.id || idx}
                     style={{
-                      contentVisibility: 'auto',
-                      containIntrinsicSize: '1px 70px',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '14px',

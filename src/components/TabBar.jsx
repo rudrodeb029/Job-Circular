@@ -58,6 +58,7 @@ export const TabContent = ({ activeTab, tabs = [], children, className = '', sty
   const isFirstRenderRef = useRef(true);
   const prevTabRef = useRef(activeTab);
   const slideDirectionRef = useRef(null);
+  const paneRef = useRef(null);
 
   if (isFirstRenderRef.current) {
     isFirstRenderRef.current = false;
@@ -75,11 +76,19 @@ export const TabContent = ({ activeTab, tabs = [], children, className = '', sty
       ? 'tab-slide-forward'
       : '';
 
+  const handleAnimationEnd = (e) => {
+    if (e.target === paneRef.current) {
+      paneRef.current.classList.remove('tab-slide-forward', 'tab-slide-back');
+    }
+  };
+
   return (
     <div
       key={activeTab}
+      ref={paneRef}
       className={`tab-pane-content ${animationClass} ${className}`}
       style={style}
+      onAnimationEnd={handleAnimationEnd}
     >
       {children}
     </div>

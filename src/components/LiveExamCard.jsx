@@ -61,13 +61,7 @@ function LiveExamCard({
         justifyContent: 'space-between',
         userSelect: 'none',
         WebkitTapHighlightColor: 'transparent',
-        boxSizing: 'border-box',
-        transform: 'translateZ(0)',
-        WebkitTransform: 'translateZ(0)',
-        backfaceVisibility: 'hidden',
-        WebkitBackfaceVisibility: 'hidden',
-        contentVisibility: 'auto',
-        containIntrinsicSize: '0 190px'
+        boxSizing: 'border-box'
       }}
       className="live-exam-card live-exam-card-hover"
     >
