@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, FileText } from '../components/Icons';
 import TabBar, { TabContent } from '../components/TabBar';
 import EmptyState from '../components/EmptyState';
+import useProgressiveList from '../hooks/useProgressiveList';
 import SearchBar from '../components/SearchBar';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
@@ -71,6 +72,8 @@ export default function AdmitCardResult() {
     });
   }, [allAdmitCards, activeTab, searchQuery]);
 
+  const { count: visibleAdmitCount, hasMore: hasMoreAdmit, sentinelRef: admitSentinelRef } = useProgressiveList(searchedItems.length, { resetKey: `${activeTab}-${searchQuery}` });
+
   return (
     <div className="page">
       <div className="page-header">
@@ -112,7 +115,7 @@ export default function AdmitCardResult() {
         <TabContent activeTab={activeTab} tabs={tabs}>
           {searchedItems.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {searchedItems.map(item => {
+            {searchedItems.slice(0, visibleAdmitCount).map(item => {
               const { icon: displayIcon } = getJobIconAndStyle(item);
               const orgName = stripHtmlTags(isEn ? (item.organizationEn || item.organization) : item.organization);
               const examName = stripHtmlTags(isEn ? (item.examNameEn || item.examName) : item.examName);
@@ -309,6 +312,7 @@ export default function AdmitCardResult() {
                 </div>
               );
             })}
+            {hasMoreAdmit && <div ref={admitSentinelRef} style={{ height: '1px' }} aria-hidden="true" />}
           </div>
         ) : (
           <EmptyState

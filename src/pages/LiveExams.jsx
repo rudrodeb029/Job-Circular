@@ -7,6 +7,7 @@ import { getLiveExams } from '../data/liveExams';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader from '../components/ModernLoader';
 import LiveExamCard from '../components/LiveExamCard';
+import useProgressiveList from '../hooks/useProgressiveList';
 import TabBar, { TabContent } from '../components/TabBar';
 
 export default function LiveExams() {
@@ -186,6 +187,8 @@ export default function LiveExams() {
       return status === 'completed';
     }
   });
+
+  const { count: visibleExamsCount, hasMore: hasMoreExams, sentinelRef: examsSentinelRef } = useProgressiveList(filteredExams.length, { resetKey: activeTab });
 
   return (
     <div className="page" style={{
@@ -405,7 +408,7 @@ export default function LiveExams() {
                 gap: '10px',
                 alignItems: 'start'
               }}>
-                {filteredExams.map(exam => {
+                {filteredExams.slice(0, visibleExamsCount).map(exam => {
                   const status = getExamStatus(exam);
                   const startMs = parseExamDate(exam.scheduledAt) || parseExamDate(exam.startTime) || parseExamDate(exam.createdAt) || Date.now();
                   const result = getExamResult(exam.id);
@@ -431,6 +434,7 @@ export default function LiveExams() {
                     />
                   );
                 })}
+                {hasMoreExams && <div ref={examsSentinelRef} style={{ height: '1px', gridColumn: '1 / -1' }} aria-hidden="true" />}
               </div>
             )}
           </TabContent>

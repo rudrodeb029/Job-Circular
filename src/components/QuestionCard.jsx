@@ -6,7 +6,7 @@ import { preloadInterstitialAd } from '../utils/admobUtils';
  * Styled 1:1 like the provided design with soft sky blue header, cloud backdrop, 
  * category icon / vector illustration, centered bold title, and meta info on the EXACT SAME LINE.
  */
-export default function QuestionCard({ paper, categoryIcon, onClick, isEn = false }) {
+function QuestionCard({ paper, categoryIcon, onClick, isEn = false }) {
   if (!paper) return null;
 
   const title = isEn ? (paper.titleEn || paper.title) : paper.title;
@@ -209,3 +209,5 @@ const toBengaliNumber = (num) => {
   const bengaliDigits = {'0': '০', '1': '১', '2': '২', '3': '৩', '4': '৪', '5': '৫', '6': '৬', '7': '৭', '8': '৮', '9': '৯'};
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
+
+export default React.memo(QuestionCard);

@@ -4,6 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { Bookmark, BookmarkCheck, Briefcase, Calendar, Clock, Download, FileText, Search } from '../components/Icons';
 import JobCard from '../components/JobCard';
+import useProgressiveList from '../hooks/useProgressiveList';
 import TabBar, { TabContent } from '../components/TabBar';
 import SearchBar from '../components/SearchBar';
 import EmptyState from '../components/EmptyState';
@@ -81,6 +82,8 @@ export default function SavedJobs() {
     ));
   }, [currentJobList, searchQuery]);
 
+  const { count: visibleSavedCount, hasMore: hasMoreSaved, sentinelRef: savedSentinelRef } = useProgressiveList(filteredJobs.length, { resetKey: `${activeTab}-${searchQuery}` });
+
   return (
     <div className="page">
       <div className="page-header">
@@ -109,7 +112,7 @@ export default function SavedJobs() {
         <TabContent activeTab={activeTab} tabs={tabs}>
           {filteredJobs.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {filteredJobs.map(job => {
+            {filteredJobs.slice(0, visibleSavedCount).map(job => {
               if (activeTab === 'result') {
                 const { icon: displayIcon } = getJobIconAndStyle(job);
                 const isSaved = state.savedJobs.includes(job.id);
@@ -286,6 +289,7 @@ export default function SavedJobs() {
               }
               return <JobCard key={job.id} job={job} isAppliedView={activeTab === 'applied'} />;
             })}
+            {hasMoreSaved && <div ref={savedSentinelRef} style={{ height: '1px' }} aria-hidden="true" />}
           </div>
         ) : (
           <EmptyState

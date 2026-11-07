@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Bell, ArrowLeft } from '../components/Icons';
 import NotificationItem from '../components/NotificationItem';
+import useProgressiveList from '../hooks/useProgressiveList';
 import EmptyState from '../components/EmptyState';
 import { getNotifications } from '../data/notifications';
 import { useAdminContext } from '../context/AdminContext';
@@ -25,6 +26,8 @@ export default function Notifications() {
       return timeB - timeA;
     });
   }, [adminState.notifications, state.installTime]);
+
+  const { count: visibleNotifCount, hasMore: hasMoreNotifs, sentinelRef: notifSentinelRef } = useProgressiveList(notificationsList.length);
 
   const handleMarkAllRead = () => {
     const allIds = notificationsList.map(n => n.id);
@@ -80,9 +83,10 @@ export default function Notifications() {
         <div className="page-content animate-fade-in" style={{ padding: '16px 16px 80px 16px' }}>
           {notificationsList.length > 0 ? (
             <div>
-              {notificationsList.map(item => (
+              {notificationsList.slice(0, visibleNotifCount).map(item => (
                 <NotificationItem key={item.id} notification={item} />
               ))}
+              {hasMoreNotifs && <div ref={notifSentinelRef} style={{ height: '1px' }} aria-hidden="true" />}
             </div>
           ) : (
             <EmptyState

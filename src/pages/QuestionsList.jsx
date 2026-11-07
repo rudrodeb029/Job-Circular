@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { getQuestionsByCategory } from '../data/questionsData';
 import SearchBar from '../components/SearchBar';
 import QuestionCard from '../components/QuestionCard';
+import useProgressiveList from '../hooks/useProgressiveList';
 
 const categoryTitlesBn = {
   bcs: 'বিসিএস প্রিলিমিনারি প্রশ্নপত্র',
@@ -127,6 +128,8 @@ export default function QuestionsList() {
     ? (categoryTitlesEn[category] || fallbackTitle) 
     : (categoryTitlesBn[category] || fallbackTitle);
 
+  const { count: visiblePapersCount, hasMore: hasMorePapers, sentinelRef: papersSentinelRef } = useProgressiveList(filteredPapers.length, { resetKey: `${category}-${searchQuery}` });
+
   return (
     <div className="page" style={{ paddingBottom: '100px' }}>
       {/* Header */}
@@ -154,15 +157,18 @@ export default function QuestionsList() {
           gap: '8px'
         }}>
           {filteredPapers.length > 0 ? (
-            filteredPapers.map(paper => (
-              <QuestionCard
-                key={paper.id}
-                paper={paper}
-                categoryIcon={renderCategoryIcon(category)}
-                isEn={isEn}
-                onClick={() => navigate(`/question-details/${paper.id}`)}
-              />
-            ))
+            <>
+              {filteredPapers.slice(0, visiblePapersCount).map(paper => (
+                <QuestionCard
+                  key={paper.id}
+                  paper={paper}
+                  categoryIcon={renderCategoryIcon(category)}
+                  isEn={isEn}
+                  onClick={() => navigate(`/question-details/${paper.id}`)}
+                />
+              ))}
+              {hasMorePapers && <div ref={papersSentinelRef} style={{ height: '1px', gridColumn: '1 / -1' }} aria-hidden="true" />}
+            </>
           ) : (
             <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '12px', opacity: 0.5 }}>

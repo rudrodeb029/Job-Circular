@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAdminContext } from '../context/AdminContext';
 import SearchBar from '../components/SearchBar';
 import JobCard from '../components/JobCard';
+import useProgressiveList from '../hooks/useProgressiveList';
 import EmptyState from '../components/EmptyState';
 import { Search } from '../components/Icons';
 import { categories } from '../data/categories';
@@ -57,6 +58,8 @@ export default function SearchFilter() {
     });
   }, [query, activeTab, localJobs]);
 
+  const { count: visibleJobsCount, hasMore: hasMoreJobs, sentinelRef: jobsSentinelRef } = useProgressiveList(filteredJobs.length, { resetKey: `${activeTab}-${query}` });
+
   return (
     <div className="page">
       <div className="page-header" style={{ flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -88,9 +91,10 @@ export default function SearchFilter() {
 
         {filteredJobs.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {filteredJobs.map(job => (
+            {filteredJobs.slice(0, visibleJobsCount).map(job => (
               <JobCard key={job.id} job={job} />
             ))}
+            {hasMoreJobs && <div ref={jobsSentinelRef} style={{ height: '1px' }} aria-hidden="true" />}
           </div>
         ) : (
           <EmptyState

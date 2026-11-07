@@ -17,6 +17,7 @@ import SearchBar from '../components/SearchBar';
 import PullToRefresh from '../components/PullToRefresh';
 import ModernLoader from '../components/ModernLoader';
 import QuestionCard from '../components/QuestionCard';
+import useProgressiveList from '../hooks/useProgressiveList';
 import { getQuestionsData } from '../data/questionsData';
 
 const categoryConfig = {
@@ -88,6 +89,8 @@ export default function QuestionsHub() {
     }
     return list;
   }, [activeCategory, searchQuery, papers]);
+
+  const { count: visiblePapersCount, hasMore: hasMorePapers, sentinelRef: papersSentinelRef } = useProgressiveList(filteredPapers.length, { resetKey: `${activeCategory}-${searchQuery}` });
 
   return (
     <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg)' }}>
@@ -186,15 +189,18 @@ export default function QuestionsHub() {
                 <ModernLoader size="md" icon={categoryConfig[activeCategory]?.icon || '📚'} />
               </div>
             ) : filteredPapers.length > 0 ? (
-              filteredPapers.map(paper => (
-                <QuestionCard
-                  key={paper.id}
-                  paper={paper}
-                  categoryIcon={categoryConfig[paper.category]?.icon || paper.icon || paper.categoryIcon}
-                  isEn={isEn}
-                  onClick={() => navigate(`/question-details/${paper.id}`)}
-                />
-              ))
+              <>
+                {filteredPapers.slice(0, visiblePapersCount).map(paper => (
+                  <QuestionCard
+                    key={paper.id}
+                    paper={paper}
+                    categoryIcon={categoryConfig[paper.category]?.icon || paper.icon || paper.categoryIcon}
+                    isEn={isEn}
+                    onClick={() => navigate(`/question-details/${paper.id}`)}
+                  />
+                ))}
+                {hasMorePapers && <div ref={papersSentinelRef} style={{ height: '1px', gridColumn: '1 / -1' }} aria-hidden="true" />}
+              </>
             ) : (
               <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
                 <p>{isEn ? 'No questions found' : 'কোন প্রশ্নপত্র পাওয়া যায়নি'}</p>

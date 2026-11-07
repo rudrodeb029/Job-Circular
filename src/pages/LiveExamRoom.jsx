@@ -448,6 +448,7 @@ export default function LiveExamRoom() {
   // Progressive rendering: keeps DOM small on frame 0 and pre-warms in background frames
   const examQuestionsCount = Array.isArray(exam?.questions) ? exam.questions.length : 0;
   const { count: visibleCount, hasMore, sentinelRef } = useProgressiveList(examQuestionsCount, { resetKey: exam?.id });
+  const { count: visibleLbCount, hasMore: hasMoreLb, sentinelRef: lbSentinelRef } = useProgressiveList(leaderboardData.length, { resetKey: `lb-${exam?.id}-${activeRoomTab}` });
 
   if (loadingExam) {
     return (
@@ -1313,7 +1314,7 @@ export default function LiveExamRoom() {
               flexDirection: 'column',
               gap: '12px'
             }}>
-              {leaderboardData.map((user, idx) => {
+              {leaderboardData.slice(0, visibleLbCount).map((user, idx) => {
                 const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
                 const displayScore = toSafeString(user.score, '0');
                 const displayTotal = toSafeString(user.total, (exam && Array.isArray(exam.questions) ? exam.questions.length : 100));
@@ -1387,6 +1388,7 @@ export default function LiveExamRoom() {
                   </div>
                 );
               })}
+              {hasMoreLb && <div ref={lbSentinelRef} style={{ height: '1px' }} aria-hidden="true" />}
 
               {leaderboardData.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>

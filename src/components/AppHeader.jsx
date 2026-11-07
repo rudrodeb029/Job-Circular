@@ -50,7 +50,6 @@ const AppHeader = React.memo(function AppHeader() {
         top: 0,
         zIndex: 100,
         background: 'var(--header-bg)',
-        backdropFilter: 'blur(10px)',
         borderBottom: '1px solid var(--border)',
         boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
         minHeight: 'calc(52px + var(--safe-area-top))',
