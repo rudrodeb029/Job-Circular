@@ -709,8 +709,8 @@
 .menu-item-label {
   flex: 1;
   font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-weight: 500;
+  color: var(--text-secondary);
 }
 .menu-item-arrow { color: var(--text-muted); }
 

@@ -363,11 +363,11 @@ export default function Profile() {
             position: 'relative',
             overflow: 'hidden'
           }}>
-            <div style={{ marginBottom: '8px' }}>
-              <h3 style={{ margin: 0, fontSize: '12px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.25 }}>
+            <div style={{ marginBottom: '7px' }}>
+              <h3 style={{ margin: 0, fontSize: '10.5px', fontWeight: 600, color: isDark ? '#e2e8f0' : '#334155', lineHeight: 1.25 }}>
                 {isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
               </h3>
-              <p style={{ margin: '2px 0 0 0', fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.4 }}>
+              <p style={{ margin: '2px 0 0 0', fontSize: '9.5px', color: 'var(--text-secondary)', fontWeight: 500, lineHeight: 1.4 }}>
                 {isEn
                   ? `${POINTS_CONFIG.DEFAULT_EXAM_COST} pts per Live Exam • Today's Ads: ${dailyAdCount}/${POINTS_CONFIG.DAILY_AD_LIMIT}`
                   : `প্রতি লাইভ পরীক্ষায় ${toBengaliNumber(POINTS_CONFIG.DEFAULT_EXAM_COST)} পয়েন্ট • আজকের অ্যাড: ${toBengaliNumber(dailyAdCount)}/${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)}`}
