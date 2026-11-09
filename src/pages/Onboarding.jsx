@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Briefcase, Bell, Search, ChevronRight, FileText, Bookmark, Check } from '../components/Icons';
+import { ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 
 const slides = [
@@ -510,7 +510,9 @@ export default function Onboarding() {
             }}
           >
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <Check size={11} color={slide.accentColor} />
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={slide.accentColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
               <span>{isEn ? slide.footerLeftEn : slide.footerLeft}</span>
             </span>
             <span style={{ fontWeight: 700, color: isDark ? '#cbd5e1' : '#334155' }}>
