@@ -237,12 +237,12 @@ function LiveExamCard({
                     <span style={{
                       display: 'block',
                       width: '100%',
-                      fontSize: '8.5px',
-                      color: isDark ? '#60a5fa' : '#2563eb',
-                      fontWeight: 800,
+                      fontSize: '7.2px',
+                      color: isDark ? '#fde047' : '#ca8a04',
+                      fontWeight: 700,
                       textTransform: 'uppercase',
                       letterSpacing: '0.2px',
-                      borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.22)' : '1px solid rgba(37, 99, 235, 0.16)',
+                      borderBottom: isDark ? '1px solid rgba(253, 224, 71, 0.26)' : '1px solid rgba(234, 179, 8, 0.28)',
                       paddingBottom: '2px',
                       lineHeight: '1.2',
                       whiteSpace: 'nowrap',
@@ -324,12 +324,12 @@ function LiveExamCard({
                 <span style={{
                   display: 'block',
                   width: '100%',
-                  fontSize: '8.5px',
-                  color: isDark ? '#60a5fa' : '#2563eb',
-                  fontWeight: 800,
+                  fontSize: '7.2px',
+                  color: isDark ? '#fde047' : '#ca8a04',
+                  fontWeight: 700,
                   textTransform: 'uppercase',
                   letterSpacing: '0.2px',
-                  borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.22)' : '1px solid rgba(37, 99, 235, 0.16)',
+                  borderBottom: isDark ? '1px solid rgba(253, 224, 71, 0.26)' : '1px solid rgba(234, 179, 8, 0.28)',
                   paddingBottom: '2px',
                   lineHeight: '1.2',
                   whiteSpace: 'nowrap',
@@ -681,12 +681,12 @@ function LiveExamCard({
                           alignItems: 'center',
                           justifyContent: 'space-between',
                           paddingBottom: '6px',
-                          borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.2)' : '1px solid rgba(37, 99, 235, 0.14)'
+                          borderBottom: isDark ? '1px solid rgba(253, 224, 71, 0.24)' : '1px solid rgba(234, 179, 8, 0.25)'
                         }}>
                           <span style={{
-                            fontSize: '12px',
-                            color: isDark ? '#60a5fa' : '#2563eb',
-                            fontWeight: 800,
+                            fontSize: '11px',
+                            color: isDark ? '#fde047' : '#ca8a04',
+                            fontWeight: 700,
                             textTransform: 'uppercase',
                             letterSpacing: '0.3px'
                           }}>
@@ -756,9 +756,9 @@ function LiveExamCard({
                   >
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <span style={{
-                        fontSize: '12px',
-                        color: isDark ? '#60a5fa' : '#2563eb',
-                        fontWeight: 800,
+                        fontSize: '11px',
+                        color: isDark ? '#fde047' : '#ca8a04',
+                        fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.3px'
                       }}>
