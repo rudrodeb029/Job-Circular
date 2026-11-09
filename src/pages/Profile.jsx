@@ -66,15 +66,16 @@ export default function Profile() {
 
   return (
     <div className="page" style={{ background: 'var(--bg)' }}>
-      {/* Glassmorphism Gradient Header */}
+      {/* Claymorphism Gradient Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
-        padding: 'calc(var(--safe-area-top) + 16px) 16px 20px 16px',
+        background: 'linear-gradient(145deg, #1e3a8a 0%, #1a56db 52%, #2563eb 100%)',
+        padding: 'calc(var(--safe-area-top) + 16px) 16px 18px 16px',
         color: 'white',
         textAlign: 'center',
         borderRadius: '0 0 12px 12px',
         position: 'relative',
-        boxShadow: '0 8px 24px -4px rgba(26, 86, 219, 0.22)',
+        borderBottom: '1px solid rgba(147, 197, 253, 0.35)',
+        boxShadow: '0 10px 24px -6px rgba(26, 86, 219, 0.32), inset 0 2px 4px rgba(255, 255, 255, 0.22), inset 0 -3px 6px rgba(15, 23, 42, 0.25)',
         overflow: 'hidden'
       }}>
         {/* Background Decorative Rings */}
@@ -99,7 +100,7 @@ export default function Profile() {
           pointerEvents: 'none'
         }}></div>
 
-        {/* Top Right Settings Gear Button */}
+        {/* Top Right Settings Gear Button (Claymorphism) */}
         <button
           onClick={() => navigate('/settings')}
           title="Settings"
@@ -108,24 +109,24 @@ export default function Profile() {
             position: 'absolute',
             top: 'calc(var(--safe-area-top) + 4px)',
             right: '16px',
-            width: '38px',
-            height: '38px',
-            borderRadius: '50%',
-            background: 'rgba(255, 255, 255, 0.18)',
+            width: '36px',
+            height: '36px',
+            borderRadius: '8px',
+            background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.12))',
             backdropFilter: 'blur(8px)',
             color: 'white',
-            border: 'none',
+            border: '1px solid rgba(255, 255, 255, 0.35)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            boxShadow: '0 4px 10px rgba(15, 23, 42, 0.18), inset 0 1.5px 2px rgba(255, 255, 255, 0.4), inset 0 -1.5px 2px rgba(15, 23, 42, 0.2)'
           }}
         >
-          <Settings size={20} />
+          <Settings size={18} />
         </button>
 
-        {/* Avatar with Ring & Edit Camera Trigger Badge */}
+        {/* Avatar with Claymorphism Ring & Edit Camera Trigger Badge */}
         <div style={{
           position: 'relative',
           width: '54px',
@@ -141,8 +142,8 @@ export default function Profile() {
                 height: '100%',
                 borderRadius: '50%',
                 objectFit: 'cover',
-                border: '2.5px solid rgba(255, 255, 255, 0.9)',
-                boxShadow: '0 6px 18px rgba(0, 0, 0, 0.18)'
+                border: '2.5px solid rgba(255, 255, 255, 0.95)',
+                boxShadow: '0 8px 18px rgba(15, 23, 42, 0.25), inset 0 2px 3px rgba(255, 255, 255, 0.6)'
               }}
             />
           ) : (
@@ -150,15 +151,15 @@ export default function Profile() {
               width: '100%',
               height: '100%',
               borderRadius: '50%',
-              background: 'linear-gradient(135deg, #ffffff 0%, #dbeafe 100%)',
+              background: 'linear-gradient(145deg, #ffffff 0%, #dbeafe 100%)',
               color: '#1a56db',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '20px',
               fontWeight: 800,
-              boxShadow: '0 6px 18px rgba(0, 0, 0, 0.18)',
-              border: '2.5px solid rgba(255, 255, 255, 0.9)'
+              boxShadow: '0 8px 18px rgba(15, 23, 42, 0.25), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(37, 99, 235, 0.18)',
+              border: '2px solid rgba(255, 255, 255, 0.95)'
             }}>
               {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
             </div>
@@ -175,14 +176,14 @@ export default function Profile() {
               width: '20px',
               height: '20px',
               borderRadius: '50%',
-              background: 'var(--primary)',
+              background: 'linear-gradient(145deg, #2563eb, #1d4ed8)',
               color: 'white',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              border: '2px solid white',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+              border: '1.8px solid white',
+              boxShadow: '0 3px 6px rgba(15, 23, 42, 0.28), inset 0 1px 1.5px rgba(255, 255, 255, 0.45)'
             }}
           >
             <Edit size={10} />
@@ -204,62 +205,114 @@ export default function Profile() {
             </div>
         )}
 
-        {/* Integrated Activity Stats Bar */}
+        {/* Integrated Activity Stats Bar (Tactile Claymorphism Card) */}
         <div style={{
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center',
-          background: 'var(--white)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '6px',
+          background: isDark
+            ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+            : 'linear-gradient(145deg, #ffffff 0%, #f1f6ff 100%)',
           padding: '7px 8px',
-          borderRadius: '10px',
-          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.08)',
+          borderRadius: '8px',
+          border: isDark
+            ? '1px solid rgba(255, 255, 255, 0.1)'
+            : '1px solid rgba(255, 255, 255, 0.95)',
+          boxShadow: isDark
+            ? '0 10px 22px -6px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.08), inset 0 -2px 4px rgba(0, 0, 0, 0.35)'
+            : '0 8px 18px -4px rgba(15, 23, 42, 0.18), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(219, 234, 254, 0.75)',
           marginTop: '12px'
         }}>
           <div
             onClick={() => navigate('/saved')}
-            style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
+            style={{
+              textAlign: 'center',
+              cursor: 'pointer',
+              padding: '5px 2px',
+              borderRadius: '6px',
+              background: isDark
+                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+              boxShadow: isDark
+                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
+                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
+            }}
           >
-            <p style={{ fontSize: '13.5px', fontWeight: 800, color: 'var(--primary)', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)', margin: 0, lineHeight: 1.15 }}>
               {state.savedJobs.length}
             </p>
-            <p style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
+            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
               Saved Jobs
             </p>
           </div>
-          <div style={{ width: '1px', height: '18px', background: 'var(--border-light)' }}></div>
           <div
             onClick={() => navigate('/saved?tab=applied')}
-            style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
+            style={{
+              textAlign: 'center',
+              cursor: 'pointer',
+              padding: '5px 2px',
+              borderRadius: '6px',
+              background: isDark
+                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+              boxShadow: isDark
+                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
+                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
+            }}
           >
-            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#059669', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: 800, color: '#059669', margin: 0, lineHeight: 1.15 }}>
               {state.appliedJobs.length}
             </p>
-            <p style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
+            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
               Applied
             </p>
           </div>
-          <div style={{ width: '1px', height: '18px', background: 'var(--border-light)' }}></div>
           <div
             onClick={() => navigate('/notifications')}
-            style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
+            style={{
+              textAlign: 'center',
+              cursor: 'pointer',
+              padding: '5px 2px',
+              borderRadius: '6px',
+              background: isDark
+                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+              boxShadow: isDark
+                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
+                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
+            }}
           >
-            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#ea580c', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: 800, color: '#ea580c', margin: 0, lineHeight: 1.15 }}>
               {unreadNotifCount}
             </p>
-            <p style={{ fontSize: '8.5px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
+            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
               Notified
             </p>
           </div>
-          <div style={{ width: '1px', height: '18px', background: 'var(--border-light)' }}></div>
           <div
             onClick={() => navigate('/live-exams-list')}
-            style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
+            style={{
+              textAlign: 'center',
+              cursor: 'pointer',
+              padding: '5px 2px',
+              borderRadius: '6px',
+              background: isDark
+                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+              boxShadow: isDark
+                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
+                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
+            }}
             title={isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
           >
-            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#7c3aed', margin: 0 }}>
+            <p style={{ fontSize: '13px', fontWeight: 800, color: '#7c3aed', margin: 0, lineHeight: 1.15 }}>
               {livePoints}
             </p>
-            <p style={{ fontSize: '8.5px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
+            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
               Exam Points
             </p>
           </div>
@@ -359,22 +412,27 @@ export default function Profile() {
             </button>
           </div>
         </div>
-        {/* Section 1: Account & Activity */}
-        <div style={{ marginBottom: '20px' }}>
+        {/* Section 1: Account & Activity (Tactile Claymorphism Card) */}
+        <div style={{ marginBottom: '14px' }}>
           <div style={{
-            background: 'var(--white)',
-            borderRadius: '20px',
-            border: '1px solid var(--border-light)',
-            boxShadow: '0 4px 18px -2px rgba(15, 23, 42, 0.04)',
+            background: isDark
+              ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%)',
+            borderRadius: '8px',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.08)'
+              : '1px solid rgba(219, 234, 254, 0.95)',
+            boxShadow: isDark
+              ? '0 10px 22px -6px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 4px rgba(0, 0, 0, 0.35)'
+              : '0 8px 18px -6px rgba(37, 99, 235, 0.10), 0 2px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(219, 234, 254, 0.65)',
             overflow: 'hidden'
           }}>
             {/* Edit Profile Action */}
             <div
               className="menu-item"
               onClick={() => navigate('/edit-profile')}
-              style={{ borderBottom: '1px solid var(--border-light)' }}
             >
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1a56db, #3b82f6)', color: 'white' }}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #2563eb, #1d4ed8)', color: 'white' }}>
                 <Edit size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন'}</span>
@@ -385,9 +443,8 @@ export default function Profile() {
             <div
               className="menu-item"
               onClick={() => navigate('/feed')}
-              style={{ borderBottom: '1px solid var(--border-light)' }}
             >
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #ec4899, #f43f5e)', color: 'white' }}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #ec4899, #e11d48)', color: 'white' }}>
                 <Rss size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Updates Feed' : 'আপডেট ফিড'}</span>
@@ -395,8 +452,8 @@ export default function Profile() {
             </div>
 
             {/* Saved Jobs */}
-            <div className="menu-item" onClick={() => navigate('/saved')} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #d97706, #f59e0b)', color: 'white' }}>
+            <div className="menu-item" onClick={() => navigate('/saved')}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #f59e0b, #d97706)', color: 'white' }}>
                 <Bookmark size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
@@ -404,8 +461,8 @@ export default function Profile() {
             </div>
 
             {/* MCQ Exam & Question Bank */}
-            <div className="menu-item" onClick={() => navigate('/questions-hub')} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white' }}>
+            <div className="menu-item" onClick={() => navigate('/questions-hub')}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #2563eb, #1e40af)', color: 'white' }}>
                 <FileText size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'MCQ Exam & Question Bank' : 'MCQ Exam ও প্রশ্নব্যাংক'}</span>
@@ -414,7 +471,7 @@ export default function Profile() {
 
             {/* Admit Card & Result */}
             <div className="menu-item" onClick={() => navigate('/admit-card')}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #7c3aed, #8b5cf6)', color: 'white' }}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #8b5cf6, #6d28d9)', color: 'white' }}>
                 <FileText size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
@@ -423,18 +480,24 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Section 2: Preferences & System */}
+        {/* Section 2: Preferences & System (Tactile Claymorphism Card) */}
         <div>
           <div style={{
-            background: 'var(--white)',
-            borderRadius: '20px',
-            border: '1px solid var(--border-light)',
-            boxShadow: '0 4px 18px -2px rgba(15, 23, 42, 0.04)',
+            background: isDark
+              ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%)',
+            borderRadius: '8px',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.08)'
+              : '1px solid rgba(219, 234, 254, 0.95)',
+            boxShadow: isDark
+              ? '0 10px 22px -6px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 4px rgba(0, 0, 0, 0.35)'
+              : '0 8px 18px -6px rgba(37, 99, 235, 0.10), 0 2px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(219, 234, 254, 0.65)',
             overflow: 'hidden'
           }}>
             {/* Notification Settings */}
-            <div className="menu-item" onClick={() => navigate('/notifications')} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #0284c7, #06b6d4)', color: 'white' }}>
+            <div className="menu-item" onClick={() => navigate('/notifications')}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #06b6d4, #0284c7)', color: 'white' }}>
                 <Bell size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'Notification Settings' : 'নোটিফিকেশন সেটিংস'}</span>
@@ -442,18 +505,24 @@ export default function Profile() {
             </div>
 
             {/* Language Switcher */}
-            <div className="menu-item" onClick={toggleLanguage} style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #db2777, #ec4899)', color: 'white' }}>
+            <div className="menu-item" onClick={toggleLanguage}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #ec4899, #db2777)', color: 'white' }}>
                 <Globe size={13} />
               </div>
               <span className="menu-item-label">{isEn ? 'App Language' : 'অ্যাপের ভাষা'}</span>
               <span style={{
-                fontSize: '10px',
+                fontSize: '9.5px',
                 fontWeight: 800,
-                background: 'var(--primary-bg)',
-                color: 'var(--primary)',
-                padding: '2px 8px',
-                borderRadius: '8px',
+                background: isDark
+                  ? 'linear-gradient(145deg, #243247, #1b2638)'
+                  : 'linear-gradient(145deg, #eff6ff, #dbeafe)',
+                color: isDark ? '#93c5fd' : 'var(--primary)',
+                border: isDark ? '1px solid rgba(96, 165, 250, 0.25)' : '1px solid rgba(191, 219, 254, 0.9)',
+                boxShadow: isDark
+                  ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.06)'
+                  : '0 2px 5px rgba(37, 99, 235, 0.08), inset 0 1px 1.5px #ffffff',
+                padding: '2.5px 8px',
+                borderRadius: '6px',
                 marginRight: '6px'
               }}>
                 {state.language === 'bn' ? 'বাংলা (BN)' : 'English (EN)'}
@@ -463,7 +532,7 @@ export default function Profile() {
 
             {/* Dark Mode Toggle */}
             <div className="menu-item" onClick={() => dispatch({ type: 'TOGGLE_THEME' })}>
-              <div className="menu-item-icon" style={{ background: 'linear-gradient(135deg, #4f46e5, #6366f1)', color: 'white' }}>
+              <div className="menu-item-icon" style={{ background: 'linear-gradient(145deg, #6366f1, #4f46e5)', color: 'white' }}>
                 {state.theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
               </div>
               <span className="menu-item-label">{isEn ? 'Dark Mode' : 'ডার্ক মোড'}</span>
