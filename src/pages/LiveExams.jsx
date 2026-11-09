@@ -298,9 +298,12 @@ export default function LiveExams() {
             alignItems: 'center',
             gap: '4px',
             padding: '4px 10px',
-            borderRadius: '999px',
-            background: isDark ? 'rgba(245, 158, 11, 0.16)' : '#fffbeb',
+            borderRadius: '6px',
+            background: isDark ? 'rgba(245, 158, 11, 0.16)' : 'linear-gradient(145deg, #fffef7, #fef3c7)',
             border: isDark ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid #fde68a',
+            boxShadow: isDark
+              ? '0 2px 6px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.08)'
+              : '0 2px 6px rgba(217, 119, 6, 0.12), inset 0 1.5px 2px #ffffff',
             color: isDark ? '#fbbf24' : '#b45309',
             fontSize: '11.5px',
             fontWeight: 800,
@@ -430,9 +433,8 @@ export default function LiveExams() {
               }}>
                 {/* Left Column: Claymorphism Live Exam Regulations Card */}
                 <div
-                  className="clay-details-card"
                   style={{
-                    borderRadius: '14px',
+                    borderRadius: '6px',
                     padding: '12px 12px',
                     minHeight: '118px',
                     display: 'flex',
@@ -440,7 +442,16 @@ export default function LiveExams() {
                     justifyContent: 'space-between',
                     boxSizing: 'border-box',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    background: isDark
+                      ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+                      : 'linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%)',
+                    border: isDark
+                      ? '1px solid rgba(255, 255, 255, 0.08)'
+                      : '1px solid rgba(219, 234, 254, 0.95)',
+                    boxShadow: isDark
+                      ? '0 10px 22px -6px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 4px rgba(0, 0, 0, 0.35)'
+                      : '0 8px 18px -6px rgba(37, 99, 235, 0.10), 0 2px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(219, 234, 254, 0.65)'
                   }}
                 >
                   <div>
@@ -448,7 +459,7 @@ export default function LiveExams() {
                       <div style={{
                         width: '22px',
                         height: '22px',
-                        borderRadius: '7px',
+                        borderRadius: '5px',
                         background: isDark ? 'rgba(37, 99, 235, 0.22)' : 'linear-gradient(145deg, #eff6ff, #dbeafe)',
                         border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid rgba(191, 219, 254, 0.9)',
                         boxShadow: isDark ? 'none' : 'inset 0 1px 1.5px #ffffff, 0 2px 4px rgba(37, 99, 235, 0.08)',
@@ -477,11 +488,19 @@ export default function LiveExams() {
                   </div>
 
                   <div
-                    className="clay-stat-box"
                     style={{
                       marginTop: '8px',
                       padding: '5px 8px',
-                      borderRadius: '8px',
+                      borderRadius: '5px',
+                      background: isDark
+                        ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+                        : 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
+                      border: isDark
+                        ? '1px solid rgba(255, 255, 255, 0.07)'
+                        : '1px solid rgba(226, 232, 240, 0.9)',
+                      boxShadow: isDark
+                        ? '0 4px 10px -2px rgba(0, 0, 0, 0.35), inset 0 1px 1.5px rgba(255, 255, 255, 0.05)'
+                        : '0 4px 8px -2px rgba(15, 23, 42, 0.05), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(226, 232, 240, 0.6)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -498,9 +517,8 @@ export default function LiveExams() {
 
                 {/* Right Column: Claymorphism Live Exam Points & Rewarded Ad Card */}
                 <div
-                  className="clay-details-card"
                   style={{
-                    borderRadius: '14px',
+                    borderRadius: '6px',
                     padding: '12px 12px',
                     minHeight: '118px',
                     display: 'flex',
@@ -508,7 +526,16 @@ export default function LiveExams() {
                     justifyContent: 'space-between',
                     boxSizing: 'border-box',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    background: isDark
+                      ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+                      : 'linear-gradient(145deg, #ffffff 0%, #fffdf5 100%)',
+                    border: isDark
+                      ? '1px solid rgba(251, 191, 36, 0.22)'
+                      : '1px solid rgba(253, 230, 138, 0.95)',
+                    boxShadow: isDark
+                      ? '0 10px 22px -6px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 4px rgba(0, 0, 0, 0.35)'
+                      : '0 8px 18px -6px rgba(217, 119, 6, 0.10), 0 2px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(254, 243, 199, 0.7)'
                   }}
                 >
                   <div>
@@ -517,7 +544,7 @@ export default function LiveExams() {
                         <div style={{
                           width: '22px',
                           height: '22px',
-                          borderRadius: '7px',
+                          borderRadius: '5px',
                           background: isDark ? 'rgba(245, 158, 11, 0.2)' : 'linear-gradient(145deg, #fffbeb, #fef3c7)',
                           border: isDark ? '1px solid rgba(251, 191, 36, 0.35)' : '1px solid #fde68a',
                           boxShadow: isDark ? 'none' : 'inset 0 1px 1.5px #ffffff, 0 2px 4px rgba(217, 119, 6, 0.1)',
@@ -535,10 +562,18 @@ export default function LiveExams() {
                       </div>
 
                       <div
-                        className="clay-stat-box"
                         style={{
                           padding: '2px 8px',
-                          borderRadius: '7px',
+                          borderRadius: '5px',
+                          background: isDark
+                            ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+                            : 'linear-gradient(145deg, #ffffff 0%, #fef9c3 100%)',
+                          border: isDark
+                            ? '1px solid rgba(251, 191, 36, 0.25)'
+                            : '1px solid rgba(253, 224, 71, 0.85)',
+                          boxShadow: isDark
+                            ? '0 3px 8px -2px rgba(0, 0, 0, 0.35), inset 0 1px 1.5px rgba(255, 255, 255, 0.05)'
+                            : '0 3px 6px -2px rgba(217, 119, 6, 0.10), inset 0 1.5px 2px #ffffff',
                           fontSize: '12px',
                           fontWeight: 900,
                           color: isDark ? '#fbbf24' : '#d97706',
@@ -564,7 +599,7 @@ export default function LiveExams() {
                       width: '100%',
                       marginTop: '8px',
                       padding: '6px 8px',
-                      borderRadius: '8px',
+                      borderRadius: '5px',
                       border: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
                         ? (isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #cbd5e1')
                         : (isDark ? '1px solid rgba(251, 191, 36, 0.4)' : '1px solid rgba(251, 191, 36, 0.85)'),
