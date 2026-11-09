@@ -4,6 +4,7 @@ import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, 
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
+import { POINTS_CONFIG } from '../utils/pointsService';
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -14,9 +15,45 @@ const toBengaliNumber = (num) => {
 
 export default function Profile() {
   const navigate = useNavigate();
-  const { state, dispatch } = useAppContext();
+  const { state, dispatch, earnPointsFromAd } = useAppContext();
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
+  const isDark = state.theme === 'dark';
+  const [watchingAd, setWatchingAd] = useState(false);
+  const [pointsToast, setPointsToast] = useState('');
+
+  const livePoints = state.liveExamPoints ?? state.pointsState?.points ?? POINTS_CONFIG.WELCOME_BONUS;
+  const dailyAdCount = state.pointsState?.dailyAdCount ?? 0;
+
+  const handleWatchRewardAd = async () => {
+    if (watchingAd) return;
+    setWatchingAd(true);
+    try {
+      const res = await earnPointsFromAd();
+      if (res.ok) {
+        setPointsToast(
+          isEn
+            ? `+${res.added} Live Exam Points earned! Total: ${res.newBalance}`
+            : `অভিনন্দন! +${toBengaliNumber(res.added)} পয়েন্ট যোগ হয়েছে (মোট: ${toBengaliNumber(res.newBalance)})`
+        );
+      } else if (res.reason === 'daily_limit') {
+        setPointsToast(
+          isEn
+            ? `Daily limit reached (${POINTS_CONFIG.DAILY_AD_LIMIT}/${POINTS_CONFIG.DAILY_AD_LIMIT} ads today)`
+            : `আজকের বিজ্ঞাপনের সীমা শেষ (${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)}/${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)})`
+        );
+      } else {
+        setPointsToast(
+          isEn
+            ? 'Watch the full ad to earn points.'
+            : 'পয়েন্ট পেতে সম্পূর্ণ বিজ্ঞাপনটি দেখুন।'
+        );
+      }
+      setTimeout(() => setPointsToast(''), 3200);
+    } finally {
+      setWatchingAd(false);
+    }
+  };
 
   const rawNotifs = adminState.notifications || [];
   const filteredNotifs = getFilteredNotifications(rawNotifs, state.installTime);
@@ -209,14 +246,169 @@ export default function Profile() {
             <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#ea580c', margin: 0 }}>
               {unreadNotifCount}
             </p>
-            <p style={{ fontSize: '9px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
+            <p style={{ fontSize: '8.5px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
               Notified
+            </p>
+          </div>
+          <div style={{ width: '1px', height: '18px', background: 'var(--border-light)' }}></div>
+          <div
+            onClick={() => navigate('/live-exams-list')}
+            style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
+            title={isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
+          >
+            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#7c3aed', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
+              <span style={{ fontSize: '11px' }}>⭐</span>
+              <span>{livePoints}</span>
+            </p>
+            <p style={{ fontSize: '8.5px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
+              Exam Points
             </p>
           </div>
         </div>
       </div>
 
+      {/* Points Toast Notification */}
+      {pointsToast && (
+        <div style={{
+          position: 'fixed',
+          top: '75px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: isDark ? 'rgba(30, 41, 59, 0.96)' : 'rgba(255, 255, 255, 0.98)',
+          borderRadius: '8px',
+          border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(226,232,240,0.9)',
+          boxShadow: '0 8px 24px rgba(15, 23, 42, 0.16)',
+          padding: '7px 14px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '7px',
+          color: isDark ? '#f8fafc' : '#0f172a',
+          fontSize: '11.5px',
+          fontWeight: 700,
+          zIndex: 9999,
+          whiteSpace: 'nowrap'
+        }}>
+          <span>⭐</span>
+          <span>{pointsToast}</span>
+        </div>
+      )}
+
       <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
+        {/* Live Exam Points Wallet Section */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{
+            background: isDark
+              ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f5f8ff 100%)',
+            borderRadius: '18px',
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.95)',
+            boxShadow: isDark
+              ? '0 4px 18px rgba(0, 0, 0, 0.35)'
+              : 'inset 0 2px 3px #ffffff, 0 6px 18px -2px rgba(26, 86, 219, 0.08)',
+            padding: '14px 15px',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '11px',
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '17px',
+                  boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)',
+                  flexShrink: 0
+                }}>
+                  ⭐
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>
+                    {isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
+                  </h3>
+                  <p style={{ margin: '2px 0 0 0', fontSize: '10.5px', color: 'var(--text-secondary)', fontWeight: 600 }}>
+                    {isEn
+                      ? `${POINTS_CONFIG.DEFAULT_EXAM_COST} pts per Live Exam • Today's Ads: ${dailyAdCount}/${POINTS_CONFIG.DAILY_AD_LIMIT}`
+                      : `প্রতি লাইভ পরীক্ষায় ${toBengaliNumber(POINTS_CONFIG.DEFAULT_EXAM_COST)} পয়েন্ট • আজকের অ্যাড: ${toBengaliNumber(dailyAdCount)}/${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)}`}
+                  </p>
+                </div>
+              </div>
+
+              <div style={{
+                background: isDark ? 'rgba(245, 158, 11, 0.16)' : '#fffbeb',
+                border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid #fde68a',
+                borderRadius: '10px',
+                padding: '5px 10px',
+                textAlign: 'center',
+                flexShrink: 0
+              }}>
+                <span style={{ display: 'block', fontSize: '15px', fontWeight: 900, color: isDark ? '#fbbf24' : '#d97706', lineHeight: 1.1 }}>
+                  {isEn ? livePoints : toBengaliNumber(livePoints)}
+                </span>
+                <span style={{ fontSize: '8.5px', fontWeight: 800, color: isDark ? '#fde68a' : '#b45309', textTransform: 'uppercase' }}>
+                  {isEn ? 'Points' : 'পয়েন্ট'}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={handleWatchRewardAd}
+                disabled={watchingAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT}
+                style={{
+                  flex: 1,
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                    ? (isDark ? '#334155' : '#cbd5e1')
+                    : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
+                  color: '#ffffff',
+                  fontSize: '11.5px',
+                  fontWeight: 800,
+                  cursor: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  boxShadow: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'none' : '0 4px 12px rgba(37, 99, 235, 0.25)'
+                }}
+              >
+                <span>🎬</span>
+                <span>
+                  {watchingAd
+                    ? (isEn ? 'Loading Ad...' : 'বিজ্ঞাপন লোড হচ্ছে...')
+                    : dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                      ? (isEn ? 'Daily Limit Reached' : 'আজকের সীমা শেষ')
+                      : (isEn ? `Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Pts)` : `বিজ্ঞাপন দেখুন (+${toBengaliNumber(POINTS_CONFIG.POINTS_PER_AD)} পয়েন্ট)`)}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => navigate('/live-exams-list')}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '10px',
+                  border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid #bfdbfe',
+                  background: isDark ? 'rgba(30, 41, 59, 0.9)' : '#eff6ff',
+                  color: isDark ? '#93c5fd' : '#1d4ed8',
+                  fontSize: '11.5px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {isEn ? 'Live Exams →' : 'লাইভ পরীক্ষা →'}
+              </button>
+            </div>
+          </div>
+        </div>
         {/* Section 1: Account & Activity */}
         <div style={{ marginBottom: '20px' }}>
           <div style={{

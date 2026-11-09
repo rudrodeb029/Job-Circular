@@ -1045,6 +1045,7 @@ export default {
               avatar: data.avatar || null,
               savedJobs: data.savedJobs || [],
               appliedJobs: data.appliedJobs || [],
+              raw_data: data,
               updatedAt: r.created_at
             });
           } catch(e) { console.error('Profile data parse error:', e); }

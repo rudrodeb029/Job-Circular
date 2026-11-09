@@ -20,6 +20,7 @@ export default function ManageLiveExams() {
   const [titleEn, setTitleEn] = useState('');
   const [startTime, setStartTime] = useState('');
   const [duration, setDuration] = useState('10');
+  const [pointCost, setPointCost] = useState('20');
   const [subjectTopics, setSubjectTopics] = useState([
     { subject: '', subjectEn: '', topics: '', topicsEn: '' }
   ]);
@@ -186,6 +187,7 @@ export default function ManageLiveExams() {
       startTime: scheduledDateIso,
       scheduledAt: scheduledDateIso,
       duration: parseInt(duration, 10) || 10,
+      pointCost: Math.max(0, parseInt(pointCost, 10) >= 0 ? parseInt(pointCost, 10) : 20),
       totalQuestions: cleanedQuestions.length,
       subjectTopics: cleanedSubjectTopics,
       subjects: cleanedSubjectTopics,
@@ -202,6 +204,7 @@ export default function ManageLiveExams() {
     setTitleEn('');
     setStartTime('');
     setDuration('10');
+    setPointCost('20');
     setSubjectTopics([{ subject: '', subjectEn: '', topics: '', topicsEn: '' }]);
     setQuestions([
       {
@@ -259,7 +262,7 @@ export default function ManageLiveExams() {
             <form onSubmit={handleSaveExam}>
              <div className="form-section">
                 <h3 style={{ margin: '0 0 20px 0', fontSize: '16px', fontWeight: 800, color: '#1e293b' }}>1. Basic Information</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 0.8fr 0.8fr', gap: '20px' }}>
                    <div className="input-group">
                       <label>Exam Title (Bengali)</label>
                       <RichInput value={title} onChange={setTitle} placeholder="পরীক্ষার শিরোনাম লিখুন..." />
@@ -273,6 +276,10 @@ export default function ManageLiveExams() {
                       <select className="modern-input" value={duration} onChange={e => setDuration(e.target.value)}>
                          {[5,10,15,20,30,60].map(m => <option key={m} value={m}>{m} Minutes</option>)}
                       </select>
+                   </div>
+                   <div className="input-group">
+                      <label>Entry Points (⭐)</label>
+                      <input className="modern-input" type="number" min="0" step="5" value={pointCost} onChange={e => setPointCost(e.target.value)} placeholder="20" />
                    </div>
                 </div>
              </div>
@@ -417,7 +424,8 @@ export default function ManageLiveExams() {
                     </td>
                     <td style={{ fontWeight: 700, color: '#2563eb' }}>{exam.duration} Min</td>
                     <td>
-                      <span style={{ padding: '4px 10px', background: '#f1f5f9', borderRadius: '6px', fontSize: '12px', fontWeight: 700, color: '#475569' }}>{exam.questions?.length || 0} MCQ</span>
+                      <span style={{ padding: '4px 10px', background: '#f1f5f9', borderRadius: '6px', fontSize: '12px', fontWeight: 700, color: '#475569', marginRight: '6px' }}>{exam.questions?.length || 0} MCQ</span>
+                      <span style={{ padding: '4px 10px', background: '#fffbeb', borderRadius: '6px', fontSize: '12px', fontWeight: 700, color: '#b45309' }}>⭐ {exam.pointCost ?? 20} Pts</span>
                     </td>
                     <td style={{ textAlign: 'center' }}>
                       <button onClick={() => handleDeleteExam(exam.id)} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#fee2e2', color: '#dc2626', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Delete</button>

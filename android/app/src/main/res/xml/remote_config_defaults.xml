@@ -19,6 +19,10 @@
         <key>show_native_ads</key>
         <value>true</value>
     </entry>
+    <entry>
+        <key>show_rewarded_ads</key>
+        <value>true</value>
+    </entry>
 
     <!-- Safety Frequency Capping Cooldown (in seconds) -->
     <entry>
@@ -42,5 +46,9 @@
     <entry>
         <key>admob_native_id</key>
         <value>ca-app-pub-3940256099942544/2247696110</value>
+    </entry>
+    <entry>
+        <key>admob_rewarded_id</key>
+        <value>ca-app-pub-3940256099942544/5224354917</value>
     </entry>
 </defaultsMap>

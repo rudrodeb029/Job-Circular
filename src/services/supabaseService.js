@@ -46,7 +46,7 @@ export const normalizeDoc = (row) => {
     ...(rawObj && typeof rawObj === 'object' ? rawObj : {})
   };
 
-  ['questions', 'subjects', 'subjectTopics', 'options', 'optionsEn', 'answers', 'savedJobs', 'appliedJobs'].forEach(key => {
+  ['questions', 'subjects', 'subjectTopics', 'options', 'optionsEn', 'answers', 'savedJobs', 'appliedJobs', 'unlockedExams', 'pointsHistory'].forEach(key => {
     if (typeof merged[key] === 'string') {
       try {
         merged[key] = JSON.parse(merged[key]);

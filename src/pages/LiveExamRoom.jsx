@@ -11,15 +11,19 @@ import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult,
 import { showNativeInterstitialAd, preloadInterstitialAd, navigateWithAdOnReturn } from '../utils/admobUtils';
 import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
 import useProgressiveList from '../hooks/useProgressiveList';
+import { POINTS_CONFIG, getExamPointCost, isExamUnlockedForUser } from '../utils/pointsService';
 
 export default function LiveExamRoom() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { state } = useAppContext();
+  const { state, earnPointsFromAd, unlockExamWithPoints } = useAppContext();
   const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
   const isDark = state.theme === 'dark';
   const roomEntryTime = useRef(Date.now());
+  const [watchingRoomAd, setWatchingRoomAd] = useState(false);
+  const livePoints = state.liveExamPoints ?? state.pointsState?.points ?? POINTS_CONFIG.WELCOME_BONUS;
+  const dailyAdCount = state.pointsState?.dailyAdCount ?? 0;
 
   const [exam, setExam] = useState(null);
   const [loadingExam, setLoadingExam] = useState(true);
@@ -692,6 +696,172 @@ export default function LiveExamRoom() {
 
 
   const showQuestionsSheet = isRunning && !currentResult;
+
+  const isExamUnlocked = useMemo(() => {
+    if (!exam) return false;
+    try {
+      const reg = JSON.parse(localStorage.getItem('registered_exams') || '{}');
+      if (reg[exam.id]) return true;
+    } catch (e) {}
+    return isExamUnlockedForUser(exam, state.pointsState);
+  }, [exam, state.pointsState]);
+
+  if (showQuestionsSheet && exam && !isExamUnlocked) {
+    const reqCost = getExamPointCost(exam);
+    const hasEnough = livePoints >= reqCost;
+    const deficit = Math.max(0, reqCost - livePoints);
+
+    return (
+      <div className="page" style={{ paddingBottom: '80px', background: 'var(--bg-secondary)' }}>
+        <div className="page-header flex-between" style={{ borderBottom: 'none' }}>
+          <button type="button" className="back-btn" onClick={handleRoomBack}>
+            <ArrowLeft size={22} />
+          </button>
+          <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>
+            {isEn ? 'Live Exam Access' : 'লাইভ পরীক্ষায় প্রবেশ'}
+          </h1>
+          <div style={{
+            padding: '4px 10px',
+            borderRadius: '999px',
+            background: isDark ? 'rgba(245, 158, 11, 0.16)' : '#fffbeb',
+            border: isDark ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid #fde68a',
+            color: isDark ? '#fbbf24' : '#b45309',
+            fontSize: '11.5px',
+            fontWeight: 800
+          }}>
+            ⭐ {livePoints}
+          </div>
+        </div>
+
+        <div className="page-content" style={{ padding: '24px 16px' }}>
+          <div className="clay-details-card" style={{
+            padding: '24px 18px',
+            borderRadius: '18px',
+            textAlign: 'center',
+            maxWidth: '380px',
+            margin: '16px auto'
+          }}>
+            <div style={{
+              width: '56px',
+              height: '56px',
+              borderRadius: '50%',
+              background: hasEnough
+                ? 'linear-gradient(135deg, #10b981, #059669)'
+                : 'linear-gradient(135deg, #f59e0b, #d97706)',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '26px',
+              margin: '0 auto 14px auto',
+              boxShadow: '0 8px 20px rgba(245, 158, 11, 0.28)'
+            }}>
+              {hasEnough ? '🔓' : '🔒'}
+            </div>
+
+            <h2 style={{ fontSize: '16px', fontWeight: 800, margin: '0 0 6px 0', color: isDark ? '#f8fafc' : '#0f172a' }}>
+              {isEn ? (exam.titleEn || exam.title) : exam.title}
+            </h2>
+
+            <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5, margin: '0 0 16px 0', fontWeight: 500 }}>
+              {hasEnough
+                ? (isEn
+                  ? `Unlock this live exam using ${reqCost} points to start answering questions now.`
+                  : `এই লাইভ পরীক্ষায় অংশ নিতে ${reqCost} পয়েন্ট ব্যবহার করে আনলক করুন।`)
+                : (isEn
+                  ? `You do not have enough points (${deficit} more needed). Watch a rewarded ad below to earn +${POINTS_CONFIG.POINTS_PER_AD} points.`
+                  : `পর্যাপ্ত পয়েন্ট না থাকায় পরীক্ষায় অংশ নেওয়া যাচ্ছে না (আরও ${deficit} পয়েন্ট প্রয়োজন)। নিচের বাটনে ট্যাপ করে বিজ্ঞাপন দেখুন এবং ফ্রি পয়েন্ট নিন।`)}
+            </p>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '10px',
+              marginBottom: '16px',
+              padding: '12px',
+              borderRadius: '12px',
+              background: isDark ? 'rgba(30, 41, 59, 0.7)' : '#f8fafc',
+              border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0'
+            }}>
+              <div>
+                <span style={{ display: 'block', fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>
+                  {isEn ? 'EXAM COST' : 'পরীক্ষার পয়েন্ট'}
+                </span>
+                <span style={{ fontSize: '15px', fontWeight: 900, color: 'var(--primary)' }}>
+                  ⭐ {reqCost}
+                </span>
+              </div>
+              <div style={{ borderLeft: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0' }}>
+                <span style={{ display: 'block', fontSize: '10px', fontWeight: 700, color: 'var(--text-muted)' }}>
+                  {isEn ? 'YOUR POINTS' : 'আপনার পয়েন্ট'}
+                </span>
+                <span style={{ fontSize: '15px', fontWeight: 900, color: hasEnough ? '#10b981' : '#d97706' }}>
+                  ⭐ {livePoints}
+                </span>
+              </div>
+            </div>
+
+            {hasEnough ? (
+              <button
+                type="button"
+                onClick={() => {
+                  unlockExamWithPoints(exam);
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  color: '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                  boxShadow: '0 6px 18px rgba(16, 185, 129, 0.3)'
+                }}
+              >
+                {isEn ? `⚡ Unlock & Start Exam (-${reqCost} Pts)` : `⚡ আনলক ও পরীক্ষা শুরু করুন (-${reqCost} পয়েন্ট)`}
+              </button>
+            ) : (
+              <button
+                type="button"
+                disabled={watchingRoomAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT}
+                onClick={async () => {
+                  if (watchingRoomAd) return;
+                  setWatchingRoomAd(true);
+                  try {
+                    await earnPointsFromAd();
+                  } finally {
+                    setWatchingRoomAd(false);
+                  }
+                }}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                    ? '#64748b'
+                    : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
+                  color: '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: 800,
+                  cursor: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'not-allowed' : 'pointer',
+                  boxShadow: '0 6px 18px rgba(37, 99, 235, 0.3)'
+                }}
+              >
+                {watchingRoomAd
+                  ? (isEn ? '🎬 Loading Ad...' : '🎬 বিজ্ঞাপন লোড হচ্ছে...')
+                  : (isEn
+                    ? `🎬 Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Points)`
+                    : `🎬 বিজ্ঞাপন দেখুন (+${POINTS_CONFIG.POINTS_PER_AD} পয়েন্ট)`)}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const totalQuestions = Array.isArray(exam?.questions) ? exam.questions.length : 0;
   const answeredCount = Object.keys(selectedAnswers || {}).filter(k => selectedAnswers[k] !== undefined && selectedAnswers[k] !== null).length;

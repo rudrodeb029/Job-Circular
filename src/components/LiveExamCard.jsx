@@ -17,6 +17,9 @@ function LiveExamCard({
   startMs = null,
   countdownStr = '',
   isRegistered = false,
+  isUnlocked = false,
+  pointCost = 20,
+  userPoints = 0,
   result = null,
   onRegister,
   onEnter,
@@ -26,6 +29,7 @@ function LiveExamCard({
   const { state: appState } = useAppContext();
   const isDark = appState?.theme === 'dark';
   const [showSyllabusModal, setShowSyllabusModal] = useState(false);
+  const canAfford = isUnlocked || isRegistered || pointCost <= 0 || userPoints >= pointCost;
 
   // Close syllabus modal on Android hardware & gesture back button press
   useBackInterceptor(() => {
@@ -127,6 +131,69 @@ function LiveExamCard({
             </>
           )}
         </div>
+
+        {/* Row 2.5: Live Exam Points Requirement & Status Bar */}
+        {!isHistorySection && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '4px',
+            background: (isUnlocked || isRegistered)
+              ? (isDark ? 'rgba(16, 185, 129, 0.16)' : '#ecfdf5')
+              : canAfford
+                ? (isDark ? 'rgba(245, 158, 11, 0.14)' : '#fffbeb')
+                : (isDark ? 'rgba(239, 68, 68, 0.16)' : '#fef2f2'),
+            border: (isUnlocked || isRegistered)
+              ? (isDark ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid #a7f3d0')
+              : canAfford
+                ? (isDark ? '1px solid rgba(245, 158, 11, 0.32)' : '1px solid #fde68a')
+                : (isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1px solid #fecaca'),
+            borderRadius: '5px',
+            padding: '2px 5px',
+            marginBottom: '5px',
+            position: 'relative',
+            zIndex: 2
+          }}>
+            <span style={{
+              fontSize: '6.8px',
+              fontWeight: 800,
+              color: (isUnlocked || isRegistered)
+                ? (isDark ? '#34d399' : '#059669')
+                : canAfford
+                  ? (isDark ? '#fbbf24' : '#b45309')
+                  : (isDark ? '#f87171' : '#dc2626'),
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '2.5px',
+              whiteSpace: 'nowrap'
+            }}>
+              <span>{(isUnlocked || isRegistered) ? '✅' : canAfford ? '⭐' : '🔒'}</span>
+              <span>
+                {pointCost <= 0
+                  ? (isEn ? 'Free Entry' : 'ফ্রি এন্ট্রি')
+                  : (isUnlocked || isRegistered)
+                    ? (isEn ? `Unlocked (${pointCost} Pts)` : `আনলকড (${toBengaliNumber(pointCost)} পয়েন্ট)`)
+                    : (isEn ? `Entry: ${pointCost} Points` : `এন্ট্রি: ${toBengaliNumber(pointCost)} পয়েন্ট`)}
+              </span>
+            </span>
+
+            {!(isUnlocked || isRegistered) && pointCost > 0 && (
+              <span style={{
+                fontSize: '6.3px',
+                fontWeight: 700,
+                color: canAfford
+                  ? (isDark ? '#34d399' : '#059669')
+                  : (isDark ? '#fca5a5' : '#e11d48'),
+                whiteSpace: 'nowrap'
+              }}>
+                {canAfford
+                  ? (isEn ? 'Ready' : 'পর্যাপ্ত পয়েন্ট আছে')
+                  : (isEn ? `Need +${pointCost - userPoints}` : `আরও ${toBengaliNumber(pointCost - userPoints)} প্রয়োজন`)}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Subjects & Topics Container */}
         <div
@@ -334,15 +401,21 @@ function LiveExamCard({
               width: '100%',
               padding: '3px 6px',
               borderRadius: '5px',
-              border: isRegistered
+              border: (isRegistered || isUnlocked)
                 ? (isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #a7f3d0')
-                : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)'),
-              background: isRegistered
+                : !canAfford
+                  ? (isDark ? '1px solid rgba(245, 158, 11, 0.4)' : '1px solid #fde68a')
+                  : (isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)'),
+              background: (isRegistered || isUnlocked)
                 ? (isDark ? 'rgba(5, 150, 105, 0.25)' : '#ecfdf5')
-                : (isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.96)'),
-              color: isRegistered
+                : !canAfford
+                  ? (isDark ? 'rgba(217, 119, 6, 0.22)' : '#fffbeb')
+                  : (isDark ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.96)'),
+              color: (isRegistered || isUnlocked)
                 ? (isDark ? '#34d399' : '#059669')
-                : (isDark ? '#60a5fa' : '#2563eb'),
+                : !canAfford
+                  ? (isDark ? '#fbbf24' : '#b45309')
+                  : (isDark ? '#60a5fa' : '#2563eb'),
               fontWeight: 800,
               fontSize: '8.5px',
               cursor: 'pointer',
@@ -355,17 +428,26 @@ function LiveExamCard({
               whiteSpace: 'nowrap'
             }}
           >
-            {isRegistered ? (
+            {(isRegistered || isUnlocked) ? (
               <>
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
                 <span>{isEn ? 'Enrolled' : 'অংশগ্রহণ করছেন'}</span>
               </>
+            ) : !canAfford ? (
+              <>
+                <span role="img" aria-label="lock" style={{ fontSize: '8.5px' }}>🔒</span>
+                <span>{isEn ? `Need ${pointCost} Pts (Watch Ad)` : `${toBengaliNumber(pointCost)} পয়েন্ট প্রয়োজন`}</span>
+              </>
             ) : (
               <>
                 <span role="img" aria-label="star" style={{ fontSize: '9px' }}>⭐</span>
-                <span>{isEn ? 'Participate' : 'অংশগ্রহণ করুন'}</span>
+                <span>
+                  {pointCost > 0
+                    ? (isEn ? `Participate (${pointCost} Pts)` : `অংশগ্রহণ (${toBengaliNumber(pointCost)} পয়েন্ট)`)
+                    : (isEn ? 'Participate' : 'অংশগ্রহণ করুন')}
+                </span>
               </>
             )}
           </button>
@@ -378,9 +460,15 @@ function LiveExamCard({
               width: '100%',
               padding: '3px 6px',
               borderRadius: '5px',
-              border: isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(226, 232, 240, 0.8)',
-              background: isDark ? 'rgba(220, 38, 38, 0.25)' : 'rgba(255, 255, 255, 0.96)',
-              color: isDark ? '#f87171' : '#dc2626',
+              border: !canAfford
+                ? (isDark ? '1px solid rgba(245, 158, 11, 0.45)' : '1px solid #fde68a')
+                : (isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid rgba(226, 232, 240, 0.8)'),
+              background: !canAfford
+                ? (isDark ? 'rgba(217, 119, 6, 0.24)' : '#fffbeb')
+                : (isDark ? 'rgba(220, 38, 38, 0.25)' : 'rgba(255, 255, 255, 0.96)'),
+              color: !canAfford
+                ? (isDark ? '#fbbf24' : '#b45309')
+                : (isDark ? '#f87171' : '#dc2626'),
               fontWeight: 800,
               fontSize: '8.5px',
               cursor: 'pointer',
@@ -393,8 +481,21 @@ function LiveExamCard({
               whiteSpace: 'nowrap'
             }}
           >
-            <span role="img" aria-label="fire" style={{ fontSize: '9px' }}>⚡</span>
-            <span>{isEn ? 'Enter Exam' : 'পরীক্ষায় অংশ নিন'}</span>
+            {!canAfford ? (
+              <>
+                <span role="img" aria-label="lock" style={{ fontSize: '8.5px' }}>🔒</span>
+                <span>{isEn ? `Need ${pointCost} Pts` : `${toBengaliNumber(pointCost)} পয়েন্ট প্রয়োজন`}</span>
+              </>
+            ) : (
+              <>
+                <span role="img" aria-label="fire" style={{ fontSize: '9px' }}>⚡</span>
+                <span>
+                  {(isUnlocked || isRegistered || pointCost <= 0)
+                    ? (isEn ? 'Enter Exam' : 'পরীক্ষায় অংশ নিন')
+                    : (isEn ? `Enter (${pointCost} Pts)` : `অংশ নিন (${toBengaliNumber(pointCost)} পয়েন্ট)`)}
+                </span>
+              </>
+            )}
           </button>
         )}
 

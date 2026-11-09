@@ -51,6 +51,10 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.facebook.ads.AdSettings;
 
 import java.util.Collections;
@@ -71,12 +75,15 @@ public class MainActivity extends BridgeActivity {
     private static final String REMOTE_CONFIG_KEY_SHOW_NATIVE = "show_native_ads";
     private static final String REMOTE_CONFIG_KEY_NATIVE_ID = "admob_native_id";
     private static final String REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC = "native_ad_cooldown_sec";
+    private static final String REMOTE_CONFIG_KEY_SHOW_REWARDED = "show_rewarded_ads";
+    private static final String REMOTE_CONFIG_KEY_REWARDED_ID = "admob_rewarded_id";
 
 
     // ═══ Default Official Test Ad Unit IDs ═══
     private static final String DEFAULT_BANNER_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111";
     private static final String DEFAULT_INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712";
     private static final String DEFAULT_NATIVE_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110";
+    private static final String DEFAULT_REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917";
 
 
     // ═══ Ad State & Remote Config Configured Values ═══
@@ -99,6 +106,11 @@ public class MainActivity extends BridgeActivity {
     private boolean isNativeAdsEnabled = true;
     private long nativeAdCooldownSec = 30;
     private String nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
+    private boolean isRewardedAdsEnabled = true;
+    private String rewardedAdUnitId = DEFAULT_REWARDED_AD_UNIT_ID;
+    private RewardedAd rewardedAd;
+    private boolean isRewardedLoading = false;
+    private boolean rewardEarnedInCurrentSession = false;
     private NativeAd currentNativeAd;
     private boolean isNativeAdLoading = false;
     private FrameLayout nativeAdContainer;
@@ -219,6 +231,14 @@ public class MainActivity extends BridgeActivity {
             nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
         }
 
+        isRewardedAdsEnabled = remoteConfig.getBoolean(REMOTE_CONFIG_KEY_SHOW_REWARDED);
+        String rId = remoteConfig.getString(REMOTE_CONFIG_KEY_REWARDED_ID);
+        if (!rId.trim().isEmpty()) {
+            rewardedAdUnitId = rId.trim();
+        } else {
+            rewardedAdUnitId = DEFAULT_REWARDED_AD_UNIT_ID;
+        }
+
         Log.d(TAG, String.format(
             Locale.US,
             "Remote Config Applied -> show_ads: %b, banner: %b, interstitial: %b, native: %b, cooldown: %ds, nativeCooldown: %ds, bannerId: %s, interstitialId: %s, nativeId: %s",
@@ -295,6 +315,9 @@ public class MainActivity extends BridgeActivity {
                 if (isNativeAdsEnabled && currentNativeAd == null && !isNativeAdLoading) {
                     loadNativeAd();
                 }
+                if (isRewardedAdsEnabled && rewardedAd == null && !isRewardedLoading) {
+                    loadRewardedAd();
+                }
                 return;
             }
 
@@ -330,6 +353,9 @@ public class MainActivity extends BridgeActivity {
                     }
                     if (isNativeAdsEnabled) {
                         loadNativeAd();
+                    }
+                    if (isRewardedAdsEnabled) {
+                        loadRewardedAd();
                     }
                 });
             });
@@ -918,6 +944,142 @@ public class MainActivity extends BridgeActivity {
     }
 
     // ══════════════════════════════════════════════════════════════════
+    // 4.8. Rewarded Ad Engine (Live Exam Points System)
+    // ══════════════════════════════════════════════════════════════════
+    public void loadRewardedAd() {
+        if (!isAdsEnabled || !isRewardedAdsEnabled || isRewardedLoading || rewardedAd != null) {
+            return;
+        }
+        try {
+            isRewardedLoading = true;
+            AdRequest adRequest = new AdRequest.Builder().build();
+
+            RewardedAd.load(this, rewardedAdUnitId, adRequest, new RewardedAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@NonNull RewardedAd ad) {
+                    rewardedAd = ad;
+                    isRewardedLoading = false;
+                    Log.d(TAG, "Rewarded Ad successfully loaded into memory cache (" + rewardedAdUnitId + ").");
+
+                    MainActivity.this.runOnUiThread(() -> {
+                        if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                            MainActivity.this.bridge.getWebView().evaluateJavascript(
+                                "try { window.dispatchEvent(new CustomEvent('native_rewarded_loaded')); } catch(e){}",
+                                null
+                            );
+                        }
+                    });
+
+                    ad.setFullScreenContentCallback(new FullScreenContentCallback() {
+                        @Override
+                        public void onAdDismissedFullScreenContent() {
+                            super.onAdDismissedFullScreenContent();
+                            final boolean earned = rewardEarnedInCurrentSession;
+                            rewardEarnedInCurrentSession = false;
+                            Log.d(TAG, "Rewarded ad dismissed by user (earned=" + earned + ").");
+                            MainActivity.this.runOnUiThread(() -> {
+                                if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                                    String script = "try { window.dispatchEvent(new CustomEvent('native_rewarded_dismissed', { detail: { earned: " + earned + " } })); } catch(e){}";
+                                    MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
+                                }
+                            });
+                            rewardedAd = null;
+                            if (isAdsEnabled && isRewardedAdsEnabled) {
+                                loadRewardedAd();
+                            }
+                        }
+
+                        @Override
+                        public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                            super.onAdFailedToShowFullScreenContent(adError);
+                            rewardEarnedInCurrentSession = false;
+                            Log.e(TAG, "Rewarded ad failed to show: " + adError.getMessage());
+                            MainActivity.this.runOnUiThread(() -> {
+                                if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                                    String script = "try { window.dispatchEvent(new CustomEvent('native_rewarded_failed', { detail: { message: 'failed_to_show' } })); } catch(e){}";
+                                    MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
+                                }
+                            });
+                            rewardedAd = null;
+                            if (isAdsEnabled && isRewardedAdsEnabled) {
+                                loadRewardedAd();
+                            }
+                        }
+
+                        @Override
+                        public void onAdShowedFullScreenContent() {
+                            super.onAdShowedFullScreenContent();
+                            Log.d(TAG, "Rewarded ad displayed on screen.");
+                            MainActivity.this.runOnUiThread(() -> {
+                                if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                                    MainActivity.this.bridge.getWebView().evaluateJavascript(
+                                        "try { window.dispatchEvent(new CustomEvent('native_rewarded_shown')); } catch(e){}",
+                                        null
+                                    );
+                                }
+                            });
+                        }
+                    });
+                }
+
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    rewardedAd = null;
+                    isRewardedLoading = false;
+                    Log.e(TAG, "Rewarded Ad failed to load: " + loadAdError.getMessage());
+                    MainActivity.this.runOnUiThread(() -> {
+                        if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                            MainActivity.this.bridge.getWebView().evaluateJavascript(
+                                "try { window.dispatchEvent(new CustomEvent('native_rewarded_load_failed')); } catch(e){}",
+                                null
+                            );
+                        }
+                    });
+                }
+            });
+        } catch (Throwable t) {
+            Log.e(TAG, "Error in loadRewardedAd: " + t.getMessage(), t);
+            rewardedAd = null;
+            isRewardedLoading = false;
+        }
+    }
+
+    public void showRewardedAd() {
+        if (isAdsEnabled && isRewardedAdsEnabled && rewardedAd != null && !isFinishing() && !isDestroyed()) {
+            Log.d(TAG, "Showing Rewarded Ad...");
+            rewardEarnedInCurrentSession = false;
+            RewardedAd adToShow = rewardedAd;
+            rewardedAd = null;
+            adToShow.show(this, new OnUserEarnedRewardListener() {
+                @Override
+                public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+                    rewardEarnedInCurrentSession = true;
+                    int rewardAmount = rewardItem.getAmount();
+                    String rewardType = rewardItem.getType();
+                    Log.d(TAG, "User earned reward from AdMob: " + rewardAmount + " " + rewardType);
+                    MainActivity.this.runOnUiThread(() -> {
+                        if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                            String script = "try { window.dispatchEvent(new CustomEvent('native_rewarded_earned', { detail: { amount: " + rewardAmount + " } })); } catch(e){}";
+                            MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
+                        }
+                    });
+                }
+            });
+        } else {
+            Log.d(TAG, "Rewarded ad not ready yet. Triggering loadRewardedAd and notifying WebView.");
+            if (isAdsEnabled && isRewardedAdsEnabled && rewardedAd == null && !isRewardedLoading) {
+                loadRewardedAd();
+            }
+            runOnUiThread(() -> {
+                if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                    String script = "try { window.dispatchEvent(new CustomEvent('native_rewarded_failed', { detail: { message: 'not_ready' } })); } catch(e){}";
+                    MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
+                }
+            });
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════
     // 5. JavaScript Interface for React Frontend
     // ══════════════════════════════════════════════════════════════════
     private void setupAdJavascriptInterface() {
@@ -1122,6 +1284,41 @@ public class MainActivity extends BridgeActivity {
                     @SuppressWarnings("unused")
                     public String getInterstitialAdUnitId() {
                         return interstitialAdUnitId;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public void showRewardedAd() {
+                        runOnUiThread(MainActivity.this::showRewardedAd);
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public boolean isRewardedAdReady() {
+                        return isAdsEnabled && isRewardedAdsEnabled && rewardedAd != null;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public void loadRewardedAd() {
+                        runOnUiThread(MainActivity.this::loadRewardedAd);
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public boolean isRewardedAdsEnabled() {
+                        return isAdsEnabled && isRewardedAdsEnabled;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public String getRewardedAdUnitId() {
+                        return rewardedAdUnitId;
                     }
                 }, "AndroidAds");
             }
