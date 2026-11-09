@@ -454,6 +454,15 @@ export default function LiveExamRoom() {
   const { count: visibleCount, hasMore, sentinelRef } = useProgressiveList(examQuestionsCount, { resetKey: exam?.id });
   const { count: visibleLbCount, hasMore: hasMoreLb, sentinelRef: lbSentinelRef } = useProgressiveList(leaderboardData.length, { resetKey: `lb-${exam?.id}-${activeRoomTab}` });
 
+  const isExamUnlocked = useMemo(() => {
+    if (!exam) return false;
+    try {
+      const reg = JSON.parse(localStorage.getItem('registered_exams') || '{}');
+      if (reg[exam.id]) return true;
+    } catch (e) {}
+    return isExamUnlockedForUser(exam, state.pointsState);
+  }, [exam, state.pointsState]);
+
   if (loadingExam) {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
@@ -684,27 +693,7 @@ export default function LiveExamRoom() {
     return `${pad(mins)}:${pad(secs)}`;
   };
 
-  function getExamResultLocal() {
-    try {
-      const results = JSON.parse(localStorage.getItem('live_exam_results')) || {};
-      return results[id];
-    } catch (e) {
-      return null;
-    }
-  }
-
-
-
   const showQuestionsSheet = isRunning && !currentResult;
-
-  const isExamUnlocked = useMemo(() => {
-    if (!exam) return false;
-    try {
-      const reg = JSON.parse(localStorage.getItem('registered_exams') || '{}');
-      if (reg[exam.id]) return true;
-    } catch (e) {}
-    return isExamUnlockedForUser(exam, state.pointsState);
-  }, [exam, state.pointsState]);
 
   if (showQuestionsSheet && exam && !isExamUnlocked) {
     const reqCost = getExamPointCost(exam);
