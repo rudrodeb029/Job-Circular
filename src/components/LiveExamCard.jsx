@@ -242,9 +242,7 @@ function LiveExamCard({
                       fontWeight: 800,
                       textTransform: 'uppercase',
                       letterSpacing: '0.2px',
-                      borderLeft: isDark ? '2px solid #60a5fa' : '2px solid #2563eb',
                       borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.22)' : '1px solid rgba(37, 99, 235, 0.16)',
-                      paddingLeft: '4px',
                       paddingBottom: '2px',
                       lineHeight: '1.2',
                       whiteSpace: 'nowrap',
@@ -332,9 +330,7 @@ function LiveExamCard({
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '0.2px',
-                  borderLeft: isDark ? '2px solid #60a5fa' : '2px solid #2563eb',
                   borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.22)' : '1px solid rgba(37, 99, 235, 0.16)',
-                  paddingLeft: '4px',
                   paddingBottom: '2px',
                   lineHeight: '1.2',
                   whiteSpace: 'nowrap',
@@ -693,9 +689,7 @@ function LiveExamCard({
                             color: isDark ? '#60a5fa' : '#2563eb',
                             fontWeight: 800,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.3px',
-                            borderLeft: isDark ? '3px solid #60a5fa' : '3px solid #2563eb',
-                            paddingLeft: '6px'
+                            letterSpacing: '0.3px'
                           }}>
                             {subjText}
                           </span>
@@ -767,9 +761,7 @@ function LiveExamCard({
                         color: isDark ? '#60a5fa' : '#2563eb',
                         fontWeight: 800,
                         textTransform: 'uppercase',
-                        letterSpacing: '0.3px',
-                        borderLeft: isDark ? '3px solid #60a5fa' : '3px solid #2563eb',
-                        paddingLeft: '6px'
+                        letterSpacing: '0.3px'
                       }}>
                         {subjName}
                       </span>
