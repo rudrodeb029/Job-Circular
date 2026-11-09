@@ -256,9 +256,8 @@ export default function Profile() {
             style={{ textAlign: 'center', cursor: 'pointer', flex: 1 }}
             title={isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
           >
-            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#7c3aed', margin: 0, display: 'inline-flex', alignItems: 'center', gap: '2px' }}>
-              <span style={{ fontSize: '11px' }}>⭐</span>
-              <span>{livePoints}</span>
+            <p style={{ fontSize: '13.5px', fontWeight: 800, color: '#7c3aed', margin: 0 }}>
+              {livePoints}
             </p>
             <p style={{ fontSize: '8.5px', color: 'var(--text-muted)', fontWeight: 600, marginTop: '1px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.2px' }}>
               Exam Points
@@ -294,119 +293,70 @@ export default function Profile() {
       )}
 
       <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
-        {/* Live Exam Points Wallet Section */}
-        <div style={{ marginBottom: '16px' }}>
+        {/* Live Exam Points Wallet Section (Compact Claymorphism Style) */}
+        <div style={{ marginBottom: '14px' }}>
           <div style={{
             background: isDark
-              ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f5f8ff 100%)',
-            borderRadius: '18px',
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(219, 234, 254, 0.95)',
+              ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%)',
+            borderRadius: '8px',
+            border: isDark
+              ? '1px solid rgba(255, 255, 255, 0.08)'
+              : '1px solid rgba(219, 234, 254, 0.95)',
             boxShadow: isDark
-              ? '0 4px 18px rgba(0, 0, 0, 0.35)'
-              : 'inset 0 2px 3px #ffffff, 0 6px 18px -2px rgba(26, 86, 219, 0.08)',
-            padding: '14px 15px',
+              ? '0 10px 22px -6px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.06), inset 0 -2px 4px rgba(0, 0, 0, 0.35)'
+              : '0 8px 18px -6px rgba(37, 99, 235, 0.10), 0 2px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(219, 234, 254, 0.65)',
+            padding: '11px 12px',
             position: 'relative',
             overflow: 'hidden'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <div style={{
-                  width: '36px',
-                  height: '36px',
-                  borderRadius: '11px',
-                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-                  color: '#ffffff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '17px',
-                  boxShadow: '0 4px 10px rgba(245, 158, 11, 0.3)',
-                  flexShrink: 0
-                }}>
-                  ⭐
-                </div>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '13.5px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a' }}>
-                    {isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
-                  </h3>
-                  <p style={{ margin: '2px 0 0 0', fontSize: '10.5px', color: 'var(--text-secondary)', fontWeight: 600 }}>
-                    {isEn
-                      ? `${POINTS_CONFIG.DEFAULT_EXAM_COST} pts per Live Exam • Today's Ads: ${dailyAdCount}/${POINTS_CONFIG.DAILY_AD_LIMIT}`
-                      : `প্রতি লাইভ পরীক্ষায় ${toBengaliNumber(POINTS_CONFIG.DEFAULT_EXAM_COST)} পয়েন্ট • আজকের অ্যাড: ${toBengaliNumber(dailyAdCount)}/${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)}`}
-                  </p>
-                </div>
-              </div>
-
-              <div style={{
-                background: isDark ? 'rgba(245, 158, 11, 0.16)' : '#fffbeb',
-                border: isDark ? '1px solid rgba(245, 158, 11, 0.35)' : '1px solid #fde68a',
-                borderRadius: '10px',
-                padding: '5px 10px',
-                textAlign: 'center',
-                flexShrink: 0
-              }}>
-                <span style={{ display: 'block', fontSize: '15px', fontWeight: 900, color: isDark ? '#fbbf24' : '#d97706', lineHeight: 1.1 }}>
-                  {isEn ? livePoints : toBengaliNumber(livePoints)}
-                </span>
-                <span style={{ fontSize: '8.5px', fontWeight: 800, color: isDark ? '#fde68a' : '#b45309', textTransform: 'uppercase' }}>
-                  {isEn ? 'Points' : 'পয়েন্ট'}
-                </span>
-              </div>
+            <div style={{ marginBottom: '8px' }}>
+              <h3 style={{ margin: 0, fontSize: '12px', fontWeight: 800, color: isDark ? '#f8fafc' : '#0f172a', lineHeight: 1.25 }}>
+                {isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
+              </h3>
+              <p style={{ margin: '2px 0 0 0', fontSize: '10px', color: 'var(--text-secondary)', fontWeight: 600, lineHeight: 1.4 }}>
+                {isEn
+                  ? `${POINTS_CONFIG.DEFAULT_EXAM_COST} pts per Live Exam • Today's Ads: ${dailyAdCount}/${POINTS_CONFIG.DAILY_AD_LIMIT}`
+                  : `প্রতি লাইভ পরীক্ষায় ${toBengaliNumber(POINTS_CONFIG.DEFAULT_EXAM_COST)} পয়েন্ট • আজকের অ্যাড: ${toBengaliNumber(dailyAdCount)}/${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)}`}
+              </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button
-                type="button"
-                onClick={handleWatchRewardAd}
-                disabled={watchingAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT}
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
-                    ? (isDark ? '#334155' : '#cbd5e1')
-                    : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
-                  color: '#ffffff',
-                  fontSize: '11.5px',
-                  fontWeight: 800,
-                  cursor: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'not-allowed' : 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'none' : '0 4px 12px rgba(37, 99, 235, 0.25)'
-                }}
-              >
-                <span>🎬</span>
-                <span>
-                  {watchingAd
-                    ? (isEn ? 'Loading Ad...' : 'বিজ্ঞাপন লোড হচ্ছে...')
-                    : dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
-                      ? (isEn ? 'Daily Limit Reached' : 'আজকের সীমা শেষ')
-                      : (isEn ? `Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Pts)` : `বিজ্ঞাপন দেখুন (+${toBengaliNumber(POINTS_CONFIG.POINTS_PER_AD)} পয়েন্ট)`)}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/live-exams-list')}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: '10px',
-                  border: isDark ? '1px solid rgba(255,255,255,0.12)' : '1px solid #bfdbfe',
-                  background: isDark ? 'rgba(30, 41, 59, 0.9)' : '#eff6ff',
-                  color: isDark ? '#93c5fd' : '#1d4ed8',
-                  fontSize: '11.5px',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {isEn ? 'Live Exams →' : 'লাইভ পরীক্ষা →'}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleWatchRewardAd}
+              disabled={watchingAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT}
+              style={{
+                width: '100%',
+                padding: '7px 12px',
+                borderRadius: '6px',
+                border: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                  ? (isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #cbd5e1')
+                  : '1px solid rgba(37, 99, 235, 0.75)',
+                background: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                  ? (isDark ? '#334155' : '#cbd5e1')
+                  : 'linear-gradient(145deg, #2563eb 0%, #1d4ed8 100%)',
+                color: '#ffffff',
+                fontSize: '11px',
+                fontWeight: 800,
+                cursor: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '5px',
+                boxShadow: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                  ? 'none'
+                  : '0 4px 10px -2px rgba(37, 99, 235, 0.30), inset 0 1.5px 2px rgba(255, 255, 255, 0.35), inset 0 -1.5px 2px rgba(30, 64, 175, 0.35)'
+              }}
+            >
+              <span>🎬</span>
+              <span>
+                {watchingAd
+                  ? (isEn ? 'Loading Ad...' : 'বিজ্ঞাপন লোড হচ্ছে...')
+                  : dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                    ? (isEn ? 'Daily Limit Reached' : 'আজকের সীমা শেষ')
+                    : (isEn ? `Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Pts)` : `বিজ্ঞাপন দেখুন (+${toBengaliNumber(POINTS_CONFIG.POINTS_PER_AD)} পয়েন্ট)`)}
+              </span>
+            </button>
           </div>
         </div>
         {/* Section 1: Account & Activity */}
