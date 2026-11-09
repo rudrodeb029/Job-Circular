@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
 import { useNavigate } from 'react-router-dom';
-import { getDocument, COLLECTIONS } from '../../services/supabaseService';
+import { getDocument, setDocument, COLLECTIONS } from '../../services/supabaseService';
 import { saveOneSignalConfig, broadcastPush } from '../../utils/oneSignalWrapper';
 import { getAppInfoConfig, saveAppInfoConfig, DEFAULT_APP_INFO } from '../../utils/appInfoService';
+import { GOOGLE_ADMOB_TEST_AD_UNITS, showRewardedAd } from '../../utils/admobUtils';
 
 const AdminSettings = () => {
   const { state, dispatch } = useAdminContext();
@@ -25,6 +26,17 @@ const AdminSettings = () => {
   const [appInfo, setAppInfo] = useState(DEFAULT_APP_INFO);
   const [appInfoSaving, setAppInfoSaving] = useState(false);
 
+  // Google AdMob & Firebase Remote Config State (Defaulted to Official Google Test Ads)
+  const [admobConfig, setAdmobConfig] = useState({
+    show_ads: true,
+    show_rewarded_ads: true,
+    admob_rewarded_id: GOOGLE_ADMOB_TEST_AD_UNITS.REWARDED,
+    admob_banner_id: GOOGLE_ADMOB_TEST_AD_UNITS.BANNER,
+    admob_interstitial_id: GOOGLE_ADMOB_TEST_AD_UNITS.INTERSTITIAL,
+    admob_native_id: GOOGLE_ADMOB_TEST_AD_UNITS.NATIVE
+  });
+  const [admobSaving, setAdmobSaving] = useState(false);
+
   // Load Configs from Firestore on mount
   useEffect(() => {
     const loadConfig = async () => {
@@ -33,6 +45,15 @@ const AdminSettings = () => {
         if (doc) {
           if (doc.appId) setOnesignalAppId(doc.appId);
           if (doc.restApiKey) setOnesignalRestKey(doc.restApiKey);
+        }
+
+        const savedAdmob = await getDocument(COLLECTIONS.APP_CONFIG, 'admob');
+        if (savedAdmob) {
+          setAdmobConfig(prev => ({
+            ...prev,
+            ...savedAdmob,
+            admob_rewarded_id: savedAdmob.admob_rewarded_id || GOOGLE_ADMOB_TEST_AD_UNITS.REWARDED
+          }));
         }
 
         // Load App Info (Contact Us, Rate Us, Share App)
@@ -81,6 +102,22 @@ const AdminSettings = () => {
       alert('❌ Failed to save App Info: ' + err.message);
     } finally {
       setAppInfoSaving(false);
+    }
+  };
+
+  const handleSaveAdmobConfig = async (e) => {
+    e.preventDefault();
+    setAdmobSaving(true);
+    try {
+      await setDocument(COLLECTIONS.APP_CONFIG, 'admob', {
+        ...admobConfig,
+        updatedAt: new Date().toISOString()
+      });
+      alert('✅ Google AdMob Rewarded Test Ad configuration saved to Firebase/Database successfully!');
+    } catch (err) {
+      alert('❌ Failed to save AdMob config: ' + err.message);
+    } finally {
+      setAdmobSaving(false);
     }
   };
 
@@ -310,6 +347,108 @@ const AdminSettings = () => {
               Reset
             </button>
           </div>
+        </div>
+
+        {/* Google AdMob & Firebase Remote Config (Rewarded Test Ads) Card */}
+        <div className="settings-card" style={{ gridColumn: '1 / -1' }}>
+          <div className="section-header">
+            <div style={{ width: '36px', height: '36px', background: '#fef3c7', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d97706', fontWeight: 900 }}>
+              🎬
+            </div>
+            <div>
+              <h3>Google AdMob & Firebase Config (Rewarded Test Ads)</h3>
+              <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#64748b' }}>
+                Configured with Google AdMob Official Test Ad Unit IDs (synced with Firebase Remote Config & Android Native SDK).
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleSaveAdmobConfig} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>
+                REWARDED AD UNIT ID (LIVE EXAM POINTS TEST AD)
+              </label>
+              <input
+                className="modern-input"
+                type="text"
+                value={admobConfig.admob_rewarded_id || ''}
+                onChange={e => setAdmobConfig({ ...admobConfig, admob_rewarded_id: e.target.value })}
+                placeholder={GOOGLE_ADMOB_TEST_AD_UNITS.REWARDED}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>
+                BANNER AD UNIT ID (TEST AD)
+              </label>
+              <input
+                className="modern-input"
+                type="text"
+                value={admobConfig.admob_banner_id || ''}
+                onChange={e => setAdmobConfig({ ...admobConfig, admob_banner_id: e.target.value })}
+                placeholder={GOOGLE_ADMOB_TEST_AD_UNITS.BANNER}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>
+                INTERSTITIAL AD UNIT ID (TEST AD)
+              </label>
+              <input
+                className="modern-input"
+                type="text"
+                value={admobConfig.admob_interstitial_id || ''}
+                onChange={e => setAdmobConfig({ ...admobConfig, admob_interstitial_id: e.target.value })}
+                placeholder={GOOGLE_ADMOB_TEST_AD_UNITS.INTERSTITIAL}
+              />
+            </div>
+
+            <div>
+              <label style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', marginBottom: '4px', display: 'block' }}>
+                NATIVE ADVANCED AD UNIT ID (TEST AD)
+              </label>
+              <input
+                className="modern-input"
+                type="text"
+                value={admobConfig.admob_native_id || ''}
+                onChange={e => setAdmobConfig({ ...admobConfig, admob_native_id: e.target.value })}
+                placeholder={GOOGLE_ADMOB_TEST_AD_UNITS.NATIVE}
+              />
+            </div>
+
+            <div style={{ gridColumn: '1 / -1', display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', marginTop: '4px' }}>
+              <button
+                type="submit"
+                disabled={admobSaving}
+                style={{ padding: '12px 24px', background: '#d97706', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                {admobSaving ? 'Saving...' : '💾 Save AdMob Firebase Config'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAdmobConfig({
+                  show_ads: true,
+                  show_rewarded_ads: true,
+                  admob_rewarded_id: GOOGLE_ADMOB_TEST_AD_UNITS.REWARDED,
+                  admob_banner_id: GOOGLE_ADMOB_TEST_AD_UNITS.BANNER,
+                  admob_interstitial_id: GOOGLE_ADMOB_TEST_AD_UNITS.INTERSTITIAL,
+                  admob_native_id: GOOGLE_ADMOB_TEST_AD_UNITS.NATIVE
+                })}
+                style={{ padding: '12px 18px', background: '#fef3c7', color: '#92400e', border: '1px solid #fde68a', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                🔄 Reset to Official Google Test IDs
+              </button>
+
+              <button
+                type="button"
+                onClick={() => showRewardedAd({ rewardPoints: 10, isEn: true })}
+                style={{ padding: '12px 18px', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe', borderRadius: '10px', fontWeight: 700, cursor: 'pointer' }}
+              >
+                ▶️ Preview Rewarded Test Ad
+              </button>
+            </div>
+          </form>
         </div>
 
         {/* Contact Us, Rate Us, Legal & Share App Admin Configuration Card */}

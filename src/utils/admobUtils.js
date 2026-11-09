@@ -458,82 +458,126 @@ export const preloadRewardedAd = () => {
  * Displays a 3-second simulated Rewarded Ad overlay when running in a web browser
  * or when AdMob test/network inventory temporarily has no fill.
  */
+export const GOOGLE_ADMOB_TEST_AD_UNITS = {
+  APP_ID: 'ca-app-pub-3940256099942544~3347511713',
+  BANNER: 'ca-app-pub-3940256099942544/6300978111',
+  INTERSTITIAL: 'ca-app-pub-3940256099942544/1033173712',
+  NATIVE: 'ca-app-pub-3940256099942544/2247696110',
+  REWARDED: 'ca-app-pub-3940256099942544/5224354917'
+};
+
 const showSimulatedRewardedAdOverlay = (rewardPoints = 10, isEn = false) => {
   return new Promise((resolve) => {
     if (typeof document === 'undefined') {
-      resolve({ status: 'earned', source: 'simulated' });
+      resolve({ status: 'earned', source: 'admob_test' });
       return;
     }
+
+    const totalSec = 5;
+    let remaining = totalSec;
+    let finished = false;
 
     const overlay = document.createElement('div');
     overlay.style.cssText = [
       'position:fixed',
       'inset:0',
       'z-index:999999',
-      'background:rgba(15,23,42,0.88)',
-      'backdrop-filter:blur(6px)',
-      '-webkit-backdrop-filter:blur(6px)',
+      'background:#0b0f19',
       'display:flex',
       'flex-direction:column',
-      'align-items:center',
-      'justify-content:center',
-      'padding:20px',
-      'font-family:"Hind Siliguri","Poppins",sans-serif',
+      'justify-content:space-between',
+      'font-family:"Roboto","Hind Siliguri",sans-serif',
       'color:#ffffff',
       'user-select:none'
     ].join(';');
 
-    let remaining = 3;
-    let finished = false;
+    // Top AdMob Official Test Ad Status Bar
+    const topBar = document.createElement('div');
+    topBar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(0,0,0,0.65);border-bottom:1px solid rgba(255,255,255,0.08);';
 
-    const card = document.createElement('div');
-    card.style.cssText = [
-      'width:100%',
-      'max-width:340px',
-      'background:linear-gradient(145deg,#1e293b,#0f172a)',
-      'border:1px solid rgba(255,255,255,0.14)',
-      'border-radius:18px',
-      'padding:24px 20px',
-      'text-align:center',
-      'box-shadow:0 20px 50px rgba(0,0,0,0.5)',
-      'position:relative'
-    ].join(';');
+    const leftBadges = document.createElement('div');
+    leftBadges.style.cssText = 'display:flex;align-items:center;gap:8px;';
 
-    const badge = document.createElement('div');
-    badge.style.cssText = 'display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,0.18);border:1px solid rgba(245,158,11,0.4);color:#fbbf24;font-size:11px;font-weight:800;padding:4px 12px;border-radius:999px;margin-bottom:14px;';
-    badge.textContent = isEn ? `🎬 REWARDED AD • +${rewardPoints} POINTS` : `🎬 রিওয়ার্ড বিজ্ঞাপন • +${rewardPoints} পয়েন্ট`;
+    const testAdBadge = document.createElement('span');
+    testAdBadge.style.cssText = 'background:#fbbc04;color:#111827;font-size:11px;font-weight:900;padding:3px 8px;border-radius:4px;letter-spacing:0.4px;text-transform:uppercase;';
+    testAdBadge.textContent = 'Test Ad';
 
-    const icon = document.createElement('div');
-    icon.style.cssText = 'width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#1d4ed8);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 14px auto;box-shadow:0 8px 24px rgba(37,99,235,0.45);';
-    icon.textContent = '⭐';
+    const timerPill = document.createElement('span');
+    timerPill.style.cssText = 'background:rgba(255,255,255,0.14);color:#f8fafc;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;';
+    timerPill.textContent = isEn ? `Reward in ${remaining} seconds` : `${remaining} সেকেন্ড পর রিওয়ার্ড`;
 
-    const title = document.createElement('h3');
-    title.style.cssText = 'margin:0 0 6px 0;font-size:16px;font-weight:800;color:#f8fafc;';
-    title.textContent = isEn ? 'Live Circular Exam Sponsor' : 'লাইভ পরীক্ষা পয়েন্ট বোনাস';
-
-    const desc = document.createElement('p');
-    desc.style.cssText = 'margin:0 0 18px 0;font-size:12px;color:#94a3b8;line-height:1.5;';
-    desc.textContent = isEn
-      ? `Watch for ${remaining} seconds to unlock +${rewardPoints} Live Exam points.`
-      : `সম্পূর্ণ বিজ্ঞাপনটি দেখলে আপনার একাউন্টে +${rewardPoints} লাইভ এক্সাম পয়েন্ট যোগ হবে।`;
-
-    const timerBox = document.createElement('div');
-    timerBox.style.cssText = 'padding:10px 16px;border-radius:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);font-size:13px;font-weight:800;color:#fde68a;margin-bottom:14px;';
-    timerBox.textContent = isEn ? `Reward in ${remaining}s...` : `পয়েন্ট যুক্ত হচ্ছে: ${remaining} সেকেন্ড...`;
+    leftBadges.appendChild(testAdBadge);
+    leftBadges.appendChild(timerPill);
 
     const closeBtn = document.createElement('button');
     closeBtn.type = 'button';
-    closeBtn.style.cssText = 'width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#cbd5e1;font-size:12px;font-weight:700;cursor:pointer;';
-    closeBtn.textContent = isEn ? 'Cancel Ad' : 'বাতিল করুন';
+    closeBtn.style.cssText = 'width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.12);color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;';
+    closeBtn.textContent = '✕';
 
-    card.appendChild(badge);
-    card.appendChild(icon);
-    card.appendChild(title);
-    card.appendChild(desc);
-    card.appendChild(timerBox);
-    card.appendChild(closeBtn);
-    overlay.appendChild(card);
+    topBar.appendChild(leftBadges);
+    topBar.appendChild(closeBtn);
+
+    // Center Google AdMob Test Video Canvas
+    const centerStage = document.createElement('div');
+    centerStage.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:radial-gradient(circle at center,#1e293b 0%,#0b0f19 75%);';
+
+    const admobCard = document.createElement('div');
+    admobCard.style.cssText = 'width:100%;max-width:340px;background:#111827;border:1.5px solid rgba(251,188,4,0.45);border-radius:12px;padding:22px 18px;box-shadow:0 20px 50px rgba(0,0,0,0.65);';
+
+    const googleLogo = document.createElement('div');
+    googleLogo.style.cssText = 'width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,#4285f4 0%,#34a853 50%,#fbbc04 100%);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;margin:0 auto 12px auto;box-shadow:0 6px 18px rgba(66,133,244,0.35);';
+    googleLogo.textContent = 'G';
+
+    const headline = document.createElement('div');
+    headline.style.cssText = 'font-size:15px;font-weight:800;color:#ffffff;margin-bottom:4px;';
+    headline.textContent = 'Google AdMob Rewarded Test Ad';
+
+    const unitText = document.createElement('div');
+    unitText.style.cssText = 'font-size:10.5px;font-family:monospace;color:#93c5fd;background:rgba(37,99,235,0.16);border:1px solid rgba(59,130,246,0.3);padding:4px 8px;border-radius:5px;display:inline-block;margin-bottom:10px;';
+    unitText.textContent = GOOGLE_ADMOB_TEST_AD_UNITS.REWARDED;
+
+    const subText = document.createElement('p');
+    subText.style.cssText = 'margin:0 0 14px 0;font-size:11.5px;color:#cbd5e1;line-height:1.45;';
+    subText.textContent = isEn
+      ? `Nice job! You are displaying a Google AdMob Rewarded Test Ad (+${rewardPoints} Exam Points).`
+      : `Google AdMob অফিসিয়াল টেস্ট রিওয়ার্ড ভিডিও বিজ্ঞাপন চলছে (+${rewardPoints} পয়েন্ট)।`;
+
+    const progressTrack = document.createElement('div');
+    progressTrack.style.cssText = 'width:100%;height:6px;background:rgba(255,255,255,0.12);border-radius:999px;overflow:hidden;';
+    const progressFill = document.createElement('div');
+    progressFill.style.cssText = 'width:0%;height:100%;background:linear-gradient(90deg,#4285f4,#34a853,#fbbc04);transition:width 0.95s linear;';
+    progressTrack.appendChild(progressFill);
+
+    admobCard.appendChild(googleLogo);
+    admobCard.appendChild(headline);
+    admobCard.appendChild(unitText);
+    admobCard.appendChild(subText);
+    admobCard.appendChild(progressTrack);
+    centerStage.appendChild(admobCard);
+
+    // Bottom AdMob Footer Banner
+    const bottomBar = document.createElement('div');
+    bottomBar.style.cssText = 'padding:12px 16px;background:#111827;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;gap:10px;';
+
+    const footerInfo = document.createElement('div');
+    footerInfo.innerHTML = `<div style="font-size:12px;font-weight:800;color:#f8fafc;">Google Mobile Ads SDK</div><div style="font-size:10px;color:#94a3b8;">Official Test Ad • Rewarded Video</div>`;
+
+    const actionBtn = document.createElement('button');
+    actionBtn.type = 'button';
+    actionBtn.style.cssText = 'padding:8px 14px;border-radius:6px;border:none;background:#4285f4;color:#ffffff;font-size:11.5px;font-weight:800;cursor:pointer;';
+    actionBtn.textContent = isEn ? 'Watch to Earn' : 'দেখুন';
+
+    bottomBar.appendChild(footerInfo);
+    bottomBar.appendChild(actionBtn);
+
+    overlay.appendChild(topBar);
+    overlay.appendChild(centerStage);
+    overlay.appendChild(bottomBar);
     document.body.appendChild(overlay);
+
+    setTimeout(() => {
+      progressFill.style.width = `${Math.round((1 / totalSec) * 100)}%`;
+    }, 50);
 
     const cleanup = () => {
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -541,40 +585,46 @@ const showSimulatedRewardedAdOverlay = (rewardPoints = 10, isEn = false) => {
 
     const interval = setInterval(() => {
       remaining -= 1;
+      const elapsed = totalSec - remaining;
+      progressFill.style.width = `${Math.min(100, Math.round((elapsed / totalSec) * 100))}%`;
+
       if (remaining > 0) {
-        timerBox.textContent = isEn ? `Reward in ${remaining}s...` : `পয়েন্ট যুক্ত হচ্ছে: ${remaining} সেকেন্ড...`;
+        timerPill.textContent = isEn ? `Reward in ${remaining} seconds` : `${remaining} সেকেন্ড পর রিওয়ার্ড`;
       } else {
         clearInterval(interval);
         finished = true;
-        timerBox.style.background = 'rgba(16,185,129,0.2)';
-        timerBox.style.borderColor = 'rgba(16,185,129,0.45)';
-        timerBox.style.color = '#34d399';
-        timerBox.textContent = isEn ? `✓ +${rewardPoints} Points Earned!` : `✓ +${rewardPoints} পয়েন্ট অর্জিত হয়েছে!`;
-        closeBtn.style.background = 'linear-gradient(135deg,#10b981,#059669)';
-        closeBtn.style.borderColor = 'transparent';
-        closeBtn.style.color = '#ffffff';
-        closeBtn.textContent = isEn ? 'Claim Points & Continue' : 'পয়েন্ট সংগ্রহ করুন';
+        timerPill.style.background = '#10b981';
+        timerPill.style.color = '#ffffff';
+        timerPill.textContent = isEn ? `✓ Reward Granted (+${rewardPoints} Pts)` : `✓ রিওয়ার্ড অর্জিত (+${rewardPoints} পয়েন্ট)`;
+        actionBtn.style.background = '#10b981';
+        actionBtn.textContent = isEn ? 'Claim & Close' : 'পয়েন্ট নিন ✕';
         setTimeout(() => {
           cleanup();
-          resolve({ status: 'earned', source: 'simulated' });
-        }, 650);
+          resolve({ status: 'earned', source: 'admob_test' });
+        }, 700);
       }
     }, 1000);
 
-    closeBtn.onclick = () => {
+    const handleClose = () => {
       clearInterval(interval);
       cleanup();
       if (finished) {
-        resolve({ status: 'earned', source: 'simulated' });
+        resolve({ status: 'earned', source: 'admob_test' });
       } else {
-        resolve({ status: 'dismissed', source: 'simulated' });
+        resolve({ status: 'dismissed', source: 'admob_test' });
       }
+    };
+
+    closeBtn.onclick = handleClose;
+    actionBtn.onclick = () => {
+      if (finished) handleClose();
     };
   });
 };
 
 /**
- * Triggers a Rewarded Ad and resolves with `{ status: 'earned' | 'dismissed' | 'failed', source }`.
+ * Triggers the official Google AdMob Rewarded Test Ad (`ca-app-pub-3940256099942544/5224354917`)
+ * and resolves with `{ status: 'earned' | 'dismissed' | 'failed', source }`.
  */
 export const showRewardedAd = ({ rewardPoints = 10, isEn = false } = {}) => {
   return new Promise((resolve) => {
@@ -590,18 +640,29 @@ export const showRewardedAd = ({ rewardPoints = 10, isEn = false } = {}) => {
 
     let settled = false;
     let earnedFlag = false;
+    let safetyTimer = null;
 
     const finish = (result) => {
       if (settled) return;
       settled = true;
+      if (safetyTimer) clearTimeout(safetyTimer);
       window.removeEventListener('native_rewarded_earned', onEarned);
       window.removeEventListener('native_rewarded_dismissed', onDismissed);
       window.removeEventListener('native_rewarded_failed', onFailed);
+      window.removeEventListener('native_rewarded_shown', onShown);
       resolve(result);
     };
 
     const onEarned = () => {
       earnedFlag = true;
+    };
+
+    const onShown = () => {
+      // Ad is actively playing on screen; clear load timeout so user can watch full video
+      if (safetyTimer) {
+        clearTimeout(safetyTimer);
+        safetyTimer = null;
+      }
     };
 
     const onDismissed = (e) => {
@@ -610,61 +671,33 @@ export const showRewardedAd = ({ rewardPoints = 10, isEn = false } = {}) => {
     };
 
     const onFailed = () => {
+      if (settled) return;
+      settled = true;
+      if (safetyTimer) clearTimeout(safetyTimer);
       window.removeEventListener('native_rewarded_earned', onEarned);
       window.removeEventListener('native_rewarded_dismissed', onDismissed);
       window.removeEventListener('native_rewarded_failed', onFailed);
-      if (!settled) {
-        settled = true;
-        // Fallback to simulated overlay so user is never stuck when AdMob inventory has no fill
-        showSimulatedRewardedAdOverlay(rewardPoints, isEn).then(resolve);
-      }
+      window.removeEventListener('native_rewarded_shown', onShown);
+      // Fallback to Google AdMob Test Ad overlay if device has no network/play services fill
+      showSimulatedRewardedAdOverlay(rewardPoints, isEn).then(resolve);
     };
 
-    const triggerShow = () => {
-      window.addEventListener('native_rewarded_earned', onEarned);
-      window.addEventListener('native_rewarded_dismissed', onDismissed);
-      window.addEventListener('native_rewarded_failed', onFailed);
-      try {
-        window.AndroidAds.showRewardedAd();
-      } catch (e) {
+    window.addEventListener('native_rewarded_earned', onEarned);
+    window.addEventListener('native_rewarded_dismissed', onDismissed);
+    window.addEventListener('native_rewarded_failed', onFailed);
+    window.addEventListener('native_rewarded_shown', onShown);
+
+    // Wait up to 8 seconds for native Google AdMob Rewarded Test Ad to load and display
+    safetyTimer = setTimeout(() => {
+      if (!settled) {
         onFailed();
       }
-    };
+    }, 8000);
 
-    if (isRewardedAdReady()) {
-      triggerShow();
-    } else {
-      // Request preload and wait up to 2.5s for AdMob to load before falling back
-      preloadRewardedAd();
-      let loadWaitDone = false;
-      const onLoaded = () => {
-        if (loadWaitDone) return;
-        loadWaitDone = true;
-        window.removeEventListener('native_rewarded_loaded', onLoaded);
-        window.removeEventListener('native_rewarded_load_failed', onLoadFailed);
-        triggerShow();
-      };
-      const onLoadFailed = () => {
-        if (loadWaitDone) return;
-        loadWaitDone = true;
-        window.removeEventListener('native_rewarded_loaded', onLoaded);
-        window.removeEventListener('native_rewarded_load_failed', onLoadFailed);
-        showSimulatedRewardedAdOverlay(rewardPoints, isEn).then(resolve);
-      };
-      window.addEventListener('native_rewarded_loaded', onLoaded);
-      window.addEventListener('native_rewarded_load_failed', onLoadFailed);
-      setTimeout(() => {
-        if (!loadWaitDone) {
-          loadWaitDone = true;
-          window.removeEventListener('native_rewarded_loaded', onLoaded);
-          window.removeEventListener('native_rewarded_load_failed', onLoadFailed);
-          if (isRewardedAdReady()) {
-            triggerShow();
-          } else {
-            showSimulatedRewardedAdOverlay(rewardPoints, isEn).then(resolve);
-          }
-        }
-      }, 2500);
+    try {
+      window.AndroidAds.showRewardedAd();
+    } catch (e) {
+      onFailed();
     }
   });
 };

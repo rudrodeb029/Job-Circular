@@ -21,6 +21,13 @@
       "description": "AdMob Native Advanced Ad Unit ID.",
       "valueType": "STRING"
     },
+    "admob_rewarded_id": {
+      "defaultValue": {
+        "value": "ca-app-pub-3940256099942544/5224354917"
+      },
+      "description": "Google AdMob Official Rewarded Test Ad Unit ID for Live Exam Points.",
+      "valueType": "STRING"
+    },
     "interstitial_cooldown_sec": {
       "defaultValue": {
         "value": "50"
@@ -61,6 +68,13 @@
         "value": "true"
       },
       "description": "Native ads switch. Set true to show native advanced card ads.",
+      "valueType": "STRING"
+    },
+    "show_rewarded_ads": {
+      "defaultValue": {
+        "value": "true"
+      },
+      "description": "Rewarded ads switch. Set true to enable Google AdMob Rewarded Ads for Live Exam Points.",
       "valueType": "STRING"
     }
   }

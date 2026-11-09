@@ -110,6 +110,7 @@ public class MainActivity extends BridgeActivity {
     private String rewardedAdUnitId = DEFAULT_REWARDED_AD_UNIT_ID;
     private RewardedAd rewardedAd;
     private boolean isRewardedLoading = false;
+    private boolean pendingShowRewardedAd = false;
     private boolean rewardEarnedInCurrentSession = false;
     private NativeAd currentNativeAd;
     private boolean isNativeAdLoading = false;
@@ -952,23 +953,17 @@ public class MainActivity extends BridgeActivity {
         }
         try {
             isRewardedLoading = true;
+            String targetRewardedId = (rewardedAdUnitId != null && !rewardedAdUnitId.trim().isEmpty())
+                ? rewardedAdUnitId.trim()
+                : DEFAULT_REWARDED_AD_UNIT_ID;
             AdRequest adRequest = new AdRequest.Builder().build();
 
-            RewardedAd.load(this, rewardedAdUnitId, adRequest, new RewardedAdLoadCallback() {
+            RewardedAd.load(this, targetRewardedId, adRequest, new RewardedAdLoadCallback() {
                 @Override
                 public void onAdLoaded(@NonNull RewardedAd ad) {
                     rewardedAd = ad;
                     isRewardedLoading = false;
-                    Log.d(TAG, "Rewarded Ad successfully loaded into memory cache (" + rewardedAdUnitId + ").");
-
-                    MainActivity.this.runOnUiThread(() -> {
-                        if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
-                            MainActivity.this.bridge.getWebView().evaluateJavascript(
-                                "try { window.dispatchEvent(new CustomEvent('native_rewarded_loaded')); } catch(e){}",
-                                null
-                            );
-                        }
-                    });
+                    Log.d(TAG, "Rewarded Ad successfully loaded into memory cache (" + targetRewardedId + ").");
 
                     ad.setFullScreenContentCallback(new FullScreenContentCallback() {
                         @Override
@@ -1020,12 +1015,27 @@ public class MainActivity extends BridgeActivity {
                             });
                         }
                     });
+
+                    MainActivity.this.runOnUiThread(() -> {
+                        if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
+                            MainActivity.this.bridge.getWebView().evaluateJavascript(
+                                "try { window.dispatchEvent(new CustomEvent('native_rewarded_loaded')); } catch(e){}",
+                                null
+                            );
+                        }
+                        if (pendingShowRewardedAd) {
+                            pendingShowRewardedAd = false;
+                            showRewardedAd();
+                        }
+                    });
                 }
 
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     rewardedAd = null;
                     isRewardedLoading = false;
+                    boolean wasPending = pendingShowRewardedAd;
+                    pendingShowRewardedAd = false;
                     Log.e(TAG, "Rewarded Ad failed to load: " + loadAdError.getMessage());
                     MainActivity.this.runOnUiThread(() -> {
                         if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
@@ -1033,6 +1043,12 @@ public class MainActivity extends BridgeActivity {
                                 "try { window.dispatchEvent(new CustomEvent('native_rewarded_load_failed')); } catch(e){}",
                                 null
                             );
+                            if (wasPending) {
+                                MainActivity.this.bridge.getWebView().evaluateJavascript(
+                                    "try { window.dispatchEvent(new CustomEvent('native_rewarded_failed', { detail: { message: 'load_failed' } })); } catch(e){}",
+                                    null
+                                );
+                            }
                         }
                     });
                 }
@@ -1041,12 +1057,14 @@ public class MainActivity extends BridgeActivity {
             Log.e(TAG, "Error in loadRewardedAd: " + t.getMessage(), t);
             rewardedAd = null;
             isRewardedLoading = false;
+            pendingShowRewardedAd = false;
         }
     }
 
     public void showRewardedAd() {
         if (isAdsEnabled && isRewardedAdsEnabled && rewardedAd != null && !isFinishing() && !isDestroyed()) {
-            Log.d(TAG, "Showing Rewarded Ad...");
+            Log.d(TAG, "Showing Google AdMob Rewarded Test Ad...");
+            pendingShowRewardedAd = false;
             rewardEarnedInCurrentSession = false;
             RewardedAd adToShow = rewardedAd;
             rewardedAd = null;
@@ -1066,16 +1084,11 @@ public class MainActivity extends BridgeActivity {
                 }
             });
         } else {
-            Log.d(TAG, "Rewarded ad not ready yet. Triggering loadRewardedAd and notifying WebView.");
+            Log.d(TAG, "Rewarded ad not cached yet. Queuing pendingShowRewardedAd and loading Google AdMob Rewarded Test Ad...");
+            pendingShowRewardedAd = true;
             if (isAdsEnabled && isRewardedAdsEnabled && rewardedAd == null && !isRewardedLoading) {
                 loadRewardedAd();
             }
-            runOnUiThread(() -> {
-                if (MainActivity.this.bridge != null && MainActivity.this.bridge.getWebView() != null) {
-                    String script = "try { window.dispatchEvent(new CustomEvent('native_rewarded_failed', { detail: { message: 'not_ready' } })); } catch(e){}";
-                    MainActivity.this.bridge.getWebView().evaluateJavascript(script, null);
-                }
-            });
         }
     }
 
