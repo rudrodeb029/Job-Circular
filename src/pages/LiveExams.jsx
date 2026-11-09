@@ -538,50 +538,25 @@ export default function LiveExams() {
                   }}
                 >
                   <div>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', marginBottom: '6px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', minWidth: 0 }}>
-                        <div style={{
-                          width: '17px',
-                          height: '17px',
-                          borderRadius: '4px',
-                          background: isDark ? 'rgba(245, 158, 11, 0.2)' : 'linear-gradient(145deg, #fffbeb, #fef3c7)',
-                          border: isDark ? '1px solid rgba(251, 191, 36, 0.35)' : '1px solid #fde68a',
-                          boxShadow: isDark ? 'none' : 'inset 0 1px 1px #ffffff, 0 1px 3px rgba(217, 119, 6, 0.1)',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '9px',
-                          flexShrink: 0
-                        }}>
-                          ⭐
-                        </div>
-                        <h3 style={{ fontSize: '10px', fontWeight: 800, color: isDark ? '#fbbf24' : '#b45309', margin: 0, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
-                          {isEn ? 'Exam Points' : 'এক্সাম পয়েন্ট'}
-                        </h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginBottom: '6px' }}>
+                      <div style={{
+                        width: '17px',
+                        height: '17px',
+                        borderRadius: '4px',
+                        background: isDark ? 'rgba(245, 158, 11, 0.2)' : 'linear-gradient(145deg, #fffbeb, #fef3c7)',
+                        border: isDark ? '1px solid rgba(251, 191, 36, 0.35)' : '1px solid #fde68a',
+                        boxShadow: isDark ? 'none' : 'inset 0 1px 1px #ffffff, 0 1px 3px rgba(217, 119, 6, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '9px',
+                        flexShrink: 0
+                      }}>
+                        ⭐
                       </div>
-
-                      <div
-                        style={{
-                          padding: '1.5px 6px',
-                          borderRadius: '4px',
-                          background: isDark
-                            ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-                            : 'linear-gradient(145deg, #ffffff 0%, #fef9c3 100%)',
-                          border: isDark
-                            ? '1px solid rgba(251, 191, 36, 0.25)'
-                            : '1px solid rgba(253, 224, 71, 0.85)',
-                          boxShadow: isDark
-                            ? '0 2px 6px -2px rgba(0, 0, 0, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.05)'
-                            : '0 2px 5px -2px rgba(217, 119, 6, 0.10), inset 0 1px 1.5px #ffffff',
-                          fontSize: '10px',
-                          fontWeight: 900,
-                          color: isDark ? '#fbbf24' : '#d97706',
-                          lineHeight: 1.2,
-                          flexShrink: 0
-                        }}
-                      >
-                        {isEn ? livePoints : toBengaliNumber(livePoints)}
-                      </div>
+                      <h3 style={{ fontSize: '10px', fontWeight: 800, color: isDark ? '#fbbf24' : '#b45309', margin: 0, lineHeight: 1.2, whiteSpace: 'nowrap' }}>
+                        {isEn ? 'Exam Points' : 'এক্সাম পয়েন্ট'}
+                      </h3>
                     </div>
 
                     <p style={{ margin: 0, fontSize: '9.5px', lineHeight: 1.45, color: 'var(--text-secondary)', fontWeight: 500 }}>
