@@ -233,19 +233,24 @@ function LiveExamCard({
                 const { visible: displayedTopics, remaining: remainingTopicsCount } = calculateVisibleTopics(topicsList, 130);
 
                 return (
-                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
+                  <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%', overflow: 'hidden' }}>
                     <span style={{
+                      display: 'block',
+                      width: '100%',
                       fontSize: '8.5px',
                       color: isDark ? '#60a5fa' : '#2563eb',
                       fontWeight: 800,
                       textTransform: 'uppercase',
                       letterSpacing: '0.2px',
                       borderLeft: isDark ? '2px solid #60a5fa' : '2px solid #2563eb',
+                      borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.22)' : '1px solid rgba(37, 99, 235, 0.16)',
                       paddingLeft: '4px',
+                      paddingBottom: '2px',
                       lineHeight: '1.2',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      textOverflow: 'ellipsis',
+                      boxSizing: 'border-box'
                     }}>
                       {subjText}
                     </span>
@@ -318,19 +323,24 @@ function LiveExamCard({
             const { visible: displayedFallbackTopics, remaining: remainingFallbackTopics } = calculateVisibleTopics(topicsArr, 130);
 
             return (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', width: '100%', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%', overflow: 'hidden' }}>
                 <span style={{
+                  display: 'block',
+                  width: '100%',
                   fontSize: '8.5px',
                   color: isDark ? '#60a5fa' : '#2563eb',
                   fontWeight: 800,
                   textTransform: 'uppercase',
                   letterSpacing: '0.2px',
                   borderLeft: isDark ? '2px solid #60a5fa' : '2px solid #2563eb',
+                  borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.22)' : '1px solid rgba(37, 99, 235, 0.16)',
                   paddingLeft: '4px',
+                  paddingBottom: '2px',
                   lineHeight: '1.2',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  textOverflow: 'ellipsis',
+                  boxSizing: 'border-box'
                 }}>
                   {subjName}
                 </span>
@@ -671,7 +681,13 @@ function LiveExamCard({
                           gap: '8px'
                         }}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          paddingBottom: '6px',
+                          borderBottom: isDark ? '1px solid rgba(96, 165, 250, 0.2)' : '1px solid rgba(37, 99, 235, 0.14)'
+                        }}>
                           <span style={{
                             fontSize: '12px',
                             color: isDark ? '#60a5fa' : '#2563eb',
