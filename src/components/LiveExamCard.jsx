@@ -230,7 +230,7 @@ function LiveExamCard({
                   : safeStringify(rawTopics).split(',').map(cleanTopicItem)
                 ).filter(t => t && t !== '&nbsp;');
 
-                const { visible: displayedTopics, remaining: remainingTopicsCount } = calculateVisibleTopics(topicsList, 130);
+                const { visible: displayedTopics, remaining: remainingTopicsCount } = calculateVisibleTopics(topicsList, 4);
 
                 return (
                   <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%', overflow: 'hidden' }}>
@@ -256,8 +256,7 @@ function LiveExamCard({
                       display: 'flex',
                       alignItems: 'center',
                       flexWrap: 'nowrap',
-                      gap: '3px',
-                      paddingLeft: '1px',
+                      gap: '2.5px',
                       width: '100%',
                       overflow: 'hidden'
                     }}>
@@ -268,13 +267,13 @@ function LiveExamCard({
                           background: isDark ? 'rgba(30, 41, 59, 0.95)' : '#ffffff',
                           border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)',
                           color: isDark ? '#f1f5f9' : '#1e293b',
-                          padding: '1px 4.5px',
+                          padding: '1px 3.5px',
                           borderRadius: '3px',
                           boxShadow: isDark ? '0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.02)',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
-                          maxWidth: remainingTopicsCount > 0 ? '52px' : '80px',
+                          minWidth: 0,
                           flexShrink: 1
                         }}>
                           {t}
@@ -292,7 +291,7 @@ function LiveExamCard({
                             background: isDark ? 'rgba(37, 99, 235, 0.25)' : '#eff6ff',
                             border: isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid #bfdbfe',
                             color: isDark ? '#93c5fd' : '#2563eb',
-                            padding: '1px 4px',
+                            padding: '1px 3.5px',
                             borderRadius: '3px',
                             whiteSpace: 'nowrap',
                             cursor: 'pointer',
@@ -318,7 +317,7 @@ function LiveExamCard({
               ? (isEn ? (exam.topicsEn || exam.topics) : exam.topics).map(cleanTopicItem)
               : safeStringify(isEn ? (exam.topicsEn || exam.topics) : exam.topics).split(',').map(cleanTopicItem)
             ).filter(t => t && t !== '&nbsp;');
-            const { visible: displayedFallbackTopics, remaining: remainingFallbackTopics } = calculateVisibleTopics(topicsArr, 130);
+            const { visible: displayedFallbackTopics, remaining: remainingFallbackTopics } = calculateVisibleTopics(topicsArr, 4);
 
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%', overflow: 'hidden' }}>
@@ -344,7 +343,7 @@ function LiveExamCard({
                   display: 'flex',
                   alignItems: 'center',
                   flexWrap: 'nowrap',
-                  gap: '3px',
+                  gap: '2.5px',
                   width: '100%',
                   overflow: 'hidden'
                 }}>
@@ -355,13 +354,13 @@ function LiveExamCard({
                       background: isDark ? 'rgba(30, 41, 59, 0.95)' : '#ffffff',
                       border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(226, 232, 240, 0.8)',
                       color: isDark ? '#f1f5f9' : '#1e293b',
-                      padding: '1px 4.5px',
+                      padding: '1px 3.5px',
                       borderRadius: '3px',
                       boxShadow: isDark ? '0 1px 2px rgba(0,0,0,0.2)' : '0 1px 2px rgba(0,0,0,0.02)',
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      maxWidth: remainingFallbackTopics > 0 ? '52px' : '80px',
+                      minWidth: 0,
                       flexShrink: 1
                     }}>
                       {t}
@@ -379,7 +378,7 @@ function LiveExamCard({
                         background: isDark ? 'rgba(37, 99, 235, 0.25)' : '#eff6ff',
                         border: isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid #bfdbfe',
                         color: isDark ? '#93c5fd' : '#2563eb',
-                        padding: '1px 4px',
+                        padding: '1px 3.5px',
                         borderRadius: '3px',
                         whiteSpace: 'nowrap',
                         cursor: 'pointer',
@@ -858,48 +857,15 @@ const toBengaliNumber = (num) => {
   return engNum.split('').map(digit => bengaliDigits[digit] || digit).join('');
 };
 
-const calculateVisibleTopics = (topicsList, maxLineWidth = 132) => {
+const calculateVisibleTopics = (topicsList, maxTopics = 4) => {
   if (!topicsList || topicsList.length === 0) return { visible: [], remaining: 0 };
-
-  const getPillWidth = (str) => {
-    const s = String(str || '');
-    return 10 + s.length * 3.8;
-  };
-
-  const PLUS_BADGE_WIDTH = 20;
-  const GAP = 2.5;
-
-  // 1. Check if ALL topics can fit on the line without any '+N' badge
-  let totalAllWidth = 0;
-  for (let i = 0; i < topicsList.length; i++) {
-    totalAllWidth += getPillWidth(topicsList[i]) + (i > 0 ? GAP : 0);
-  }
-  if (totalAllWidth <= maxLineWidth) {
+  if (topicsList.length <= maxTopics) {
     return { visible: topicsList, remaining: 0 };
   }
-
-  // 2. Otherwise fit as many as possible while leaving room for the '+N' badge at the end
-  let currentWidth = 0;
-  const visible = [];
-
-  for (let i = 0; i < topicsList.length; i++) {
-    const pillW = Math.min(getPillWidth(topicsList[i]), 50);
-    const addedWidth = (visible.length > 0 ? GAP : 0) + pillW;
-
-    if (visible.length === 0 || (currentWidth + addedWidth + GAP + PLUS_BADGE_WIDTH <= maxLineWidth)) {
-      visible.push(topicsList[i]);
-      currentWidth += addedWidth;
-    } else {
-      break;
-    }
-  }
-
-  if (visible.length === 0 && topicsList.length > 0) {
-    visible.push(topicsList[0]);
-  }
-
-  const remaining = topicsList.length - visible.length;
-  return { visible, remaining };
+  return {
+    visible: topicsList.slice(0, maxTopics),
+    remaining: topicsList.length - maxTopics
+  };
 };
 
 export default React.memo(LiveExamCard);
