@@ -3,112 +3,567 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 
+/**
+ * Slide 1 Isometric Illustration:
+ * Candidate at an isometric desk browsing Govt, Bank & NGO Job Circulars on a monitor
+ * with a document printer/folder stack and graphic tablet (matching reference style).
+ */
+function JobPortalIllustration() {
+  return (
+    <svg
+      width="270"
+      height="225"
+      viewBox="0 0 320 265"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+    >
+      {/* Soft Ground Shadow under Desk & Chair */}
+      <ellipse cx="160" cy="232" rx="124" ry="22" fill="#e2e8f0" opacity="0.65" />
+      <ellipse cx="152" cy="228" rx="95" ry="15" fill="#cbd5e1" opacity="0.45" />
+
+      {/* Isometric Desk Back & Left Legs */}
+      <path d="M52 146V218" stroke="#334155" strokeWidth="7" strokeLinecap="round" />
+      <path d="M118 186V248" stroke="#1e293b" strokeWidth="7" strokeLinecap="round" />
+      <path d="M186 84V156" stroke="#475569" strokeWidth="6" strokeLinecap="round" />
+      <path d="M254 122V194" stroke="#334155" strokeWidth="6" strokeLinecap="round" />
+
+      {/* Isometric Desk Surface (Warm Cream / Soft Yellow 3D Slab) */}
+      {/* Desk Side Thickness */}
+      <path
+        d="M38 140L118 188L266 116L266 125L118 197L38 149Z"
+        fill="#d97706"
+        opacity="0.35"
+      />
+      {/* Desk Top Face */}
+      <path
+        d="M38 140L186 68L266 116L118 188L38 140Z"
+        fill="#fef3c7"
+        stroke="#f59e0b"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M44 140L186 71L260 116L118 184L44 140Z"
+        fill="#fffbeb"
+      />
+
+      {/* Isometric Monitor Stand */}
+      <path d="M142 114L162 126L148 134L128 122Z" fill="#cbd5e1" />
+      <path d="M142 98V122L152 127V103Z" fill="#94a3b8" />
+
+      {/* Isometric Monitor Frame (3D Angled) */}
+      <path
+        d="M100 54L184 13L190 16L190 88L106 129L100 126Z"
+        fill="#1e293b"
+      />
+      {/* Monitor Front Bezel */}
+      <path
+        d="M104 56L188 15L188 86L104 127Z"
+        fill="#0f172a"
+        stroke="#fbbf24"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      {/* Monitor Screen */}
+      <path
+        d="M108 60L184 23L184 78L108 115Z"
+        fill="#1e3a8a"
+      />
+      {/* Monitor Bottom Chin Bar */}
+      <path
+        d="M104 117L188 76L188 86L104 127Z"
+        fill="#f8fafc"
+      />
+      <circle cx="146" cy="101" r="2.2" fill="#334155" />
+
+      {/* Sidebar UI inside Monitor */}
+      <path d="M111 62L128 54L128 101L111 109Z" fill="#1d4ed8" />
+      <path d="M114 66L125 61" stroke="#93c5fd" strokeWidth="2" strokeLinecap="round" />
+      <path d="M114 72L123 68" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" />
+      <path d="M114 78L124 73" stroke="#60a5fa" strokeWidth="2" strokeLinecap="round" />
+
+      {/* Main Grid Lines inside Monitor */}
+      <path d="M132 52L156 40L156 86L132 98Z" fill="#2563eb" opacity="0.45" />
+
+      {/* Floating Pop-out Job Circular Window on Right of Monitor */}
+      <path
+        d="M150 44L198 20L198 62L150 86Z"
+        fill="#ffffff"
+        stroke="#fde68a"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      {/* Golden Graphic/Banner inside Floating Window */}
+      <path
+        d="M154 47L194 27L194 55L154 75Z"
+        fill="#fef3c7"
+      />
+      <circle cx="184" cy="39" r="3.5" fill="#f59e0b" />
+      <path
+        d="M154 75L166 56L176 61L185 47L194 55L154 75Z"
+        fill="#f59e0b"
+      />
+
+      {/* Circular Printer / Gazette Box on Left of Desk */}
+      <path
+        d="M52 128L82 113L104 126L74 141Z"
+        fill="#d97706"
+      />
+      <path
+        d="M52 128L74 141V155L52 142Z"
+        fill="#92400e"
+      />
+      <path
+        d="M74 141L104 126V140L74 155Z"
+        fill="#78350f"
+      />
+      <path
+        d="M58 127L80 116L96 125L74 136Z"
+        fill="#fbbf24"
+      />
+      <circle cx="77" cy="126" r="3.2" fill="#ffffff" />
+      {/* Printed Circular Sheet coming out */}
+      <path
+        d="M78 148L96 139L108 146L90 155Z"
+        fill="#ffffff"
+        stroke="#cbd5e1"
+        strokeWidth="1"
+      />
+
+      {/* Isometric Keyboard on Desk */}
+      <path
+        d="M126 146L166 126L176 132L136 152Z"
+        fill="#ffffff"
+        stroke="#cbd5e1"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M132 146L164 130" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 3" />
+      <path d="M136 149L168 133" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 3" />
+
+      {/* Small Note / Circular Sheet on Front Left of Desk */}
+      <path
+        d="M94 158L114 148L128 156L108 166Z"
+        fill="#ffffff"
+        stroke="#e2e8f0"
+        strokeWidth="1.2"
+      />
+      <path d="M102 157L113 152" stroke="#64748b" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M106 161L118 155" stroke="#94a3b8" strokeWidth="1.6" strokeLinecap="round" />
+
+      {/* Drawing / Study Tablet on Right Side of Desk */}
+      <path
+        d="M172 118L198 105L214 114L188 127Z"
+        fill="#d97706"
+        stroke="#92400e"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M177 118L197 108L208 114L188 124Z"
+        fill="#334155"
+      />
+
+      {/* Color Swatches / Reference Cards near Top of Desk */}
+      <path d="M182 94L204 88L206 93L184 99Z" fill="#1e293b" />
+      <path d="M184 97L208 94L209 99L185 102Z" fill="#64748b" />
+      <path d="M185 100L209 101L208 106L184 105Z" fill="#cbd5e1" />
+
+      {/* Candidate Character Sitting in Chair */}
+      {/* Chair Legs */}
+      <path d="M216 184L198 218" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M226 186L224 228" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M236 182L254 216" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M220 184L208 208" stroke="#64748b" strokeWidth="3" strokeLinecap="round" />
+
+      {/* Candidate Legs & Shoes */}
+      {/* Back Leg */}
+      <path d="M214 156L194 166L196 192" stroke="#334155" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+      <ellipse cx="190" cy="196" rx="10" ry="5" fill="#78350f" />
+      <path d="M181 196C181 193 185 192 188 194" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
+
+      {/* Front Leg */}
+      <path d="M224 164L184 176L182 206" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="166" y="202" width="22" height="9" rx="4.5" fill="#78350f" />
+      <rect x="166" y="203" width="7" height="7" rx="3.5" fill="#ffffff" />
+
+      {/* Ergonomic Yellow Chair Seat & Backrest */}
+      <path
+        d="M196 164C196 156 226 152 242 162C248 166 254 132 260 134C268 136 268 176 248 184C228 192 196 174 196 164Z"
+        fill="#f59e0b"
+        stroke="#d97706"
+        strokeWidth="2"
+      />
+      <path
+        d="M236 178C252 174 262 152 260 134C266 136 267 174 248 184Z"
+        fill="#fbbf24"
+      />
+
+      {/* Candidate Torso (White T-shirt with Dark Navy Raglan Sleeves) */}
+      <path
+        d="M214 118C222 114 238 115 244 122L240 166C228 170 214 166 210 158L214 118Z"
+        fill="#f8fafc"
+      />
+      {/* Left Sleeve & Raised Arm Holding Stylus Pen */}
+      <path
+        d="M216 120L202 128L194 110"
+        stroke="#fda4af"
+        strokeWidth="9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M218 119L205 127"
+        stroke="#1e293b"
+        strokeWidth="11"
+        strokeLinecap="round"
+      />
+      {/* Stylus Pen in Hand */}
+      <path d="M185 108L201 100" stroke="#78350f" strokeWidth="3" strokeLinecap="round" />
+
+      {/* Right Sleeve & Arm Resting by Chair */}
+      <path
+        d="M242 122L252 142L246 164"
+        stroke="#fda4af"
+        strokeWidth="9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M241 121L250 138"
+        stroke="#1e293b"
+        strokeWidth="11"
+        strokeLinecap="round"
+      />
+
+      {/* Candidate Head, Glasses & Hair */}
+      {/* Neck */}
+      <rect x="223" y="108" width="11" height="10" rx="4" fill="#fb7185" />
+      {/* Face */}
+      <rect x="214" y="84" width="26" height="27" rx="11" fill="#fda4af" />
+      {/* Ear */}
+      <circle cx="241" cy="98" r="4" fill="#fda4af" />
+      {/* Hair */}
+      <path
+        d="M213 91C212 81 220 76 230 77C238 77 244 82 243 92C240 87 235 85 227 85C220 85 216 88 213 91Z"
+        fill="#92400e"
+      />
+      {/* Glasses */}
+      <circle cx="221" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
+      <circle cx="232" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
+      <path d="M225 96H228" stroke="#475569" strokeWidth="1.5" />
+      {/* Eyes & Smile */}
+      <circle cx="221" cy="96" r="1.3" fill="#0f172a" />
+      <circle cx="232" cy="96" r="1.3" fill="#0f172a" />
+      <path d="M224 104C226 105.5 229 105.5 231 104" stroke="#be123c" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * Slide 2 Isometric Illustration:
+ * Exam Preparation, Admit Card & Live MCQ Result Architecture Desk.
+ */
+function ExamPrepIllustration() {
+  return (
+    <svg
+      width="270"
+      height="225"
+      viewBox="0 0 320 265"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+    >
+      {/* Ground Shadow */}
+      <ellipse cx="160" cy="232" rx="124" ry="22" fill="#e2e8f0" opacity="0.65" />
+      <ellipse cx="152" cy="228" rx="95" ry="15" fill="#cbd5e1" opacity="0.45" />
+
+      {/* Isometric Desk Legs */}
+      <path d="M52 146V218" stroke="#334155" strokeWidth="7" strokeLinecap="round" />
+      <path d="M118 186V248" stroke="#1e293b" strokeWidth="7" strokeLinecap="round" />
+      <path d="M186 84V156" stroke="#475569" strokeWidth="6" strokeLinecap="round" />
+      <path d="M254 122V194" stroke="#334155" strokeWidth="6" strokeLinecap="round" />
+
+      {/* Isometric Desk Surface */}
+      <path
+        d="M38 140L118 188L266 116L266 125L118 197L38 149Z"
+        fill="#d97706"
+        opacity="0.35"
+      />
+      <path
+        d="M38 140L186 68L266 116L118 188L38 140Z"
+        fill="#fef3c7"
+        stroke="#f59e0b"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M44 140L186 71L260 116L118 184L44 140Z"
+        fill="#fffbeb"
+      />
+
+      {/* Stack of Academic Books on Left Corner of Desk */}
+      {/* Bottom Book (Blue) */}
+      <path d="M54 132L84 117L104 129L74 144Z" fill="#2563eb" />
+      <path d="M54 132L74 144V151L54 139Z" fill="#1d4ed8" />
+      <path d="M74 144L104 129V136L74 151Z" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1" />
+      {/* Top Book (Amber/Gold) */}
+      <path d="M58 124L86 110L104 121L76 135Z" fill="#f59e0b" />
+      <path d="M58 124L76 135V141L58 130Z" fill="#d97706" />
+      <path d="M76 135L104 121V127L76 141Z" fill="#fffbeb" stroke="#fde68a" strokeWidth="1" />
+
+      {/* Monitor Stand & Isometric Exam Screen */}
+      <path d="M142 114L162 126L148 134L128 122Z" fill="#cbd5e1" />
+      <path d="M142 98V122L152 127V103Z" fill="#94a3b8" />
+      <path d="M100 54L184 13L190 16L190 88L106 129L100 126Z" fill="#1e293b" />
+      <path
+        d="M104 56L188 15L188 86L104 127Z"
+        fill="#0f172a"
+        stroke="#fbbf24"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M108 60L184 23L184 78L108 115Z" fill="#312e81" />
+      <path d="M104 117L188 76L188 86L104 127Z" fill="#f8fafc" />
+      <circle cx="146" cy="101" r="2.2" fill="#334155" />
+
+      {/* MCQ Options & Progress Bars on Monitor */}
+      <path d="M114 66L144 51" stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round" />
+      <path d="M114 75L140 62" stroke="#34d399" strokeWidth="3" strokeLinecap="round" />
+      <path d="M114 84L142 70" stroke="#a5b4fc" strokeWidth="3" strokeLinecap="round" />
+      <path d="M114 93L136 82" stroke="#fbbf24" strokeWidth="3" strokeLinecap="round" />
+
+      {/* Floating Admit Card & Trophy Result Panel */}
+      <path
+        d="M150 42L200 18L200 60L150 84Z"
+        fill="#ffffff"
+        stroke="#fde68a"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path d="M155 46L195 26L195 54L155 74Z" fill="#fef3c7" />
+      {/* Trophy / Star Badge inside Floating Card */}
+      <circle cx="175" cy="48" r="9" fill="#f59e0b" />
+      <path d="M171 48L174 51L180 45" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+
+      {/* Open Exam Answer Sheet & Pencil on Desk */}
+      <path
+        d="M116 148L156 128L174 139L134 159Z"
+        fill="#ffffff"
+        stroke="#cbd5e1"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M125 148L152 134" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" />
+      <path d="M130 152L157 138" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
+      <path d="M135 155L162 141" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+
+      {/* Isometric Graduation Cap on Top Right of Desk */}
+      <path d="M176 96L198 85L220 96L198 107Z" fill="#1e293b" stroke="#fbbf24" strokeWidth="1.2" />
+      <path d="M186 101V109C186 112 210 112 210 109V101" fill="#334155" />
+      <path d="M214 99L218 111" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+
+      {/* Candidate Character at Desk */}
+      <path d="M216 184L198 218" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M226 186L224 228" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M236 182L254 216" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M214 156L194 166L196 192" stroke="#334155" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+      <ellipse cx="190" cy="196" rx="10" ry="5" fill="#78350f" />
+      <path d="M224 164L184 176L182 206" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="166" y="202" width="22" height="9" rx="4.5" fill="#78350f" />
+      <rect x="166" y="203" width="7" height="7" rx="3.5" fill="#ffffff" />
+
+      {/* Chair */}
+      <path
+        d="M196 164C196 156 226 152 242 162C248 166 254 132 260 134C268 136 268 176 248 184C228 192 196 174 196 164Z"
+        fill="#f59e0b"
+        stroke="#d97706"
+        strokeWidth="2"
+      />
+      <path d="M236 178C252 174 262 152 260 134C266 136 267 174 248 184Z" fill="#fbbf24" />
+
+      {/* Torso & Arms */}
+      <path d="M214 118C222 114 238 115 244 122L240 166C228 170 214 166 210 158L214 118Z" fill="#f8fafc" />
+      <path d="M216 120L198 130L184 122" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M218 119L203 128" stroke="#312e81" strokeWidth="11" strokeLinecap="round" />
+      <path d="M176 118L190 125" stroke="#d97706" strokeWidth="3" strokeLinecap="round" />
+      <path d="M242 122L252 142L246 164" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M241 121L250 138" stroke="#312e81" strokeWidth="11" strokeLinecap="round" />
+
+      {/* Head */}
+      <rect x="223" y="108" width="11" height="10" rx="4" fill="#fb7185" />
+      <rect x="214" y="84" width="26" height="27" rx="11" fill="#fda4af" />
+      <circle cx="241" cy="98" r="4" fill="#fda4af" />
+      <path d="M213 91C212 81 220 76 230 77C238 77 244 82 243 92C240 87 235 85 227 85C220 85 216 88 213 91Z" fill="#78350f" />
+      <circle cx="221" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
+      <circle cx="232" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
+      <path d="M225 96H228" stroke="#475569" strokeWidth="1.5" />
+      <circle cx="221" cy="96" r="1.3" fill="#0f172a" />
+      <circle cx="232" cy="96" r="1.3" fill="#0f172a" />
+      <path d="M224 104C226 105.5 229 105.5 231 104" stroke="#be123c" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * Slide 3 Isometric Illustration:
+ * Smart Filter (District & Qualification) & Saved Circular Organizer Desk.
+ */
+function SmartFilterIllustration() {
+  return (
+    <svg
+      width="270"
+      height="225"
+      viewBox="0 0 320 265"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ display: 'block', maxWidth: '100%', height: 'auto' }}
+    >
+      {/* Ground Shadow */}
+      <ellipse cx="160" cy="232" rx="124" ry="22" fill="#e2e8f0" opacity="0.65" />
+      <ellipse cx="152" cy="228" rx="95" ry="15" fill="#cbd5e1" opacity="0.45" />
+
+      {/* Isometric Desk Legs */}
+      <path d="M52 146V218" stroke="#334155" strokeWidth="7" strokeLinecap="round" />
+      <path d="M118 186V248" stroke="#1e293b" strokeWidth="7" strokeLinecap="round" />
+      <path d="M186 84V156" stroke="#475569" strokeWidth="6" strokeLinecap="round" />
+      <path d="M254 122V194" stroke="#334155" strokeWidth="6" strokeLinecap="round" />
+
+      {/* Isometric Desk Surface */}
+      <path
+        d="M38 140L118 188L266 116L266 125L118 197L38 149Z"
+        fill="#d97706"
+        opacity="0.35"
+      />
+      <path
+        d="M38 140L186 68L266 116L118 188L38 140Z"
+        fill="#fef3c7"
+        stroke="#f59e0b"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M44 140L186 71L260 116L118 184L44 140Z"
+        fill="#fffbeb"
+      />
+
+      {/* Saved Circular File Organizer Box on Left of Desk */}
+      <path d="M56 126L84 112L104 124L76 138Z" fill="#059669" />
+      <path d="M56 126L76 138V152L56 140Z" fill="#047857" />
+      <path d="M76 138L104 124V138L76 152Z" fill="#065f46" />
+      {/* Bookmark File Tabs sticking out */}
+      <path d="M64 122L82 113L88 117L70 126Z" fill="#fbbf24" />
+      <path d="M72 126L90 117L96 121L78 130Z" fill="#ffffff" />
+
+      {/* Monitor Stand & Isometric Filter Screen */}
+      <path d="M142 114L162 126L148 134L128 122Z" fill="#cbd5e1" />
+      <path d="M142 98V122L152 127V103Z" fill="#94a3b8" />
+      <path d="M100 54L184 13L190 16L190 88L106 129L100 126Z" fill="#1e293b" />
+      <path
+        d="M104 56L188 15L188 86L104 127Z"
+        fill="#0f172a"
+        stroke="#fbbf24"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path d="M108 60L184 23L184 78L108 115Z" fill="#064e3b" />
+      <path d="M104 117L188 76L188 86L104 127Z" fill="#f8fafc" />
+      <circle cx="146" cy="101" r="2.2" fill="#334155" />
+
+      {/* Filter Bars inside Monitor */}
+      <path d="M114 66L142 52" stroke="#6ee7b7" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M114 76L138 64" stroke="#fde68a" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M114 86L144 71" stroke="#a7f3d0" strokeWidth="3.5" strokeLinecap="round" />
+
+      {/* Floating Search & Bookmark Card on Monitor */}
+      <path
+        d="M150 42L200 18L200 60L150 84Z"
+        fill="#ffffff"
+        stroke="#fde68a"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path d="M155 46L195 26L195 54L155 74Z" fill="#fef3c7" />
+      {/* Magnifying Glass Icon inside Floating Card */}
+      <circle cx="173" cy="46" r="7" stroke="#d97706" strokeWidth="2.5" fill="#ffffff" />
+      <path d="M178 51L184 57" stroke="#d97706" strokeWidth="2.8" strokeLinecap="round" />
+
+      {/* Keyboard & Bookmarked Circular Cards on Desk */}
+      <path
+        d="M124 146L164 126L174 132L134 152Z"
+        fill="#ffffff"
+        stroke="#cbd5e1"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path d="M130 146L162 130" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 3" />
+      <path
+        d="M174 116L200 103L216 112L190 125Z"
+        fill="#f59e0b"
+        stroke="#b45309"
+        strokeWidth="1.4"
+      />
+      <path d="M179 116L199 106L210 112L190 122Z" fill="#ffffff" />
+
+      {/* Candidate Character at Desk */}
+      <path d="M216 184L198 218" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M226 186L224 228" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M236 182L254 216" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M214 156L194 166L196 192" stroke="#334155" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
+      <ellipse cx="190" cy="196" rx="10" ry="5" fill="#78350f" />
+      <path d="M224 164L184 176L182 206" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="166" y="202" width="22" height="9" rx="4.5" fill="#78350f" />
+      <rect x="166" y="203" width="7" height="7" rx="3.5" fill="#ffffff" />
+
+      {/* Chair */}
+      <path
+        d="M196 164C196 156 226 152 242 162C248 166 254 132 260 134C268 136 268 176 248 184C228 192 196 174 196 164Z"
+        fill="#f59e0b"
+        stroke="#d97706"
+        strokeWidth="2"
+      />
+      <path d="M236 178C252 174 262 152 260 134C266 136 267 174 248 184Z" fill="#fbbf24" />
+
+      {/* Torso & Arms */}
+      <path d="M214 118C222 114 238 115 244 122L240 166C228 170 214 166 210 158L214 118Z" fill="#f8fafc" />
+      <path d="M216 120L202 128L194 110" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M218 119L205 127" stroke="#065f46" strokeWidth="11" strokeLinecap="round" />
+      <path d="M185 108L201 100" stroke="#78350f" strokeWidth="3" strokeLinecap="round" />
+      <path d="M242 122L252 142L246 164" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M241 121L250 138" stroke="#065f46" strokeWidth="11" strokeLinecap="round" />
+
+      {/* Head */}
+      <rect x="223" y="108" width="11" height="10" rx="4" fill="#fb7185" />
+      <rect x="214" y="84" width="26" height="27" rx="11" fill="#fda4af" />
+      <circle cx="241" cy="98" r="4" fill="#fda4af" />
+      <path d="M213 91C212 81 220 76 230 77C238 77 244 82 243 92C240 87 235 85 227 85C220 85 216 88 213 91Z" fill="#92400e" />
+      <circle cx="221" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
+      <circle cx="232" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
+      <path d="M225 96H228" stroke="#475569" strokeWidth="1.5" />
+      <circle cx="221" cy="96" r="1.3" fill="#0f172a" />
+      <circle cx="232" cy="96" r="1.3" fill="#0f172a" />
+      <path d="M224 104C226 105.5 229 105.5 231 104" stroke="#be123c" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const slides = [
   {
     id: 1,
     title: 'সব চাকরির খবর এক জায়গায়',
     titleEn: 'All Job Circulars in One Place',
     subtitle: 'শিক্ষা মন্ত্রণালয়, পুলিশ, ব্যাংক, এনজিও ও প্রাইভেট চাকরির নিয়োগ বিজ্ঞপ্তি পান সবার আগে।',
-    subtitleEn: 'Get verified notifications of Government, Bank, NGO, and private job circulars first.',
-    headerTitle: 'চাকরির নিয়োগ পোর্টাল',
-    headerTitleEn: 'Job Circular Portal',
-    headerBadge: 'অফিসিয়াল সোর্স',
-    headerBadgeEn: 'Verified Source',
-    accentColor: '#1a56db',
-    accentBg: '#eff6ff',
-    accentBorder: '#bfdbfe',
-    items: [
-      {
-        code: 'GOV',
-        codeBg: '#dbeafe',
-        codeColor: '#1d4ed8',
-        title: 'সরকারি ও মন্ত্রণালয় নিয়োগ',
-        titleEn: 'Government & Ministry Jobs',
-        meta: 'বিসিএস, প্রাথমিক শিক্ষক, নিবন্ধন (NTRCA) ও অধিদপ্তর',
-        metaEn: 'BCS, Primary, NTRCA & Directorate Circulars',
-        tag: 'সরকারি',
-        tagEn: 'Govt'
-      },
-      {
-        code: 'BNK',
-        codeBg: '#e0e7ff',
-        codeColor: '#4338ca',
-        title: 'ব্যাংক ও আর্থিক প্রতিষ্ঠান',
-        titleEn: 'Bank & Financial Institutions',
-        meta: 'বাংলাদেশ ব্যাংক, সমন্বিত ব্যাংক ও বেসরকারি ব্যাংক',
-        metaEn: 'Bangladesh Bank, Combined & Private Banks',
-        tag: 'ব্যাংক',
-        tagEn: 'Bank'
-      },
-      {
-        code: 'NGO',
-        codeBg: '#dcfce7',
-        codeColor: '#15803d',
-        title: 'এনজিও ও প্রাইভেট ক্যারিয়ার',
-        titleEn: 'NGO & Corporate Sector',
-        meta: 'জাতীয় ও আন্তর্জাতিক উন্নয়ন সংস্থা এবং কর্পোরেট জব',
-        metaEn: 'National & International NGOs and Private Jobs',
-        tag: 'প্রাইভেট',
-        tagEn: 'Private'
-      }
-    ],
-    footerLeft: 'প্রতিদিন নতুন সার্কুলার আপডেট',
-    footerLeftEn: 'Daily Verified Circulars',
-    footerRight: 'মূল পিডিএফ সহ',
-    footerRightEn: 'With Official PDF'
+    subtitleEn: 'Get notification of Government, Bank, NGO, and private job circulars first.',
+    illustration: <JobPortalIllustration />
   },
   {
     id: 2,
-    title: 'পরীক্ষার নোটিশ ও প্রস্তুতি',
-    titleEn: 'Exam Notices, Live MCQ & Results',
-    subtitle: 'অ্যাডমিট কার্ড ডাউনলোড, পরীক্ষার সময়সূচি, লাইভ এমসিকিউ পরীক্ষা ও ফলাফলের আপডেট পান সাথে সাথে।',
-    subtitleEn: 'Download admit cards, join live MCQ exams, and receive instant result updates.',
-    headerTitle: 'একাডেমিক ও পরীক্ষা আর্কিটেকচার',
-    headerTitleEn: 'Exam & Preparation Hub',
-    headerBadge: 'লাইভ প্রস্তুতি',
-    headerBadgeEn: 'Live Prep',
-    accentColor: '#4f46e5',
-    accentBg: '#eef2ff',
-    accentBorder: '#c7d2fe',
-    items: [
-      {
-        code: 'MCQ',
-        codeBg: '#fef3c7',
-        codeColor: '#b45309',
-        title: 'লাইভ এমসিকিউ ও মডেল টেস্ট',
-        titleEn: 'Live MCQ & Model Tests',
-        meta: 'সিলেবাস ভিত্তিক লাইভ পরীক্ষা, ব্যাখ্যা ও মেধা তালিকা',
-        metaEn: 'Syllabus-based Live Exams, Explanations & Ranks',
-        tag: 'লাইভ',
-        tagEn: 'Live'
-      },
-      {
-        code: 'ADM',
-        codeBg: '#e0e7ff',
-        codeColor: '#4338ca',
-        title: 'প্রবেশপত্র ও পরীক্ষার সময়সূচি',
-        titleEn: 'Admit Card & Exam Schedule',
-        meta: 'পরীক্ষার তারিখ, আসন বিন্যাস ও প্রবেশপত্র ডাউনলোড',
-        metaEn: 'Exam Dates, Seat Plans & Admit Card Notices',
-        tag: 'নোটিশ',
-        tagEn: 'Notice'
-      },
-      {
-        code: 'RES',
-        codeBg: '#dcfce7',
-        codeColor: '#15803d',
-        title: 'ফলাফল ও বিগত প্রশ্নব্যাংক',
-        titleEn: 'Results & Question Bank',
-        meta: 'প্রিলিমিনারি ও লিখিত রেজাল্ট এবং বিগত সালের প্রশ্ন সমাধান',
-        metaEn: 'Exam Results & Previous Year Question Solutions',
-        tag: 'রেজাল্ট',
-        tagEn: 'Result'
-      }
-    ],
-    footerLeft: 'বিষয়ভিত্তিক প্রস্তুতি ও সমাধান',
-    footerLeftEn: 'Subject-wise Prep & Solutions',
-    footerRight: 'তাৎক্ষণিক অ্যালার্ট',
-    footerRightEn: 'Instant Alerts'
+    title: 'পরীক্ষার নোটিশ ও রেজাল্ট',
+    titleEn: 'Exam Dates & Results',
+    subtitle: 'অ্যাডমিট কার্ড ডাউনলোড, পরীক্ষার সময়সূচি এবং ফলাফলের নোটিফিকেশন পান সাথে সাথে।',
+    subtitleEn: 'Download admit cards, get exam schedules, and receive instant result alerts.',
+    illustration: <ExamPrepIllustration />
   },
   {
     id: 3,
@@ -116,57 +571,7 @@ const slides = [
     titleEn: 'Smart Filter & Bookmarks',
     subtitle: 'আপনার যোগ্যতা ও জেলা অনুযায়ী চাকরি খুঁজুন এবং প্রয়োজনীয় সার্কুলার বুকমার্ক করে রাখুন।',
     subtitleEn: 'Filter jobs by your educational qualification and district, and bookmark circulars.',
-    headerTitle: 'স্মার্ট ক্যারিয়ার অর্গানাইজার',
-    headerTitleEn: 'Smart Career Organizer',
-    headerBadge: 'পার্সোনালাইজড',
-    headerBadgeEn: 'Personalized',
-    accentColor: '#059669',
-    accentBg: '#ecfdf5',
-    accentBorder: '#a7f3d0',
-    filterPills: [
-      { bn: 'স্নাতক / মাস্টার্স', en: 'Graduate / Masters' },
-      { bn: 'এইচএসসি / ডিপ্লোমা', en: 'HSC / Diploma' },
-      { bn: 'সকল ৬৪ জেলা', en: 'All 64 Districts' }
-    ],
-    items: [
-      {
-        code: 'EDU',
-        codeBg: '#d1fae5',
-        codeColor: '#047857',
-        title: 'যোগ্যতা ও জেলা ভিত্তিক ফিল্টার',
-        titleEn: 'Qualification & District Filter',
-        meta: 'শিক্ষাগত যোগ্যতা, অভিজ্ঞতা ও নিজ জেলা অনুযায়ী বাছাই',
-        metaEn: 'Filter by Education, Experience & Home District',
-        tag: 'ফিল্টার',
-        tagEn: 'Filter'
-      },
-      {
-        code: 'SAV',
-        codeBg: '#dbeafe',
-        codeColor: '#1d4ed8',
-        title: 'প্রয়োজনীয় সার্কুলার বুকমার্ক',
-        titleEn: 'Saved Circulars & Offline Access',
-        meta: 'পছন্দের বিজ্ঞপ্তি ও প্রশ্নপত্র সংরক্ষণ করে যেকোনো সময় দেখুন',
-        metaEn: 'Bookmark important circulars for quick access anytime',
-        tag: 'সেভড',
-        tagEn: 'Saved'
-      },
-      {
-        code: 'DLINE',
-        codeBg: '#fee2e2',
-        codeColor: '#b91c1c',
-        title: 'আবেদনের সময়সীমা ট্র্যাকার',
-        titleEn: 'Application Deadline Tracker',
-        meta: 'আবেদনের শেষ তারিখ শেষ হওয়ার আগেই সতর্কবার্তা',
-        metaEn: 'Track remaining days before application closes',
-        tag: 'ডেডলাইন',
-        tagEn: 'Deadline'
-      }
-    ],
-    footerLeft: 'সহজ ও দ্রুত ক্যাটাগরি সার্চ',
-    footerLeftEn: 'Fast Category Search',
-    footerRight: 'অফলাইন বুকমার্ক',
-    footerRightEn: 'Offline Bookmarks'
+    illustration: <SmartFilterIllustration />
   }
 ];
 
@@ -299,226 +704,17 @@ export default function Onboarding() {
         </button>
       </div>
 
-      {/* Educational & Career Architecture Panel (Static, Polished, Content-Driven) */}
+      {/* Isometric Educational & Career Workspace Illustration (Static, Smooth & Polished) */}
       <div className="onboarding-hero">
         <div
-          className="onboarding-arch-card"
           style={{
-            background: isDark
-              ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            border: isDark
-              ? '1px solid rgba(255, 255, 255, 0.1)'
-              : '1.2px solid rgba(226, 232, 240, 0.95)',
-            boxShadow: isDark
-              ? '0 10px 28px -4px rgba(0, 0, 0, 0.55), inset 0 1px 1.5px rgba(255, 255, 255, 0.08)'
-              : '0 10px 28px -6px rgba(15, 23, 42, 0.08), 0 3px 8px -2px rgba(15, 23, 42, 0.04), inset 0 2px 3px #ffffff'
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%'
           }}
         >
-          {/* Card Top Architecture Bar */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '10px 12px',
-              background: isDark ? 'rgba(15, 23, 42, 0.6)' : slide.accentBg,
-              borderBottom: isDark
-                ? '1px solid rgba(255, 255, 255, 0.08)'
-                : `1px solid ${slide.accentBorder}`
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-              <span
-                style={{
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  background: slide.accentColor,
-                  display: 'inline-block'
-                }}
-              />
-              <span
-                style={{
-                  fontSize: '11.5px',
-                  fontWeight: 800,
-                  color: isDark ? '#f8fafc' : '#0f172a',
-                  letterSpacing: '-0.1px'
-                }}
-              >
-                {isEn ? slide.headerTitleEn : slide.headerTitle}
-              </span>
-            </div>
-            <span
-              style={{
-                fontSize: '9.5px',
-                fontWeight: 700,
-                color: isDark ? '#93c5fd' : slide.accentColor,
-                background: isDark ? 'rgba(30, 41, 59, 0.9)' : '#ffffff',
-                border: isDark
-                  ? '1px solid rgba(255, 255, 255, 0.1)'
-                  : `1px solid ${slide.accentBorder}`,
-                padding: '2px 8px',
-                borderRadius: '999px'
-              }}
-            >
-              {isEn ? slide.headerBadgeEn : slide.headerBadge}
-            </span>
-          </div>
-
-          {/* Optional Filter Chips Row (for Slide 3) */}
-          {slide.filterPills && (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px',
-                padding: '8px 12px 2px 12px',
-                flexWrap: 'nowrap',
-                overflow: 'hidden'
-              }}
-            >
-              {slide.filterPills.map((pill, idx) => (
-                <span
-                  key={idx}
-                  style={{
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    color: isDark ? '#e2e8f0' : '#334155',
-                    background: isDark ? 'rgba(30, 41, 59, 0.85)' : '#f1f5f9',
-                    border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0',
-                    padding: '3px 7px',
-                    borderRadius: '5px',
-                    whiteSpace: 'nowrap',
-                    flex: 1,
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
-                >
-                  {isEn ? pill.en : pill.bn}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Structured Content Modules */}
-          <div style={{ padding: '10px 12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {slide.items.map((item, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '9px 10px',
-                  borderRadius: '8px',
-                  background: isDark
-                    ? 'rgba(30, 41, 59, 0.7)'
-                    : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-                  border: isDark
-                    ? '1px solid rgba(255, 255, 255, 0.07)'
-                    : '1px solid rgba(226, 232, 240, 0.9)',
-                  boxShadow: isDark
-                    ? 'none'
-                    : '0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 1px 1.5px #ffffff'
-                }}
-              >
-                {/* Module Code Pill */}
-                <div
-                  style={{
-                    width: '34px',
-                    height: '34px',
-                    borderRadius: '7px',
-                    background: isDark ? 'rgba(59, 130, 246, 0.18)' : item.codeBg,
-                    color: isDark ? '#93c5fd' : item.codeColor,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '9.5px',
-                    fontWeight: 800,
-                    letterSpacing: '0.2px',
-                    flexShrink: 0,
-                    border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(255,255,255,0.8)'
-                  }}
-                >
-                  {item.code}
-                </div>
-
-                {/* Module Text Info */}
-                <div style={{ flex: 1, minWidth: 0, textAlign: 'left' }}>
-                  <div
-                    style={{
-                      fontSize: '11.5px',
-                      fontWeight: 700,
-                      color: isDark ? '#f8fafc' : '#0f172a',
-                      lineHeight: 1.25,
-                      marginBottom: '2px',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}
-                  >
-                    {isEn ? item.titleEn : item.title}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: '9.8px',
-                      fontWeight: 500,
-                      color: isDark ? '#94a3b8' : '#64748b',
-                      lineHeight: 1.3,
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis'
-                    }}
-                  >
-                    {isEn ? item.metaEn : item.meta}
-                  </div>
-                </div>
-
-                {/* Right Status Tag */}
-                <span
-                  style={{
-                    fontSize: '9px',
-                    fontWeight: 700,
-                    color: isDark ? '#cbd5e1' : '#475569',
-                    background: isDark ? 'rgba(15, 23, 42, 0.7)' : '#f1f5f9',
-                    border: isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e2e8f0',
-                    padding: '2.5px 6.5px',
-                    borderRadius: '5px',
-                    flexShrink: 0
-                  }}
-                >
-                  {isEn ? item.tagEn : item.tag}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Card Footer Architecture Summary Strip */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '8px 12px',
-              background: isDark ? 'rgba(15, 23, 42, 0.5)' : '#f8fafc',
-              borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #e2e8f0',
-              fontSize: '9.5px',
-              fontWeight: 600,
-              color: isDark ? '#94a3b8' : '#475569'
-            }}
-          >
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={slide.accentColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span>{isEn ? slide.footerLeftEn : slide.footerLeft}</span>
-            </span>
-            <span style={{ fontWeight: 700, color: isDark ? '#cbd5e1' : '#334155' }}>
-              {isEn ? slide.footerRightEn : slide.footerRight}
-            </span>
-          </div>
+          {slide.illustration}
         </div>
       </div>
 
