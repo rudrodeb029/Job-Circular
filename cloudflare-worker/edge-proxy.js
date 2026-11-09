@@ -623,7 +623,7 @@ export default {
 
       const results = await Promise.all([...fetchAll, controlFetch]);
       const controlData = results[results.length - 1];
-      const masterLastUpdated = controlData?.[0]?.last_updated || new Date().toISOString();
+      const masterLastUpdated = isBypass ? new Date().toISOString() : (controlData?.[0]?.last_updated || new Date().toISOString());
       const bootstrapPayload = {};
       CORE_COLLECTIONS.forEach((col, i) => {
         bootstrapPayload[col] = Array.isArray(results[i]) ? results[i] : [];

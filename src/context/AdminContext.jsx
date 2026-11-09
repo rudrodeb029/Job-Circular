@@ -131,7 +131,6 @@ const adminReducer = (state, action) => {
     case 'ADD_JOB':
     case 'UPDATE_JOB':
       const job = action.payload;
-      setDocument(COLLECTIONS.JOBS, job.id, job).catch(console.error);
 
       if (action.type === 'ADD_JOB' || job.shouldNotify) {
           let type = 'new_job';
@@ -154,16 +153,6 @@ const adminReducer = (state, action) => {
                 ? `${pushTitle} -এর পরীক্ষার তারিখ প্রকাশিত হয়েছে।`
                 : `${pushTitle} -এ নতুন নিয়োগ বিজ্ঞপ্তি প্রকাশিত হয়েছে।`);
 
-          broadcastPush(pushTitle, pushMsg, { jobId: job.id, type: type })
-              .then(res => {
-                  if (res.success) {
-                      console.log(`✅ Push sent for circular update ("${type}"): "${pushTitle}" → ${res.recipients} device(s)`);
-                  } else {
-                      console.error(`❌ Push failed for circular: "${pushTitle}" →`, res.error);
-                  }
-              })
-              .catch(err => console.error('Push error for circular:', err));
-
           // Auto-generate and save in-app notification record
           const notifId = `notif-job-${job.id}`;
           const notifObj = {
@@ -175,9 +164,26 @@ const adminReducer = (state, action) => {
             jobId: job.id,
             createdAt: job.createdAt || new Date().toISOString()
           };
-          setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj).catch(console.error);
+
+          // Save circular + notification & refresh KV cache FIRST, then send push notification
+          Promise.all([
+            setDocument(COLLECTIONS.JOBS, job.id, job),
+            setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj)
+          ])
+            .then(() => broadcastPush(pushTitle, pushMsg, { jobId: job.id, type: type }))
+            .then(res => {
+              if (res?.success) {
+                console.log(`✅ Push sent for circular update ("${type}"): "${pushTitle}" → ${res.recipients} device(s)`);
+              } else {
+                console.error(`❌ Push failed for circular: "${pushTitle}" →`, res?.error);
+              }
+            })
+            .catch(err => console.error('Save or Push error for circular:', err));
+
           newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
           saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
+      } else {
+          setDocument(COLLECTIONS.JOBS, job.id, job).catch(console.error);
       }
 
       if (action.type === 'ADD_JOB') {
@@ -252,21 +258,21 @@ const adminReducer = (state, action) => {
         }
       }
 
-      setDocument(COLLECTIONS.NOTIFICATIONS, notifItem.id, notifItem).catch(console.error);
-
       if (action.type === 'ADD_NOTIFICATION') {
-        broadcastPush(notifItem.title || notifItem.organization, notifItem.message, { jobId: notifItem.jobId, type: notifItem.type })
+        setDocument(COLLECTIONS.NOTIFICATIONS, notifItem.id, notifItem)
+          .then(() => broadcastPush(notifItem.title || notifItem.organization, notifItem.message, { jobId: notifItem.jobId, type: notifItem.type }))
           .then(res => {
-            if (res.success) {
+            if (res?.success) {
               console.log(`✅ Notification push sent: "${notifItem.title}" → ${res.recipients} device(s)`);
             } else {
-              console.error(`❌ Notification push failed:`, res.error);
+              console.error(`❌ Notification push failed:`, res?.error);
             }
           })
-          .catch(err => console.error('Push error for notification:', err));
+          .catch(err => console.error('Save or Push error for notification:', err));
 
         newState.notifications = [notifItem, ...state.notifications.filter(n => n.id !== notifItem.id)].sort(sortByCreatedAt);
       } else {
+        setDocument(COLLECTIONS.NOTIFICATIONS, notifItem.id, notifItem).catch(console.error);
         newState.notifications = state.notifications.map(n => n.id === notifItem.id ? notifItem : n).sort(sortByCreatedAt);
       }
       saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
@@ -351,19 +357,9 @@ const adminReducer = (state, action) => {
     case 'UPDATE_LIVE_EXAM':
     case 'UPDATE_EXAM': {
       const examItem = action.payload;
-      setDocument(COLLECTIONS.LIVE_EXAMS, examItem.id, examItem).catch(console.error);
 
       if (action.type === 'ADD_LIVE_EXAM' || action.type === 'ADD_EXAM') {
         logActivity('add', `Scheduled new live exam: ${examItem.title}`);
-        sendExamCountdownPush(examItem)
-          .then(res => {
-            if (res.success) {
-              console.log(`✅ Exam push sent: "${examItem.title}" → ${res.recipients} device(s)`);
-            } else {
-              console.error(`❌ Exam push failed: "${examItem.title}" →`, res.error);
-            }
-          })
-          .catch(err => console.error('Push error for exam:', err));
 
         const notifId = `notif-exam-${examItem.id}`;
         const baseTitle = examItem.title || 'লাইভ এমসিকিউ পরীক্ষা';
@@ -377,11 +373,27 @@ const adminReducer = (state, action) => {
           examId: examItem.id,
           createdAt: examItem.createdAt || new Date().toISOString()
         };
-        setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj).catch(console.error);
+
+        // Save live exam + notification & refresh KV cache FIRST, then send push notification
+        Promise.all([
+          setDocument(COLLECTIONS.LIVE_EXAMS, examItem.id, examItem),
+          setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj)
+        ])
+          .then(() => sendExamCountdownPush(examItem))
+          .then(res => {
+            if (res?.success) {
+              console.log(`✅ Exam push sent: "${examItem.title}" → ${res.recipients} device(s)`);
+            } else {
+              console.error(`❌ Exam push failed: "${examItem.title}" →`, res?.error);
+            }
+          })
+          .catch(err => console.error('Save or Push error for exam:', err));
+
         newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
         saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
         newState.liveExams = [examItem, ...state.liveExams.filter(e => e.id !== examItem.id)].sort(sortByCreatedAt);
       } else {
+        setDocument(COLLECTIONS.LIVE_EXAMS, examItem.id, examItem).catch(console.error);
         logActivity('update', `Updated live exam: ${examItem.title}`);
         newState.liveExams = state.liveExams.map(e => e.id === examItem.id ? examItem : e).sort(sortByCreatedAt);
       }
@@ -402,19 +414,9 @@ const adminReducer = (state, action) => {
     case 'ADD_QUESTION_PAPER':
     case 'UPDATE_QUESTION_PAPER': {
       const paperItem = action.payload;
-      setDocument(COLLECTIONS.QUESTIONS, paperItem.id, paperItem).catch(console.error);
 
       if (action.type === 'ADD_QUESTION_PAPER') {
         logActivity('add', `Created question paper: ${paperItem.title}`);
-        broadcastPush("নতুন প্রশ্নপত্র", `${paperItem.title} - প্রস্তুতি নিন এখনই!`, { paperId: paperItem.id, type: 'new_paper' })
-          .then(res => {
-            if (res.success) {
-              console.log(`✅ Question paper push sent: "${paperItem.title}" → ${res.recipients} device(s)`);
-            } else {
-              console.error(`❌ Question paper push failed:`, res.error);
-            }
-          })
-          .catch(err => console.error('Push error for question paper:', err));
 
         const notifId = `notif-paper-${paperItem.id}`;
         const baseTitle = paperItem.title || 'নতুন প্রশ্নপত্র';
@@ -428,11 +430,27 @@ const adminReducer = (state, action) => {
           paperId: paperItem.id,
           createdAt: paperItem.createdAt || new Date().toISOString()
         };
-        setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj).catch(console.error);
+
+        // Save question paper + notification & refresh KV cache FIRST, then send push notification
+        Promise.all([
+          setDocument(COLLECTIONS.QUESTIONS, paperItem.id, paperItem),
+          setDocument(COLLECTIONS.NOTIFICATIONS, notifId, notifObj)
+        ])
+          .then(() => broadcastPush("নতুন প্রশ্নপত্র", `${paperItem.title} - প্রস্তুতি নিন এখনই!`, { paperId: paperItem.id, type: 'new_paper' }))
+          .then(res => {
+            if (res?.success) {
+              console.log(`✅ Question paper push sent: "${paperItem.title}" → ${res.recipients} device(s)`);
+            } else {
+              console.error(`❌ Question paper push failed:`, res?.error);
+            }
+          })
+          .catch(err => console.error('Save or Push error for question paper:', err));
+
         newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
         saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
         newState.questions = [paperItem, ...state.questions.filter(p => p.id !== paperItem.id)].sort(sortByCreatedAt);
       } else {
+        setDocument(COLLECTIONS.QUESTIONS, paperItem.id, paperItem).catch(console.error);
         logActivity('update', `Updated question paper: ${paperItem.title}`);
         newState.questions = state.questions.map(p => p.id === paperItem.id ? paperItem : p).sort(sortByCreatedAt);
       }
@@ -458,22 +476,30 @@ const adminReducer = (state, action) => {
 
     case 'ADD_FEED_POST': {
       const post = action.payload;
-      setDocument(COLLECTIONS.FEED_POSTS, post.id, post).catch(console.error);
-      newState.feedPosts = [post, ...(newState.feedPosts || state.feedPosts || [])].sort(sortByCreatedAt);
+      newState.feedPosts = [post, ...(newState.feedPosts || state.feedPosts || []).filter(p => p.id !== post.id)].sort(sortByCreatedAt);
       saveLocalCache(COLLECTIONS.FEED_POSTS, newState.feedPosts);
       window.dispatchEvent(new CustomEvent('feed_posts_updated', { detail: newState.feedPosts }));
 
       if (post.shouldNotify !== false) {
-        try {
-          const pushTitle = '📢 লাইভ ফিড আপডেট';
-          const pushMsg = post.content
-            ? (post.content.length > 90 ? post.content.slice(0, 90) + '...' : post.content)
-            : 'লাইভ ফিডে একটি নতুন আপডেট পোস্ট করা হয়েছে। দেখুন এখনই!';
+        const cleanFeedText = stripHtmlTags(post.content || '');
+        const pushTitle = '📢 লাইভ ফিড আপডেট';
+        const pushMsg = cleanFeedText
+          ? (cleanFeedText.length > 90 ? cleanFeedText.slice(0, 90) + '...' : cleanFeedText)
+          : 'লাইভ ফিডে একটি নতুন আপডেট পোস্ট করা হয়েছে। দেখুন এখনই!';
 
-          broadcastPush(pushTitle, pushMsg, { type: 'feed_update', postId: post.id }).catch(console.error);
-        } catch (err) {
-          console.warn('Feed push notification error:', err);
-        }
+        // Save feed post & refresh KV cache FIRST, then send push notification
+        setDocument(COLLECTIONS.FEED_POSTS, post.id, post)
+          .then(() => broadcastPush(pushTitle, pushMsg, { type: 'feed_update', postId: post.id }))
+          .then(res => {
+            if (res?.success) {
+              console.log(`✅ Feed push sent → ${res.recipients} device(s)`);
+            } else {
+              console.error(`❌ Feed push failed:`, res?.error);
+            }
+          })
+          .catch(err => console.warn('Feed save or push notification error:', err));
+      } else {
+        setDocument(COLLECTIONS.FEED_POSTS, post.id, post).catch(console.error);
       }
       break;
     }

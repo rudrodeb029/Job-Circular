@@ -63,37 +63,93 @@ export const getOneSignalAppId = () => {
     return _cachedConfig?.appId || DEFAULT_APP_ID;
 };
 
+let _clickHandlerCallback = null;
+let _foregroundHandlerCallback = null;
+let _nativeListenersAttached = false;
+let _webClickListenerAttached = false;
+let _webForegroundListenerAttached = false;
+
+const attachNativeOneSignalListeners = (OneSignal) => {
+  if (_nativeListenersAttached || !OneSignal?.Notifications || typeof OneSignal.Notifications.addEventListener !== 'function') {
+    return;
+  }
+  _nativeListenersAttached = true;
+
+  OneSignal.Notifications.addEventListener('click', (event) => {
+    console.log('OneSignal: Notification clicked (Native):', event);
+    const data = event?.notification?.additionalData || event?.notification?.data || {};
+    if (typeof _clickHandlerCallback === 'function') {
+      _clickHandlerCallback(data);
+    }
+  });
+
+  OneSignal.Notifications.addEventListener('foregroundWillDisplay', (event) => {
+    console.log('OneSignal: Notification received in foreground (Native):', event);
+    try {
+      if (event?.notification && typeof event.notification.display === 'function') {
+        event.notification.display();
+      }
+    } catch (e) {}
+    const data = event?.notification?.additionalData || event?.notification?.data || {};
+    if (typeof _foregroundHandlerCallback === 'function') {
+      _foregroundHandlerCallback(data);
+    }
+  });
+};
+
 /**
  * Set up a callback for when a notification is clicked.
  */
 export const setupOneSignalClickHandler = (callback) => {
-  const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+  _clickHandlerCallback = callback;
 
-  if (OneSignal) {
-    if (Capacitor.isNativePlatform()) {
-      // Native OneSignal Click Handler
-      if (OneSignal.Notifications && typeof OneSignal.Notifications.addEventListener === 'function') {
+  if (Capacitor.isNativePlatform()) {
+    const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+    if (OneSignal) {
+      attachNativeOneSignalListeners(OneSignal);
+    }
+  } else if (!_webClickListenerAttached) {
+    _webClickListenerAttached = true;
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push((OneSignal) => {
+      if (OneSignal?.Notifications && typeof OneSignal.Notifications.addEventListener === 'function') {
         OneSignal.Notifications.addEventListener('click', (event) => {
-          console.log('OneSignal: Notification clicked (Native):', event);
-          const data = event.notification.additionalData;
-          if (data && typeof callback === 'function') {
-            callback(data);
+          console.log('OneSignal: Notification clicked (Web):', event);
+          const data = event?.notification?.data || event?.notification?.additionalData || {};
+          if (typeof _clickHandlerCallback === 'function') {
+            _clickHandlerCallback(data);
           }
         });
       }
-    } else {
-      // Web OneSignal Click Handler
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      window.OneSignalDeferred.push((OneSignal) => {
-        OneSignal.Notifications.addEventListener('click', (event) => {
-          console.log('OneSignal: Notification clicked (Web):', event);
-          const data = event.notification.data;
-          if (data && typeof callback === 'function') {
-            callback(data);
+    });
+  }
+};
+
+/**
+ * Set up a callback for when a notification arrives while the app is open in the foreground.
+ */
+export const setupOneSignalForegroundHandler = (callback) => {
+  _foregroundHandlerCallback = callback;
+
+  if (Capacitor.isNativePlatform()) {
+    const OneSignal = window.OneSignal || (window.plugins && window.plugins.OneSignal);
+    if (OneSignal) {
+      attachNativeOneSignalListeners(OneSignal);
+    }
+  } else if (!_webForegroundListenerAttached) {
+    _webForegroundListenerAttached = true;
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push((OneSignal) => {
+      if (OneSignal?.Notifications && typeof OneSignal.Notifications.addEventListener === 'function') {
+        OneSignal.Notifications.addEventListener('foregroundWillDisplay', (event) => {
+          console.log('OneSignal: Notification received in foreground (Web):', event);
+          const data = event?.notification?.data || event?.notification?.additionalData || {};
+          if (typeof _foregroundHandlerCallback === 'function') {
+            _foregroundHandlerCallback(data);
           }
         });
-      });
-    }
+      }
+    });
   }
 };
 
@@ -148,6 +204,9 @@ export const initializeOneSignal = () => {
         } else if (typeof OneSignal.setAppId === 'function') {
             OneSignal.setAppId(appId);
         }
+
+        // Attach click & foreground reception listeners immediately after OneSignal.initialize
+        attachNativeOneSignalListeners(OneSignal);
 
         // Prompt for notification permission shortly after boot
         setTimeout(() => {

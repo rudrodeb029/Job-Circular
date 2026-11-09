@@ -58,6 +58,7 @@ export default function QuestionDetails() {
           .from('questions')
           .select('*')
           .eq('id', id)
+          .setHeader('Cache-Control', 'no-cache')
           .single();
 
         if (error) throw error;

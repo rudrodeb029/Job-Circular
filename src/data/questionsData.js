@@ -17,9 +17,6 @@ export const getQuestionById = (id) => {
 };
 
 export const getQuestionsData = () => {
-  if (cachedQuestionsData && cachedQuestionsData.length > 0) {
-    return cachedQuestionsData;
-  }
   try {
     const saved = localStorage.getItem('cache_data_questions') || localStorage.getItem('questions_data');
     if (saved) {
@@ -29,7 +26,7 @@ export const getQuestionsData = () => {
   } catch (e) {
     console.error('Error reading questions cache:', e);
   }
-  return [];
+  return cachedQuestionsData || [];
 };
 
 export const saveQuestionsData = async (data) => {

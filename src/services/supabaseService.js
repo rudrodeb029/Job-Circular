@@ -94,20 +94,28 @@ export const getCollection = async (collectionName, forceServer = false) => {
 const _sessionRevalidatedCollections = new Set();
 let _appInitialized = false;
 let _isStartupSyncing = false;
+let _activeStartupSyncPromise = null;
 
 /**
  * Global app initialization sync.
- * Fetches core data when the app opens or when a forced refresh is needed (e.g. floating loader click).
- * @param {boolean|string} force - If true, checks Cloudflare Worker for new data immediately.
+ * Fetches core data when the app opens or when a forced refresh is needed (e.g. floating loader click or push notification).
+ * @param {boolean|string} force - If true/'admin_force'/'push_force', bypasses conditional/HTTP cache and fetches fresh data immediately.
  */
-
-
 export const syncCoreDataOnStartup = async (force = false) => {
   if (!navigator.onLine) return null;
-  if (_isStartupSyncing) return null;
 
   const isExplicitForce = Boolean(force);
-  const isExplicitAdminBypass = force === 'admin_force';
+  const isExplicitBypass = isExplicitForce || force === 'admin_force' || force === 'push_force';
+
+  if (_isStartupSyncing && _activeStartupSyncPromise) {
+    if (!isExplicitForce) {
+      return _activeStartupSyncPromise;
+    }
+    // For forced syncs (e.g. push notification arrived/clicked during boot), wait for current sync then run forced bypass sync
+    try {
+      await _activeStartupSyncPromise;
+    } catch (e) {}
+  }
 
   let syncSuccess = false;
   _isStartupSyncing = true;
@@ -122,113 +130,129 @@ export const syncCoreDataOnStartup = async (force = false) => {
     COLLECTIONS.APP_CONFIG
   ];
 
-  console.log(isExplicitForce ? '🔄 Loader / Forced Refresh: Checking Cloudflare KV for updates...' : '🚀 Startup Sync: Checking Cloudflare KV with 304 conditional check...');
+  console.log(isExplicitForce ? '🔄 Loader / Push Forced Refresh: Fetching fresh data from Cloudflare Worker...' : '🚀 Startup Sync: Checking Cloudflare KV with 304 conditional check...');
 
-  try {
-    const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
-    const syncUrl = `${proxyUrl}/sync-all${isExplicitAdminBypass ? '?cache=bypass' : ''}`;
-    
-    const headers = {
-      'apikey': SUPABASE_CONFIG.anonKey,
-      'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
-      'X-App-Client': 'live-circular'
-    };
+  const runSync = async () => {
+    try {
+      const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
+      const syncUrl = `${proxyUrl}/sync-all${isExplicitBypass ? `?cache=bypass&t=${Date.now()}` : ''}`;
+      
+      const headers = {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+        'X-App-Client': 'live-circular'
+      };
 
-    if (isExplicitAdminBypass) {
-      headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
-      headers['Pragma'] = 'no-cache';
-    } else {
-      const lastSyncedAt = localStorage.getItem('last_updated_server');
-      if (lastSyncedAt) {
-        headers['If-Modified-Since'] = lastSyncedAt;
-      }
-    }
-
-    const response = await fetch(syncUrl, { headers });
-
-    if (response.status === 304) {
-      console.log('⚡ 304 Not Modified: Server timestamp matches local data! 0 bytes downloaded from Cloudflare KV.');
-      localStorage.setItem('last_client_sync_time', String(Date.now()));
-      localStorage.setItem('last_sync_timestamp', String(Date.now()));
-      _appInitialized = true;
-      _isStartupSyncing = false;
-      window.dispatchEvent(new CustomEvent('app_sync_finished'));
-      return null;
-    }
-
-    if (response.ok) {
-      const data = await response.json();
-      if (data && (data.jobs || data.questions || data.notifications)) {
-        const collectionsMap = {
-          [COLLECTIONS.JOBS]: data.jobs,
-          [COLLECTIONS.NOTIFICATIONS]: data.notifications,
-          [COLLECTIONS.ADMITS]: data.admits,
-          [COLLECTIONS.LIVE_EXAMS]: data.live_exams,
-          [COLLECTIONS.QUESTIONS]: data.questions,
-          [COLLECTIONS.FEED_POSTS]: data.feed_posts,
-          [COLLECTIONS.APP_CONFIG]: data.app_config,
-        };
-
-        Object.entries(collectionsMap).forEach(([col, items]) => {
-          if (Array.isArray(items) && items.length > 0) {
-            try {
-              const normalizedItems = items.map(normalizeDoc);
-              localStorage.setItem(`cache_data_${col}`, JSON.stringify(normalizedItems));
-              localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-              _sessionRevalidatedCollections.add(col);
-              window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: normalizedItems }));
-            } catch (storageErr) {
-              console.warn(`⚠️ LocalStorage write failed for ${col} (likely storage limit exceeded):`, storageErr.message || storageErr);
-            }
-          }
-        });
-
-        const serverSyncTime = data.masterLastUpdated || data.syncedAt;
-        if (serverSyncTime) {
-          localStorage.setItem('last_updated_server', serverSyncTime);
+      if (isExplicitBypass) {
+        headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+        headers['Pragma'] = 'no-cache';
+      } else {
+        const lastSyncedAt = localStorage.getItem('last_updated_server');
+        if (lastSyncedAt) {
+          headers['If-Modified-Since'] = lastSyncedAt;
         }
-        window.dispatchEvent(new CustomEvent('force_app_data_reload'));
-        localStorage.setItem('last_sync_timestamp', String(Date.now()));
-        localStorage.setItem('last_client_sync_time', String(Date.now()));
+      }
 
+      const response = await fetch(syncUrl, { headers, cache: isExplicitBypass ? 'no-store' : 'default' });
+
+      if (response.status === 304) {
+        console.log('⚡ 304 Not Modified: Server timestamp matches local data! 0 bytes downloaded from Cloudflare KV.');
+        localStorage.setItem('last_client_sync_time', String(Date.now()));
+        localStorage.setItem('last_sync_timestamp', String(Date.now()));
         _appInitialized = true;
         _isStartupSyncing = false;
-        console.log('✅ Single-Request Unified Sync: Complete! 20-Min Client Lock Activated.');
-        syncSuccess = true;
         window.dispatchEvent(new CustomEvent('app_sync_finished'));
-        return data;
-      } else {
-        console.warn('⚠️ Unified Sync JSON response did not contain expected collections structure.', data);
+        return null;
       }
-    } else {
-      console.warn(`⚠️ Unified Sync /sync-all endpoint returned non-OK status: ${response.status}`);
-    }
-  } catch (err) {
-    console.error('❌ Unified Sync /sync-all endpoint failed, falling back:', err.message || err);
-  }
 
-  // Fallback: If /sync-all endpoint is unavailable, sync core collections directly
-  if (!syncSuccess) {
-    console.warn('⚠️ Running direct GET fallback to Supabase because sync-all was unsuccessful or incomplete.');
-    try {
-      await Promise.all(coreCollections.map(async (col) => {
-        const data = await getCollection(col, force);
-        if (data && data.length > 0) {
-          localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
-          localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-          _sessionRevalidatedCollections.add(col);
-          window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
+      if (response.ok) {
+        const data = await response.json();
+        if (data && (data.jobs || data.questions || data.notifications || data.live_exams || data.feed_posts)) {
+          const collectionsMap = {
+            [COLLECTIONS.JOBS]: data.jobs,
+            [COLLECTIONS.NOTIFICATIONS]: data.notifications,
+            [COLLECTIONS.ADMITS]: data.admits,
+            [COLLECTIONS.LIVE_EXAMS]: data.live_exams,
+            [COLLECTIONS.QUESTIONS]: data.questions,
+            [COLLECTIONS.FEED_POSTS]: data.feed_posts,
+            [COLLECTIONS.APP_CONFIG]: data.app_config,
+          };
+
+          Object.entries(collectionsMap).forEach(([col, items]) => {
+            if (Array.isArray(items)) {
+              try {
+                const normalizedItems = items.map(normalizeDoc);
+                localStorage.setItem(`cache_data_${col}`, JSON.stringify(normalizedItems));
+                localStorage.setItem(`cache_time_${col}`, String(Date.now()));
+                if (col === COLLECTIONS.QUESTIONS) {
+                  localStorage.setItem('questions_data', JSON.stringify(normalizedItems));
+                }
+                _sessionRevalidatedCollections.add(col);
+                window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: normalizedItems }));
+              } catch (storageErr) {
+                console.warn(`⚠️ LocalStorage write failed for ${col} (likely storage limit exceeded):`, storageErr.message || storageErr);
+              }
+            }
+          });
+
+          const serverSyncTime = data.masterLastUpdated || data.syncedAt || new Date().toISOString();
+          if (serverSyncTime) {
+            localStorage.setItem('last_updated_server', serverSyncTime);
+          }
+          window.dispatchEvent(new CustomEvent('force_app_data_reload'));
+          localStorage.setItem('last_sync_timestamp', String(Date.now()));
+          localStorage.setItem('last_client_sync_time', String(Date.now()));
+
+          _appInitialized = true;
+          _isStartupSyncing = false;
+          console.log('✅ Single-Request Unified Sync: Complete!');
+          syncSuccess = true;
+          window.dispatchEvent(new CustomEvent('app_sync_finished'));
+          return data;
+        } else {
+          console.warn('⚠️ Unified Sync JSON response did not contain expected collections structure.', data);
         }
-      }));
-      _appInitialized = true;
-    } catch (e) {
-      console.error('Fallback core sync failed:', e);
-    } finally {
-      _isStartupSyncing = false;
-      window.dispatchEvent(new CustomEvent('force_app_data_reload'));
-      window.dispatchEvent(new CustomEvent('app_sync_finished'));
+      } else {
+        console.warn(`⚠️ Unified Sync /sync-all endpoint returned non-OK status: ${response.status}`);
+      }
+    } catch (err) {
+      console.error('❌ Unified Sync /sync-all endpoint failed, falling back:', err.message || err);
     }
-  }
+
+    // Fallback: If /sync-all endpoint is unavailable, sync core collections directly
+    if (!syncSuccess) {
+      console.warn('⚠️ Running direct GET fallback to Supabase because sync-all was unsuccessful or incomplete.');
+      try {
+        await Promise.all(coreCollections.map(async (col) => {
+          const data = await getCollection(col, true);
+          if (Array.isArray(data) && data.length > 0) {
+            localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
+            localStorage.setItem(`cache_time_${col}`, String(Date.now()));
+            if (col === COLLECTIONS.QUESTIONS) {
+              localStorage.setItem('questions_data', JSON.stringify(data));
+            }
+            _sessionRevalidatedCollections.add(col);
+            window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
+          }
+        }));
+        _appInitialized = true;
+      } catch (e) {
+        console.error('Fallback core sync failed:', e);
+      } finally {
+        _isStartupSyncing = false;
+        window.dispatchEvent(new CustomEvent('force_app_data_reload'));
+        window.dispatchEvent(new CustomEvent('app_sync_finished'));
+      }
+    }
+    return null;
+  };
+
+  _activeStartupSyncPromise = runSync().finally(() => {
+    _isStartupSyncing = false;
+    _activeStartupSyncPromise = null;
+  });
+
+  return _activeStartupSyncPromise;
 };
 
 /**
@@ -370,24 +394,29 @@ const sanitizePayload = (collectionName, docId, data) => {
   return sanitized;
 };
 
-const triggerKvCacheInvalidation = () => {
-  // Only trigger from Admin Panel (check path or if adminUser exists in localStorage)
-  const isAdmin = window.location.pathname.startsWith('/admin') || localStorage.getItem('admin_user');
-  if (!isAdmin) return;
+const triggerKvCacheInvalidation = async (collectionName = '') => {
+  // Skip KV invalidation for user-specific non-core tables (users, activities)
+  if (collectionName === COLLECTIONS.USERS || collectionName === COLLECTIONS.ACTIVITIES) return;
 
-  console.log('⚡ Admin change detected: Silently invalidating Cloudflare KV cache in background...');
+  console.log('⚡ Admin change detected: Invalidating & refreshing Cloudflare KV cache...');
   const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
-  fetch(`${proxyUrl}/sync-all?cache=bypass`, {
-    headers: {
-      'apikey': SUPABASE_CONFIG.anonKey,
-      'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
-      'X-App-Client': 'live-circular-admin'
+  try {
+    const res = await fetch(`${proxyUrl}/sync-all?cache=bypass&t=${Date.now()}`, {
+      headers: {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+        'X-App-Client': 'live-circular-admin',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      },
+      cache: 'no-store'
+    });
+    if (res.ok) {
+      console.log('⚡ Cloudflare KV cache successfully updated in realtime!');
     }
-  }).then(res => {
-    if (res.ok) console.log('⚡ Cloudflare KV cache successfully updated in realtime!');
-  }).catch(err => {
+  } catch (err) {
     console.warn('Failed to invalidate Cloudflare KV cache:', err);
-  });
+  }
 };
 
 /**
@@ -406,7 +435,7 @@ export const addDocument = async (collectionName, data) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
-    triggerKvCacheInvalidation();
+    await triggerKvCacheInvalidation(collectionName);
 
     return normalizeDoc(inserted || payload);
   } catch (error) {
@@ -429,7 +458,7 @@ export const setDocument = async (collectionName, docId, data) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
-    triggerKvCacheInvalidation();
+    await triggerKvCacheInvalidation(collectionName);
 
     return normalizeDoc(upserted || payload);
   } catch (error) {
@@ -452,7 +481,7 @@ export const updateDocument = async (collectionName, docId, updates) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
-    triggerKvCacheInvalidation();
+    await triggerKvCacheInvalidation(collectionName);
 
     return normalizeDoc(updated || payload);
   } catch (error) {
@@ -473,7 +502,7 @@ export const deleteDocument = async (collectionName, docId) => {
 
     if (error) throw error;
     clearCollectionCache(collectionName);
-    triggerKvCacheInvalidation();
+    await triggerKvCacheInvalidation(collectionName);
 
     return true;
   } catch (error) {

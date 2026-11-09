@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
+import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsByCategory } from '../data/questionsData';
 import SearchBar from '../components/SearchBar';
 import QuestionCard from '../components/QuestionCard';
@@ -101,13 +102,18 @@ export default function QuestionsList() {
   const { category } = useParams();
   const navigate = useNavigate();
   const { state } = useAppContext();
+  const { state: adminState } = useAdminContext();
   const isEn = state.language === 'en';
 
   const [searchQuery, setSearchQuery] = useState('');
 
   const papers = useMemo(() => {
-    return getQuestionsByCategory(category || 'bcs');
-  }, [category]);
+    const targetCategory = category || 'bcs';
+    if (Array.isArray(adminState?.questions) && adminState.questions.length > 0) {
+      return adminState.questions.filter(q => q.category === targetCategory || (targetCategory === 'recent' && q.category === 'admission') || (targetCategory === 'admission' && q.category === 'recent'));
+    }
+    return getQuestionsByCategory(targetCategory);
+  }, [category, adminState?.questions]);
 
   const filteredPapers = useMemo(() => {
     if (!searchQuery.trim()) return papers;

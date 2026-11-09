@@ -9,7 +9,7 @@ import ConnectivityBanner from './components/ConnectivityBanner'
 import ErrorBoundary from './components/ErrorBoundary'
 import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
-import { initializeOneSignal, setupOneSignalClickHandler, loginOneSignal } from './utils/oneSignalWrapper'
+import { initializeOneSignal, setupOneSignalClickHandler, setupOneSignalForegroundHandler, loginOneSignal } from './utils/oneSignalWrapper'
 import { syncCoreDataOnStartup } from './services/supabaseService'
 import { triggerDeltaSync } from './services/sqliteService'
 import { Capacitor } from '@capacitor/core'
@@ -140,7 +140,7 @@ function App() {
         console.log('📱 App resumed! Checking for updates...');
         const status = await Network.getStatus().catch(() => ({ connected: navigator.onLine }));
         if (status.connected) {
-          syncCoreDataOnStartup().catch(console.error);
+          syncCoreDataOnStartup(true).catch(console.error);
           triggerDeltaSync().catch(console.error);
         }
       }
@@ -172,14 +172,24 @@ function App() {
       loginOneSignal(state.user.id);
     }
 
+    // Handle OneSignal Foreground Push Reception (Auto-update app data immediately when push arrives)
+    setupOneSignalForegroundHandler(async (data) => {
+      console.log('⚡ Push Notification Arrived in Foreground! Auto-syncing new content:', data);
+      try {
+        await Promise.all([
+          syncCoreDataOnStartup('push_force'),
+          triggerDeltaSync()
+        ]);
+        window.dispatchEvent(new CustomEvent('force_app_data_reload'));
+        console.log('✅ Foreground Push Auto-Sync Complete!');
+      } catch (err) {
+        console.error('Data refresh from foreground push failed:', err);
+      }
+    });
+
     // Handle OneSignal Notification Clicks (Protected by Notification Processing Lock)
     setupOneSignalClickHandler(async (data) => {
       console.log('⚡ Push Notification Clicked! Payload:', data);
-      if (!data) {
-        navigate('/notifications');
-        return;
-      }
-
       if (isNotificationProcessingRef.current) {
         console.warn('🔒 Push Notification Lock Active: Skipping duplicate click event.');
         return;
@@ -189,9 +199,10 @@ function App() {
       // Execute unified background sync from Cloudflare Worker & SQLite delta update on push click
       try {
         await Promise.all([
-          syncCoreDataOnStartup(true),
+          syncCoreDataOnStartup('push_force'),
           triggerDeltaSync()
         ]);
+        window.dispatchEvent(new CustomEvent('force_app_data_reload'));
         console.log('✅ Push Notification Click Sync Complete!');
       } catch (err) {
         console.error('Data refresh from push click failed:', err);
@@ -200,6 +211,11 @@ function App() {
       setTimeout(() => {
         isNotificationProcessingRef.current = false;
       }, 1500);
+
+      if (!data) {
+        navigate('/notifications');
+        return;
+      }
 
       const targetType = data.type || data.feedType || '';
       const targetId = data.jobId || data.examId || data.paperId || data.questionId || data.postId || data.id;
