@@ -291,8 +291,6 @@ export default function LiveExams() {
           <span>{isEn ? 'Live MCQ Exam' : 'লাইভ এমসিকিউ পরীক্ষা'}</span>
         </h1>
         <div
-          onClick={handleWatchRewardAd}
-          title={isEn ? 'Tap to watch ad & earn points' : 'বিজ্ঞাপন দেখে পয়েন্ট অর্জন করতে ট্যাপ করুন'}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -307,7 +305,8 @@ export default function LiveExams() {
             color: isDark ? '#fbbf24' : '#b45309',
             fontSize: '11.5px',
             fontWeight: 800,
-            cursor: 'pointer',
+            cursor: 'default',
+            userSelect: 'none',
             flexShrink: 0
           }}
         >
