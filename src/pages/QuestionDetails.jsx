@@ -15,14 +15,18 @@ export default function QuestionDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const handleBack = () => {
-    const hasHistory = window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0;
-    navigateWithAdOnReturn(navigate, hasHistory ? -1 : '/questions-hub');
-  };
   const { state } = useAppContext();
   const { state: adminState, dispatch: adminDispatch } = useAdminContext();
   const isEn = state.language === 'en';
   const isDark = state.theme === 'dark';
+
+  const handleBack = () => {
+    const hasHistory = window.history.state && typeof window.history.state.idx === 'number' && window.history.state.idx > 0;
+    const attemptedCount = Object.keys(selectedAnswers || {}).length;
+    // If user attempted/read 3+ questions in practice mode, give appropriate action weight towards 4-action threshold
+    const actionWeight = attemptedCount >= 3 ? attemptedCount : 1;
+    navigateWithAdOnReturn(navigate, hasHistory ? -1 : '/questions-hub', false, isEn, actionWeight);
+  };
 
   const [pageLoading, setPageLoading] = useState(true);
   const [isSwitchingMode, setIsSwitchingMode] = useState(false);

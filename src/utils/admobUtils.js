@@ -38,10 +38,11 @@ export const getInterstitialActionCount = () => {
   }
 };
 
-export const incrementInterstitialActionCount = () => {
+export const incrementInterstitialActionCount = (amount = 1) => {
   try {
     const current = getInterstitialActionCount();
-    const next = current + 1;
+    const inc = Math.max(1, Number(amount) || 1);
+    const next = current + inc;
     localStorage.setItem(ACTION_STORAGE_KEY, String(next));
     return next;
   } catch (e) {
@@ -545,12 +546,12 @@ export const showLoadingAdDialog = (isEn = false) => {
  * @param {boolean} force - Whether to bypass action counter (still throttled by 60s hard cooldown)
  * @param {boolean} isEn - English language toggle for dialog
  */
-export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = false, isEn = false) => {
+export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = false, isEn = false, actionWeight = 1) => {
   const isReady = isNativeInterstitialReady();
   const now = Date.now();
 
   // Increment action count every time user reads/backs from a content page
-  const actionCount = incrementInterstitialActionCount();
+  const actionCount = incrementInterstitialActionCount(actionWeight);
 
   // Refresh cooldown if available from Native
   if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getInterstitialCooldownSec === 'function') {
@@ -564,6 +565,17 @@ export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = fals
   const cooldownPassed = (now - lastInterstitialTime >= minCooldown);
   const thresholdReached = force || (actionCount >= INTERSTITIAL_ACTION_THRESHOLD);
   const underDailyLimit = getDailyInterstitialCount() < DAILY_INTERSTITIAL_LIMIT;
+
+  console.log('[AdMob Interstitial Evaluation]', {
+    isReady,
+    cooldownPassed,
+    thresholdReached,
+    actionCount,
+    requiredThreshold: INTERSTITIAL_ACTION_THRESHOLD,
+    underDailyLimit,
+    dailyCount: getDailyInterstitialCount(),
+    willShowAd: Boolean(isReady && cooldownPassed && thresholdReached && underDailyLimit)
+  });
 
   const executeNavigation = () => {
     if (typeof fallbackPath === 'number' || typeof fallbackPath === 'string') {
@@ -582,24 +594,35 @@ export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = fals
       removeDialog();
 
       let navigated = false;
+      let fallbackTimer = null;
+
       const doNavigateOnce = () => {
         if (!navigated) {
           navigated = true;
+          if (fallbackTimer) clearTimeout(fallbackTimer);
           window.removeEventListener('native_interstitial_dismissed', doNavigateOnce);
           window.removeEventListener('native_interstitial_failed', doNavigateOnce);
+          window.removeEventListener('native_interstitial_shown', onAdShown);
           executeNavigation();
         }
       };
 
+      const onAdShown = () => {
+        // Interstitial is actively presented on screen: allow user time to view & close
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        fallbackTimer = setTimeout(doNavigateOnce, 60000);
+      };
+
       window.addEventListener('native_interstitial_dismissed', doNavigateOnce, { once: true });
       window.addEventListener('native_interstitial_failed', doNavigateOnce, { once: true });
-
-      // Safety fallback: if dismissed event doesn't fire within 800ms, proceed
-      setTimeout(doNavigateOnce, 800);
+      window.addEventListener('native_interstitial_shown', onAdShown, { once: true });
 
       const shown = showNativeInterstitialAd(force);
       if (!shown) {
         doNavigateOnce();
+      } else {
+        // Wait up to 6 seconds for native Android to open ad activity
+        fallbackTimer = setTimeout(doNavigateOnce, 6000);
       }
     }, 1000);
   } else {
