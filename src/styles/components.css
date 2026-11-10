@@ -706,6 +706,14 @@
     inset 0 1.5px 2px rgba(255, 255, 255, 0.45),
     inset 0 -1.5px 2px rgba(0, 0, 0, 0.18);
 }
+.menu-item-icon.drawer-menu-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
 .menu-item-label {
   flex: 1;
   font-size: 12px;

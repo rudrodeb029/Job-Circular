@@ -305,27 +305,27 @@ const AppHeader = React.memo(function AppHeader() {
               overscrollBehavior: 'contain'
             }}>
               <Link to="/home" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Home size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><Home size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Home' : 'হোম'}</span>
               </Link>
 
               <Link to="/feed" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Rss size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><Rss size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Feed' : 'ফিড'}</span>
               </Link>
 
               <Link to="/all-circulars" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Briefcase size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><Briefcase size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'All Circulars' : 'সকল সার্কুলার'}</span>
               </Link>
 
               <Link to="/categories" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><LayoutGrid size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><LayoutGrid size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Categories' : 'ক্যাটাগরি'}</span>
               </Link>
 
               <Link to="/saved" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Bookmark size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><Bookmark size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Saved Jobs' : 'সংরক্ষিত সার্কুলার'}</span>
               </Link>
 
@@ -344,7 +344,7 @@ const AppHeader = React.memo(function AppHeader() {
                   }}
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div className="menu-item-icon"><FileText size={20} /></div>
+                    <div className="menu-item-icon drawer-menu-icon"><FileText size={16} /></div>
                     <span className="menu-item-label" style={{ fontWeight: 700 }}>
                       {state.language === 'en' ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
                     </span>
@@ -514,17 +514,17 @@ const AppHeader = React.memo(function AppHeader() {
               </div>
 
               <Link to="/admit-card" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Calendar size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><Calendar size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Admit Card & Result' : 'প্রবেশপত্র ও ফলাফল'}</span>
               </Link>
 
               <Link to="/notifications" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Bell size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><Bell size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Notifications' : 'বিজ্ঞপ্তি'}</span>
               </Link>
 
               <Link to="/settings" onClick={() => handleCloseDrawer()} className="menu-item" style={{ borderRadius: '10px' }}>
-                <div className="menu-item-icon"><Settings size={20} /></div>
+                <div className="menu-item-icon drawer-menu-icon"><Settings size={16} /></div>
                 <span className="menu-item-label">{state.language === 'en' ? 'Settings' : 'সেটিংস'}</span>
               </Link>
             </div>
