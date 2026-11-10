@@ -106,35 +106,21 @@ function IsometricCandidateCharacter({ sleeveColor = '#1e293b' }) {
         strokeLinecap="round"
       />
 
-      {/* Right Arm (Viewer's Left — Natural Bent Elbow & Raised Hand Holding Stylus Over Tablet) */}
-      {/* Continuous Bare Skin Upper-Arm, Rounded Elbow & Forearm */}
+      {/* Right Arm (Viewer's Left — Directed Downward Following Marked Path) */}
+      {/* Continuous Bare Skin Arm & Hand */}
       <path
-        d="M210 124L195 135L184 113"
+        d="M207 131L202 144L199 156"
         stroke="#f4a594"
-        strokeWidth="7.8"
+        strokeWidth="7.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Subtle Inner Elbow Crease Shadow */}
+      <circle cx="199" cy="158" r="3.8" fill="#f4a594" />
+      {/* Raglan Right Short Sleeve */}
       <path
-        d="M196 131L192 126"
-        stroke="#e58e7e"
-        strokeWidth="1.2"
-        strokeLinecap="round"
-      />
-      {/* Raglan Right Short Sleeve (Cleanly Perpendicular to Upper Arm Before Elbow) */}
-      <path
-        d="M222 115C214 116 207 119 202 124L208 132C212 129 217 125 222 122Z"
+        d="M222 115C214 116 207 122 203 133L211 137C214 129 217 124 222 121Z"
         fill={sleeveColor}
       />
-      {/* Sculpted Hand & Fingers Holding Stylus */}
-      <ellipse cx="183.5" cy="111.5" rx="4.4" ry="3.8" transform="rotate(-25 183.5 111.5)" fill="#f4a594" />
-      {/* Stylus Pen Angled Naturally Toward Graphic Tablet */}
-      <path d="M173 115.5L191 106.5" stroke="#78350f" strokeWidth="2.6" strokeLinecap="round" />
-      <path d="M172 116L174.5 114.8" stroke="#fbbf24" strokeWidth="2.4" strokeLinecap="round" />
-      {/* Thumb & Index Finger Gripping Stylus */}
-      <path d="M181.5 112.2L185.5 110.2" stroke="#e58e7e" strokeWidth="2.3" strokeLinecap="round" />
-      <circle cx="182.5" cy="109.5" r="1.8" fill="#f4a594" />
 
       {/* Left Arm (Viewer's Right — Relaxed Along Chair Backrest) */}
       {/* Continuous Bare Skin Arm & Hand */}
