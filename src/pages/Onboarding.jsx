@@ -4,6 +4,193 @@ import { ChevronRight } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 
 /**
+ * Shared Isometric Candidate Character:
+ * Properly proportioned 3/4 isometric seated character matching the reference illustration
+ * (natural warm skin tone, swept-up hair, sleek glasses, raglan T-shirt, raised stylus hand,
+ * relaxed side arm, ergonomic yellow shell chair, and both seated legs with sneakers).
+ */
+function IsometricCandidateCharacter({ sleeveColor = '#1e293b' }) {
+  return (
+    <g>
+      {/* Chair Metal Legs & Cross-Braces */}
+      <path d="M222 182L204 216" stroke="#475569" strokeWidth="2.8" strokeLinecap="round" />
+      <path d="M205 214L204 216" stroke="#f59e0b" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M232 184L226 226" stroke="#334155" strokeWidth="2.8" strokeLinecap="round" />
+      <path d="M226 224L226 226" stroke="#f59e0b" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M242 181L258 214" stroke="#475569" strokeWidth="2.8" strokeLinecap="round" />
+      <path d="M257 212L258 214" stroke="#f59e0b" strokeWidth="3.2" strokeLinecap="round" />
+      <path d="M236 182L242 208" stroke="#64748b" strokeWidth="2.4" strokeLinecap="round" />
+      {/* Thin Wire Crossbars on Chair Base */}
+      <path d="M214 198L244 196" stroke="#64748b" strokeWidth="1.3" />
+      <path d="M222 186L248 200" stroke="#64748b" strokeWidth="1.2" />
+      <path d="M240 185L212 199" stroke="#64748b" strokeWidth="1.2" />
+
+      {/* Ergonomic Yellow Shell Chair (Backrest & Seat Base) */}
+      <path
+        d="M200 163C200 155 226 151 244 159C250 162 254 131 261 132C269 134 269 175 250 183C231 191 200 173 200 163Z"
+        fill="#f59e0b"
+        stroke="#d97706"
+        strokeWidth="1.8"
+      />
+      {/* Chair Inner Shadow Cushion */}
+      <path
+        d="M204 163C206 157 227 154 243 161C247 163 251 144 256 138C257 152 254 171 243 177C229 183 204 170 204 163Z"
+        fill="#d97706"
+        opacity="0.55"
+      />
+      {/* Chair Outer Highlight */}
+      <path
+        d="M240 179C254 175 263 152 261 132C267 134 268 173 250 183Z"
+        fill="#fbbf24"
+      />
+
+      {/* Candidate Seated Legs & Sneakers (Both legs clearly visible in 3/4 isometric view) */}
+      {/* Right Leg (Far / Left in view) */}
+      <path
+        d="M223 156L197 166L197 192"
+        stroke="#334155"
+        strokeWidth="10.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Right Sock */}
+      <rect x="193" y="190" width="8" height="6" rx="2" fill="#f8fafc" />
+      {/* Right Sneaker */}
+      <path
+        d="M180 198C180 194.5 185 193 192 193H201C202.5 193 203.5 194.5 203.5 196.5V199.5C203.5 200.8 202.5 201.5 201 201.5H182C180.8 201.5 180 200 180 198Z"
+        fill="#854d0e"
+      />
+      {/* Right Sneaker White Toe & Sole */}
+      <path d="M180 198C180 195.2 183 194 186 194.2V201H182C180.8 201 180 200 180 198Z" fill="#ffffff" />
+      <rect x="180" y="199.8" width="23.5" height="2.2" rx="1.1" fill="#ffffff" />
+      <path d="M189 194.5L191 197" stroke="#ffffff" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M192.5 194.2L194.5 196.8" stroke="#ffffff" strokeWidth="1.3" strokeLinecap="round" />
+
+      {/* Left Leg (Near / Right in view) */}
+      <path
+        d="M235 161L209 172L209 199"
+        stroke="#1e293b"
+        strokeWidth="11"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Left Sock */}
+      <rect x="205" y="197" width="8" height="6" rx="2" fill="#f8fafc" />
+      {/* Left Sneaker */}
+      <path
+        d="M192 205C192 201.5 197 200 204 200H213C214.5 200 215.5 201.5 215.5 203.5V206.5C215.5 207.8 214.5 208.5 213 208.5H194C192.8 208.5 192 207 192 205Z"
+        fill="#78350f"
+      />
+      {/* Left Sneaker White Toe & Sole */}
+      <path d="M192 205C192 202.2 195 201 198 201.2V208H194C192.8 208 192 207 192 205Z" fill="#ffffff" />
+      <rect x="192" y="206.8" width="23.5" height="2.2" rx="1.1" fill="#ffffff" />
+      <path d="M201 201.5L203 204" stroke="#ffffff" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M204.5 201.2L206.5 203.8" stroke="#ffffff" strokeWidth="1.3" strokeLinecap="round" />
+
+      {/* Candidate Torso (White Raglan T-Shirt with Subtle Side Shading) */}
+      <path
+        d="M216 116C222 113 236 113 242 118L244 159C235 165 220 164 214 156L216 116Z"
+        fill="#ffffff"
+      />
+      {/* Torso Right-Side Subtle Shadow */}
+      <path
+        d="M235 115L242 118L244 159C240 162 236 163 232 163L235 115Z"
+        fill="#e2e8f0"
+        opacity="0.6"
+      />
+      {/* Crew-Neck Collar */}
+      <path
+        d="M222 115C225 118.5 232 118.5 235 115"
+        stroke="#cbd5e1"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+
+      {/* Right Arm (Viewer's Left — Raised Holding Stylus Pen) */}
+      {/* Forearm & Hand */}
+      <path
+        d="M206 128L196 108"
+        stroke="#f4a594"
+        strokeWidth="7.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Raglan Right Sleeve */}
+      <path
+        d="M222 115C215 115 208 119 202 127L211 133C215 127 219 123 223 121Z"
+        fill={sleeveColor}
+      />
+      {/* Sculpted Hand Holding Stylus */}
+      <circle cx="195" cy="106" r="4.2" fill="#f4a594" />
+      {/* Stylus Pen Held Naturally Between Fingers */}
+      <path d="M185 110L203 101" stroke="#78350f" strokeWidth="2.8" strokeLinecap="round" />
+      <path d="M184 110.5L186.5 109.2" stroke="#fbbf24" strokeWidth="2.6" strokeLinecap="round" />
+      {/* Thumb Over Stylus */}
+      <path d="M194 106.5L197 105" stroke="#e58e7e" strokeWidth="2.2" strokeLinecap="round" />
+
+      {/* Left Arm (Viewer's Right — Relaxed Down Along Chair) */}
+      {/* Forearm & Hand */}
+      <path
+        d="M249 135L251 157"
+        stroke="#f4a594"
+        strokeWidth="7.5"
+        strokeLinecap="round"
+      />
+      <circle cx="251" cy="159" r="3.8" fill="#f4a594" />
+      {/* Raglan Left Sleeve */}
+      <path
+        d="M235 116C242 117 248 123 253 135L244 139C241 130 238 124 234 121Z"
+        fill={sleeveColor}
+      />
+
+      {/* Neck & Head (3/4 Isometric Turn Looking Slightly Left-Forward) */}
+      {/* Neck with Chin Shadow */}
+      <rect x="224" y="106" width="9.5" height="11" rx="4" fill="#e58e7e" />
+      {/* Right Ear */}
+      <circle cx="242" cy="96" r="3.6" fill="#f4a594" />
+      <circle cx="242" cy="96" r="1.6" fill="#e58e7e" />
+      {/* Sculpted 3/4 Face */}
+      <path
+        d="M215 92C215 83.5 220.5 79 228.5 79C236.5 79 242 84 242 93C242 101.5 237 108.5 228 108.5C220 108.5 215 102.5 215 92Z"
+        fill="#f4a594"
+      />
+      {/* Subtle Cheek Warmth */}
+      <circle cx="219.5" cy="99" r="2.6" fill="#eb9080" opacity="0.55" />
+      <circle cx="234.5" cy="99" r="2.8" fill="#eb9080" opacity="0.55" />
+
+      {/* Eyebrows */}
+      <path d="M217 89.8C218.5 89 221.5 89 223 89.8" stroke="#6b3e1b" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M227.5 89.8C229 89 232 89 233.5 89.8" stroke="#6b3e1b" strokeWidth="1.3" strokeLinecap="round" />
+
+      {/* Eyes */}
+      <circle cx="220" cy="94.8" r="1.2" fill="#1e293b" />
+      <circle cx="230.5" cy="94.8" r="1.2" fill="#1e293b" />
+
+      {/* Sleek Rectangular-Rounded Eyeglasses */}
+      <rect x="215.8" y="91.8" width="8.4" height="6" rx="2" stroke="#334155" strokeWidth="1.35" fill="#ffffff" fillOpacity="0.28" />
+      <rect x="226.4" y="91.8" width="8.4" height="6" rx="2" stroke="#334155" strokeWidth="1.35" fill="#ffffff" fillOpacity="0.28" />
+      <path d="M224.2 94.4H226.4" stroke="#334155" strokeWidth="1.35" />
+      <path d="M234.8 94.2L241.2 94.8" stroke="#334155" strokeWidth="1.25" />
+
+      {/* Subtle Nose Bridge & Calm Focused Mouth */}
+      <path d="M224.5 95.5L223 99.5L225 100" stroke="#d47666" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M223.8 103.3C225.5 104.3 228 104.3 229.8 103.1" stroke="#a84a3e" strokeWidth="1.35" strokeLinecap="round" />
+
+      {/* Swept-Up Modern Brown Hairstyle with Temple Taper */}
+      <path
+        d="M214.5 90.5C212.5 83.5 215.5 76.5 224.5 75C231.5 73.8 239.5 76 243 82C244.8 85.5 244 91.5 242 94.5L239.2 93.8C239.5 89 237.8 85 233.5 84C227.5 82.8 219.5 83.8 216.2 89Z"
+        fill="#854d0e"
+      />
+      {/* Top Hair Volume Highlight */}
+      <path
+        d="M216.5 82C219.5 77.5 226.5 75.5 234.5 77C238 77.8 240.5 79.8 241.5 82.5C237.5 80.2 230.5 79.5 223.5 80.8C220 81.4 218 82 216.5 82Z"
+        fill="#a16207"
+      />
+    </g>
+  );
+}
+
+/**
  * Slide 1 Isometric Illustration:
  * Candidate at an isometric desk browsing Govt, Bank & NGO Job Circulars on a monitor
  * with a document printer/folder stack and graphic tablet (matching reference style).
@@ -171,92 +358,7 @@ function JobPortalIllustration() {
       <path d="M185 100L209 101L208 106L184 105Z" fill="#cbd5e1" />
 
       {/* Candidate Character Sitting in Chair */}
-      {/* Chair Legs */}
-      <path d="M216 184L198 218" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M226 186L224 228" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M236 182L254 216" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M220 184L208 208" stroke="#64748b" strokeWidth="3" strokeLinecap="round" />
-
-      {/* Candidate Legs & Shoes */}
-      {/* Back Leg */}
-      <path d="M214 156L194 166L196 192" stroke="#334155" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-      <ellipse cx="190" cy="196" rx="10" ry="5" fill="#78350f" />
-      <path d="M181 196C181 193 185 192 188 194" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" />
-
-      {/* Front Leg */}
-      <path d="M224 164L184 176L182 206" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="166" y="202" width="22" height="9" rx="4.5" fill="#78350f" />
-      <rect x="166" y="203" width="7" height="7" rx="3.5" fill="#ffffff" />
-
-      {/* Ergonomic Yellow Chair Seat & Backrest */}
-      <path
-        d="M196 164C196 156 226 152 242 162C248 166 254 132 260 134C268 136 268 176 248 184C228 192 196 174 196 164Z"
-        fill="#f59e0b"
-        stroke="#d97706"
-        strokeWidth="2"
-      />
-      <path
-        d="M236 178C252 174 262 152 260 134C266 136 267 174 248 184Z"
-        fill="#fbbf24"
-      />
-
-      {/* Candidate Torso (White T-shirt with Dark Navy Raglan Sleeves) */}
-      <path
-        d="M214 118C222 114 238 115 244 122L240 166C228 170 214 166 210 158L214 118Z"
-        fill="#f8fafc"
-      />
-      {/* Left Sleeve & Raised Arm Holding Stylus Pen */}
-      <path
-        d="M216 120L202 128L194 110"
-        stroke="#fda4af"
-        strokeWidth="9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M218 119L205 127"
-        stroke="#1e293b"
-        strokeWidth="11"
-        strokeLinecap="round"
-      />
-      {/* Stylus Pen in Hand */}
-      <path d="M185 108L201 100" stroke="#78350f" strokeWidth="3" strokeLinecap="round" />
-
-      {/* Right Sleeve & Arm Resting by Chair */}
-      <path
-        d="M242 122L252 142L246 164"
-        stroke="#fda4af"
-        strokeWidth="9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M241 121L250 138"
-        stroke="#1e293b"
-        strokeWidth="11"
-        strokeLinecap="round"
-      />
-
-      {/* Candidate Head, Glasses & Hair */}
-      {/* Neck */}
-      <rect x="223" y="108" width="11" height="10" rx="4" fill="#fb7185" />
-      {/* Face */}
-      <rect x="214" y="84" width="26" height="27" rx="11" fill="#fda4af" />
-      {/* Ear */}
-      <circle cx="241" cy="98" r="4" fill="#fda4af" />
-      {/* Hair */}
-      <path
-        d="M213 91C212 81 220 76 230 77C238 77 244 82 243 92C240 87 235 85 227 85C220 85 216 88 213 91Z"
-        fill="#92400e"
-      />
-      {/* Glasses */}
-      <circle cx="221" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
-      <circle cx="232" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
-      <path d="M225 96H228" stroke="#475569" strokeWidth="1.5" />
-      {/* Eyes & Smile */}
-      <circle cx="221" cy="96" r="1.3" fill="#0f172a" />
-      <circle cx="232" cy="96" r="1.3" fill="#0f172a" />
-      <path d="M224 104C226 105.5 229 105.5 231 104" stroke="#be123c" strokeWidth="1.5" strokeLinecap="round" />
+      <IsometricCandidateCharacter sleeveColor="#1e293b" />
     </svg>
   );
 }
@@ -365,43 +467,7 @@ function ExamPrepIllustration() {
       <path d="M214 99L218 111" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
 
       {/* Candidate Character at Desk */}
-      <path d="M216 184L198 218" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M226 186L224 228" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M236 182L254 216" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M214 156L194 166L196 192" stroke="#334155" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-      <ellipse cx="190" cy="196" rx="10" ry="5" fill="#78350f" />
-      <path d="M224 164L184 176L182 206" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="166" y="202" width="22" height="9" rx="4.5" fill="#78350f" />
-      <rect x="166" y="203" width="7" height="7" rx="3.5" fill="#ffffff" />
-
-      {/* Chair */}
-      <path
-        d="M196 164C196 156 226 152 242 162C248 166 254 132 260 134C268 136 268 176 248 184C228 192 196 174 196 164Z"
-        fill="#f59e0b"
-        stroke="#d97706"
-        strokeWidth="2"
-      />
-      <path d="M236 178C252 174 262 152 260 134C266 136 267 174 248 184Z" fill="#fbbf24" />
-
-      {/* Torso & Arms */}
-      <path d="M214 118C222 114 238 115 244 122L240 166C228 170 214 166 210 158L214 118Z" fill="#f8fafc" />
-      <path d="M216 120L198 130L184 122" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M218 119L203 128" stroke="#312e81" strokeWidth="11" strokeLinecap="round" />
-      <path d="M176 118L190 125" stroke="#d97706" strokeWidth="3" strokeLinecap="round" />
-      <path d="M242 122L252 142L246 164" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M241 121L250 138" stroke="#312e81" strokeWidth="11" strokeLinecap="round" />
-
-      {/* Head */}
-      <rect x="223" y="108" width="11" height="10" rx="4" fill="#fb7185" />
-      <rect x="214" y="84" width="26" height="27" rx="11" fill="#fda4af" />
-      <circle cx="241" cy="98" r="4" fill="#fda4af" />
-      <path d="M213 91C212 81 220 76 230 77C238 77 244 82 243 92C240 87 235 85 227 85C220 85 216 88 213 91Z" fill="#78350f" />
-      <circle cx="221" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
-      <circle cx="232" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
-      <path d="M225 96H228" stroke="#475569" strokeWidth="1.5" />
-      <circle cx="221" cy="96" r="1.3" fill="#0f172a" />
-      <circle cx="232" cy="96" r="1.3" fill="#0f172a" />
-      <path d="M224 104C226 105.5 229 105.5 231 104" stroke="#be123c" strokeWidth="1.5" strokeLinecap="round" />
+      <IsometricCandidateCharacter sleeveColor="#312e81" />
     </svg>
   );
 }
@@ -507,43 +573,7 @@ function SmartFilterIllustration() {
       <path d="M179 116L199 106L210 112L190 122Z" fill="#ffffff" />
 
       {/* Candidate Character at Desk */}
-      <path d="M216 184L198 218" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M226 186L224 228" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M236 182L254 216" stroke="#475569" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M214 156L194 166L196 192" stroke="#334155" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round" />
-      <ellipse cx="190" cy="196" rx="10" ry="5" fill="#78350f" />
-      <path d="M224 164L184 176L182 206" stroke="#1e293b" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" />
-      <rect x="166" y="202" width="22" height="9" rx="4.5" fill="#78350f" />
-      <rect x="166" y="203" width="7" height="7" rx="3.5" fill="#ffffff" />
-
-      {/* Chair */}
-      <path
-        d="M196 164C196 156 226 152 242 162C248 166 254 132 260 134C268 136 268 176 248 184C228 192 196 174 196 164Z"
-        fill="#f59e0b"
-        stroke="#d97706"
-        strokeWidth="2"
-      />
-      <path d="M236 178C252 174 262 152 260 134C266 136 267 174 248 184Z" fill="#fbbf24" />
-
-      {/* Torso & Arms */}
-      <path d="M214 118C222 114 238 115 244 122L240 166C228 170 214 166 210 158L214 118Z" fill="#f8fafc" />
-      <path d="M216 120L202 128L194 110" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M218 119L205 127" stroke="#065f46" strokeWidth="11" strokeLinecap="round" />
-      <path d="M185 108L201 100" stroke="#78350f" strokeWidth="3" strokeLinecap="round" />
-      <path d="M242 122L252 142L246 164" stroke="#fda4af" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M241 121L250 138" stroke="#065f46" strokeWidth="11" strokeLinecap="round" />
-
-      {/* Head */}
-      <rect x="223" y="108" width="11" height="10" rx="4" fill="#fb7185" />
-      <rect x="214" y="84" width="26" height="27" rx="11" fill="#fda4af" />
-      <circle cx="241" cy="98" r="4" fill="#fda4af" />
-      <path d="M213 91C212 81 220 76 230 77C238 77 244 82 243 92C240 87 235 85 227 85C220 85 216 88 213 91Z" fill="#92400e" />
-      <circle cx="221" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
-      <circle cx="232" cy="96" r="4.2" stroke="#475569" strokeWidth="1.5" fill="#ffffff" fillOpacity="0.35" />
-      <path d="M225 96H228" stroke="#475569" strokeWidth="1.5" />
-      <circle cx="221" cy="96" r="1.3" fill="#0f172a" />
-      <circle cx="232" cy="96" r="1.3" fill="#0f172a" />
-      <path d="M224 104C226 105.5 229 105.5 231 104" stroke="#be123c" strokeWidth="1.5" strokeLinecap="round" />
+      <IsometricCandidateCharacter sleeveColor="#065f46" />
     </svg>
   );
 }
