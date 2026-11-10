@@ -148,19 +148,18 @@ export default function Profile() {
           width: '36px',
           height: '36px',
           borderRadius: '50%',
-          background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-          backdropFilter: 'blur(8px)',
+          background: 'transparent',
           color: 'var(--text-primary)',
-          border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.08)',
+          border: 'none',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+          boxShadow: 'none',
           zIndex: 10
         }}
       >
-        <Settings size={18} />
+        <Settings size={20} />
       </button>
 
       {/* ═══ 1. Cover Photo Banner (Only rendered if user has uploaded a cover photo) ═══ */}
@@ -333,44 +332,34 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ═══ 3. Integrated Activity Stats Bar (From App Image, 4 Tiles) ═══ */}
+      {/* ═══ 3. Integrated Activity Stats Bar (Seamless Transparent Look) ═══ */}
       <div style={{
         margin: '0 14px 14px 14px',
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         gap: '6px',
-        background: isDark
-          ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
-          : 'linear-gradient(145deg, #ffffff 0%, #f1f6ff 100%)',
-        padding: '7px 8px',
-        borderRadius: '10px',
-        border: isDark
-          ? '1px solid rgba(255, 255, 255, 0.08)'
-          : '1px solid rgba(226, 232, 240, 0.95)',
-        boxShadow: isDark
-          ? '0 8px 20px -5px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.06)'
-          : '0 6px 16px -4px rgba(30, 64, 175, 0.08), inset 0 1.5px 2px #ffffff'
+        background: 'transparent',
+        padding: '0',
+        borderRadius: '0',
+        border: 'none',
+        boxShadow: 'none'
       }}>
         <div
           onClick={() => navigate('/saved')}
           style={{
             textAlign: 'center',
             cursor: 'pointer',
-            padding: '5px 2px',
-            borderRadius: '6px',
-            background: isDark
-              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-            boxShadow: isDark
-              ? '0 2px 5px rgba(0,0,0,0.3)'
-              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+            padding: '6px 2px',
+            borderRadius: '8px',
+            background: 'transparent',
+            border: 'none',
+            boxShadow: 'none'
           }}
         >
-          <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)', margin: 0, lineHeight: 1.15 }}>
+          <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)', margin: 0, lineHeight: 1.15 }}>
             {state.savedJobs.length}
           </p>
-          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '3px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
             Saved Jobs
           </p>
         </div>
@@ -379,21 +368,17 @@ export default function Profile() {
           style={{
             textAlign: 'center',
             cursor: 'pointer',
-            padding: '5px 2px',
-            borderRadius: '6px',
-            background: isDark
-              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-            boxShadow: isDark
-              ? '0 2px 5px rgba(0,0,0,0.3)'
-              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+            padding: '6px 2px',
+            borderRadius: '8px',
+            background: 'transparent',
+            border: 'none',
+            boxShadow: 'none'
           }}
         >
-          <p style={{ fontSize: '13px', fontWeight: 800, color: '#059669', margin: 0, lineHeight: 1.15 }}>
+          <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669', margin: 0, lineHeight: 1.15 }}>
             {state.appliedJobs.length}
           </p>
-          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '3px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
             Applied
           </p>
         </div>
@@ -402,21 +387,17 @@ export default function Profile() {
           style={{
             textAlign: 'center',
             cursor: 'pointer',
-            padding: '5px 2px',
-            borderRadius: '6px',
-            background: isDark
-              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-            boxShadow: isDark
-              ? '0 2px 5px rgba(0,0,0,0.3)'
-              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+            padding: '6px 2px',
+            borderRadius: '8px',
+            background: 'transparent',
+            border: 'none',
+            boxShadow: 'none'
           }}
         >
-          <p style={{ fontSize: '13px', fontWeight: 800, color: '#ea580c', margin: 0, lineHeight: 1.15 }}>
+          <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c', margin: 0, lineHeight: 1.15 }}>
             {unreadNotifCount}
           </p>
-          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '3px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
             Notified
           </p>
         </div>
@@ -425,22 +406,18 @@ export default function Profile() {
           style={{
             textAlign: 'center',
             cursor: 'pointer',
-            padding: '5px 2px',
-            borderRadius: '6px',
-            background: isDark
-              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-            boxShadow: isDark
-              ? '0 2px 5px rgba(0,0,0,0.3)'
-              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+            padding: '6px 2px',
+            borderRadius: '8px',
+            background: 'transparent',
+            border: 'none',
+            boxShadow: 'none'
           }}
           title={isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
         >
-          <p style={{ fontSize: '13px', fontWeight: 800, color: '#7c3aed', margin: 0, lineHeight: 1.15 }}>
+          <p style={{ fontSize: '15px', fontWeight: 800, color: '#7c3aed', margin: 0, lineHeight: 1.15 }}>
             {livePoints}
           </p>
-          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '3px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
             Exam Points
           </p>
         </div>
