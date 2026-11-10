@@ -31,7 +31,8 @@
     "@capacitor/core": "^8.2.1",
     "@vitejs/plugin-react": "^4.3.4",
     "sharp": "^0.35.3",
-    "vite": "^5.4.11"
+    "vite": "^5.4.11",
+    "wrangler": "^4.160.0"
   },
   "optionalDependencies": {
     "@esbuild/win32-x64": "^0.28.1"
