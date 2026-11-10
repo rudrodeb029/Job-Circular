@@ -136,19 +136,42 @@ export default function Profile() {
         onChange={handleAvatarUpload}
       />
 
-      {/* ═══ 1. Clean Gradient Cover Banner ═══ */}
-      <div style={{
-        position: 'relative',
-        height: '145px',
-        width: '100%',
-        overflow: 'hidden',
-        background: isDark
-          ? 'linear-gradient(135deg, #091224 0%, #172554 45%, #1e3a8a 80%, #1e40af 100%)'
-          : 'linear-gradient(135deg, #0a1f44 0%, #173b8a 45%, #1a56db 75%, #2563eb 100%)',
-        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(147, 197, 253, 0.4)',
-        boxShadow: '0 8px 24px -4px rgba(15, 23, 42, 0.25)'
-      }}>
-        {state.user.coverPhoto ? (
+      {/* Top-Right Settings Gear Button (Floats at top right) */}
+      <button
+        onClick={() => navigate('/settings')}
+        title="Settings"
+        aria-label="Settings"
+        style={{
+          position: 'absolute',
+          top: 'calc(var(--safe-area-top) + 8px)',
+          right: '16px',
+          width: '36px',
+          height: '36px',
+          borderRadius: '50%',
+          background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+          backdropFilter: 'blur(8px)',
+          color: 'var(--text-primary)',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.12)' : '1px solid rgba(0, 0, 0, 0.08)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
+          zIndex: 10
+        }}
+      >
+        <Settings size={18} />
+      </button>
+
+      {/* ═══ 1. Cover Photo Banner (Only rendered if user has uploaded a cover photo) ═══ */}
+      {state.user.coverPhoto && (
+        <div style={{
+          position: 'relative',
+          height: '150px',
+          width: '100%',
+          overflow: 'hidden',
+          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)'
+        }}>
           <img
             src={state.user.coverPhoto}
             alt="Cover"
@@ -158,94 +181,35 @@ export default function Profile() {
               objectFit: 'cover'
             }}
           />
-        ) : (
-          /* Ambient Background Glows */
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            overflow: 'hidden'
-          }}>
-            <div style={{
-              position: 'absolute',
-              top: '-30px',
-              right: '-30px',
-              width: '180px',
-              height: '180px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(96, 165, 250, 0.25) 0%, rgba(37, 99, 235, 0) 70%)',
-              pointerEvents: 'none'
-            }} />
-            <div style={{
-              position: 'absolute',
-              bottom: '-40px',
-              left: '-20px',
-              width: '160px',
-              height: '160px',
-              borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(147, 197, 253, 0.15) 0%, rgba(30, 64, 175, 0) 70%)',
-              pointerEvents: 'none'
-            }} />
-          </div>
-        )}
+        </div>
+      )}
 
-        {/* Top-Right Settings Gear Button */}
-        <button
-          onClick={() => navigate('/settings')}
-          title="Settings"
-          aria-label="Settings"
-          style={{
-            position: 'absolute',
-            top: 'calc(var(--safe-area-top) + 8px)',
-            right: '14px',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            background: 'rgba(15, 23, 42, 0.45)',
-            backdropFilter: 'blur(8px)',
-            color: 'white',
-            border: '1px solid rgba(255, 255, 255, 0.35)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
-            zIndex: 3
-          }}
-        >
-          <Settings size={18} />
-        </button>
-      </div>
-
-      {/* ═══ 2. Profile Details Card with Overlapping Avatar ═══ */}
+      {/* ═══ 2. Profile Details Section (Cards Colors Removed - Seamless Look) ═══ */}
       <div style={{
-        margin: '0 14px 12px 14px',
-        background: isDark
-          ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
-          : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
-        borderRadius: '16px',
-        border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(226, 232, 240, 0.95)',
-        boxShadow: isDark
-          ? '0 10px 24px -4px rgba(0, 0, 0, 0.45)'
-          : '0 8px 24px -4px rgba(30, 64, 175, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03)',
-        padding: '0 14px 14px 14px',
+        margin: state.user.coverPhoto ? '0 14px 10px 14px' : '0 14px 6px 14px',
+        background: 'transparent',
+        borderRadius: '0',
+        border: 'none',
+        boxShadow: 'none',
+        padding: state.user.coverPhoto ? '0 14px 6px 14px' : 'calc(var(--safe-area-top) + 16px) 14px 6px 14px',
         textAlign: 'center',
         position: 'relative',
         zIndex: 2
       }}>
-        {/* Centered Overlapping Avatar (Half on Cover, Half on Card) */}
+        {/* Centered Avatar */}
         <div style={{
-          marginTop: '-46px',
+          marginTop: state.user.coverPhoto ? '-46px' : '0',
           display: 'inline-block',
           position: 'relative'
         }}>
           <div style={{
-            width: '92px',
-            height: '92px',
+            width: '88px',
+            height: '88px',
             borderRadius: '50%',
             overflow: 'hidden',
-            border: isDark ? '3.5px solid #1e293b' : '3.5px solid #ffffff',
-            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.22)',
-            background: isDark ? '#0f172a' : '#ffffff',
+            border: isDark ? '3px solid #334155' : '3px solid #ffffff',
+            boxShadow: '0 6px 18px rgba(15, 23, 42, 0.12)',
+            background: isDark ? '#1e293b' : '#ffffff',
             position: 'relative'
           }}>
             {state.user.avatar ? (
@@ -268,7 +232,7 @@ export default function Profile() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '32px',
+                fontSize: '30px',
                 fontWeight: 800,
                 boxShadow: 'inset 0 2px 4px #ffffff, inset 0 -2px 4px rgba(37, 99, 235, 0.18)'
               }}>
@@ -302,8 +266,8 @@ export default function Profile() {
               position: 'absolute',
               bottom: '1px',
               right: '1px',
-              width: '28px',
-              height: '28px',
+              width: '26px',
+              height: '26px',
               borderRadius: '50%',
               background: 'linear-gradient(145deg, #2563eb, #1d4ed8)',
               color: 'white',
@@ -312,11 +276,11 @@ export default function Profile() {
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: '0 3px 8px rgba(15, 23, 42, 0.28), inset 0 1px 1.5px rgba(255, 255, 255, 0.45)',
+              boxShadow: '0 3px 8px rgba(15, 23, 42, 0.25)',
               zIndex: 3
             }}
           >
-            <Camera size={13} color="white" />
+            <Camera size={12} color="white" />
           </button>
         </div>
 
@@ -336,7 +300,7 @@ export default function Profile() {
           fontSize: '11px',
           fontWeight: 700,
           color: isDark ? '#94a3b8' : 'var(--text-secondary)',
-          margin: '0 0 12px 0',
+          margin: '0 0 10px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -362,18 +326,17 @@ export default function Profile() {
         <button
           onClick={() => navigate('/edit-profile')}
           style={{
-            width: '100%',
-            height: '36px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            padding: '7px 20px',
             borderRadius: '8px',
             background: isDark
               ? 'linear-gradient(145deg, #2563eb, #1d4ed8)'
               : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
             color: isDark ? '#ffffff' : 'var(--primary)',
             border: isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid rgba(191, 219, 254, 0.85)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
             fontSize: '11.5px',
             fontWeight: 700,
             cursor: 'pointer',
