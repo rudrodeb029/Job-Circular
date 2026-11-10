@@ -106,40 +106,49 @@ function IsometricCandidateCharacter({ sleeveColor = '#1e293b' }) {
         strokeLinecap="round"
       />
 
-      {/* Right Arm (Viewer's Left — Raised Holding Stylus Pen) */}
-      {/* Forearm & Hand */}
+      {/* Right Arm (Viewer's Left — Natural Bent Elbow & Raised Hand Holding Stylus Over Tablet) */}
+      {/* Continuous Bare Skin Upper-Arm, Rounded Elbow & Forearm */}
       <path
-        d="M206 128L196 108"
+        d="M210 124L195 135L184 113"
+        stroke="#f4a594"
+        strokeWidth="7.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* Subtle Inner Elbow Crease Shadow */}
+      <path
+        d="M196 131L192 126"
+        stroke="#e58e7e"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      {/* Raglan Right Short Sleeve (Cleanly Perpendicular to Upper Arm Before Elbow) */}
+      <path
+        d="M222 115C214 116 207 119 202 124L208 132C212 129 217 125 222 122Z"
+        fill={sleeveColor}
+      />
+      {/* Sculpted Hand & Fingers Holding Stylus */}
+      <ellipse cx="183.5" cy="111.5" rx="4.4" ry="3.8" transform="rotate(-25 183.5 111.5)" fill="#f4a594" />
+      {/* Stylus Pen Angled Naturally Toward Graphic Tablet */}
+      <path d="M173 115.5L191 106.5" stroke="#78350f" strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M172 116L174.5 114.8" stroke="#fbbf24" strokeWidth="2.4" strokeLinecap="round" />
+      {/* Thumb & Index Finger Gripping Stylus */}
+      <path d="M181.5 112.2L185.5 110.2" stroke="#e58e7e" strokeWidth="2.3" strokeLinecap="round" />
+      <circle cx="182.5" cy="109.5" r="1.8" fill="#f4a594" />
+
+      {/* Left Arm (Viewer's Right — Relaxed Along Chair Backrest) */}
+      {/* Continuous Bare Skin Arm & Hand */}
+      <path
+        d="M245 130L251 144L249 158"
         stroke="#f4a594"
         strokeWidth="7.5"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* Raglan Right Sleeve */}
+      <circle cx="249" cy="159.5" r="3.8" fill="#f4a594" />
+      {/* Raglan Left Short Sleeve */}
       <path
-        d="M222 115C215 115 208 119 202 127L211 133C215 127 219 123 223 121Z"
-        fill={sleeveColor}
-      />
-      {/* Sculpted Hand Holding Stylus */}
-      <circle cx="195" cy="106" r="4.2" fill="#f4a594" />
-      {/* Stylus Pen Held Naturally Between Fingers */}
-      <path d="M185 110L203 101" stroke="#78350f" strokeWidth="2.8" strokeLinecap="round" />
-      <path d="M184 110.5L186.5 109.2" stroke="#fbbf24" strokeWidth="2.6" strokeLinecap="round" />
-      {/* Thumb Over Stylus */}
-      <path d="M194 106.5L197 105" stroke="#e58e7e" strokeWidth="2.2" strokeLinecap="round" />
-
-      {/* Left Arm (Viewer's Right — Relaxed Down Along Chair) */}
-      {/* Forearm & Hand */}
-      <path
-        d="M249 135L251 157"
-        stroke="#f4a594"
-        strokeWidth="7.5"
-        strokeLinecap="round"
-      />
-      <circle cx="251" cy="159" r="3.8" fill="#f4a594" />
-      {/* Raglan Left Sleeve */}
-      <path
-        d="M235 116C242 117 248 123 253 135L244 139C241 130 238 124 234 121Z"
+        d="M235 116C242 117 248 123 252 133L244 137C241 129 238 124 234 121Z"
         fill={sleeveColor}
       />
 
@@ -341,21 +350,21 @@ function JobPortalIllustration() {
 
       {/* Drawing / Study Tablet on Right Side of Desk */}
       <path
-        d="M172 118L198 105L214 114L188 127Z"
+        d="M164 123L190 110L206 119L180 132Z"
         fill="#d97706"
         stroke="#92400e"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
       <path
-        d="M177 118L197 108L208 114L188 124Z"
+        d="M169 123L189 113L200 119L180 129Z"
         fill="#334155"
       />
 
       {/* Color Swatches / Reference Cards near Top of Desk */}
-      <path d="M182 94L204 88L206 93L184 99Z" fill="#1e293b" />
-      <path d="M184 97L208 94L209 99L185 102Z" fill="#64748b" />
-      <path d="M185 100L209 101L208 106L184 105Z" fill="#cbd5e1" />
+      <path d="M176 86L198 80L200 85L178 91Z" fill="#1e293b" />
+      <path d="M178 89L202 86L203 91L179 94Z" fill="#64748b" />
+      <path d="M179 92L203 93L202 98L178 97Z" fill="#cbd5e1" />
 
       {/* Candidate Character Sitting in Chair */}
       <IsometricCandidateCharacter sleeveColor="#1e293b" />
@@ -449,22 +458,35 @@ function ExamPrepIllustration() {
       <circle cx="175" cy="48" r="9" fill="#f59e0b" />
       <path d="M171 48L174 51L180 45" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
 
-      {/* Open Exam Answer Sheet & Pencil on Desk */}
+      {/* Open Exam Answer Sheet on Desk */}
       <path
-        d="M116 148L156 128L174 139L134 159Z"
+        d="M114 150L150 132L166 141L130 159Z"
         fill="#ffffff"
         stroke="#cbd5e1"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <path d="M125 148L152 134" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" />
-      <path d="M130 152L157 138" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
-      <path d="M135 155L162 141" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+      <path d="M122 150L146 138" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" />
+      <path d="M126 153L150 141" stroke="#10b981" strokeWidth="2" strokeLinecap="round" />
+      <path d="M130 156L154 144" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" />
+
+      {/* Study Tablet Under Stylus Hand */}
+      <path
+        d="M164 123L190 110L206 119L180 132Z"
+        fill="#d97706"
+        stroke="#92400e"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M169 123L189 113L200 119L180 129Z"
+        fill="#312e81"
+      />
 
       {/* Isometric Graduation Cap on Top Right of Desk */}
-      <path d="M176 96L198 85L220 96L198 107Z" fill="#1e293b" stroke="#fbbf24" strokeWidth="1.2" />
-      <path d="M186 101V109C186 112 210 112 210 109V101" fill="#334155" />
-      <path d="M214 99L218 111" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+      <path d="M172 86L192 76L212 86L192 96Z" fill="#1e293b" stroke="#fbbf24" strokeWidth="1.2" />
+      <path d="M181 91V98C181 101 203 101 203 98V91" fill="#334155" />
+      <path d="M207 89L210 99" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
 
       {/* Candidate Character at Desk */}
       <IsometricCandidateCharacter sleeveColor="#312e81" />
@@ -555,22 +577,23 @@ function SmartFilterIllustration() {
       <circle cx="173" cy="46" r="7" stroke="#d97706" strokeWidth="2.5" fill="#ffffff" />
       <path d="M178 51L184 57" stroke="#d97706" strokeWidth="2.8" strokeLinecap="round" />
 
-      {/* Keyboard & Bookmarked Circular Cards on Desk */}
+      {/* Keyboard & Bookmarked Circular Tablet on Desk */}
       <path
-        d="M124 146L164 126L174 132L134 152Z"
+        d="M120 148L158 129L168 135L130 154Z"
         fill="#ffffff"
         stroke="#cbd5e1"
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
-      <path d="M130 146L162 130" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 3" />
+      <path d="M126 148L156 133" stroke="#94a3b8" strokeWidth="2" strokeDasharray="3 3" />
       <path
-        d="M174 116L200 103L216 112L190 125Z"
+        d="M164 123L190 110L206 119L180 132Z"
         fill="#f59e0b"
         stroke="#b45309"
         strokeWidth="1.4"
+        strokeLinejoin="round"
       />
-      <path d="M179 116L199 106L210 112L190 122Z" fill="#ffffff" />
+      <path d="M169 123L189 113L200 119L180 129Z" fill="#ffffff" />
 
       {/* Candidate Character at Desk */}
       <IsometricCandidateCharacter sleeveColor="#065f46" />
