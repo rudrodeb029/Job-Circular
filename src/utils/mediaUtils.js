@@ -153,3 +153,46 @@ export function extractJobMediaList(item) {
 
   return rawList.map(u => (typeof u === 'string' ? u.trim() : '')).filter(Boolean);
 }
+
+/**
+ * Compresses an image File using HTML5 Canvas to a lightweight JPEG Data URL.
+ *
+ * @param {File} file - Input image file
+ * @param {number} maxWidth - Max width or height in pixels (default: 800)
+ * @param {number} quality - JPEG compression quality 0.0 - 1.0 (default: 0.8)
+ * @returns {Promise<string>} - Compressed image Data URL
+ */
+export function compressImageFile(file, maxWidth = 800, quality = 0.8) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type || !file.type.startsWith('image/')) {
+      return reject(new Error('Invalid image file'));
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth || height > maxWidth) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxWidth) / height);
+            height = maxWidth;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => reject(new Error('Failed to load image into canvas'));
+    };
+    reader.onerror = () => reject(new Error('Failed to read image file'));
+  });
+}

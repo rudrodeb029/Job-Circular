@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Edit, FileText, MapPin } from '../components/Icons';
+import { ArrowLeft, User, Edit, FileText, MapPin, Camera } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { CLOUDINARY_CONFIG } from '../cloudinary';
 import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
+import { compressImageFile } from '../utils/mediaUtils';
 
 const PhoneIcon = ({ size = 15, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -326,11 +327,14 @@ export default function EditProfile() {
     phone: state.user.phone || '',
     qualification: state.user.qualification || '',
     location: state.user.location || '',
-    avatar: state.user.avatar || null
+    avatar: state.user.avatar || null,
+    coverPhoto: state.user.coverPhoto || null,
+    bio: state.user.bio || ''
   });
 
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
   const qualificationOptions = [
     { value: 'স্নাতক (Bachelor)', label: 'স্নাতক (Bachelor)', labelEn: 'Bachelor (স্নাতক)' },
@@ -359,34 +363,54 @@ export default function EditProfile() {
     const file = e.target.files[0];
     if (!file) return;
 
-    const cloudName = CLOUDINARY_CONFIG.cloudName;
-    const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
-
-    if (!cloudName || !uploadPreset || cloudName === 'dqy39gghx') {
-      alert('Cloudinary is not connected yet.');
-      return;
-    }
-
     setUploadingImage(true);
-    const data = new FormData();
-    data.append('file', file);
-    data.append('upload_preset', uploadPreset);
-
     try {
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: 'POST',
-        body: data
-      });
-      const fileData = await res.json();
-      if (fileData.secure_url) {
-        const optimizedUrl = optimizeCloudinaryUrl(fileData.secure_url);
-        setFormData(prev => ({ ...prev, avatar: optimizedUrl }));
+      const cloudName = CLOUDINARY_CONFIG.cloudName;
+      const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
+
+      if (cloudName && uploadPreset && cloudName !== 'dqy39gghx') {
+        const data = new FormData();
+        data.append('file', file);
+        data.append('upload_preset', uploadPreset);
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: data
+        });
+        const fileData = await res.json();
+        if (fileData.secure_url) {
+          const optimizedUrl = optimizeCloudinaryUrl(fileData.secure_url);
+          setFormData(prev => ({ ...prev, avatar: optimizedUrl }));
+          return;
+        }
       }
+      const dataUrl = await compressImageFile(file, 400, 0.85);
+      setFormData(prev => ({ ...prev, avatar: dataUrl }));
     } catch (err) {
       console.error(err);
-      alert('Upload failed: ' + err.message);
+      try {
+        const dataUrl = await compressImageFile(file, 400, 0.85);
+        setFormData(prev => ({ ...prev, avatar: dataUrl }));
+      } catch (fallbackErr) {
+        alert('Upload failed: ' + err.message);
+      }
     } finally {
       setUploadingImage(false);
+    }
+  };
+
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploadingCover(true);
+    try {
+      const dataUrl = await compressImageFile(file, 960, 0.8);
+      setFormData(prev => ({ ...prev, coverPhoto: dataUrl }));
+    } catch (err) {
+      console.error(err);
+      alert('Cover upload failed');
+    } finally {
+      setUploadingCover(false);
     }
   };
 
@@ -402,13 +426,15 @@ export default function EditProfile() {
 
   return (
     <div className="page" style={{ background: 'var(--bg)', paddingBottom: '85px' }}>
-      {/* Glassmorphism Gradient Hero Header */}
+      {/* Glassmorphism Gradient Hero Header / Cover */}
       <div style={{
-        background: 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
+        background: formData.coverPhoto
+          ? `linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.7)), url(${formData.coverPhoto}) center/cover no-repeat`
+          : 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
         padding: 'calc(var(--safe-area-top) + 10px) 16px 40px 16px',
         color: 'white',
         textAlign: 'center',
-        borderRadius: '0 0 12px 12px',
+        borderRadius: '0 0 16px 16px',
         position: 'relative',
         boxShadow: '0 8px 25px -4px rgba(26, 86, 219, 0.3)',
         overflow: 'hidden'
@@ -463,6 +489,34 @@ export default function EditProfile() {
           >
             <ArrowLeft size={18} />
           </button>
+
+          {/* Change Cover Button */}
+          <label htmlFor="edit-cover-upload" style={{
+            padding: '5px 10px',
+            borderRadius: '8px',
+            background: 'rgba(15, 23, 42, 0.55)',
+            backdropFilter: 'blur(8px)',
+            color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.35)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '11px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+          }}>
+            <Camera size={13} />
+            <span>{uploadingCover ? '...' : (isEn ? 'Cover Photo' : 'কভার ছবি')}</span>
+          </label>
+          <input
+            id="edit-cover-upload"
+            type="file"
+            accept="image/*"
+            onChange={handleCoverUpload}
+            style={{ display: 'none' }}
+            disabled={uploadingCover}
+          />
         </div>
 
         {/* Integrated Avatar Section */}
@@ -578,6 +632,16 @@ export default function EditProfile() {
               value={formData.phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               placeholder={isEn ? 'Enter phone number' : 'মোবাইল নম্বর লিখুন'}
+              isOptional
+              isEn={isEn}
+            />
+
+            <FormInput
+              label={isEn ? 'Bio / Short Description' : 'বায়ো / পরিচয়'}
+              icon={<FileText size={15} />}
+              value={formData.bio}
+              onChange={(e) => handleChange('bio', e.target.value)}
+              placeholder={isEn ? 'e.g. BCS & Bank Job Candidate' : 'যেমন: সরকারি ও ব্যাংক চাকরি প্রত্যাশী'}
               isOptional
               isEn={isEn}
             />

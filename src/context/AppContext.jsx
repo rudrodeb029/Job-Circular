@@ -21,7 +21,9 @@ const initialUser = {
   qualification: '',
   category: 'gov',
   location: '',
-  avatar: null
+  avatar: null,
+  coverPhoto: null,
+  bio: ''
 };
 
 if (!localStorage.getItem('user_id')) {

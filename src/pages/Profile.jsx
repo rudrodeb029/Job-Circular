@@ -1,11 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Edit, Bookmark, Briefcase, FileText, Bell, Globe, Moon, Sun, Settings, ChevronRight, Rss } from '../components/Icons';
+import {
+  Edit,
+  Bookmark,
+  Briefcase,
+  FileText,
+  Bell,
+  Globe,
+  Moon,
+  Sun,
+  Settings,
+  ChevronRight,
+  Rss,
+  Camera,
+  GraduationCap,
+  MapPin
+} from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
 import { POINTS_CONFIG } from '../utils/pointsService';
 import { getRewardedCooldownRemainingSec } from '../utils/admobUtils';
+import { compressImageFile } from '../utils/mediaUtils';
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -24,6 +40,11 @@ export default function Profile() {
   const [cooldownRemaining, setCooldownRemaining] = useState(() => getRewardedCooldownRemainingSec());
   const [pointsToast, setPointsToast] = useState('');
 
+  const coverInputRef = useRef(null);
+  const avatarInputRef = useRef(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
   const livePoints = state.liveExamPoints ?? state.pointsState?.points ?? POINTS_CONFIG.WELCOME_BONUS;
   const dailyAdCount = state.pointsState?.dailyAdCount ?? 0;
 
@@ -33,6 +54,44 @@ export default function Profile() {
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, [state.pointsState]);
+
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCover(true);
+    try {
+      const dataUrl = await compressImageFile(file, 960, 0.8);
+      dispatch({ type: 'UPDATE_USER_PROFILE', payload: { coverPhoto: dataUrl } });
+      setPointsToast(isEn ? 'Cover photo updated!' : 'কভার ছবি সফলভাবে পরিবর্তিত হয়েছে!');
+      setTimeout(() => setPointsToast(''), 3000);
+    } catch (err) {
+      console.error('Cover upload failed', err);
+      setPointsToast(isEn ? 'Upload failed' : 'আপলোড ব্যর্থ হয়েছে');
+      setTimeout(() => setPointsToast(''), 2500);
+    } finally {
+      setUploadingCover(false);
+      if (e.target) e.target.value = '';
+    }
+  };
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const dataUrl = await compressImageFile(file, 400, 0.85);
+      dispatch({ type: 'UPDATE_USER_PROFILE', payload: { avatar: dataUrl } });
+      setPointsToast(isEn ? 'Profile picture updated!' : 'প্রোফাইল ছবি সফলভাবে পরিবর্তিত হয়েছে!');
+      setTimeout(() => setPointsToast(''), 3000);
+    } catch (err) {
+      console.error('Avatar upload failed', err);
+      setPointsToast(isEn ? 'Upload failed' : 'আপলোড ব্যর্থ হয়েছে');
+      setTimeout(() => setPointsToast(''), 2500);
+    } finally {
+      setUploadingAvatar(false);
+      if (e.target) e.target.value = '';
+    }
+  };
 
   const handleWatchRewardAd = async () => {
     if (watchingAd) return;
@@ -92,53 +151,124 @@ export default function Profile() {
 
   return (
     <div className="page" style={{ background: 'var(--bg)' }}>
-      {/* Claymorphism Gradient Header */}
-      <div style={{
-        background: 'linear-gradient(145deg, #1e3a8a 0%, #1a56db 52%, #2563eb 100%)',
-        padding: 'calc(var(--safe-area-top) + 16px) 16px 18px 16px',
-        color: 'white',
-        textAlign: 'center',
-        borderRadius: '0 0 12px 12px',
-        position: 'relative',
-        borderBottom: '1px solid rgba(147, 197, 253, 0.35)',
-        boxShadow: '0 10px 24px -6px rgba(26, 86, 219, 0.32), inset 0 2px 4px rgba(255, 255, 255, 0.22), inset 0 -3px 6px rgba(15, 23, 42, 0.25)',
-        overflow: 'hidden'
-      }}>
-        {/* Background Decorative Rings */}
-        <div style={{
-          position: 'absolute',
-          top: '-40px',
-          right: '-40px',
-          width: '160px',
-          height: '160px',
-          borderRadius: '50%',
-          background: 'rgba(255, 255, 255, 0.08)',
-          pointerEvents: 'none'
-        }}></div>
-        <div style={{
-          position: 'absolute',
-          bottom: '-30px',
-          left: '-30px',
-          width: '120px',
-          height: '120px',
-          borderRadius: '50%',
-          background: 'rgba(255, 255, 255, 0.05)',
-          pointerEvents: 'none'
-        }}></div>
+      {/* Hidden File Inputs for Cover Photo & Profile Picture */}
+      <input
+        type="file"
+        ref={coverInputRef}
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleCoverUpload}
+      />
+      <input
+        type="file"
+        ref={avatarInputRef}
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleAvatarUpload}
+      />
 
-        {/* Top Right Settings Gear Button (Claymorphism) */}
+      {/* ═══ 1. Facebook-Style Cover Photo Banner (App Design Language) ═══ */}
+      <div style={{
+        position: 'relative',
+        height: '175px',
+        width: '100%',
+        overflow: 'hidden',
+        background: isDark
+          ? 'linear-gradient(135deg, #091224 0%, #172554 45%, #1e3a8a 80%, #1e40af 100%)'
+          : 'linear-gradient(135deg, #0a1f44 0%, #173b8a 45%, #1a56db 75%, #2563eb 100%)',
+        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(147, 197, 253, 0.4)',
+        boxShadow: '0 8px 24px -4px rgba(15, 23, 42, 0.25)'
+      }}>
+        {state.user.coverPhoto ? (
+          <img
+            src={state.user.coverPhoto}
+            alt="Cover"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              filter: uploadingCover ? 'brightness(0.6)' : 'none',
+              transition: 'filter 0.3s'
+            }}
+          />
+        ) : (
+          /* Artistic Default Cover Banner with Career Motifs (Matching reference's inspirational banner) */
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: 'calc(var(--safe-area-top) + 12px) 20px 20px 20px',
+            color: 'white'
+          }}>
+            {/* Ambient Background Glows */}
+            <div style={{
+              position: 'absolute',
+              top: '-30px',
+              right: '-30px',
+              width: '180px',
+              height: '180px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(96, 165, 250, 0.25) 0%, rgba(37, 99, 235, 0) 70%)',
+              pointerEvents: 'none'
+            }} />
+            <div style={{
+              position: 'absolute',
+              bottom: '-40px',
+              left: '-20px',
+              width: '160px',
+              height: '160px',
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(147, 197, 253, 0.15) 0%, rgba(30, 64, 175, 0) 70%)',
+              pointerEvents: 'none'
+            }} />
+
+            {/* Motivational Banner Typography */}
+            <div style={{ position: 'relative', zIndex: 1, maxWidth: '68%' }}>
+              <div style={{
+                fontSize: '9.5px',
+                fontWeight: 800,
+                letterSpacing: '0.8px',
+                color: '#93c5fd',
+                textTransform: 'uppercase',
+                marginBottom: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}>
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#60a5fa' }} />
+                <span>{isEn ? 'Believe In Yourself' : 'লক্ষ্যে অবিচল'}</span>
+              </div>
+              <h1 style={{
+                fontSize: '15px',
+                fontWeight: 800,
+                color: '#ffffff',
+                margin: 0,
+                lineHeight: 1.25,
+                textShadow: '0 2px 8px rgba(0,0,0,0.4)',
+                letterSpacing: '-0.2px'
+              }}>
+                {isEn ? 'It’s Possible • Win Your Career' : 'স্বপ্ন জয়ের প্রস্তুতি • Live Circular'}
+              </h1>
+            </div>
+          </div>
+        )}
+
+        {/* Top-Right Settings Gear Button */}
         <button
           onClick={() => navigate('/settings')}
           title="Settings"
           aria-label="Settings"
           style={{
             position: 'absolute',
-            top: 'calc(var(--safe-area-top) + 4px)',
-            right: '16px',
+            top: 'calc(var(--safe-area-top) + 8px)',
+            right: '14px',
             width: '36px',
             height: '36px',
-            borderRadius: '8px',
-            background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.12))',
+            borderRadius: '50%',
+            background: 'rgba(15, 23, 42, 0.45)',
             backdropFilter: 'blur(8px)',
             color: 'white',
             border: '1px solid rgba(255, 255, 255, 0.35)',
@@ -146,202 +276,364 @@ export default function Profile() {
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(15, 23, 42, 0.18), inset 0 1.5px 2px rgba(255, 255, 255, 0.4), inset 0 -1.5px 2px rgba(15, 23, 42, 0.2)'
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+            zIndex: 3
           }}
         >
           <Settings size={18} />
         </button>
 
-        {/* Avatar with Claymorphism Ring & Edit Camera Trigger Badge */}
+        {/* Cover Photo Camera Button (Bottom-Right, matching reference image) */}
+        <button
+          onClick={() => coverInputRef.current?.click()}
+          title={isEn ? 'Change Cover Photo' : 'কভার ছবি পরিবর্তন'}
+          aria-label="Change Cover Photo"
+          disabled={uploadingCover}
+          style={{
+            position: 'absolute',
+            bottom: '10px',
+            right: '12px',
+            width: '34px',
+            height: '34px',
+            borderRadius: '50%',
+            background: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(8px)',
+            color: 'white',
+            border: '1.5px solid rgba(255, 255, 255, 0.65)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.35)',
+            zIndex: 3
+          }}
+        >
+          {uploadingCover ? (
+            <span style={{ fontSize: '10px', fontWeight: 800 }}>...</span>
+          ) : (
+            <Camera size={16} color="white" />
+          )}
+        </button>
+      </div>
+
+      {/* ═══ 2. Profile Details Card with Overlapping Avatar (Facebook Style) ═══ */}
+      <div style={{
+        margin: '0 14px 12px 14px',
+        background: isDark
+          ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+          : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+        borderRadius: '16px',
+        border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid rgba(226, 232, 240, 0.95)',
+        boxShadow: isDark
+          ? '0 10px 24px -4px rgba(0, 0, 0, 0.45)'
+          : '0 8px 24px -4px rgba(30, 64, 175, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03)',
+        padding: '0 14px 14px 14px',
+        textAlign: 'center',
+        position: 'relative',
+        zIndex: 2
+      }}>
+        {/* Centered Overlapping Avatar (Half on Cover, Half on Card, like reference) */}
         <div style={{
-          position: 'relative',
-          width: '54px',
-          height: '54px',
-          margin: '0 auto 10px auto'
+          marginTop: '-48px',
+          display: 'inline-block',
+          position: 'relative'
         }}>
-          {state.user.avatar ? (
-            <img
-              src={state.user.avatar}
-              alt={state.user.name}
-              style={{
+          <div style={{
+            width: '92px',
+            height: '92px',
+            borderRadius: '50%',
+            overflow: 'hidden',
+            border: isDark ? '3.5px solid #1e293b' : '3.5px solid #ffffff',
+            boxShadow: '0 8px 24px rgba(15, 23, 42, 0.22)',
+            background: isDark ? '#0f172a' : '#ffffff',
+            position: 'relative'
+          }}>
+            {state.user.avatar ? (
+              <img
+                src={state.user.avatar}
+                alt={state.user.name || 'User'}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  filter: uploadingAvatar ? 'brightness(0.6)' : 'none'
+                }}
+              />
+            ) : (
+              <div style={{
                 width: '100%',
                 height: '100%',
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: '2.5px solid rgba(255, 255, 255, 0.95)',
-                boxShadow: '0 8px 18px rgba(15, 23, 42, 0.25), inset 0 2px 3px rgba(255, 255, 255, 0.6)'
-              }}
-            />
-          ) : (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              borderRadius: '50%',
-              background: 'linear-gradient(145deg, #ffffff 0%, #dbeafe 100%)',
-              color: '#1a56db',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '20px',
-              fontWeight: 800,
-              boxShadow: '0 8px 18px rgba(15, 23, 42, 0.25), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(37, 99, 235, 0.18)',
-              border: '2px solid rgba(255, 255, 255, 0.95)'
-            }}>
-              {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
-            </div>
-          )}
+                background: 'linear-gradient(145deg, #ffffff 0%, #dbeafe 100%)',
+                color: '#1a56db',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '32px',
+                fontWeight: 800,
+                boxShadow: 'inset 0 2px 4px #ffffff, inset 0 -2px 4px rgba(37, 99, 235, 0.18)'
+              }}>
+                {state.user.name ? state.user.name[0].toUpperCase() : 'U'}
+              </div>
+            )}
+            {uploadingAvatar && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'rgba(0,0,0,0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '9px',
+                fontWeight: 800
+              }}>
+                ...
+              </div>
+            )}
+          </div>
 
-          {/* Edit Camera Badge */}
-          <div
-            onClick={() => navigate('/edit-profile')}
-            title="Edit Profile & Picture"
+          {/* Avatar Camera Badge (Bottom-Right of Avatar circle, like reference) */}
+          <button
+            onClick={() => avatarInputRef.current?.click()}
+            title={isEn ? 'Change Profile Picture' : 'প্রোফাইল ছবি পরিবর্তন'}
+            aria-label="Change Profile Picture"
+            disabled={uploadingAvatar}
             style={{
               position: 'absolute',
-              bottom: '-2px',
-              right: '-2px',
-              width: '20px',
-              height: '20px',
+              bottom: '1px',
+              right: '1px',
+              width: '28px',
+              height: '28px',
               borderRadius: '50%',
               background: 'linear-gradient(145deg, #2563eb, #1d4ed8)',
               color: 'white',
+              border: isDark ? '2px solid #1e293b' : '2px solid #ffffff',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              border: '1.8px solid white',
-              boxShadow: '0 3px 6px rgba(15, 23, 42, 0.28), inset 0 1px 1.5px rgba(255, 255, 255, 0.45)'
+              boxShadow: '0 3px 8px rgba(15, 23, 42, 0.28), inset 0 1px 1.5px rgba(255, 255, 255, 0.45)',
+              zIndex: 3
             }}
           >
-            <Edit size={10} />
-          </div>
+            <Camera size={13} color="white" />
+          </button>
         </div>
-        {/* User Info */}
-        <h2 style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '-0.2px', marginBottom: '2px' }}>
+
+        {/* User Name */}
+        <h2 style={{
+          fontSize: '17px',
+          fontWeight: 800,
+          color: 'var(--text-primary)',
+          letterSpacing: '-0.3px',
+          margin: '8px 0 2px 0'
+        }}>
           {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
         </h2>
-        {(state.user.qualification || state.user.location) && (
-          <p style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.6)', fontWeight: 500, margin: '2px 0 6px 0' }}>
-            {state.user.qualification} {state.user.qualification && state.user.location && '•'} {state.user.location}
-          </p>
-        )}
-        {localStorage.getItem('onesignal_subscribed') === 'true' && (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '10px', color: '#4ade80', fontWeight: 700 }}>
-                <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></div>
-                {isEn ? 'Notifications Active' : 'নোটিফিকেশন সক্রিয়'}
-            </div>
-        )}
 
-        {/* Integrated Activity Stats Bar (Tactile Claymorphism Card) */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '6px',
-          background: isDark
-            ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
-            : 'linear-gradient(145deg, #ffffff 0%, #f1f6ff 100%)',
-          padding: '7px 8px',
-          borderRadius: '8px',
-          border: isDark
-            ? '1px solid rgba(255, 255, 255, 0.1)'
-            : '1px solid rgba(255, 255, 255, 0.95)',
-          boxShadow: isDark
-            ? '0 10px 22px -6px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.08), inset 0 -2px 4px rgba(0, 0, 0, 0.35)'
-            : '0 8px 18px -4px rgba(15, 23, 42, 0.18), inset 0 2px 3px #ffffff, inset 0 -2px 4px rgba(219, 234, 254, 0.75)',
-          marginTop: '12px'
+        {/* Meta / Subtitle line (like reference "1.1K friends") */}
+        <p style={{
+          fontSize: '11px',
+          fontWeight: 700,
+          color: isDark ? '#94a3b8' : 'var(--text-secondary)',
+          margin: '0 0 10px 0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '5px'
         }}>
-          <div
-            onClick={() => navigate('/saved')}
-            style={{
-              textAlign: 'center',
-              cursor: 'pointer',
-              padding: '5px 2px',
-              borderRadius: '6px',
-              background: isDark
-                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-              boxShadow: isDark
-                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
-                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
-            }}
-          >
-            <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)', margin: 0, lineHeight: 1.15 }}>
-              {state.savedJobs.length}
-            </p>
-            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
-              Saved Jobs
-            </p>
+          <span style={{ color: '#7c3aed', fontWeight: 800 }}>
+            🎯 {toBengaliNumber(livePoints)} {isEn ? 'Exam Points' : 'এক্সাম পয়েন্ট'}
+          </span>
+          <span>•</span>
+          <span>{isEn ? 'Job Seeker' : 'চাকরি প্রত্যাশী'}</span>
+          {localStorage.getItem('onesignal_subscribed') === 'true' && (
+            <>
+              <span>•</span>
+              <span style={{ color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16a34a' }} />
+                {isEn ? 'Active' : 'সক্রিয়'}
+              </span>
+            </>
+          )}
+        </p>
+
+        {/* Bio & Details Items (Like the reference image's bullet list) */}
+        <div style={{
+          background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(241, 245, 249, 0.7)',
+          borderRadius: '10px',
+          padding: '8px 12px',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(226, 232, 240, 0.8)',
+          marginBottom: '10px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '6px',
+          textAlign: 'left'
+        }}>
+          {/* Item 1: Career / Bio */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
+            <Briefcase size={13} color="var(--primary)" style={{ flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {state.user.bio || (isEn ? 'Govt & Private Job Candidate' : 'সরকারি ও বেসরকারি চাকরি প্রত্যাশী')}
+            </span>
           </div>
-          <div
-            onClick={() => navigate('/saved?tab=applied')}
-            style={{
-              textAlign: 'center',
-              cursor: 'pointer',
-              padding: '5px 2px',
-              borderRadius: '6px',
-              background: isDark
-                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-              boxShadow: isDark
-                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
-                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
-            }}
-          >
-            <p style={{ fontSize: '13px', fontWeight: 800, color: '#059669', margin: 0, lineHeight: 1.15 }}>
-              {state.appliedJobs.length}
-            </p>
-            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
-              Applied
-            </p>
+
+          {/* Item 2: Education / Qualification */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
+            <GraduationCap size={14} color="#2563eb" style={{ flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {state.user.qualification || (isEn ? 'Educational Qualification not set' : 'শিক্ষাগত যোগ্যতা যুক্ত করুন')}
+            </span>
           </div>
-          <div
-            onClick={() => navigate('/notifications')}
-            style={{
-              textAlign: 'center',
-              cursor: 'pointer',
-              padding: '5px 2px',
-              borderRadius: '6px',
-              background: isDark
-                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-              boxShadow: isDark
-                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
-                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
-            }}
-          >
-            <p style={{ fontSize: '13px', fontWeight: 800, color: '#ea580c', margin: 0, lineHeight: 1.15 }}>
-              {unreadNotifCount}
-            </p>
-            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
-              Notified
-            </p>
+
+          {/* Item 3: Location / District */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
+            <MapPin size={13} color="#ea580c" style={{ flexShrink: 0 }} />
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {state.user.location ? (isEn ? state.user.location : `${state.user.location}, বাংলাদেশ`) : (isEn ? 'Location not set' : 'জেলা / অবস্থান যুক্ত করুন')}
+            </span>
           </div>
-          <div
-            onClick={() => navigate('/live-exams-list')}
-            style={{
-              textAlign: 'center',
-              cursor: 'pointer',
-              padding: '5px 2px',
-              borderRadius: '6px',
-              background: isDark
-                ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
-                : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
-              border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
-              boxShadow: isDark
-                ? '0 2px 5px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.05)'
-                : '0 2px 5px rgba(15, 23, 42, 0.04), inset 0 1.5px 2px #ffffff'
-            }}
-            title={isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
-          >
-            <p style={{ fontSize: '13px', fontWeight: 800, color: '#7c3aed', margin: 0, lineHeight: 1.15 }}>
-              {livePoints}
-            </p>
-            <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
-              Exam Points
-            </p>
-          </div>
+        </div>
+
+        {/* Action Button: Edit Profile (like reference image's action button) */}
+        <button
+          onClick={() => navigate('/edit-profile')}
+          style={{
+            width: '100%',
+            height: '36px',
+            borderRadius: '8px',
+            background: isDark
+              ? 'linear-gradient(145deg, #2563eb, #1d4ed8)'
+              : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
+            color: isDark ? '#ffffff' : 'var(--primary)',
+            border: isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid rgba(191, 219, 254, 0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            fontSize: '11.5px',
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: isDark
+              ? '0 3px 8px rgba(0,0,0,0.25)'
+              : '0 2px 5px rgba(37, 99, 235, 0.08), inset 0 1.5px 2px #ffffff'
+          }}
+        >
+          <Edit size={12} />
+          <span>{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন করুন'}</span>
+        </button>
+      </div>
+
+      {/* ═══ 3. Integrated Activity Stats Bar (From App Image, 4 Tiles) ═══ */}
+      <div style={{
+        margin: '0 14px 14px 14px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: '6px',
+        background: isDark
+          ? 'linear-gradient(145deg, #1e293b 0%, #172033 100%)'
+          : 'linear-gradient(145deg, #ffffff 0%, #f1f6ff 100%)',
+        padding: '7px 8px',
+        borderRadius: '10px',
+        border: isDark
+          ? '1px solid rgba(255, 255, 255, 0.08)'
+          : '1px solid rgba(226, 232, 240, 0.95)',
+        boxShadow: isDark
+          ? '0 8px 20px -5px rgba(0, 0, 0, 0.45), inset 0 1.5px 2px rgba(255, 255, 255, 0.06)'
+          : '0 6px 16px -4px rgba(30, 64, 175, 0.08), inset 0 1.5px 2px #ffffff'
+      }}>
+        <div
+          onClick={() => navigate('/saved')}
+          style={{
+            textAlign: 'center',
+            cursor: 'pointer',
+            padding: '5px 2px',
+            borderRadius: '6px',
+            background: isDark
+              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+            boxShadow: isDark
+              ? '0 2px 5px rgba(0,0,0,0.3)'
+              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+          }}
+        >
+          <p style={{ fontSize: '13px', fontWeight: 800, color: 'var(--primary)', margin: 0, lineHeight: 1.15 }}>
+            {state.savedJobs.length}
+          </p>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+            Saved Jobs
+          </p>
+        </div>
+        <div
+          onClick={() => navigate('/saved?tab=applied')}
+          style={{
+            textAlign: 'center',
+            cursor: 'pointer',
+            padding: '5px 2px',
+            borderRadius: '6px',
+            background: isDark
+              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+            boxShadow: isDark
+              ? '0 2px 5px rgba(0,0,0,0.3)'
+              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+          }}
+        >
+          <p style={{ fontSize: '13px', fontWeight: 800, color: '#059669', margin: 0, lineHeight: 1.15 }}>
+            {state.appliedJobs.length}
+          </p>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+            Applied
+          </p>
+        </div>
+        <div
+          onClick={() => navigate('/notifications')}
+          style={{
+            textAlign: 'center',
+            cursor: 'pointer',
+            padding: '5px 2px',
+            borderRadius: '6px',
+            background: isDark
+              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+            boxShadow: isDark
+              ? '0 2px 5px rgba(0,0,0,0.3)'
+              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+          }}
+        >
+          <p style={{ fontSize: '13px', fontWeight: 800, color: '#ea580c', margin: 0, lineHeight: 1.15 }}>
+            {unreadNotifCount}
+          </p>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+            Notified
+          </p>
+        </div>
+        <div
+          onClick={() => navigate('/live-exams-list')}
+          style={{
+            textAlign: 'center',
+            cursor: 'pointer',
+            padding: '5px 2px',
+            borderRadius: '6px',
+            background: isDark
+              ? 'linear-gradient(145deg, #243247 0%, #1b2638 100%)'
+              : 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)',
+            border: isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(226, 232, 240, 0.85)',
+            boxShadow: isDark
+              ? '0 2px 5px rgba(0,0,0,0.3)'
+              : '0 2px 4px rgba(15, 23, 42, 0.04), inset 0 1px 1.5px #ffffff'
+          }}
+          title={isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
+        >
+          <p style={{ fontSize: '13px', fontWeight: 800, color: '#7c3aed', margin: 0, lineHeight: 1.15 }}>
+            {livePoints}
+          </p>
+          <p style={{ fontSize: '8px', color: 'var(--text-muted)', fontWeight: 700, marginTop: '2px', marginBottom: 0, textTransform: 'uppercase', letterSpacing: '0.1px', whiteSpace: 'nowrap' }}>
+            Exam Points
+          </p>
         </div>
       </div>
 
@@ -371,7 +663,7 @@ export default function Profile() {
         </div>
       )}
 
-      <div className="page-content" style={{ padding: '16px 16px 80px 16px' }}>
+      <div className="page-content" style={{ padding: '0 14px 80px 14px' }}>
         {/* Live Exam Points Wallet Section (Compact Claymorphism Style) */}
         <div style={{ marginBottom: '14px' }}>
           <div style={{
