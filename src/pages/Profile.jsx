@@ -284,23 +284,55 @@ export default function Profile() {
           </button>
         </div>
 
-        {/* User Name */}
-        <h2 style={{
-          fontSize: '17px',
-          fontWeight: 800,
-          color: 'var(--text-primary)',
-          letterSpacing: '-0.3px',
-          margin: '8px 0 2px 0'
-        }}>
-          {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
-        </h2>
+        {/* User Name with Inline Edit Icon (Clickable to Edit Profile) */}
+        <div
+          onClick={() => navigate('/edit-profile')}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+            cursor: 'pointer',
+            margin: '8px 0 2px 0',
+            padding: '2px 6px',
+            borderRadius: '8px'
+          }}
+          title={isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন করুন'}
+        >
+          <h2 style={{
+            fontSize: '17px',
+            fontWeight: 800,
+            color: 'var(--text-primary)',
+            letterSpacing: '-0.3px',
+            margin: 0
+          }}>
+            {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
+          </h2>
+          <div style={{
+            width: '22px',
+            height: '22px',
+            borderRadius: '50%',
+            background: isDark
+              ? 'rgba(37, 99, 235, 0.25)'
+              : 'linear-gradient(145deg, #eff6ff, #dbeafe)',
+            border: isDark ? '1px solid rgba(96, 165, 250, 0.35)' : '1px solid rgba(191, 219, 254, 0.9)',
+            color: isDark ? '#60a5fa' : 'var(--primary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(37, 99, 235, 0.1)',
+            flexShrink: 0
+          }}>
+            <Edit size={11} />
+          </div>
+        </div>
 
         {/* Meta / Subtitle line */}
         <p style={{
           fontSize: '11px',
           fontWeight: 700,
           color: isDark ? '#94a3b8' : 'var(--text-secondary)',
-          margin: '0 0 10px 0',
+          margin: '2px 0 12px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -321,33 +353,6 @@ export default function Profile() {
             </>
           )}
         </p>
-
-        {/* Action Button: Edit Profile */}
-        <button
-          onClick={() => navigate('/edit-profile')}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            padding: '7px 20px',
-            borderRadius: '8px',
-            background: isDark
-              ? 'linear-gradient(145deg, #2563eb, #1d4ed8)'
-              : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
-            color: isDark ? '#ffffff' : 'var(--primary)',
-            border: isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid rgba(191, 219, 254, 0.85)',
-            fontSize: '11.5px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: isDark
-              ? '0 3px 8px rgba(0,0,0,0.25)'
-              : '0 2px 5px rgba(37, 99, 235, 0.08), inset 0 1.5px 2px #ffffff'
-          }}
-        >
-          <Edit size={12} />
-          <span>{isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন করুন'}</span>
-        </button>
       </div>
 
       {/* ═══ 3. Integrated Activity Stats Bar (From App Image, 4 Tiles) ═══ */}
