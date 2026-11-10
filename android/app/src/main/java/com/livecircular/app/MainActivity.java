@@ -77,6 +77,7 @@ public class MainActivity extends BridgeActivity {
     private static final String REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC = "native_ad_cooldown_sec";
     private static final String REMOTE_CONFIG_KEY_SHOW_REWARDED = "show_rewarded_ads";
     private static final String REMOTE_CONFIG_KEY_REWARDED_ID = "admob_rewarded_id";
+    private static final String REMOTE_CONFIG_KEY_REWARDED_COOLDOWN_SEC = "rewarded_cooldown_sec";
 
 
     // ═══ Default Official Test Ad Unit IDs ═══
@@ -91,7 +92,7 @@ public class MainActivity extends BridgeActivity {
     private boolean isAdsEnabled = true;
     private boolean isBannerAdsEnabled = true;
     private boolean isInterstitialAdsEnabled = true;
-    private long interstitialCooldownSec = 50;
+    private long interstitialCooldownSec = 180;
     private String bannerAdUnitId = DEFAULT_BANNER_AD_UNIT_ID;
     private String interstitialAdUnitId = DEFAULT_INTERSTITIAL_AD_UNIT_ID;
     private boolean isMobileAdsInitialized = false;
@@ -107,6 +108,8 @@ public class MainActivity extends BridgeActivity {
     private long nativeAdCooldownSec = 30;
     private String nativeAdUnitId = DEFAULT_NATIVE_AD_UNIT_ID;
     private boolean isRewardedAdsEnabled = true;
+    private long rewardedCooldownSec = 120;
+    private long lastRewardedShownTimestamp = 0;
     private String rewardedAdUnitId = DEFAULT_REWARDED_AD_UNIT_ID;
     private RewardedAd rewardedAd;
     private boolean isRewardedLoading = false;
@@ -203,7 +206,12 @@ public class MainActivity extends BridgeActivity {
 
         interstitialCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_COOLDOWN_SEC);
         if (interstitialCooldownSec <= 0) {
-            interstitialCooldownSec = 50;
+            interstitialCooldownSec = 180;
+        }
+
+        rewardedCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_REWARDED_COOLDOWN_SEC);
+        if (rewardedCooldownSec <= 0) {
+            rewardedCooldownSec = 120;
         }
 
         nativeAdCooldownSec = remoteConfig.getLong(REMOTE_CONFIG_KEY_NATIVE_COOLDOWN_SEC);
@@ -626,8 +634,9 @@ public class MainActivity extends BridgeActivity {
     public void showInterstitialAd(boolean force) {
         long now = System.currentTimeMillis();
         long cooldownMs = interstitialCooldownSec * 1000L;
-        if (!force && (now - lastInterstitialShownTimestamp < cooldownMs)) {
-            Log.d(TAG, "Interstitial ad cooldown active (" + (now - lastInterstitialShownTimestamp) / 1000 + "s / " + interstitialCooldownSec + "s). Skipping ad.");
+        long minBufferMs = force ? 60000L : cooldownMs;
+        if (now - lastInterstitialShownTimestamp < minBufferMs) {
+            Log.d(TAG, "Interstitial ad cooldown active (" + (now - lastInterstitialShownTimestamp) / 1000 + "s / " + (minBufferMs / 1000) + "s). Skipping ad.");
             return;
         }
         if (now - lastInterstitialShownTimestamp < 3000L) {
@@ -1062,8 +1071,16 @@ public class MainActivity extends BridgeActivity {
     }
 
     public void showRewardedAd() {
+        long now = System.currentTimeMillis();
+        long rewardedCooldownMs = rewardedCooldownSec * 1000L;
+        if (now - lastRewardedShownTimestamp < rewardedCooldownMs) {
+            Log.d(TAG, "Rewarded ad cooldown active (" + (now - lastRewardedShownTimestamp) / 1000 + "s / " + rewardedCooldownSec + "s). Skipping ad.");
+            return;
+        }
+
         if (isAdsEnabled && isRewardedAdsEnabled && rewardedAd != null && !isFinishing() && !isDestroyed()) {
             Log.d(TAG, "Showing Google AdMob Rewarded Test Ad...");
+            lastRewardedShownTimestamp = now;
             pendingShowRewardedAd = false;
             rewardEarnedInCurrentSession = false;
             RewardedAd adToShow = rewardedAd;
@@ -1311,6 +1328,13 @@ public class MainActivity extends BridgeActivity {
                     @SuppressWarnings("unused")
                     public boolean isRewardedAdReady() {
                         return isAdsEnabled && isRewardedAdsEnabled && rewardedAd != null;
+                    }
+
+                    @JavascriptInterface
+                    @Keep
+                    @SuppressWarnings("unused")
+                    public long getRewardedCooldownSec() {
+                        return rewardedCooldownSec;
                     }
 
                     @JavascriptInterface

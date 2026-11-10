@@ -4,7 +4,8 @@ import { SUPABASE_CONFIG } from '../services/supabaseClient';
 export const POINTS_CONFIG = {
   POINTS_PER_AD: 10,
   DEFAULT_EXAM_COST: 20,
-  DAILY_AD_LIMIT: 10,
+  DAILY_AD_LIMIT: 8,
+  REWARDED_COOLDOWN_SEC: 120, // 2 minutes cooldown between rewarded ads
   WELCOME_BONUS: 10,
   STORAGE_KEY: 'live_exam_points_state_v1'
 };
@@ -18,6 +19,7 @@ const getDefaultPointsState = () => {
     unlockedExams: [],
     dailyAdDate: getTodayStr(),
     dailyAdCount: 0,
+    lastRewardedAdTime: 0,
     history: [
       {
         id: 'welcome_bonus',
@@ -52,6 +54,7 @@ export const loadLocalPointsState = () => {
       unlockedExams: Array.isArray(parsed.unlockedExams) ? parsed.unlockedExams.map(String) : [],
       dailyAdDate: today,
       dailyAdCount,
+      lastRewardedAdTime: Number(parsed.lastRewardedAdTime) || 0,
       history: Array.isArray(parsed.history) ? parsed.history.slice(0, 25) : [],
       updatedAt: parsed.updatedAt || new Date().toISOString()
     };
@@ -70,6 +73,7 @@ export const saveLocalPointsState = (nextState) => {
       ...nextState,
       points: Math.max(0, Number(nextState.points) || 0),
       unlockedExams: Array.from(new Set((nextState.unlockedExams || []).map(String))),
+      lastRewardedAdTime: Number(nextState.lastRewardedAdTime) || 0,
       history: (nextState.history || []).slice(0, 25),
       updatedAt: nextState.updatedAt || new Date().toISOString()
     };

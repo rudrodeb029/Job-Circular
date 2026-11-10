@@ -10,7 +10,7 @@ import {
   getExamPointCost,
   isExamUnlockedForUser
 } from '../utils/pointsService';
-import { showRewardedAd, preloadRewardedAd } from '../utils/admobUtils';
+import { showRewardedAd, preloadRewardedAd, getRewardedCooldownRemainingSec } from '../utils/admobUtils';
 
 const AppContext = createContext();
 
@@ -253,6 +253,15 @@ export function AppProvider({ children }) {
       };
     }
 
+    const cooldownSec = getRewardedCooldownRemainingSec();
+    if (cooldownSec > 0) {
+      return {
+        ok: false,
+        reason: 'cooldown',
+        remainingSec: cooldownSec
+      };
+    }
+
     const adResult = await showRewardedAd({
       rewardPoints: POINTS_CONFIG.POINTS_PER_AD,
       isEn
@@ -261,7 +270,8 @@ export function AppProvider({ children }) {
     if (!adResult || adResult.status !== 'earned') {
       return {
         ok: false,
-        reason: adResult?.status || 'dismissed'
+        reason: adResult?.status || 'dismissed',
+        message: adResult?.message
       };
     }
 
@@ -272,6 +282,7 @@ export function AppProvider({ children }) {
       ...latest,
       points: (Number(latest.points) || 0) + rewardAmount,
       dailyAdCount: (Number(latest.dailyAdCount) || 0) + 1,
+      lastRewardedAdTime: Date.now(),
       history: [
         {
           id: `ad_${Date.now()}`,

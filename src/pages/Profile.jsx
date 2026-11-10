@@ -5,6 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
 import { POINTS_CONFIG } from '../utils/pointsService';
+import { getRewardedCooldownRemainingSec } from '../utils/admobUtils';
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -20,13 +21,32 @@ export default function Profile() {
   const isEn = state.language === 'en';
   const isDark = state.theme === 'dark';
   const [watchingAd, setWatchingAd] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(() => getRewardedCooldownRemainingSec());
   const [pointsToast, setPointsToast] = useState('');
 
   const livePoints = state.liveExamPoints ?? state.pointsState?.points ?? POINTS_CONFIG.WELCOME_BONUS;
   const dailyAdCount = state.pointsState?.dailyAdCount ?? 0;
 
+  useEffect(() => {
+    const update = () => setCooldownRemaining(getRewardedCooldownRemainingSec());
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [state.pointsState]);
+
   const handleWatchRewardAd = async () => {
     if (watchingAd) return;
+    const remaining = getRewardedCooldownRemainingSec();
+    if (remaining > 0) {
+      setPointsToast(
+        isEn
+          ? `Please wait ${remaining}s before watching another ad.`
+          : `পরবর্তী বিজ্ঞাপন দেখার আগে ${toBengaliNumber(remaining)} সেকেন্ড অপেক্ষা করুন।`
+      );
+      setTimeout(() => setPointsToast(''), 3000);
+      return;
+    }
+
     setWatchingAd(true);
     try {
       const res = await earnPointsFromAd();
@@ -42,11 +62,17 @@ export default function Profile() {
             ? `Daily limit reached (${POINTS_CONFIG.DAILY_AD_LIMIT}/${POINTS_CONFIG.DAILY_AD_LIMIT} ads today)`
             : `আজকের বিজ্ঞাপনের সীমা শেষ (${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)}/${toBengaliNumber(POINTS_CONFIG.DAILY_AD_LIMIT)})`
         );
-      } else {
+      } else if (res.reason === 'cooldown') {
         setPointsToast(
           isEn
+            ? `Please wait ${res.remainingSec}s before watching another ad.`
+            : `পরবর্তী বিজ্ঞাপন দেখার আগে ${toBengaliNumber(res.remainingSec)} সেকেন্ড অপেক্ষা করুন।`
+        );
+      } else {
+        setPointsToast(
+          res.message || (isEn
             ? 'Watch the full ad to earn points.'
-            : 'পয়েন্ট পেতে সম্পূর্ণ বিজ্ঞাপনটি দেখুন।'
+            : 'পয়েন্ট পেতে সম্পূর্ণ বিজ্ঞাপনটি দেখুন।')
         );
       }
       setTimeout(() => setPointsToast(''), 3200);
@@ -377,37 +403,39 @@ export default function Profile() {
             <button
               type="button"
               onClick={handleWatchRewardAd}
-              disabled={watchingAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT}
+              disabled={watchingAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0}
               style={{
                 width: '100%',
                 padding: '7px 12px',
                 borderRadius: '6px',
-                border: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                border: (dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0)
                   ? (isDark ? '1px solid rgba(255,255,255,0.08)' : '1px solid #cbd5e1')
                   : '1px solid rgba(37, 99, 235, 0.75)',
-                background: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                background: (dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0)
                   ? (isDark ? '#334155' : '#cbd5e1')
                   : 'linear-gradient(145deg, #2563eb 0%, #1d4ed8 100%)',
                 color: '#ffffff',
                 fontSize: '11px',
                 fontWeight: 800,
-                cursor: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'not-allowed' : 'pointer',
+                cursor: (dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0) ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '5px',
-                boxShadow: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                boxShadow: (dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0)
                   ? 'none'
                   : '0 4px 10px -2px rgba(37, 99, 235, 0.30), inset 0 1.5px 2px rgba(255, 255, 255, 0.35), inset 0 -1.5px 2px rgba(30, 64, 175, 0.35)'
               }}
             >
-              <span>🎬</span>
+              <span>{cooldownRemaining > 0 ? '⏳' : '🎬'}</span>
               <span>
                 {watchingAd
                   ? (isEn ? 'Loading Ad...' : 'বিজ্ঞাপন লোড হচ্ছে...')
                   : dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
                     ? (isEn ? 'Daily Limit Reached' : 'আজকের সীমা শেষ')
-                    : (isEn ? `Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Pts)` : `বিজ্ঞাপন দেখুন (+${toBengaliNumber(POINTS_CONFIG.POINTS_PER_AD)} পয়েন্ট)`)}
+                    : cooldownRemaining > 0
+                      ? (isEn ? `Wait ${cooldownRemaining}s` : `${toBengaliNumber(cooldownRemaining)}সে: অপেক্ষা করুন`)
+                      : (isEn ? `Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Pts)` : `বিজ্ঞাপন দেখুন (+${toBengaliNumber(POINTS_CONFIG.POINTS_PER_AD)} পয়েন্ট)`)}
               </span>
             </button>
           </div>

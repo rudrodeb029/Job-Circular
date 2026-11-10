@@ -8,7 +8,7 @@ import { getDocument, getCollectionCached, setDocument, onCollectionSnapshot, CO
 import { supabase } from '../services/supabaseClient';
 import ModernLoader from '../components/ModernLoader';
 import { saveLocalAnswer, getAllLocalAnswers, clearLocalAnswers, saveExamResult, getExamResult, saveLeaderboard, getLeaderboard, getExamFromSQLite, saveExamToSQLite } from '../services/sqliteService';
-import { showNativeInterstitialAd, preloadInterstitialAd, navigateWithAdOnReturn } from '../utils/admobUtils';
+import { showNativeInterstitialAd, preloadInterstitialAd, navigateWithAdOnReturn, getRewardedCooldownRemainingSec } from '../utils/admobUtils';
 import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
 import useProgressiveList from '../hooks/useProgressiveList';
 import { POINTS_CONFIG, getExamPointCost, isExamUnlockedForUser } from '../utils/pointsService';
@@ -22,8 +22,16 @@ export default function LiveExamRoom() {
   const isDark = state.theme === 'dark';
   const roomEntryTime = useRef(Date.now());
   const [watchingRoomAd, setWatchingRoomAd] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(() => getRewardedCooldownRemainingSec());
   const livePoints = state.liveExamPoints ?? state.pointsState?.points ?? POINTS_CONFIG.WELCOME_BONUS;
   const dailyAdCount = state.pointsState?.dailyAdCount ?? 0;
+
+  useEffect(() => {
+    const update = () => setCooldownRemaining(getRewardedCooldownRemainingSec());
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, [state.pointsState]);
 
   const [exam, setExam] = useState(null);
   const [loadingExam, setLoadingExam] = useState(true);
@@ -814,9 +822,11 @@ export default function LiveExamRoom() {
             ) : (
               <button
                 type="button"
-                disabled={watchingRoomAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT}
+                disabled={watchingRoomAd || dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0}
                 onClick={async () => {
                   if (watchingRoomAd) return;
+                  const sec = getRewardedCooldownRemainingSec();
+                  if (sec > 0) return;
                   setWatchingRoomAd(true);
                   try {
                     await earnPointsFromAd();
@@ -829,21 +839,27 @@ export default function LiveExamRoom() {
                   padding: '12px 16px',
                   borderRadius: '12px',
                   border: 'none',
-                  background: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                  background: (dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0)
                     ? '#64748b'
                     : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)',
                   color: '#ffffff',
                   fontSize: '13px',
                   fontWeight: 800,
-                  cursor: dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 6px 18px rgba(37, 99, 235, 0.3)'
+                  cursor: (dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0) ? 'not-allowed' : 'pointer',
+                  boxShadow: (dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT || cooldownRemaining > 0)
+                    ? 'none'
+                    : '0 6px 18px rgba(37, 99, 235, 0.3)'
                 }}
               >
                 {watchingRoomAd
                   ? (isEn ? '🎬 Loading Ad...' : '🎬 বিজ্ঞাপন লোড হচ্ছে...')
-                  : (isEn
-                    ? `🎬 Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Points)`
-                    : `🎬 বিজ্ঞাপন দেখুন (+${POINTS_CONFIG.POINTS_PER_AD} পয়েন্ট)`)}
+                  : dailyAdCount >= POINTS_CONFIG.DAILY_AD_LIMIT
+                    ? (isEn ? '🎬 Daily Limit Reached' : '🎬 আজকের সীমা শেষ')
+                    : cooldownRemaining > 0
+                      ? (isEn ? `⏳ Please Wait ${cooldownRemaining}s` : `⏳ ${cooldownRemaining} সেকেন্ড অপেক্ষা করুন`)
+                      : (isEn
+                        ? `🎬 Watch Ad (+${POINTS_CONFIG.POINTS_PER_AD} Points)`
+                        : `🎬 বিজ্ঞাপন দেখুন (+${POINTS_CONFIG.POINTS_PER_AD} পয়েন্ট)`)}
               </button>
             )}
           </div>

@@ -7,8 +7,97 @@
 // ═══ Frequency Capping / Cooldown Protection (AdMob Safety) ═══
 // Minimum interval between interstitials to prevent AdMob "Too Many Ads" and "Ad Serving Limits"
 let lastInterstitialTime = 0;
-let dynamicCooldownMs = 50000; // Default: 50 seconds cooldown
+try {
+  lastInterstitialTime = Number(localStorage.getItem('admob_last_interstitial_time') || 0);
+} catch (e) {}
+
+let dynamicCooldownMs = 180000; // Default: 3 minutes (180 seconds) cooldown for Interstitials
+let dynamicRewardedCooldownMs = 120000; // Default: 2 minutes (120 seconds) cooldown for Rewarded Ads
 let dynamicNativeCooldownMs = 30000; // Default: 30 seconds cooldown for Native Advanced Ads
+
+// Action counter for Interstitial Ads: user must read/complete at least 4 items before an ad is eligible
+const ACTION_STORAGE_KEY = 'admob_interstitial_action_count';
+const DAILY_INTERSTITIAL_KEY = 'admob_daily_interstitial_count';
+const DAILY_INTERSTITIAL_DATE_KEY = 'admob_daily_interstitial_date';
+export const INTERSTITIAL_ACTION_THRESHOLD = 4;
+export const DAILY_INTERSTITIAL_LIMIT = 10;
+
+// Official Google AdMob sample test unit IDs (safe for development & staging)
+export const GOOGLE_ADMOB_TEST_AD_UNITS = {
+  BANNER: 'ca-app-pub-3940256099942544/6300978111',
+  INTERSTITIAL: 'ca-app-pub-3940256099942544/1033173712',
+  REWARDED: 'ca-app-pub-3940256099942544/5224354917',
+  NATIVE: 'ca-app-pub-3940256099942544/2247696110'
+};
+
+export const getInterstitialActionCount = () => {
+  try {
+    return Number(localStorage.getItem(ACTION_STORAGE_KEY) || 0);
+  } catch (e) {
+    return 0;
+  }
+};
+
+export const incrementInterstitialActionCount = () => {
+  try {
+    const current = getInterstitialActionCount();
+    const next = current + 1;
+    localStorage.setItem(ACTION_STORAGE_KEY, String(next));
+    return next;
+  } catch (e) {
+    return 1;
+  }
+};
+
+export const resetInterstitialActionCount = () => {
+  try {
+    localStorage.setItem(ACTION_STORAGE_KEY, '0');
+  } catch (e) {}
+};
+
+export const getDailyInterstitialCount = () => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const savedDate = localStorage.getItem(DAILY_INTERSTITIAL_DATE_KEY);
+    if (savedDate !== today) {
+      localStorage.setItem(DAILY_INTERSTITIAL_DATE_KEY, today);
+      localStorage.setItem(DAILY_INTERSTITIAL_KEY, '0');
+      return 0;
+    }
+    return Number(localStorage.getItem(DAILY_INTERSTITIAL_KEY) || 0);
+  } catch (e) {
+    return 0;
+  }
+};
+
+export const incrementDailyInterstitialCount = () => {
+  try {
+    const count = getDailyInterstitialCount() + 1;
+    localStorage.setItem(DAILY_INTERSTITIAL_KEY, String(count));
+    return count;
+  } catch (e) {
+    return 1;
+  }
+};
+
+let lastRewardedTime = 0;
+try {
+  lastRewardedTime = Number(localStorage.getItem('admob_last_rewarded_time') || 0);
+} catch (e) {}
+
+export const getRewardedCooldownRemainingSec = () => {
+  const now = Date.now();
+  const diff = now - lastRewardedTime;
+  if (diff >= dynamicRewardedCooldownMs) return 0;
+  return Math.max(0, Math.ceil((dynamicRewardedCooldownMs - diff) / 1000));
+};
+
+export const recordRewardedAdShown = () => {
+  lastRewardedTime = Date.now();
+  try {
+    localStorage.setItem('admob_last_rewarded_time', String(lastRewardedTime));
+  } catch (e) {}
+};
 
 // Initialize cooldown from Native interface if available on startup
 if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getInterstitialCooldownSec === 'function') {
@@ -21,6 +110,10 @@ if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidA
       const nSec = window.AndroidAds.getNativeAdCooldownSec();
       if (nSec > 0) dynamicNativeCooldownMs = nSec * 1000;
     }
+    if (typeof window.AndroidAds.getRewardedCooldownSec === 'function') {
+      const rSec = window.AndroidAds.getRewardedCooldownSec();
+      if (rSec > 0) dynamicRewardedCooldownMs = rSec * 1000;
+    }
   } catch (e) {
     // Non-fatal fallback
   }
@@ -30,10 +123,14 @@ if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidA
 if (typeof window !== 'undefined') {
   window.addEventListener('remote_config_ads_updated', (e) => {
     if (e && e.detail) {
-      const { interstitial_cooldown_sec, native_ad_cooldown_sec, show_ads, show_banner_ads, show_interstitial_ads, show_native_ads } = e.detail;
+      const { interstitial_cooldown_sec, rewarded_cooldown_sec, native_ad_cooldown_sec, show_ads, show_banner_ads, show_interstitial_ads, show_native_ads } = e.detail;
       if (typeof interstitial_cooldown_sec === 'number' && interstitial_cooldown_sec > 0) {
         dynamicCooldownMs = interstitial_cooldown_sec * 1000;
         console.log(`[AdMob Remote Config] Updated cooldown to ${interstitial_cooldown_sec}s`);
+      }
+      if (typeof rewarded_cooldown_sec === 'number' && rewarded_cooldown_sec > 0) {
+        dynamicRewardedCooldownMs = rewarded_cooldown_sec * 1000;
+        console.log(`[AdMob Remote Config] Updated rewarded cooldown to ${rewarded_cooldown_sec}s`);
       }
       if (typeof native_ad_cooldown_sec === 'number' && native_ad_cooldown_sec > 0) {
         dynamicNativeCooldownMs = native_ad_cooldown_sec * 1000;
@@ -46,7 +143,7 @@ if (typeof window !== 'undefined') {
 
 /**
  * Triggers the native Interstitial Ad via Android JavascriptInterface.
- * @param {boolean} force - If true, bypasses the cooldown (used for key milestones like exam submit or portal leave)
+ * @param {boolean} force - If true, bypasses the cooldown (still subject to 60s hard throttle)
  * Returns true if the native method was called, false otherwise.
  */
 export { showInterstitialAd } from './adService';
@@ -63,8 +160,14 @@ export const showNativeInterstitialAd = (force = false) => {
   }
 
   const now = Date.now();
-  if (!force && (now - lastInterstitialTime < dynamicCooldownMs)) {
+  const minInterval = force ? 60000 : dynamicCooldownMs;
+  if (now - lastInterstitialTime < minInterval) {
     // Cooldown is active: Silently skip ad to protect account from AdMob frequency limits
+    return false;
+  }
+
+  // Check daily limit
+  if (getDailyInterstitialCount() >= DAILY_INTERSTITIAL_LIMIT) {
     return false;
   }
 
@@ -72,6 +175,11 @@ export const showNativeInterstitialAd = (force = false) => {
     if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.showInterstitial === 'function') {
       window.AndroidAds.showInterstitial();
       lastInterstitialTime = now;
+      try {
+        localStorage.setItem('admob_last_interstitial_time', String(now));
+      } catch (e) {}
+      incrementDailyInterstitialCount();
+      resetInterstitialActionCount();
       return true;
     }
   } catch (err) {
@@ -355,9 +463,94 @@ export const preloadInterstitialAd = () => {
  * @param {string|number} fallbackPath - Navigation target (default: -1)
  * @param {boolean} force - Whether to bypass cooldown (default: false)
  */
-export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = false) => {
+/**
+ * Shows a temporary, non-clickable 1-second "Loading Ad..." safety dialog
+ * to alert the user that an Interstitial Ad is about to appear, preventing accidental clicks.
+ */
+export const showLoadingAdDialog = (isEn = false) => {
+  if (typeof document === 'undefined') return () => {};
+  try {
+    const existing = document.getElementById('admob_loading_ad_dialog');
+    if (existing && existing.parentNode) {
+      existing.parentNode.removeChild(existing);
+    }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'admob_loading_ad_dialog';
+    overlay.style.cssText = [
+      'position:fixed',
+      'inset:0',
+      'z-index:9999999',
+      'background:rgba(15, 23, 42, 0.72)',
+      'backdrop-filter:blur(4px)',
+      'WebkitBackdropFilter:blur(4px)',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
+      'pointer-events:all',
+      'user-select:none'
+    ].join(';');
+
+    const box = document.createElement('div');
+    box.style.cssText = [
+      'background:#ffffff',
+      'border-radius:12px',
+      'padding:14px 22px',
+      'display:flex',
+      'align-items:center',
+      'gap:12px',
+      'box-shadow:0 12px 32px rgba(0,0,0,0.3)',
+      'border:1px solid #e2e8f0',
+      'animation:fadeIn 0.15s ease-out'
+    ].join(';');
+
+    box.innerHTML = `
+      <div style="width:20px;height:20px;border:2.5px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:admobSpin 0.75s linear infinite;flex-shrink:0;"></div>
+      <span style="font-size:13px;font-weight:700;color:#0f172a;font-family:'Noto Sans Bengali',sans-serif;white-space:nowrap;">
+        ${isEn ? 'Loading Ad...' : 'বিজ্ঞাপন লোড হচ্ছে...'}
+      </span>
+      <style>
+        @keyframes admobSpin { to { transform: rotate(360deg); } }
+      </style>
+    `;
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    return () => {
+      try {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      } catch (e) {}
+    };
+  } catch (e) {
+    return () => {};
+  }
+};
+
+/**
+ * Safe Back Navigation with Interstitial Ad Display.
+ * Used when a user returns to the main menu/list after finishing a set of questions
+ * (e.g. from QuestionDetails or LiveExamRoom).
+ * 
+ * Rules:
+ * 1. Action Counter: User must have completed/backed from at least 4 items (INTERSTITIAL_ACTION_THRESHOLD = 4).
+ * 2. Cooldown Timer: At least 3 minutes (180 seconds) must have passed since last interstitial.
+ * 3. Daily Cap: Max 10 interstitials per day.
+ * 4. Ad Ready Check: Ad must be preloaded and ready (isNativeInterstitialReady).
+ * 5. Safety Dialog: Shows a 1-second "Loading Ad..." modal before displaying the ad to prevent accidental clicks.
+ * 6. Zero Interruption: If any rule fails, navigates immediately with 0ms delay.
+ * 
+ * @param {Function} navigate - React Router navigate function
+ * @param {string|number} fallbackPath - Navigation target (default: -1)
+ * @param {boolean} force - Whether to bypass action counter (still throttled by 60s hard cooldown)
+ * @param {boolean} isEn - English language toggle for dialog
+ */
+export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = false, isEn = false) => {
   const isReady = isNativeInterstitialReady();
   const now = Date.now();
+
+  // Increment action count every time user reads/backs from a content page
+  const actionCount = incrementInterstitialActionCount();
 
   // Refresh cooldown if available from Native
   if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.getInterstitialCooldownSec === 'function') {
@@ -367,7 +560,10 @@ export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = fals
     } catch (e) {}
   }
 
-  const cooldownPassed = force || (now - lastInterstitialTime >= dynamicCooldownMs);
+  const minCooldown = force ? 60000 : dynamicCooldownMs;
+  const cooldownPassed = (now - lastInterstitialTime >= minCooldown);
+  const thresholdReached = force || (actionCount >= INTERSTITIAL_ACTION_THRESHOLD);
+  const underDailyLimit = getDailyInterstitialCount() < DAILY_INTERSTITIAL_LIMIT;
 
   const executeNavigation = () => {
     if (typeof fallbackPath === 'number' || typeof fallbackPath === 'string') {
@@ -377,62 +573,65 @@ export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = fals
     }
   };
 
-  // Check readiness before display
-  if (isReady && cooldownPassed) {
-    let navigated = false;
-    const doNavigateOnce = () => {
-      if (!navigated) {
-        navigated = true;
-        window.removeEventListener('native_interstitial_dismissed', doNavigateOnce);
-        window.removeEventListener('native_interstitial_failed', doNavigateOnce);
-        executeNavigation();
+  // Check all safety conditions before showing Interstitial Ad
+  if (isReady && cooldownPassed && thresholdReached && underDailyLimit) {
+    // Show 1-second "Loading Ad..." alert dialog to prevent accidental clicks
+    const removeDialog = showLoadingAdDialog(isEn);
+
+    setTimeout(() => {
+      removeDialog();
+
+      let navigated = false;
+      const doNavigateOnce = () => {
+        if (!navigated) {
+          navigated = true;
+          window.removeEventListener('native_interstitial_dismissed', doNavigateOnce);
+          window.removeEventListener('native_interstitial_failed', doNavigateOnce);
+          executeNavigation();
+        }
+      };
+
+      window.addEventListener('native_interstitial_dismissed', doNavigateOnce, { once: true });
+      window.addEventListener('native_interstitial_failed', doNavigateOnce, { once: true });
+
+      // Safety fallback: if dismissed event doesn't fire within 800ms, proceed
+      setTimeout(doNavigateOnce, 800);
+
+      const shown = showNativeInterstitialAd(force);
+      if (!shown) {
+        doNavigateOnce();
       }
-    };
-
-    window.addEventListener('native_interstitial_dismissed', doNavigateOnce, { once: true });
-    window.addEventListener('native_interstitial_failed', doNavigateOnce, { once: true });
-
-    // Safety fallback: if dismissed event doesn't fire within 600ms, proceed
-    setTimeout(doNavigateOnce, 600);
-
-    const shown = showNativeInterstitialAd(force);
-    if (!shown) {
-      doNavigateOnce();
-    }
+    }, 1000);
   } else {
-    // Not ready or in cooldown: Proceed directly without interrupting the user
+    // Not ready, in cooldown, or action counter not reached: Proceed directly without interrupting the user
     executeNavigation();
   }
 };
 
-
-// Sync lastInterstitialTime when native Android triggers an interstitial directly (e.g. onResume from Custom In-App Browser)
+// Sync lastInterstitialTime when native Android triggers an interstitial directly
 if (typeof window !== 'undefined') {
   window.addEventListener('native_interstitial_shown', () => {
     lastInterstitialTime = Date.now();
+    try {
+      localStorage.setItem('admob_last_interstitial_time', String(lastInterstitialTime));
+    } catch (e) {}
   });
 }
 
 /**
- * Arms the Native Android engine and preloads an Interstitial Ad before opening
- * the Custom In-App Browser (Chrome Custom Tabs). When the user clicks the Cross (✕)
- * icon or Back button to return to the app, the Interstitial Ad displays automatically.
+ * Preloads an Interstitial Ad in background so it is ready for safe display.
  */
 export const armInterstitialOnBrowserReturn = () => {
   try {
     preloadInterstitialAd();
-    if (typeof window !== 'undefined' && window.AndroidAds && typeof window.AndroidAds.notifyInAppBrowserOpened === 'function') {
-      window.AndroidAds.notifyInAppBrowserOpened();
-      return true;
-    }
-  } catch (err) {
-    console.error('Error arming interstitial on browser return:', err);
-  }
+  } catch (err) {}
   return false;
 };
 
 /**
  * ═══ Rewarded Ad Engine (Live Exam Points System) ═══
+ * Policy Compliant: Directly calls native Google Mobile Ads SDK for official AdMob Rewarded Test Ad.
+ * Never uses simulated fake HTML overlays.
  */
 
 export const isRewardedAdReady = () => {
@@ -455,176 +654,8 @@ export const preloadRewardedAd = () => {
 };
 
 /**
- * Displays a 3-second simulated Rewarded Ad overlay when running in a web browser
- * or when AdMob test/network inventory temporarily has no fill.
- */
-export const GOOGLE_ADMOB_TEST_AD_UNITS = {
-  APP_ID: 'ca-app-pub-3940256099942544~3347511713',
-  BANNER: 'ca-app-pub-3940256099942544/6300978111',
-  INTERSTITIAL: 'ca-app-pub-3940256099942544/1033173712',
-  NATIVE: 'ca-app-pub-3940256099942544/2247696110',
-  REWARDED: 'ca-app-pub-3940256099942544/5224354917'
-};
-
-const showSimulatedRewardedAdOverlay = (rewardPoints = 10, isEn = false) => {
-  return new Promise((resolve) => {
-    if (typeof document === 'undefined') {
-      resolve({ status: 'earned', source: 'admob_test' });
-      return;
-    }
-
-    const totalSec = 5;
-    let remaining = totalSec;
-    let finished = false;
-
-    const overlay = document.createElement('div');
-    overlay.style.cssText = [
-      'position:fixed',
-      'inset:0',
-      'z-index:999999',
-      'background:#0b0f19',
-      'display:flex',
-      'flex-direction:column',
-      'justify-content:space-between',
-      'font-family:"Roboto","Hind Siliguri",sans-serif',
-      'color:#ffffff',
-      'user-select:none'
-    ].join(';');
-
-    // Top AdMob Official Test Ad Status Bar
-    const topBar = document.createElement('div');
-    topBar.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(0,0,0,0.65);border-bottom:1px solid rgba(255,255,255,0.08);';
-
-    const leftBadges = document.createElement('div');
-    leftBadges.style.cssText = 'display:flex;align-items:center;gap:8px;';
-
-    const testAdBadge = document.createElement('span');
-    testAdBadge.style.cssText = 'background:#fbbc04;color:#111827;font-size:11px;font-weight:900;padding:3px 8px;border-radius:4px;letter-spacing:0.4px;text-transform:uppercase;';
-    testAdBadge.textContent = 'Test Ad';
-
-    const timerPill = document.createElement('span');
-    timerPill.style.cssText = 'background:rgba(255,255,255,0.14);color:#f8fafc;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;';
-    timerPill.textContent = isEn ? `Reward in ${remaining} seconds` : `${remaining} সেকেন্ড পর রিওয়ার্ড`;
-
-    leftBadges.appendChild(testAdBadge);
-    leftBadges.appendChild(timerPill);
-
-    const closeBtn = document.createElement('button');
-    closeBtn.type = 'button';
-    closeBtn.style.cssText = 'width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.12);color:#ffffff;font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;';
-    closeBtn.textContent = '✕';
-
-    topBar.appendChild(leftBadges);
-    topBar.appendChild(closeBtn);
-
-    // Center Google AdMob Test Video Canvas
-    const centerStage = document.createElement('div');
-    centerStage.style.cssText = 'flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;background:radial-gradient(circle at center,#1e293b 0%,#0b0f19 75%);';
-
-    const admobCard = document.createElement('div');
-    admobCard.style.cssText = 'width:100%;max-width:340px;background:#111827;border:1.5px solid rgba(251,188,4,0.45);border-radius:12px;padding:22px 18px;box-shadow:0 20px 50px rgba(0,0,0,0.65);';
-
-    const googleLogo = document.createElement('div');
-    googleLogo.style.cssText = 'width:54px;height:54px;border-radius:12px;background:linear-gradient(135deg,#4285f4 0%,#34a853 50%,#fbbc04 100%);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#fff;margin:0 auto 12px auto;box-shadow:0 6px 18px rgba(66,133,244,0.35);';
-    googleLogo.textContent = 'G';
-
-    const headline = document.createElement('div');
-    headline.style.cssText = 'font-size:15px;font-weight:800;color:#ffffff;margin-bottom:4px;';
-    headline.textContent = 'Google AdMob Rewarded Test Ad';
-
-    const unitText = document.createElement('div');
-    unitText.style.cssText = 'font-size:10.5px;font-family:monospace;color:#93c5fd;background:rgba(37,99,235,0.16);border:1px solid rgba(59,130,246,0.3);padding:4px 8px;border-radius:5px;display:inline-block;margin-bottom:10px;';
-    unitText.textContent = GOOGLE_ADMOB_TEST_AD_UNITS.REWARDED;
-
-    const subText = document.createElement('p');
-    subText.style.cssText = 'margin:0 0 14px 0;font-size:11.5px;color:#cbd5e1;line-height:1.45;';
-    subText.textContent = isEn
-      ? `Nice job! You are displaying a Google AdMob Rewarded Test Ad (+${rewardPoints} Exam Points).`
-      : `Google AdMob অফিসিয়াল টেস্ট রিওয়ার্ড ভিডিও বিজ্ঞাপন চলছে (+${rewardPoints} পয়েন্ট)।`;
-
-    const progressTrack = document.createElement('div');
-    progressTrack.style.cssText = 'width:100%;height:6px;background:rgba(255,255,255,0.12);border-radius:999px;overflow:hidden;';
-    const progressFill = document.createElement('div');
-    progressFill.style.cssText = 'width:0%;height:100%;background:linear-gradient(90deg,#4285f4,#34a853,#fbbc04);transition:width 0.95s linear;';
-    progressTrack.appendChild(progressFill);
-
-    admobCard.appendChild(googleLogo);
-    admobCard.appendChild(headline);
-    admobCard.appendChild(unitText);
-    admobCard.appendChild(subText);
-    admobCard.appendChild(progressTrack);
-    centerStage.appendChild(admobCard);
-
-    // Bottom AdMob Footer Banner
-    const bottomBar = document.createElement('div');
-    bottomBar.style.cssText = 'padding:12px 16px;background:#111827;border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;gap:10px;';
-
-    const footerInfo = document.createElement('div');
-    footerInfo.innerHTML = `<div style="font-size:12px;font-weight:800;color:#f8fafc;">Google Mobile Ads SDK</div><div style="font-size:10px;color:#94a3b8;">Official Test Ad • Rewarded Video</div>`;
-
-    const actionBtn = document.createElement('button');
-    actionBtn.type = 'button';
-    actionBtn.style.cssText = 'padding:8px 14px;border-radius:6px;border:none;background:#4285f4;color:#ffffff;font-size:11.5px;font-weight:800;cursor:pointer;';
-    actionBtn.textContent = isEn ? 'Watch to Earn' : 'দেখুন';
-
-    bottomBar.appendChild(footerInfo);
-    bottomBar.appendChild(actionBtn);
-
-    overlay.appendChild(topBar);
-    overlay.appendChild(centerStage);
-    overlay.appendChild(bottomBar);
-    document.body.appendChild(overlay);
-
-    setTimeout(() => {
-      progressFill.style.width = `${Math.round((1 / totalSec) * 100)}%`;
-    }, 50);
-
-    const cleanup = () => {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-    };
-
-    const interval = setInterval(() => {
-      remaining -= 1;
-      const elapsed = totalSec - remaining;
-      progressFill.style.width = `${Math.min(100, Math.round((elapsed / totalSec) * 100))}%`;
-
-      if (remaining > 0) {
-        timerPill.textContent = isEn ? `Reward in ${remaining} seconds` : `${remaining} সেকেন্ড পর রিওয়ার্ড`;
-      } else {
-        clearInterval(interval);
-        finished = true;
-        timerPill.style.background = '#10b981';
-        timerPill.style.color = '#ffffff';
-        timerPill.textContent = isEn ? `✓ Reward Granted (+${rewardPoints} Pts)` : `✓ রিওয়ার্ড অর্জিত (+${rewardPoints} পয়েন্ট)`;
-        actionBtn.style.background = '#10b981';
-        actionBtn.textContent = isEn ? 'Claim & Close' : 'পয়েন্ট নিন ✕';
-        setTimeout(() => {
-          cleanup();
-          resolve({ status: 'earned', source: 'admob_test' });
-        }, 700);
-      }
-    }, 1000);
-
-    const handleClose = () => {
-      clearInterval(interval);
-      cleanup();
-      if (finished) {
-        resolve({ status: 'earned', source: 'admob_test' });
-      } else {
-        resolve({ status: 'dismissed', source: 'admob_test' });
-      }
-    };
-
-    closeBtn.onclick = handleClose;
-    actionBtn.onclick = () => {
-      if (finished) handleClose();
-    };
-  });
-};
-
-/**
- * Triggers the official Google AdMob Rewarded Test Ad (`ca-app-pub-3940256099942544/5224354917`)
- * and resolves with `{ status: 'earned' | 'dismissed' | 'failed', source }`.
+ * Triggers the official Google AdMob Rewarded Test Ad via native Android Bridge
+ * and resolves with `{ status: 'earned' | 'dismissed' | 'failed' | 'not_ready' }`.
  */
 export const showRewardedAd = ({ rewardPoints = 10, isEn = false } = {}) => {
   return new Promise((resolve) => {
@@ -634,7 +665,10 @@ export const showRewardedAd = ({ rewardPoints = 10, isEn = false } = {}) => {
       typeof window.AndroidAds.showRewardedAd === 'function';
 
     if (!hasNativeBridge) {
-      showSimulatedRewardedAdOverlay(rewardPoints, isEn).then(resolve);
+      resolve({
+        status: 'not_ready',
+        message: isEn ? 'Ads are only available in the Android application.' : 'বিজ্ঞাপন শুধুমাত্র অ্যান্ড্রয়েড অ্যাপে উপলব্ধ।'
+      });
       return;
     }
 
@@ -667,19 +701,19 @@ export const showRewardedAd = ({ rewardPoints = 10, isEn = false } = {}) => {
 
     const onDismissed = (e) => {
       const earned = earnedFlag || Boolean(e?.detail?.earned);
+      if (earned) {
+        recordRewardedAdShown();
+      }
+      preloadRewardedAd();
       finish({ status: earned ? 'earned' : 'dismissed', source: 'admob' });
     };
 
     const onFailed = () => {
-      if (settled) return;
-      settled = true;
-      if (safetyTimer) clearTimeout(safetyTimer);
-      window.removeEventListener('native_rewarded_earned', onEarned);
-      window.removeEventListener('native_rewarded_dismissed', onDismissed);
-      window.removeEventListener('native_rewarded_failed', onFailed);
-      window.removeEventListener('native_rewarded_shown', onShown);
-      // Fallback to Google AdMob Test Ad overlay if device has no network/play services fill
-      showSimulatedRewardedAdOverlay(rewardPoints, isEn).then(resolve);
+      preloadRewardedAd();
+      finish({
+        status: 'failed',
+        message: isEn ? 'Ad could not be loaded. Please try again shortly.' : 'বিজ্ঞাপন লোড হতে পারেনি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।'
+      });
     };
 
     window.addEventListener('native_rewarded_earned', onEarned);
@@ -687,7 +721,7 @@ export const showRewardedAd = ({ rewardPoints = 10, isEn = false } = {}) => {
     window.addEventListener('native_rewarded_failed', onFailed);
     window.addEventListener('native_rewarded_shown', onShown);
 
-    // Wait up to 8 seconds for native Google AdMob Rewarded Test Ad to load and display
+    // Wait up to 8 seconds for native Google AdMob Rewarded Test Ad to display
     safetyTimer = setTimeout(() => {
       if (!settled) {
         onFailed();

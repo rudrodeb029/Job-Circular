@@ -27,7 +27,11 @@
     <!-- Safety Frequency Capping Cooldown (in seconds) -->
     <entry>
         <key>interstitial_cooldown_sec</key>
-        <value>50</value>
+        <value>180</value>
+    </entry>
+    <entry>
+        <key>rewarded_cooldown_sec</key>
+        <value>120</value>
     </entry>
     <entry>
         <key>native_ad_cooldown_sec</key>
