@@ -129,7 +129,7 @@ export default function Profile() {
     textAlign: 'center',
     cursor: 'pointer',
     padding: '9px 4px 8px 4px',
-    borderRadius: '14px',
+    borderRadius: '7px',
     background: isDark
       ? 'linear-gradient(145deg, #243248 0%, #1a2436 100%)'
       : 'linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%)',
