@@ -107,6 +107,18 @@ export const syncCoreDataOnStartup = async (force = false) => {
   const isExplicitForce = Boolean(force);
   const isExplicitBypass = isExplicitForce || force === 'admin_force' || force === 'push_force';
 
+  // 30-minute client sync cooldown: If local data exists and was synced recently, skip network sync!
+  // 100% of reads are served from local SQLite / LocalStorage cache with 0 Cloudflare requests.
+  const SYNC_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
+  const lastSync = Number(localStorage.getItem('last_client_sync_time') || 0);
+  const hasLocalData = localStorage.getItem('cache_data_jobs') || localStorage.getItem('last_updated_server');
+
+  if (!isExplicitBypass && hasLocalData && Date.now() - lastSync < SYNC_COOLDOWN_MS) {
+    console.log(`⚡ SQLite/Local-First: Synced ${Math.round((Date.now() - lastSync) / 60000)}m ago. Serving 100% from local database (0 Cloudflare requests).`);
+    _appInitialized = true;
+    return null;
+  }
+
   if (_isStartupSyncing && _activeStartupSyncPromise) {
     if (!isExplicitForce) {
       return _activeStartupSyncPromise;

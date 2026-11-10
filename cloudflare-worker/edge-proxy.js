@@ -48,6 +48,16 @@ function stripAnswerKeys(exams) {
   });
 }
 
+// Helper: Safe KV Put wrapper (prevents 429 quota exhaustion from throwing errors or breaking worker requests)
+async function safeKvPut(kv, key, val, options) {
+  try {
+    if (!kv) return;
+    await kv.put(key, val, options);
+  } catch (err) {
+    console.warn(`[KV-Safe] Put skipped for ${key}:`, err?.message || err);
+  }
+}
+
 // ══════════════════════════════════════
 // HMAC-SHA256 VERIFICATION (Phase 2C)
 // Verifies client request signatures with 5-minute replay window
@@ -338,7 +348,7 @@ export default {
     }
 
     // ══════════════════════════════════════
-    // POST /feed/like -> Store in D1 + Realtime KV Update
+    // POST /feed/like -> Store in D1 (0 KV PUTs!)
     // ══════════════════════════════════════
     if (url.pathname === '/feed/like' && request.method === 'POST') {
       try {
@@ -349,29 +359,25 @@ export default {
           return new Response(JSON.stringify({ error: 'Missing postId or delta' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
         }
 
-        // 1. Insert into D1 queue
+        // 1. Insert into D1 queue (D1 has 100k free writes/day, 0 KV put operations!)
         const likeId = `like-${postId}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
         await env.EXAM_DB.prepare(
           `INSERT INTO feed_likes_queue (id, post_id, delta, synced, created_at) VALUES (?, ?, ?, 0, ?)`
         ).bind(likeId, String(postId), Number(delta), new Date().toISOString()).run();
 
-        // 2. Realtime KV Update
-        const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+        // 2. Query total delta from D1 queue + base likes from KV (Read-Only)
         let finalLikes = 0;
-        if (kvData) {
-          if (!kvData.feed_posts) kvData.feed_posts = [];
-          const postIdx = kvData.feed_posts.findIndex(p => String(p.id) === String(postId));
-          if (postIdx !== -1) {
-            kvData.feed_posts[postIdx].likes = Math.max(0, (Number(kvData.feed_posts[postIdx].likes) || 0) + delta);
-            finalLikes = kvData.feed_posts[postIdx].likes;
-            const newTimestamp = new Date().toISOString();
-            kvData.masterLastUpdated = newTimestamp;
-            await Promise.all([
-              env.CACHE_KV?.put('sync_all_data', JSON.stringify(kvData)),
-              env.CACHE_KV?.put('last_sync_timestamp', newTimestamp),
-              env.CACHE_KV?.put('last_updated_by', 'feed-like-action')
-            ]);
-          }
+        try {
+          const d1Likes = await env.EXAM_DB.prepare(
+            `SELECT SUM(delta) as total_delta FROM feed_likes_queue WHERE post_id = ?`
+          ).bind(String(postId)).first();
+          const queueDelta = Number(d1Likes?.total_delta) || 0;
+          const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+          const post = kvData?.feed_posts?.find(p => String(p.id) === String(postId));
+          const baseLikes = Number(post?.likes) || 0;
+          finalLikes = Math.max(0, baseLikes + queueDelta);
+        } catch (e) {
+          finalLikes = 0;
         }
 
         return new Response(JSON.stringify({ success: true, likes: finalLikes }), {
@@ -385,7 +391,7 @@ export default {
     }
 
     // ══════════════════════════════════════
-    // POST /feed/comment -> Store in D1 + Realtime KV Update
+    // POST /feed/comment -> Store in D1 (0 KV PUTs!)
     // ══════════════════════════════════════
     if (url.pathname === '/feed/comment' && request.method === 'POST') {
       try {
@@ -396,39 +402,13 @@ export default {
           return new Response(JSON.stringify({ error: 'Missing postId or commentObj' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
         }
 
-        // 1. Insert into D1 queue
+        // 1. Insert into D1 queue (D1 has 100k free writes/day, 0 KV put operations!)
         const cmtId = `cmt-${postId}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
         await env.EXAM_DB.prepare(
           `INSERT INTO feed_comments_queue (id, post_id, comment_data, synced, created_at) VALUES (?, ?, ?, 0, ?)`
         ).bind(cmtId, String(postId), JSON.stringify(commentObj), new Date().toISOString()).run();
 
-        // 2. Realtime KV Update
-        const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
-        let finalComments = [];
-        if (kvData) {
-          if (!kvData.feed_posts) kvData.feed_posts = [];
-          const postIdx = kvData.feed_posts.findIndex(p => String(p.id) === String(postId));
-          if (postIdx !== -1) {
-            let comments = kvData.feed_posts[postIdx].comments;
-            if (typeof comments === 'string') {
-              try { comments = JSON.parse(comments); } catch(e) { comments = []; }
-            }
-            if (!Array.isArray(comments)) comments = [];
-            comments.push(commentObj);
-            kvData.feed_posts[postIdx].comments = comments;
-            finalComments = comments;
-
-            const newTimestamp = new Date().toISOString();
-            kvData.masterLastUpdated = newTimestamp;
-            await Promise.all([
-              env.CACHE_KV?.put('sync_all_data', JSON.stringify(kvData)),
-              env.CACHE_KV?.put('last_sync_timestamp', newTimestamp),
-              env.CACHE_KV?.put('last_updated_by', 'feed-comment-action')
-            ]);
-          }
-        }
-
-        return new Response(JSON.stringify({ success: true, comments: finalComments }), {
+        return new Response(JSON.stringify({ success: true, comment: commentObj }), {
           status: 200,
           headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
         });
@@ -500,7 +480,7 @@ export default {
               correctIndex: q.correctIndex,
               explanation: q.explanation || ''
             }));
-            await env.CACHE_KV?.put(`answer_key_${record.id}`, JSON.stringify(answerKey));
+            await safeKvPut(env.CACHE_KV, `answer_key_${record.id}`, JSON.stringify(answerKey));
             console.log(`🔐 Answer key saved for exam ${record.id} (${answerKey.length} questions)`);
 
             // Questions থেকে correctIndex মুছে দাও (শিক্ষার্থী দেখতে পারবে না!)
@@ -534,9 +514,9 @@ export default {
         kvData.masterLastUpdated = newTimestamp;
 
         const updatePromises = [
-          env.CACHE_KV?.put('sync_all_data', JSON.stringify(kvData)),
-          env.CACHE_KV?.put('last_sync_timestamp', newTimestamp),
-          env.CACHE_KV?.put('last_updated_by', 'supabase-webhook')
+          safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(kvData)),
+          safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+          safeKvPut(env.CACHE_KV, 'last_updated_by', 'supabase-webhook')
         ];
 
         await Promise.all(updatePromises);
@@ -571,8 +551,8 @@ export default {
           const data = await controlRes.json();
           if (data?.[0]?.last_updated) {
             ctx.waitUntil(Promise.all([
-              env.CACHE_KV?.put('last_sync_timestamp', data[0].last_updated),
-              env.CACHE_KV?.put('last_updated_by', data[0].updated_by || 'system')
+              safeKvPut(env.CACHE_KV, 'last_sync_timestamp', data[0].last_updated),
+              safeKvPut(env.CACHE_KV, 'last_updated_by', data[0].updated_by || 'system')
             ]));
           }
           return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-cache, no-store', 'X-Edge-Cache': 'KV-MISS-SUPABASE-FALLBACK' } });
@@ -638,7 +618,7 @@ export default {
               correctIndex: q.correctIndex,
               explanation: q.explanation || ''
             }));
-            await env.CACHE_KV?.put(`answer_key_${exam.id}`, JSON.stringify(answerKey)).catch(() => {});
+            await safeKvPut(env.CACHE_KV, `answer_key_${exam.id}`, JSON.stringify(answerKey));
           }
         }
         bootstrapPayload.live_exams = stripAnswerKeys(bootstrapPayload.live_exams);
@@ -648,10 +628,10 @@ export default {
       bootstrapPayload.syncedAt = masterLastUpdated;
       
       ctx.waitUntil(Promise.all([
-        env.CACHE_KV?.put('sync_all_data', JSON.stringify(bootstrapPayload)),
-        env.CACHE_KV?.put('last_sync_timestamp', masterLastUpdated),
-        env.CACHE_KV?.put('last_updated_by', isBypass ? 'admin-bypass-invalidation' : 'bootstrap')
-      ]).catch(e => console.error('KV put error:', e)));
+        safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(bootstrapPayload)),
+        safeKvPut(env.CACHE_KV, 'last_sync_timestamp', masterLastUpdated),
+        safeKvPut(env.CACHE_KV, 'last_updated_by', isBypass ? 'admin-bypass-invalidation' : 'bootstrap')
+      ]));
 
       return new Response(JSON.stringify(bootstrapPayload), {
         status: 200,
@@ -710,7 +690,7 @@ export default {
           createdAt: r.created_at
         }));
 
-        ctx.waitUntil(env.CACHE_KV?.put(kvKey, JSON.stringify(leaderboard), { expirationTtl: 3600 }));
+        ctx.waitUntil(safeKvPut(env.CACHE_KV, kvKey, JSON.stringify(leaderboard), { expirationTtl: 3600 }));
         return new Response(JSON.stringify(leaderboard), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'X-Edge-Cache': 'D1-CALCULATED', 'X-Supabase-Queries': '0' } });
       } catch (d1Err) {
         console.error('D1 leaderboard error, falling back to Supabase:', d1Err);
@@ -719,7 +699,7 @@ export default {
           ? `${SUPABASE_ORIGIN}/rest/v1/activities?select=*&type=eq.live_exam_submission&examId=eq.${examId}&order=score.desc,timeTakenSec.asc&limit=100`
           : `${SUPABASE_ORIGIN}/rest/v1/activities?select=*&type=eq.live_exam_submission&order=score.desc,timeTakenSec.asc&limit=100`;
         const lbData = await fetch(lbTarget, { headers: originHeaders }).then(r => r.ok ? r.json() : []).catch(() => []);
-        ctx.waitUntil(env.CACHE_KV?.put(kvKey, JSON.stringify(lbData), { expirationTtl: 3600 }));
+        ctx.waitUntil(safeKvPut(env.CACHE_KV, kvKey, JSON.stringify(lbData), { expirationTtl: 3600 }));
         return new Response(JSON.stringify(lbData), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'X-Edge-Cache': 'SUPABASE-FALLBACK' } });
       }
     }
@@ -789,9 +769,9 @@ export default {
                 const newTimestamp = new Date().toISOString();
                 kvData.masterLastUpdated = newTimestamp;
                 await Promise.all([
-                  env.CACHE_KV.put('sync_all_data', JSON.stringify(kvData)),
-                  env.CACHE_KV.put('last_sync_timestamp', newTimestamp),
-                  env.CACHE_KV.put('last_updated_by', 'admin-delete-action')
+                  safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(kvData)),
+                  safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                  safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-delete-action')
                 ]);
                 console.log(`🗑️ KV Sync: Removed deleted record "${deletedId}" from table "${targetTable}".`);
               }
@@ -799,8 +779,8 @@ export default {
           } else if (['POST', 'PATCH', 'PUT'].includes(request.method)) {
             const newTimestamp = new Date().toISOString();
             await Promise.all([
-              env.CACHE_KV?.put('last_sync_timestamp', newTimestamp),
-              env.CACHE_KV?.put('last_updated_by', 'admin-write-action')
+              safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+              safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-write-action')
             ]);
           }
         } catch (e) {
@@ -1107,7 +1087,7 @@ export default {
             const answerKey = exam.questions.map((q, idx) => ({
               index: idx, correctIndex: q.correctIndex, explanation: q.explanation || ''
             }));
-            await env.CACHE_KV?.put(`answer_key_${exam.id}`, JSON.stringify(answerKey));
+            await safeKvPut(env.CACHE_KV, `answer_key_${exam.id}`, JSON.stringify(answerKey));
           }
         }
         existingData[col] = stripAnswerKeys(existingData[col]);
@@ -1118,9 +1098,9 @@ export default {
     existingData.syncedAt = row.last_updated;
 
     await Promise.all([
-      env.CACHE_KV?.put('sync_all_data', JSON.stringify(existingData)),
-      env.CACHE_KV?.put('last_sync_timestamp', row.last_updated),
-      env.CACHE_KV?.put('last_updated_by', row.updated_by || 'system')
+      safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(existingData)),
+      safeKvPut(env.CACHE_KV, 'last_sync_timestamp', row.last_updated),
+      safeKvPut(env.CACHE_KV, 'last_updated_by', row.updated_by || 'system')
     ]).catch(e => console.error('KV put error:', e));
 
     console.log('Cron: Incremental sync complete!');
@@ -1168,7 +1148,7 @@ export default {
         }
 
         if (alreadySent.length > 0) {
-          await env.CACHE_KV?.put(sentKey, JSON.stringify(alreadySent), { expirationTtl: 259200 });
+          await safeKvPut(env.CACHE_KV, sentKey, JSON.stringify(alreadySent), { expirationTtl: 259200 });
         }
       }
     } catch (e) { console.error('Deadline reminder check failed:', e); }
