@@ -304,17 +304,17 @@ export default function Profile() {
           title={isEn ? 'Edit Profile' : 'প্রোফাইল পরিবর্তন করুন'}
         >
           <h2 style={{
-            fontSize: '17px',
-            fontWeight: 800,
+            fontSize: '14px',
+            fontWeight: 600,
             color: 'var(--text-primary)',
-            letterSpacing: '-0.3px',
+            letterSpacing: '-0.2px',
             margin: 0
           }}>
             {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
           </h2>
           <div style={{
-            width: '22px',
-            height: '22px',
+            width: '20px',
+            height: '20px',
             borderRadius: '50%',
             background: isDark
               ? 'rgba(37, 99, 235, 0.25)'
@@ -327,7 +327,7 @@ export default function Profile() {
             boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(37, 99, 235, 0.1)',
             flexShrink: 0
           }}>
-            <Edit size={11} />
+            <Edit size={10} />
           </div>
         </div>
       </div>
