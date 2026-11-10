@@ -125,6 +125,23 @@ export default function Profile() {
     dispatch({ type: 'SET_LANGUAGE', payload: nextLang });
   };
 
+  const clayTileStyle = {
+    textAlign: 'center',
+    cursor: 'pointer',
+    padding: '9px 4px 8px 4px',
+    borderRadius: '14px',
+    background: isDark
+      ? 'linear-gradient(145deg, #243248 0%, #1a2436 100%)'
+      : 'linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%)',
+    border: isDark
+      ? '1px solid rgba(255, 255, 255, 0.08)'
+      : '1px solid rgba(255, 255, 255, 0.95)',
+    boxShadow: isDark
+      ? '0 8px 18px -4px rgba(0, 0, 0, 0.5), 0 2px 5px rgba(0, 0, 0, 0.3), inset 1.5px 1.5px 3px rgba(255, 255, 255, 0.1), inset -2.5px -2.5px 5px rgba(0, 0, 0, 0.45)'
+      : '0 8px 16px -4px rgba(37, 99, 235, 0.09), 0 3px 6px rgba(15, 23, 42, 0.04), inset 2px 2px 4px #ffffff, inset -2.5px -2.5px 5px rgba(203, 213, 225, 0.6)',
+    transition: 'transform 0.15s ease, box-shadow 0.15s ease'
+  };
+
   return (
     <div className="page" style={{ background: 'var(--bg)' }}>
       {/* Hidden File Input for Profile Picture */}
@@ -332,12 +349,12 @@ export default function Profile() {
         </div>
       </div>
 
-      {/* ═══ 3. Integrated Activity Stats Bar (Seamless Transparent Look) ═══ */}
+      {/* ═══ 3. Integrated Activity Stats Bar (Claymorphism Style) ═══ */}
       <div style={{
-        margin: '0 14px 14px 14px',
+        margin: '0 14px 16px 14px',
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: '6px',
+        gap: '8px',
         background: 'transparent',
         padding: '0',
         borderRadius: '0',
@@ -346,15 +363,7 @@ export default function Profile() {
       }}>
         <div
           onClick={() => navigate('/saved')}
-          style={{
-            textAlign: 'center',
-            cursor: 'pointer',
-            padding: '6px 2px',
-            borderRadius: '8px',
-            background: 'transparent',
-            border: 'none',
-            boxShadow: 'none'
-          }}
+          style={clayTileStyle}
         >
           <p style={{ fontSize: '15px', fontWeight: 800, color: 'var(--primary)', margin: 0, lineHeight: 1.15 }}>
             {state.savedJobs.length}
@@ -365,15 +374,7 @@ export default function Profile() {
         </div>
         <div
           onClick={() => navigate('/saved?tab=applied')}
-          style={{
-            textAlign: 'center',
-            cursor: 'pointer',
-            padding: '6px 2px',
-            borderRadius: '8px',
-            background: 'transparent',
-            border: 'none',
-            boxShadow: 'none'
-          }}
+          style={clayTileStyle}
         >
           <p style={{ fontSize: '15px', fontWeight: 800, color: '#059669', margin: 0, lineHeight: 1.15 }}>
             {state.appliedJobs.length}
@@ -384,15 +385,7 @@ export default function Profile() {
         </div>
         <div
           onClick={() => navigate('/notifications')}
-          style={{
-            textAlign: 'center',
-            cursor: 'pointer',
-            padding: '6px 2px',
-            borderRadius: '8px',
-            background: 'transparent',
-            border: 'none',
-            boxShadow: 'none'
-          }}
+          style={clayTileStyle}
         >
           <p style={{ fontSize: '15px', fontWeight: 800, color: '#ea580c', margin: 0, lineHeight: 1.15 }}>
             {unreadNotifCount}
@@ -403,15 +396,7 @@ export default function Profile() {
         </div>
         <div
           onClick={() => navigate('/live-exams-list')}
-          style={{
-            textAlign: 'center',
-            cursor: 'pointer',
-            padding: '6px 2px',
-            borderRadius: '8px',
-            background: 'transparent',
-            border: 'none',
-            boxShadow: 'none'
-          }}
+          style={clayTileStyle}
           title={isEn ? 'Live Exam Points' : 'লাইভ এক্সাম পয়েন্টস'}
         >
           <p style={{ fontSize: '15px', fontWeight: 800, color: '#7c3aed', margin: 0, lineHeight: 1.15 }}>
