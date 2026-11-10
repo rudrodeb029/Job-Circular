@@ -297,24 +297,24 @@ export default function QuestionDetails() {
               ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
               : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
             border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)',
-            borderRadius: '14px',
-            padding: '14px 16px',
-            marginBottom: '14px',
+            borderRadius: '12px',
+            padding: '10px 13px',
+            marginBottom: '12px',
             boxShadow: isDark
               ? '0 6px 18px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.06)'
               : '0 6px 18px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
-              <span style={{ fontSize: '13px', fontWeight: 700, color: isDark ? '#f1f5f9' : 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, color: isDark ? '#cbd5e1' : 'var(--text-secondary)' }}>
                 {isEn ? 'Practice Progress' : 'অনুশীলন অগ্রগতি'}
               </span>
               <span style={{
-                fontSize: '12px',
+                fontSize: '10px',
                 fontWeight: 800,
                 color: isDark ? '#60a5fa' : 'var(--primary)',
                 background: isDark ? 'rgba(37, 99, 235, 0.2)' : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)',
-                padding: '3px 10px',
-                borderRadius: '8px',
+                padding: '2.5px 8px',
+                borderRadius: '6px',
                 border: isDark ? '1px solid rgba(96, 165, 250, 0.35)' : '1px solid rgba(191, 219, 254, 0.8)',
                 boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.3)' : 'inset 0 1px 1.5px #ffffff, inset 0 -1px 1.5px rgba(37, 99, 235, 0.08)'
               }}>
