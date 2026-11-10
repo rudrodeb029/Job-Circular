@@ -192,6 +192,10 @@ export default function Profile() {
         border: 'none',
         boxShadow: 'none',
         padding: state.user.coverPhoto ? '0 14px 6px 14px' : 'calc(var(--safe-area-top) + 16px) 14px 6px 14px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         textAlign: 'center',
         position: 'relative',
         zIndex: 2
@@ -199,7 +203,8 @@ export default function Profile() {
         {/* Centered Avatar */}
         <div style={{
           marginTop: state.user.coverPhoto ? '-46px' : '0',
-          display: 'inline-block',
+          width: '88px',
+          height: '88px',
           position: 'relative'
         }}>
           <div style={{
