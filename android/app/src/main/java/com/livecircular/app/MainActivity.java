@@ -140,6 +140,11 @@ public class MainActivity extends BridgeActivity {
         OneSignal.getDebug().setLogLevel(LogLevel.VERBOSE);
         OneSignal.initWithContext(this, ONESIGNAL_APP_ID);
 
+        // Initialize persistent cooldown timestamps across app restarts
+        android.content.SharedPreferences prefs = getSharedPreferences("admob_cooldown_prefs", MODE_PRIVATE);
+        lastInterstitialShownTimestamp = prefs.getLong("last_interstitial_time", 0);
+        lastRewardedShownTimestamp = prefs.getLong("last_rewarded_time", 0);
+
         // Set up in-app DownloadListener to handle file downloads via Android DownloadManager without leaving the app
         setupDownloadListener();
 
@@ -652,6 +657,10 @@ public class MainActivity extends BridgeActivity {
         if (isAdsEnabled && isInterstitialAdsEnabled && interstitialAd != null) {
             Log.d(TAG, "Showing Interstitial Ad...");
             lastInterstitialShownTimestamp = now;
+            getSharedPreferences("admob_cooldown_prefs", MODE_PRIVATE)
+                .edit()
+                .putLong("last_interstitial_time", now)
+                .apply();
             pendingBrowserReturnShowUntil = 0;
             InterstitialAd adToShow = interstitialAd;
             interstitialAd = null;
@@ -1081,6 +1090,10 @@ public class MainActivity extends BridgeActivity {
         if (isAdsEnabled && isRewardedAdsEnabled && rewardedAd != null && !isFinishing() && !isDestroyed()) {
             Log.d(TAG, "Showing Google AdMob Rewarded Test Ad...");
             lastRewardedShownTimestamp = now;
+            getSharedPreferences("admob_cooldown_prefs", MODE_PRIVATE)
+                .edit()
+                .putLong("last_rewarded_time", now)
+                .apply();
             pendingShowRewardedAd = false;
             rewardEarnedInCurrentSession = false;
             RewardedAd adToShow = rewardedAd;

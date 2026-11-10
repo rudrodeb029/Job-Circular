@@ -81,6 +81,25 @@ export const incrementDailyInterstitialCount = () => {
   }
 };
 
+export const getInterstitialCooldownRemainingSec = () => {
+  const now = Date.now();
+  let saved = lastInterstitialTime;
+  try {
+    const val = Number(localStorage.getItem('admob_last_interstitial_time') || 0);
+    if (val > saved) saved = val;
+  } catch (e) {}
+  const diff = now - saved;
+  if (diff >= dynamicCooldownMs) return 0;
+  return Math.max(0, Math.ceil((dynamicCooldownMs - diff) / 1000));
+};
+
+export const recordInterstitialAdShown = () => {
+  lastInterstitialTime = Date.now();
+  try {
+    localStorage.setItem('admob_last_interstitial_time', String(lastInterstitialTime));
+  } catch (e) {}
+};
+
 let lastRewardedTime = 0;
 try {
   lastRewardedTime = Number(localStorage.getItem('admob_last_rewarded_time') || 0);
@@ -88,7 +107,12 @@ try {
 
 export const getRewardedCooldownRemainingSec = () => {
   const now = Date.now();
-  const diff = now - lastRewardedTime;
+  let saved = lastRewardedTime;
+  try {
+    const val = Number(localStorage.getItem('admob_last_rewarded_time') || 0);
+    if (val > saved) saved = val;
+  } catch (e) {}
+  const diff = now - saved;
   if (diff >= dynamicRewardedCooldownMs) return 0;
   return Math.max(0, Math.ceil((dynamicRewardedCooldownMs - diff) / 1000));
 };
@@ -631,13 +655,13 @@ export const navigateWithAdOnReturn = (navigate, fallbackPath = -1, force = fals
   }
 };
 
-// Sync lastInterstitialTime when native Android triggers an interstitial directly
+// Sync timestamps when native Android triggers ads directly
 if (typeof window !== 'undefined') {
   window.addEventListener('native_interstitial_shown', () => {
-    lastInterstitialTime = Date.now();
-    try {
-      localStorage.setItem('admob_last_interstitial_time', String(lastInterstitialTime));
-    } catch (e) {}
+    recordInterstitialAdShown();
+  });
+  window.addEventListener('native_rewarded_shown', () => {
+    recordRewardedAdShown();
   });
 }
 
