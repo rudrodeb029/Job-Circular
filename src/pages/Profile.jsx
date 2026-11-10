@@ -293,7 +293,7 @@ export default function Profile() {
             justifyContent: 'center',
             gap: '6px',
             cursor: 'pointer',
-            margin: '8px 0 2px 0',
+            margin: '8px 0 14px 0',
             padding: '2px 6px',
             borderRadius: '8px'
           }}
@@ -326,33 +326,6 @@ export default function Profile() {
             <Edit size={11} />
           </div>
         </div>
-
-        {/* Meta / Subtitle line */}
-        <p style={{
-          fontSize: '11px',
-          fontWeight: 700,
-          color: isDark ? '#94a3b8' : 'var(--text-secondary)',
-          margin: '2px 0 12px 0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '5px'
-        }}>
-          <span style={{ color: '#7c3aed', fontWeight: 800 }}>
-            🎯 {toBengaliNumber(livePoints)} {isEn ? 'Exam Points' : 'এক্সাম পয়েন্ট'}
-          </span>
-          <span>•</span>
-          <span>{isEn ? 'Job Seeker' : 'চাকরি প্রত্যাশী'}</span>
-          {localStorage.getItem('onesignal_subscribed') === 'true' && (
-            <>
-              <span>•</span>
-              <span style={{ color: '#16a34a', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
-                <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16a34a' }} />
-                {isEn ? 'Active' : 'সক্রিয়'}
-              </span>
-            </>
-          )}
-        </p>
       </div>
 
       {/* ═══ 3. Integrated Activity Stats Bar (From App Image, 4 Tiles) ═══ */}
