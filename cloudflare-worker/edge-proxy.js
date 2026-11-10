@@ -147,6 +147,27 @@ export default {
 
     const url = new URL(request.url);
 
+    // Threat Score check (Cloudflare Free Tier Intelligence)
+    const threatScore = request.cf?.threatScore || 0;
+    if (threatScore > 50 && !url.pathname.startsWith('/webhook')) {
+      return new Response(
+        JSON.stringify({ error: 'Security verification failed: High threat score detected.' }),
+        { status: 403, headers: { ...corsHeaders, 'X-Robots-Tag': 'noindex, nofollow' } }
+      );
+    }
+
+    // Cloud Datacenter Bot Protection (POST/PUT/PATCH/DELETE)
+    // Expatriate Bangladeshis on normal residential/mobile ISPs (STC, Zain, Celcom, EE, Vodafone, etc.) are 100% permitted.
+    // Only automated scripts on AWS/DigitalOcean/Hetzner/Linode/OVH/Alibaba cloud hosting are restricted.
+    const asOrg = (request.cf?.asOrganization || '').toLowerCase();
+    const isCloudDatacenter = /amazon|aws|digitalocean|hetzner|linode|ovh|alibaba|tencent|vultr|oracle\s*(cloud|data)/i.test(asOrg);
+    if (isCloudDatacenter && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method) && !url.pathname.startsWith('/webhook')) {
+      return new Response(
+        JSON.stringify({ error: 'Access denied: Automated requests from cloud hosting datacenters are not allowed.' }),
+        { status: 403, headers: { ...corsHeaders, 'X-Robots-Tag': 'noindex, nofollow' } }
+      );
+    }
+
     // CORS Preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, {
@@ -156,35 +177,60 @@ export default {
     }
 
     // ══════════════════════════════════════
-    // IP RATE LIMITER (D1-based, 60 req/min/IP) — Phase 2B
+    // DUAL RATE LIMITER (D1-based: IP-level & Device-level) — Phase 2B
     // Uses D1 (5M writes/day free) instead of KV (1K writes/day)
     // ══════════════════════════════════════
     const clientIP = request.headers.get('CF-Connecting-IP') || 'unknown';
-    if (!appClientHeader.includes('admin')) {
-      try {
-        const minuteKey = Math.floor(Date.now() / 60000);
-        const rateResult = await env.EXAM_DB.prepare(
-          'SELECT cnt FROM rate_limits WHERE ip = ? AND minute_key = ?'
-        ).bind(clientIP, minuteKey).first().catch(() => null);
+    const deviceIdHeader = request.headers.get('X-Device-Id') || '';
+    const isAdmin = appClientHeader.includes('admin');
+    const maxIpLimit = isAdmin ? 120 : 60; // Admin header capped at 120/min to prevent spoofed header floods
 
-        if (rateResult?.cnt > 60) {
+    try {
+      const minuteKey = Math.floor(Date.now() / 60000);
+      const rateResult = await env.EXAM_DB.prepare(
+        'SELECT cnt FROM rate_limits WHERE ip = ? AND minute_key = ?'
+      ).bind(clientIP, minuteKey).first().catch(() => null);
+
+      if (rateResult?.cnt > maxIpLimit) {
+        return new Response(JSON.stringify({
+          error: 'Rate limit exceeded. Please try again in 1 minute.'
+        }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Retry-After': '60' }
+        });
+      }
+
+      // Device-level rate limit for write requests (max 30 write actions/min per device)
+      if (deviceIdHeader && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(request.method)) {
+        const devKey = `dev:${deviceIdHeader.slice(0, 40)}`;
+        const devResult = await env.EXAM_DB.prepare(
+          'SELECT cnt FROM rate_limits WHERE ip = ? AND minute_key = ?'
+        ).bind(devKey, minuteKey).first().catch(() => null);
+
+        if (devResult?.cnt > 30) {
           return new Response(JSON.stringify({
-            error: 'Rate limit exceeded. Please try again in 1 minute.'
+            error: 'Device request limit exceeded. Please slow down.'
           }), {
             status: 429,
             headers: { ...corsHeaders, 'Retry-After': '60' }
           });
         }
 
-        // Async increment (non-blocking — doesn't slow down the response)
         ctx.waitUntil(
           env.EXAM_DB.prepare(
             'INSERT INTO rate_limits (ip, minute_key, cnt) VALUES (?, ?, 1) ON CONFLICT(ip, minute_key) DO UPDATE SET cnt = cnt + 1'
-          ).bind(clientIP, minuteKey).run().catch(() => {})
+          ).bind(devKey, minuteKey).run().catch(() => {})
         );
-      } catch (e) {
-        // Rate limiter failure should NEVER block requests
       }
+
+      // Async IP increment (non-blocking)
+      ctx.waitUntil(
+        env.EXAM_DB.prepare(
+          'INSERT INTO rate_limits (ip, minute_key, cnt) VALUES (?, ?, 1) ON CONFLICT(ip, minute_key) DO UPDATE SET cnt = cnt + 1'
+        ).bind(clientIP, minuteKey).run().catch(() => {})
+      );
+    } catch (e) {
+      // Rate limiter failure should NEVER block requests
     }
 
     const apiKey = request.headers.get('apikey') || env.SUPABASE_ANON_KEY || 'sb_publishable_6U3mjliIxh7zfUdlBYp0aA_joaBHdPd';
@@ -195,6 +241,111 @@ export default {
     if (apiKey) originHeaders.set('apikey', apiKey);
     if (authHeader) originHeaders.set('Authorization', authHeader);
     originHeaders.set('Host', new URL(SUPABASE_ORIGIN).host);
+
+    // ══════════════════════════════════════
+    // POST /points/verify-ad -> Server-side Ad Cooldown & Daily Limit (100% AdMob Safe)
+    // ══════════════════════════════════════
+    if (url.pathname === '/points/verify-ad' && request.method === 'POST') {
+      try {
+        const body = await request.json().catch(() => null);
+        const deviceId = body?.deviceId || request.headers.get('X-Device-Id');
+        if (!deviceId) {
+          return new Response(JSON.stringify({ success: false, error: 'Device ID required' }), { status: 400, headers: corsHeaders });
+        }
+
+        const today = new Date().toISOString().slice(0, 10);
+        const record = await env.EXAM_DB.prepare(
+          'SELECT * FROM device_points_security WHERE device_id = ?'
+        ).bind(deviceId).first().catch(() => null);
+
+        const now = Date.now();
+        const lastAdTime = Number(record?.last_ad_time) || 0;
+        const diffMs = now - lastAdTime;
+        const COOLDOWN_MS = 120 * 1000; // 2 minutes server-enforced cooldown
+
+        if (lastAdTime > 0 && diffMs < COOLDOWN_MS) {
+          const waitSec = Math.ceil((COOLDOWN_MS - diffMs) / 1000);
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Ad cooldown active',
+            waitSec
+          }), { status: 429, headers: corsHeaders });
+        }
+
+        const isSameDay = record?.daily_ad_date === today;
+        const currentCount = isSameDay ? (Number(record?.daily_ad_count) || 0) : 0;
+
+        if (currentCount >= 8) {
+          return new Response(JSON.stringify({
+            success: false,
+            error: 'Daily ad limit reached (8/8)',
+            dailyAdCount: 8
+          }), { status: 400, headers: corsHeaders });
+        }
+
+        const nextCount = currentCount + 1;
+        await env.EXAM_DB.prepare(`
+          INSERT INTO device_points_security (device_id, welcome_bonus_claimed, last_ad_time, daily_ad_date, daily_ad_count, updated_at)
+          VALUES (?, 0, ?, ?, ?, ?)
+          ON CONFLICT(device_id) DO UPDATE SET
+            last_ad_time = excluded.last_ad_time,
+            daily_ad_date = excluded.daily_ad_date,
+            daily_ad_count = excluded.daily_ad_count,
+            updated_at = excluded.updated_at
+        `).bind(deviceId, now, today, nextCount, new Date().toISOString()).run();
+
+        return new Response(JSON.stringify({
+          success: true,
+          dailyAdCount: nextCount,
+          pointsGranted: 10,
+          serverTimestamp: now
+        }), { status: 200, headers: corsHeaders });
+      } catch (err) {
+        console.error('Verify ad error:', err);
+        return new Response(JSON.stringify({ success: false, error: 'Server error' }), { status: 500, headers: corsHeaders });
+      }
+    }
+
+    // ══════════════════════════════════════
+    // POST /points/claim-welcome -> 1 Welcome Bonus per Device (Anti-Fraud)
+    // ══════════════════════════════════════
+    if (url.pathname === '/points/claim-welcome' && request.method === 'POST') {
+      try {
+        const body = await request.json().catch(() => null);
+        const deviceId = body?.deviceId || request.headers.get('X-Device-Id');
+        if (!deviceId) {
+          return new Response(JSON.stringify({ success: false, error: 'Device ID required' }), { status: 400, headers: corsHeaders });
+        }
+
+        const record = await env.EXAM_DB.prepare(
+          'SELECT welcome_bonus_claimed FROM device_points_security WHERE device_id = ?'
+        ).bind(deviceId).first().catch(() => null);
+
+        if (record && Number(record.welcome_bonus_claimed) === 1) {
+          return new Response(JSON.stringify({
+            success: false,
+            alreadyClaimed: true,
+            error: 'Welcome bonus already claimed on this device'
+          }), { status: 200, headers: corsHeaders });
+        }
+
+        await env.EXAM_DB.prepare(`
+          INSERT INTO device_points_security (device_id, welcome_bonus_claimed, last_ad_time, daily_ad_date, daily_ad_count, updated_at)
+          VALUES (?, 1, 0, '', 0, ?)
+          ON CONFLICT(device_id) DO UPDATE SET
+            welcome_bonus_claimed = 1,
+            updated_at = excluded.updated_at
+        `).bind(deviceId, new Date().toISOString()).run();
+
+        return new Response(JSON.stringify({
+          success: true,
+          pointsGranted: 10,
+          welcomeBonusClaimed: true
+        }), { status: 200, headers: corsHeaders });
+      } catch (err) {
+        return new Response(JSON.stringify({ success: false, error: 'Server error' }), { status: 500, headers: corsHeaders });
+      }
+    }
 
     // ══════════════════════════════════════
     // Rule 13: /exam-submit -> Server-Side Grading + D1 (0 Supabase!)

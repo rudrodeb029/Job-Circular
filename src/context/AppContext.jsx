@@ -11,6 +11,8 @@ import {
   isExamUnlockedForUser
 } from '../utils/pointsService';
 import { showRewardedAd, preloadRewardedAd, getRewardedCooldownRemainingSec } from '../utils/admobUtils';
+import { getDeviceId } from '../utils/deviceHelper';
+import { SUPABASE_CONFIG } from '../services/supabaseClient';
 
 const AppContext = createContext();
 
@@ -277,13 +279,37 @@ export function AppProvider({ children }) {
       };
     }
 
+    // Server-Side Verification for AdMob Safety & Anti-Fraud
+    let serverGrantedCount = null;
+    try {
+      const devId = await getDeviceId();
+      const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
+      const verifyRes = await fetch(`${proxyUrl}/points/verify-ad`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deviceId: devId })
+      });
+      const verifyJson = await verifyRes.json();
+      if (verifyJson && verifyJson.success) {
+        serverGrantedCount = verifyJson.dailyAdCount;
+      } else if (verifyJson?.waitSec) {
+        return {
+          ok: false,
+          reason: 'cooldown',
+          remainingSec: verifyJson.waitSec
+        };
+      }
+    } catch (e) {
+      // Graceful network/offline fallback
+    }
+
     const latest = loadLocalPointsState();
     const nowIso = new Date().toISOString();
     const rewardAmount = POINTS_CONFIG.POINTS_PER_AD;
     const nextState = {
       ...latest,
       points: (Number(latest.points) || 0) + rewardAmount,
-      dailyAdCount: (Number(latest.dailyAdCount) || 0) + 1,
+      dailyAdCount: serverGrantedCount !== null ? serverGrantedCount : ((Number(latest.dailyAdCount) || 0) + 1),
       lastRewardedAdTime: Date.now(),
       history: [
         {

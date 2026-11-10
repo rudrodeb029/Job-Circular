@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { getDeviceId } from '../utils/deviceHelper';
 
 // Supabase Configuration
 export const SUPABASE_CONFIG = {
@@ -24,6 +25,12 @@ export const supabase = createClient(
 
         const headers = new Headers(options.headers || {});
         headers.set('X-App-Client', isAdmin ? 'live-circular-admin' : 'live-circular-android');
+        
+        try {
+          const devId = await getDeviceId();
+          if (devId) headers.set('X-Device-Id', devId);
+        } catch (e) { /* non-blocking */ }
+
         if (isAdmin) {
           headers.set('Cache-Control', 'no-cache');
           headers.set('Pragma', 'no-cache');
