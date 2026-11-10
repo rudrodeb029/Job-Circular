@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Edit,
   Bookmark,
-  Briefcase,
   FileText,
   Bell,
   Globe,
@@ -12,9 +11,7 @@ import {
   Settings,
   ChevronRight,
   Rss,
-  Camera,
-  GraduationCap,
-  MapPin
+  Camera
 } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
@@ -40,9 +37,7 @@ export default function Profile() {
   const [cooldownRemaining, setCooldownRemaining] = useState(() => getRewardedCooldownRemainingSec());
   const [pointsToast, setPointsToast] = useState('');
 
-  const coverInputRef = useRef(null);
   const avatarInputRef = useRef(null);
-  const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const livePoints = state.liveExamPoints ?? state.pointsState?.points ?? POINTS_CONFIG.WELCOME_BONUS;
@@ -54,25 +49,6 @@ export default function Profile() {
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, [state.pointsState]);
-
-  const handleCoverUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingCover(true);
-    try {
-      const dataUrl = await compressImageFile(file, 960, 0.8);
-      dispatch({ type: 'UPDATE_USER_PROFILE', payload: { coverPhoto: dataUrl } });
-      setPointsToast(isEn ? 'Cover photo updated!' : 'কভার ছবি সফলভাবে পরিবর্তিত হয়েছে!');
-      setTimeout(() => setPointsToast(''), 3000);
-    } catch (err) {
-      console.error('Cover upload failed', err);
-      setPointsToast(isEn ? 'Upload failed' : 'আপলোড ব্যর্থ হয়েছে');
-      setTimeout(() => setPointsToast(''), 2500);
-    } finally {
-      setUploadingCover(false);
-      if (e.target) e.target.value = '';
-    }
-  };
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -151,14 +127,7 @@ export default function Profile() {
 
   return (
     <div className="page" style={{ background: 'var(--bg)' }}>
-      {/* Hidden File Inputs for Cover Photo & Profile Picture */}
-      <input
-        type="file"
-        ref={coverInputRef}
-        accept="image/*"
-        style={{ display: 'none' }}
-        onChange={handleCoverUpload}
-      />
+      {/* Hidden File Input for Profile Picture */}
       <input
         type="file"
         ref={avatarInputRef}
@@ -167,10 +136,10 @@ export default function Profile() {
         onChange={handleAvatarUpload}
       />
 
-      {/* ═══ 1. Facebook-Style Cover Photo Banner (App Design Language) ═══ */}
+      {/* ═══ 1. Clean Gradient Cover Banner ═══ */}
       <div style={{
         position: 'relative',
-        height: '175px',
+        height: '145px',
         width: '100%',
         overflow: 'hidden',
         background: isDark
@@ -186,24 +155,16 @@ export default function Profile() {
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
-              filter: uploadingCover ? 'brightness(0.6)' : 'none',
-              transition: 'filter 0.3s'
+              objectFit: 'cover'
             }}
           />
         ) : (
-          /* Artistic Default Cover Banner with Career Motifs (Matching reference's inspirational banner) */
+          /* Ambient Background Glows */
           <div style={{
             position: 'absolute',
             inset: 0,
-            overflow: 'hidden',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: 'calc(var(--safe-area-top) + 12px) 20px 20px 20px',
-            color: 'white'
+            overflow: 'hidden'
           }}>
-            {/* Ambient Background Glows */}
             <div style={{
               position: 'absolute',
               top: '-30px',
@@ -224,35 +185,6 @@ export default function Profile() {
               background: 'radial-gradient(circle, rgba(147, 197, 253, 0.15) 0%, rgba(30, 64, 175, 0) 70%)',
               pointerEvents: 'none'
             }} />
-
-            {/* Motivational Banner Typography */}
-            <div style={{ position: 'relative', zIndex: 1, maxWidth: '68%' }}>
-              <div style={{
-                fontSize: '9.5px',
-                fontWeight: 800,
-                letterSpacing: '0.8px',
-                color: '#93c5fd',
-                textTransform: 'uppercase',
-                marginBottom: '4px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
-              }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#60a5fa' }} />
-                <span>{isEn ? 'Believe In Yourself' : 'লক্ষ্যে অবিচল'}</span>
-              </div>
-              <h1 style={{
-                fontSize: '15px',
-                fontWeight: 800,
-                color: '#ffffff',
-                margin: 0,
-                lineHeight: 1.25,
-                textShadow: '0 2px 8px rgba(0,0,0,0.4)',
-                letterSpacing: '-0.2px'
-              }}>
-                {isEn ? 'It’s Possible • Win Your Career' : 'স্বপ্ন জয়ের প্রস্তুতি • Live Circular'}
-              </h1>
-            </div>
           </div>
         )}
 
@@ -282,41 +214,9 @@ export default function Profile() {
         >
           <Settings size={18} />
         </button>
-
-        {/* Cover Photo Camera Button (Bottom-Right, matching reference image) */}
-        <button
-          onClick={() => coverInputRef.current?.click()}
-          title={isEn ? 'Change Cover Photo' : 'কভার ছবি পরিবর্তন'}
-          aria-label="Change Cover Photo"
-          disabled={uploadingCover}
-          style={{
-            position: 'absolute',
-            bottom: '10px',
-            right: '12px',
-            width: '34px',
-            height: '34px',
-            borderRadius: '50%',
-            background: 'rgba(15, 23, 42, 0.65)',
-            backdropFilter: 'blur(8px)',
-            color: 'white',
-            border: '1.5px solid rgba(255, 255, 255, 0.65)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.35)',
-            zIndex: 3
-          }}
-        >
-          {uploadingCover ? (
-            <span style={{ fontSize: '10px', fontWeight: 800 }}>...</span>
-          ) : (
-            <Camera size={16} color="white" />
-          )}
-        </button>
       </div>
 
-      {/* ═══ 2. Profile Details Card with Overlapping Avatar (Facebook Style) ═══ */}
+      {/* ═══ 2. Profile Details Card with Overlapping Avatar ═══ */}
       <div style={{
         margin: '0 14px 12px 14px',
         background: isDark
@@ -332,9 +232,9 @@ export default function Profile() {
         position: 'relative',
         zIndex: 2
       }}>
-        {/* Centered Overlapping Avatar (Half on Cover, Half on Card, like reference) */}
+        {/* Centered Overlapping Avatar (Half on Cover, Half on Card) */}
         <div style={{
-          marginTop: '-48px',
+          marginTop: '-46px',
           display: 'inline-block',
           position: 'relative'
         }}>
@@ -392,7 +292,7 @@ export default function Profile() {
             )}
           </div>
 
-          {/* Avatar Camera Badge (Bottom-Right of Avatar circle, like reference) */}
+          {/* Avatar Camera Badge (Bottom-Right of Avatar circle) */}
           <button
             onClick={() => avatarInputRef.current?.click()}
             title={isEn ? 'Change Profile Picture' : 'প্রোফাইল ছবি পরিবর্তন'}
@@ -431,12 +331,12 @@ export default function Profile() {
           {state.user.name || (isEn ? 'Set Your Name' : 'নাম সেট করুন')}
         </h2>
 
-        {/* Meta / Subtitle line (like reference "1.1K friends") */}
+        {/* Meta / Subtitle line */}
         <p style={{
           fontSize: '11px',
           fontWeight: 700,
           color: isDark ? '#94a3b8' : 'var(--text-secondary)',
-          margin: '0 0 10px 0',
+          margin: '0 0 12px 0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -458,44 +358,7 @@ export default function Profile() {
           )}
         </p>
 
-        {/* Bio & Details Items (Like the reference image's bullet list) */}
-        <div style={{
-          background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(241, 245, 249, 0.7)',
-          borderRadius: '10px',
-          padding: '8px 12px',
-          border: isDark ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(226, 232, 240, 0.8)',
-          marginBottom: '10px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '6px',
-          textAlign: 'left'
-        }}>
-          {/* Item 1: Career / Bio */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
-            <Briefcase size={13} color="var(--primary)" style={{ flexShrink: 0 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {state.user.bio || (isEn ? 'Govt & Private Job Candidate' : 'সরকারি ও বেসরকারি চাকরি প্রত্যাশী')}
-            </span>
-          </div>
-
-          {/* Item 2: Education / Qualification */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
-            <GraduationCap size={14} color="#2563eb" style={{ flexShrink: 0 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {state.user.qualification || (isEn ? 'Educational Qualification not set' : 'শিক্ষাগত যোগ্যতা যুক্ত করুন')}
-            </span>
-          </div>
-
-          {/* Item 3: Location / District */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', color: 'var(--text-primary)', fontWeight: 600 }}>
-            <MapPin size={13} color="#ea580c" style={{ flexShrink: 0 }} />
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {state.user.location ? (isEn ? state.user.location : `${state.user.location}, বাংলাদেশ`) : (isEn ? 'Location not set' : 'জেলা / অবস্থান যুক্ত করুন')}
-            </span>
-          </div>
-        </div>
-
-        {/* Action Button: Edit Profile (like reference image's action button) */}
+        {/* Action Button: Edit Profile */}
         <button
           onClick={() => navigate('/edit-profile')}
           style={{
