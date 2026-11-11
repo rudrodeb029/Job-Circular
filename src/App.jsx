@@ -163,6 +163,12 @@ function App() {
     if (hasBootedRef.current || isAdminRoute) return;
     hasBootedRef.current = true;
 
+    // Reset initial splash inline background so theme CSS smoothly takes over
+    if (typeof document !== 'undefined') {
+      document.documentElement.style.backgroundColor = '';
+      document.body.style.backgroundColor = '';
+    }
+
     console.log('⚡ App Boot: Executing fresh background data sync from Cloudflare Worker...');
     syncCoreDataOnStartup(true).catch(err => console.error('App launch refresh failed:', err));
     triggerDeltaSync().catch(err => console.error('SQLite delta sync failed:', err));
