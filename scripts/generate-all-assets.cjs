@@ -198,7 +198,9 @@ async function run() {
     safeWriteFileSync(path.join(drawableDir, 'ic_launcher_foreground.png'), drawableFgBuf);
 
     // Native Splash Screen transparent logos (512x512)
-    const splashLogo512 = await makeCenteredTransparentLogo(512, 0.84);
+    // Android 12+ Splash Screen Guidelines: The icon MUST fit within a safe zone circle of ~55% diameter.
+    // Scale 0.54 ensures the logo is completely visible and never cut off at top or bottom on any device!
+    const splashLogo512 = await makeCenteredTransparentLogo(512, 0.54);
     safeWriteFileSync(path.join(drawableDir, 'app_logo_splash.png'), splashLogo512);
     safeWriteFileSync(path.join(drawableDir, 'splash_icon.png'), splashLogo512);
     console.log('✔ drawable/ic_launcher_foreground.png, app_logo_splash.png, splash_icon.png generated.');
@@ -215,7 +217,7 @@ async function run() {
   for (const s of splashSizes) {
     const targetDir = path.join(RES_DIR, s.folder);
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-    const splashBuf = await makeCenteredTransparentLogo(s.size, 0.84);
+    const splashBuf = await makeCenteredTransparentLogo(s.size, 0.54);
     safeWriteFileSync(path.join(targetDir, 'splash_logo.png'), splashBuf);
     console.log(`✔ ${s.folder}/splash_logo.png (${s.size}x${s.size})`);
   }
