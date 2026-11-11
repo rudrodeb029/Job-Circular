@@ -13,6 +13,7 @@ import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeU
 import PullToRefresh from '../components/PullToRefresh';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
 import { BcsIcon, BankIcon, NtrcaIcon, PrimaryIcon, GovIcon, getCategoryIconComponent } from '../components/CategoryIcons';
+import { stripHtmlTags } from '../utils/textUtils';
 
 const toBengaliNumber = (num) => {
   if (num === undefined || num === null) return '';
@@ -393,14 +394,17 @@ export default function Home() {
               }
 
               const { icon: displayIcon, style: styleConfig } = getJobIconAndStyle(item);
-              const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
-              const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
+              const rawOrg = isEn ? (item.organizationEn || item.organization) : item.organization;
+              const orgName = stripHtmlTags(rawOrg);
+              const rawTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
+              const postTitle = stripHtmlTags(rawTitle);
               const catData = categories.find(c => c.id === (item.category || item.categoryId));
               const catName = isEn ? (catData?.nameEn || catData?.name) : catData?.name;
 
               if (item.feedType === 'exam_date') {
                 const descriptionSentence = isEn ? `Exam date published for the post of ${postTitle}.` : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
-                const displayDesc = item.description || descriptionSentence;
+                const cleanDesc = item.description ? stripHtmlTags(item.description) : '';
+                const displayDesc = cleanDesc || descriptionSentence;
                 return (
                   <div key={item.id} className="job-card" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '10px 12px', gap: '10px' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #10b981, #34d399)', borderRadius: '4px 0 0 4px' }}></div>
@@ -420,7 +424,8 @@ export default function Home() {
               }
 
               const descriptionSentence = isEn ? `Written/Viva exam result published for the post of ${postTitle}. View result now!` : `${postTitle} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
-              const displayDesc = item.description || descriptionSentence;
+              const cleanDesc = item.description ? stripHtmlTags(item.description) : '';
+              const displayDesc = cleanDesc || descriptionSentence;
               return (
                 <div key={item.id} className="job-card" onClick={() => navigate(`/result-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #7c3aed, #a78bfa)', borderRadius: '4px 0 0 4px' }}></div>

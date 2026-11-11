@@ -9,6 +9,7 @@ import { formatTimeAgo, getItemTimestamp, sortByCreatedAt } from '../utils/timeU
 import { categories } from '../data/categories';
 import PullToRefresh from '../components/PullToRefresh';
 import { getJobIconAndStyle } from '../utils/jobIconUtils';
+import { stripHtmlTags } from '../utils/textUtils';
 
 export default function AllCirculars() {
   const navigate = useNavigate();
@@ -209,8 +210,10 @@ export default function AllCirculars() {
               }
 
               const { icon: displayIcon, style: styleConfig } = getJobIconAndStyle(item);
-              const orgName = isEn ? (item.organizationEn || item.organization) : item.organization;
-              const postTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
+              const rawOrg = isEn ? (item.organizationEn || item.organization) : item.organization;
+              const orgName = stripHtmlTags(rawOrg);
+              const rawTitle = isEn ? (item.postTitleEn || item.postTitle) : item.postTitle;
+              const postTitle = stripHtmlTags(rawTitle);
               const catData = categories.find(c => c.id === (item.category || item.categoryId));
               const catName = isEn ? (catData?.nameEn || catData?.name) : catData?.name;
 
@@ -219,7 +222,8 @@ export default function AllCirculars() {
                   ? `Exam date published for the post of ${postTitle}.`
                   : `${postTitle} পদের পরীক্ষার তারিখ প্রকাশিত হয়েছে।`;
 
-                const displayDesc = item.description || descriptionSentence;
+                const cleanDesc = item.description ? stripHtmlTags(item.description) : '';
+                const displayDesc = cleanDesc || descriptionSentence;
 
                 return (
                   <div 
@@ -301,7 +305,8 @@ export default function AllCirculars() {
                 ? `Written/Viva exam result published for the post of ${postTitle}. View result now!`
                 : `${postTitle} পদের পরীক্ষার ফলাফল প্রকাশিত হয়েছে। এখনই ফলাফল দেখুন!`;
 
-              const displayDesc = item.description || descriptionSentence;
+              const cleanDesc = item.description ? stripHtmlTags(item.description) : '';
+              const displayDesc = cleanDesc || descriptionSentence;
 
               return (
                 <div 

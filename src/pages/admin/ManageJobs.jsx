@@ -7,7 +7,7 @@ import { optimizeCloudinaryUrl } from '../../utils/cloudinaryUtils';
 import { normalizeMediaUrl, getGoogleDriveFileId } from '../../utils/mediaUtils';
 import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
 import StructuredDescriptionCard from '../../components/StructuredDescriptionCard';
-import { stripHtmlTags, sanitizeRichHtml } from '../../utils/textUtils';
+import { stripHtmlTags, sanitizeRichHtml, parseTimeAndPeriod } from '../../utils/textUtils';
 
 export default function ManageJobs() {
   const { state, dispatch } = useAdminContext();
@@ -39,7 +39,7 @@ export default function ManageJobs() {
     vacancy: '',
     salary: '',
     deadline: '',
-    deadlineTime: '23:59',
+    deadlineTime: '11:59 PM',
     examTime: '10:00 AM',
     resultDate: '',
     resultTime: 'প্রকাশিত',
@@ -57,6 +57,8 @@ export default function ManageJobs() {
   };
 
   const [formData, setFormData] = useState(initialFormState);
+  const parsedDeadline = useMemo(() => parseTimeAndPeriod(formData.deadlineTime), [formData.deadlineTime]);
+  const parsedExamTime = useMemo(() => parseTimeAndPeriod(formData.examTime), [formData.examTime]);
 
   const [uploadProgress, setUploadProgress] = useState('');
   const [resultUploadProgress, setResultUploadProgress] = useState('');
@@ -220,7 +222,7 @@ export default function ManageJobs() {
         linkedCircularId: job.linkedCircularId || '',
         requirements: Array.isArray(job.requirements) ? job.requirements.join('\n') : (job.requirements || ''),
         images: Array.isArray(job.images) ? job.images.join(', ') : (job.images || ''),
-        deadlineTime: job.deadlineTime || '23:59',
+        deadlineTime: job.deadlineTime || '11:59 PM',
         examTime: job.examTime || '10:00 AM',
         resultDate: job.resultDate || '',
         resultTime: job.resultTime || 'প্রকাশিত'
@@ -515,8 +517,98 @@ export default function ManageJobs() {
                  <input type="date" name="deadline" className="modern-input" value={formData.deadline} onChange={handleInputChange} required />
               </div>
               <div className="input-group">
-                 <label>Deadline Time (শেষ সময়)</label>
-                 <input type="text" name="deadlineTime" className="modern-input" value={formData.deadlineTime || ''} onChange={handleInputChange} placeholder="e.g. 23:59 or রাত ১১:৫৯" />
+                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label style={{ margin: 0 }}>Deadline Time (শেষ সময়)</label>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {['11:59 PM', '05:00 PM'].map(preset => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, deadlineTime: preset }))}
+                          style={{
+                            fontSize: '10px',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            border: formData.deadlineTime === preset ? '1px solid #2563eb' : '1px solid #cbd5e1',
+                            background: formData.deadlineTime === preset ? '#eff6ff' : '#ffffff',
+                            color: formData.deadlineTime === preset ? '#1d4ed8' : '#64748b',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
+                 </div>
+                 <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <input
+                      type="text"
+                      name="deadlineTimeVal"
+                      className="modern-input"
+                      style={{ flex: 1, minWidth: 0, fontWeight: 600 }}
+                      value={parsedDeadline.time}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFormData(prev => ({
+                          ...prev,
+                          deadlineTime: val ? `${val} ${parsedDeadline.period}`.trim() : ''
+                        }));
+                      }}
+                      placeholder="e.g. 11:59 or 05:00"
+                    />
+                    <div style={{
+                      display: 'inline-flex',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      overflow: 'hidden',
+                      background: '#f8fafc',
+                      flexShrink: 0
+                    }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            deadlineTime: `${parsedDeadline.time} AM`.trim()
+                          }));
+                        }}
+                        style={{
+                          padding: '7px 11px',
+                          fontSize: '11.5px',
+                          fontWeight: 800,
+                          border: 'none',
+                          cursor: 'pointer',
+                          background: parsedDeadline.period === 'AM' ? '#2563eb' : 'transparent',
+                          color: parsedDeadline.period === 'AM' ? '#ffffff' : '#64748b',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        AM
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormData(prev => ({
+                            ...prev,
+                            deadlineTime: `${parsedDeadline.time} PM`.trim()
+                          }));
+                        }}
+                        style={{
+                          padding: '7px 11px',
+                          fontSize: '11.5px',
+                          fontWeight: 800,
+                          border: 'none',
+                          cursor: 'pointer',
+                          background: parsedDeadline.period === 'PM' ? '#2563eb' : 'transparent',
+                          color: parsedDeadline.period === 'PM' ? '#ffffff' : '#64748b',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        PM
+                      </button>
+                    </div>
+                 </div>
               </div>
             </div>
 
@@ -741,8 +833,97 @@ export default function ManageJobs() {
                     <input name="examDate" className="modern-input" value={formData.examDate || ''} onChange={handleInputChange} placeholder="e.g. 15 June 2024 / ১৫ জুন ২০২৪" />
                  </div>
                  <div className="input-group">
-                    <label>Exam Time (পরীক্ষার সময়)</label>
-                    <input name="examTime" className="modern-input" value={formData.examTime || ''} onChange={handleInputChange} placeholder="e.g. 10:00 AM / সকাল ১০:০০" />
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                       <label style={{ margin: 0 }}>Exam Time (পরীক্ষার সময়)</label>
+                       <div style={{ display: 'flex', gap: '4px' }}>
+                         {['10:00 AM', '03:00 PM'].map(preset => (
+                           <button
+                             key={preset}
+                             type="button"
+                             onClick={() => setFormData(prev => ({ ...prev, examTime: preset }))}
+                             style={{
+                               fontSize: '10px',
+                               padding: '2px 6px',
+                               borderRadius: '4px',
+                               border: formData.examTime === preset ? '1px solid #2563eb' : '1px solid #cbd5e1',
+                               background: formData.examTime === preset ? '#eff6ff' : '#ffffff',
+                               color: formData.examTime === preset ? '#1d4ed8' : '#64748b',
+                               fontWeight: 700,
+                               cursor: 'pointer'
+                             }}
+                           >
+                             {preset}
+                           </button>
+                         ))}
+                       </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                       <input
+                         name="examTime"
+                         className="modern-input"
+                         style={{ flex: 1, minWidth: 0, fontWeight: 600 }}
+                         value={parsedExamTime.time}
+                         onChange={(e) => {
+                           const val = e.target.value;
+                           setFormData(prev => ({
+                             ...prev,
+                             examTime: val ? `${val} ${parsedExamTime.period}`.trim() : ''
+                           }));
+                         }}
+                         placeholder="e.g. 10:00 or 03:00"
+                       />
+                       <div style={{
+                         display: 'inline-flex',
+                         borderRadius: '8px',
+                         border: '1px solid #cbd5e1',
+                         overflow: 'hidden',
+                         background: '#f8fafc',
+                         flexShrink: 0
+                       }}>
+                         <button
+                           type="button"
+                           onClick={() => {
+                             setFormData(prev => ({
+                               ...prev,
+                               examTime: `${parsedExamTime.time} AM`.trim()
+                             }));
+                           }}
+                           style={{
+                             padding: '7px 11px',
+                             fontSize: '11.5px',
+                             fontWeight: 800,
+                             border: 'none',
+                             cursor: 'pointer',
+                             background: parsedExamTime.period === 'AM' ? '#2563eb' : 'transparent',
+                             color: parsedExamTime.period === 'AM' ? '#ffffff' : '#64748b',
+                             transition: 'all 0.15s ease'
+                           }}
+                         >
+                           AM
+                         </button>
+                         <button
+                           type="button"
+                           onClick={() => {
+                             setFormData(prev => ({
+                               ...prev,
+                               examTime: `${parsedExamTime.time} PM`.trim()
+                             }));
+                           }}
+                           style={{
+                             padding: '7px 11px',
+                             fontSize: '11.5px',
+                             fontWeight: 800,
+                             border: 'none',
+                             cursor: 'pointer',
+                             background: parsedExamTime.period === 'PM' ? '#2563eb' : 'transparent',
+                             color: parsedExamTime.period === 'PM' ? '#ffffff' : '#64748b',
+                             transition: 'all 0.15s ease'
+                           }}
+                         >
+                           PM
+                         </button>
+                       </div>
+                    </div>
                  </div>
               </div>
             )}

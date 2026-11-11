@@ -66,23 +66,30 @@ const formatLocalizedTime = (timeStr, isEn = false) => {
   if (match) {
     let hours = parseInt(match[1], 10);
     const mins = match[2];
-    let periodBn = 'রাত';
-    let periodEn = 'PM';
 
-    if (hours < 6) periodBn = 'রাত';
-    else if (hours < 12) { periodBn = 'সকাল'; periodEn = 'AM'; }
-    else if (hours < 15) periodBn = 'দুপুর';
-    else if (hours < 18) periodBn = 'বিকাল';
-    else if (hours < 20) periodBn = 'সন্ধ্যা';
+    const isPm = /pm|রাত|বিকাল|সন্ধ্যা|দুপুর/i.test(timeStr);
+    const isAm = /am|সকাল|ভোর/i.test(timeStr);
+
+    if (isPm && hours < 12) hours += 12;
+    if (isAm && hours === 12) hours = 0;
+
+    let periodBn = 'রাত';
+    let periodEn = hours >= 12 ? 'PM' : 'AM';
+
+    if (hours >= 0 && hours < 6) periodBn = 'রাত';
+    else if (hours >= 6 && hours < 12) periodBn = 'সকাল';
+    else if (hours >= 12 && hours < 15) periodBn = 'দুপুর';
+    else if (hours >= 15 && hours < 18) periodBn = 'বিকাল';
+    else if (hours >= 18 && hours < 20) periodBn = 'সন্ধ্যা';
     else periodBn = 'রাত';
 
-    if (hours > 12) hours -= 12;
-    if (hours === 0) hours = 12;
+    let displayHours = hours % 12;
+    if (displayHours === 0) displayHours = 12;
 
     if (isEn) {
-      return `${hours}:${mins} ${periodEn}`;
+      return `${displayHours}:${mins} ${periodEn}`;
     } else {
-      return `${periodBn} ${toBengaliNumber(hours, 1)}:${toBengaliNumber(mins, 2)}`;
+      return `${periodBn} ${toBengaliNumber(displayHours, 1)}:${toBengaliNumber(mins, 2)}`;
     }
   }
 
@@ -135,7 +142,7 @@ const parseTargetTimestamp = (dateStr, timeStr) => {
     if (match) {
       hours = parseInt(match[1], 10);
       mins = parseInt(match[2], 10);
-      if (/pm|রাত|বিকাল|সন্ধ্যা/i.test(timeStr) && hours < 12) hours += 12;
+      if (/pm|রাত|বিকাল|সন্ধ্যা|দুপুর/i.test(timeStr) && hours < 12) hours += 12;
       if (/am|সকাল|ভোর/i.test(timeStr) && hours === 12) hours = 0;
     }
   }

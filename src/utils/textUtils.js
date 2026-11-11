@@ -30,13 +30,28 @@ export function stripHtmlTags(input) {
     return stripCache.get(str);
   }
 
-  // Replace block endings and line breaks with spaces so words do not concatenate
+  // 1. Decode entities first so encoded tags like &lt;p&gt; become <p>
   let cleaned = str
+    .replace(/&lt;/g, '<')
+    .replace(/&#60;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&#62;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&#34;/g, '"')
+    .replace(/&amp;/g, '&')
+    .replace(/&#38;/g, '&')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&#160;/g, ' ');
+
+  // 2. Replace block endings and line breaks with spaces so words do not concatenate
+  cleaned = cleaned
     .replace(/<br\s*[\/]?>/gi, ' ')
     .replace(/<\/(p|div|h[1-6]|li|tr|th|td|blockquote)>/gi, ' ')
-    .replace(/<[^>]*>/g, '');
+    .replace(/<[^>]*>/g, ' ');
 
-  // Decode HTML entities
+  // 3. Decode any secondary entities (including numeric & hex)
   cleaned = cleaned
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
@@ -64,6 +79,12 @@ export function stripHtmlTags(input) {
         return '';
       }
     });
+
+  // 4. Final tag cleanup: eliminate any leftover tags (e.g. <p>, </p>, <span ...>, etc.)
+  cleaned = cleaned.replace(/<[^>]*>/g, ' ');
+
+  // 5. In case of stray, unclosed, or malformed tags like "<p " or "<p>" at the beginning of snippet
+  cleaned = cleaned.replace(/<\/?\w+[^>]*>?/gi, '');
 
   // Collapse multiple whitespaces and newlines
   const result = cleaned.replace(/\s+/g, ' ').trim();
@@ -174,4 +195,56 @@ export function sanitizeQuestionHtml(input) {
   if (sanitizeQuestionCache.size >= MAX_CACHE_SIZE) sanitizeQuestionCache.clear();
   sanitizeQuestionCache.set(html, result);
   return result;
+}
+
+/**
+ * Splits any time string into 12-hour { time: 'HH:MM', period: 'AM'|'PM' }
+ * Handles 24h ('23:59', '15:30'), 12h ('3:59', '03:59 PM', '10:00 AM'), Bengali digits, etc.
+ */
+export function parseTimeAndPeriod(rawTime) {
+  if (!rawTime || typeof rawTime !== 'string') {
+    return { time: '11:59', period: 'PM' };
+  }
+  const str = rawTime.trim();
+  const isPm = /pm|রাত|বিকাল|সন্ধ্যা|দুপুর/i.test(str);
+  const isAm = /am|সকাল|ভোর/i.test(str);
+
+  // Convert Bengali numerals to English numerals
+  const bengaliDigits = { '০':'0', '১':'1', '২':'2', '৩':'3', '৪':'4', '৫':'5', '৬':'6', '৭':'7', '৮':'8', '৯':'9' };
+  const cleanStr = str.replace(/[০-৯]/g, d => bengaliDigits[d] || d);
+  const match = cleanStr.match(/(\d{1,2}):(\d{2})/);
+
+  if (match) {
+    let h = parseInt(match[1], 10);
+    const m = match[2];
+
+    if (h >= 12) {
+      const pmH = h > 12 ? h - 12 : 12;
+      return {
+        time: `${String(pmH).padStart(2, '0')}:${m}`,
+        period: 'PM'
+      };
+    }
+
+    if (h === 0) {
+      return {
+        time: `12:${m}`,
+        period: 'AM'
+      };
+    }
+
+    let period = 'PM';
+    if (isAm) period = 'AM';
+    else if (isPm) period = 'PM';
+
+    return {
+      time: `${String(h).padStart(2, '0')}:${m}`,
+      period
+    };
+  }
+
+  return {
+    time: str || '11:59',
+    period: isAm ? 'AM' : 'PM'
+  };
 }

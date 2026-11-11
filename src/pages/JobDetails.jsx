@@ -277,7 +277,7 @@ export default function JobDetails() {
           categoryId={job.categoryId || job.category}
           type="job"
           date={job.deadline}
-          time={job.deadlineTime || '23:59'}
+          time={job.deadlineTime || '11:59 PM'}
           isEn={isEn}
         />
 
