@@ -639,6 +639,14 @@ ul, ol {
 }
 
 
+/* GPU Acceleration & Layout Containment (Isolates layout recalculations during fast scrolling) */
+.job-card,
+.category-card,
+.notification-item,
+.live-exam-card {
+  contain: layout style;
+}
+
 @keyframes scaleIn {
   0% { opacity: 0.95; transform: scale3d(0.98, 0.98, 1); }
   100% { opacity: 1; transform: scale3d(1, 1, 1); }

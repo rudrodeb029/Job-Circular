@@ -148,6 +148,9 @@ public class MainActivity extends BridgeActivity {
         // Set up in-app DownloadListener to handle file downloads via Android DownloadManager without leaving the app
         setupDownloadListener();
 
+        // Optimize WebView hardware scrolling & DOM cache
+        optimizeWebViewPerformance();
+
         // Set up JavaScript interface for React app to trigger ads
         setupAdJavascriptInterface();
 
@@ -1374,6 +1377,28 @@ public class MainActivity extends BridgeActivity {
             }
         } catch (Exception e) {
             Log.e(TAG, "Error setting up JavaScript interface", e);
+        }
+    }
+
+    /**
+     * Optimizes Android WebView rendering pipeline for 120 FPS buttery-smooth scrolling:
+     * - Enables overlay scrollbars to eliminate layout recalculations during scrolls
+     * - Configures overscroll mode to prevent compositor stutter
+     * - Enables DOM and database storage for lightning-fast asset retrieval
+     */
+    private void optimizeWebViewPerformance() {
+        try {
+            if (this.bridge != null && this.bridge.getWebView() != null) {
+                android.webkit.WebView webView = this.bridge.getWebView();
+                webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+                webView.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
+                
+                android.webkit.WebSettings settings = webView.getSettings();
+                settings.setDomStorageEnabled(true);
+                settings.setDatabaseEnabled(true);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error optimizing WebView performance: " + e.getMessage());
         }
     }
 

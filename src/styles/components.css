@@ -2151,6 +2151,7 @@ mark {
 
 /* ═══ Question Card - Tactile Claymorphism Style ═══ */
 .question-card {
+  contain: layout style;
   background: linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%);
   border-radius: 10px;
   border: 1.2px solid rgba(255, 255, 255, 0.95);

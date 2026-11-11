@@ -2,6 +2,11 @@
  * Text and HTML sanitization utilities for Job Circular
  */
 
+const MAX_CACHE_SIZE = 1200;
+const stripCache = new Map();
+const cleanOptionCache = new Map();
+const sanitizeQuestionCache = new Map();
+
 /**
  * Strips all HTML tags and decodes common HTML entities from a string.
  * Ensures clean plain-text output for card titles, organization names, and descriptions.
@@ -18,6 +23,11 @@ export function stripHtmlTags(input) {
   }
   if (typeof str !== 'string') {
     str = String(str || '');
+  }
+
+  // Fast cache lookup
+  if (stripCache.has(str)) {
+    return stripCache.get(str);
   }
 
   // Replace block endings and line breaks with spaces so words do not concatenate
@@ -56,7 +66,10 @@ export function stripHtmlTags(input) {
     });
 
   // Collapse multiple whitespaces and newlines
-  return cleaned.replace(/\s+/g, ' ').trim();
+  const result = cleaned.replace(/\s+/g, ' ').trim();
+  if (stripCache.size >= MAX_CACHE_SIZE) stripCache.clear();
+  stripCache.set(str, result);
+  return result;
 }
 
 /**
@@ -85,8 +98,12 @@ export function cleanOptionText(input) {
   }
   str = String(str || '');
 
+  if (cleanOptionCache.has(str)) {
+    return cleanOptionCache.get(str);
+  }
+
   // Strip all HTML tags and decode entities first
-  str = stripHtmlTags(str);
+  let cleaned = stripHtmlTags(str);
 
   // Remove duplicated option prefix if present in the text
   const prefixPatterns = [
@@ -98,10 +115,13 @@ export function cleanOptionText(input) {
     /^\d+[\.\)]\s*/    // 1., 1)
   ];
   prefixPatterns.forEach(pattern => {
-    str = str.replace(pattern, '');
+    cleaned = cleaned.replace(pattern, '');
   });
 
-  return str.trim();
+  const result = cleaned.trim();
+  if (cleanOptionCache.size >= MAX_CACHE_SIZE) cleanOptionCache.clear();
+  cleanOptionCache.set(str, result);
+  return result;
 }
 
 /**
@@ -121,30 +141,37 @@ export function sanitizeQuestionHtml(input) {
   }
   html = String(html || '');
 
+  if (sanitizeQuestionCache.has(html)) {
+    return sanitizeQuestionCache.get(html);
+  }
+
   // Remove script tags
-  html = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  let cleaned = html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
 
   // Strip intrusive inline styling from contentEditable
-  html = html.replace(/font-family:\s*[^;"]*;?/gi, '');
-  html = html.replace(/font-size:\s*[^;"]*;?/gi, '');
-  html = html.replace(/line-height:\s*[^;"]*;?/gi, '');
-  html = html.replace(/color:\s*(#fff(fff)?|white|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\)|rgb\(\s*51\s*,\s*65\s*,\s*85\s*\));?/gi, '');
-  html = html.replace(/background(-color)?:\s*[^;"]*;?/gi, '');
+  cleaned = cleaned.replace(/font-family:\s*[^;"]*;?/gi, '');
+  cleaned = cleaned.replace(/font-size:\s*[^;"]*;?/gi, '');
+  cleaned = cleaned.replace(/line-height:\s*[^;"]*;?/gi, '');
+  cleaned = cleaned.replace(/color:\s*(#fff(fff)?|white|rgb\(\s*255\s*,\s*255\s*,\s*255\s*\)|rgb\(\s*51\s*,\s*65\s*,\s*85\s*\));?/gi, '');
+  cleaned = cleaned.replace(/background(-color)?:\s*[^;"]*;?/gi, '');
 
   // Clean empty style attributes
-  html = html.replace(/\s*style=(["'])\s*\1/gi, '');
+  cleaned = cleaned.replace(/\s*style=(["'])\s*\1/gi, '');
 
   // Unwrap useless spans that have no attributes left: <span>text</span> -> text
   let prev;
   let loops = 0;
   do {
-    prev = html;
-    html = html.replace(/<span>([\s\S]*?)<\/span>/gi, '$1');
+    prev = cleaned;
+    cleaned = cleaned.replace(/<span>([\s\S]*?)<\/span>/gi, '$1');
     loops++;
-  } while (html !== prev && loops < 10);
+  } while (cleaned !== prev && loops < 10);
 
   // Replace &nbsp; with normal space
-  html = html.replace(/&nbsp;/g, ' ');
+  cleaned = cleaned.replace(/&nbsp;/g, ' ');
 
-  return html.trim();
+  const result = cleaned.trim();
+  if (sanitizeQuestionCache.size >= MAX_CACHE_SIZE) sanitizeQuestionCache.clear();
+  sanitizeQuestionCache.set(html, result);
+  return result;
 }
