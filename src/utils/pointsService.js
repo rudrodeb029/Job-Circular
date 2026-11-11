@@ -1,5 +1,6 @@
 import { getDocument, setDocument, COLLECTIONS } from '../services/supabaseService';
 import { SUPABASE_CONFIG } from '../services/supabaseClient';
+import { getDeviceId } from './deviceHelper';
 
 export const POINTS_CONFIG = {
   POINTS_PER_AD: 10,
@@ -98,9 +99,14 @@ export const pushPointsToSupabase = async (userId, pointsState, userContext = {}
     const savedUser = JSON.parse(localStorage.getItem('job_user') || '{}');
     const savedJobs = JSON.parse(localStorage.getItem('savedJobs') || '[]');
     const appliedJobs = JSON.parse(localStorage.getItem('appliedJobs') || '[]');
+    let devId = null;
+    try {
+      devId = await getDeviceId();
+    } catch (e) {}
 
     const payload = {
       id: userId,
+      deviceId: devId || undefined,
       name: userContext.name ?? savedUser.name ?? '',
       phone: userContext.phone ?? savedUser.phone ?? '',
       qualification: userContext.qualification ?? savedUser.qualification ?? '',
