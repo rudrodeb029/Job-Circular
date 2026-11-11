@@ -108,6 +108,18 @@ export default function QuestionDetails() {
     }, 180);
   };
 
+  const handleOptionClick = useCallback((questionId, index) => {
+    if (mode !== 'practice') return;
+    // Don't allow changing answer once selected in practice mode
+    setSelectedAnswers(prev => {
+      if (prev[questionId] !== undefined) return prev;
+      return {
+        ...prev,
+        [questionId]: index
+      };
+    });
+  }, [mode]);
+
   // Progressive rendering: keeps DOM small on frame 0 and pre-warms in background frames
   const totalQuestionsCount = Array.isArray(paper?.questions) ? paper.questions.length : 0;
   const { count: visibleCount, hasMore, sentinelRef } = useProgressiveList(totalQuestionsCount, { resetKey: paper?.id });
@@ -158,18 +170,6 @@ export default function QuestionDetails() {
       </div>
     );
   }
-
-  const handleOptionClick = useCallback((questionId, index) => {
-    if (mode !== 'practice') return;
-    // Don't allow changing answer once selected in practice mode
-    setSelectedAnswers(prev => {
-      if (prev[questionId] !== undefined) return prev;
-      return {
-        ...prev,
-        [questionId]: index
-      };
-    });
-  }, [mode]);
 
   const handleReset = () => {
     setSelectedAnswers({});
