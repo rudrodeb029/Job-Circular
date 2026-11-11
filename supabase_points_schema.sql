@@ -7,7 +7,6 @@
 -- ====================================================================
 
 ALTER TABLE IF EXISTS public.users
-  ADD COLUMN IF NOT EXISTS "deviceId" TEXT,
   ADD COLUMN IF NOT EXISTS "liveExamPoints" INTEGER NOT NULL DEFAULT 10,
   ADD COLUMN IF NOT EXISTS "unlockedExams" JSONB NOT NULL DEFAULT '[]'::jsonb,
   ADD COLUMN IF NOT EXISTS "dailyAdDate" TEXT,

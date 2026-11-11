@@ -197,16 +197,14 @@ async function run() {
     const drawableFgBuf = await makeCenteredTransparentLogo(432, 0.48);
     safeWriteFileSync(path.join(drawableDir, 'ic_launcher_foreground.png'), drawableFgBuf);
 
-    // Native Splash Screen transparent logos (512x512)
-    // Android 12+ Splash Screen Guidelines: The icon MUST fit within a safe zone circle of ~55% diameter.
-    // Scale 0.54 ensures the logo is completely visible and never cut off at top or bottom on any device!
-    const splashLogo512 = await makeCenteredTransparentLogo(512, 0.54);
+    // Native Splash Screen transparent logos (512x512 with 0.52 Android 12+ safe-zone)
+    const splashLogo512 = await makeCenteredTransparentLogo(512, 0.52);
     safeWriteFileSync(path.join(drawableDir, 'app_logo_splash.png'), splashLogo512);
     safeWriteFileSync(path.join(drawableDir, 'splash_icon.png'), splashLogo512);
-    console.log('✔ drawable/ic_launcher_foreground.png, app_logo_splash.png, splash_icon.png generated.');
+    console.log('✔ drawable/ic_launcher_foreground.png, app_logo_splash.png, splash_icon.png generated (0.52 safe-zone).');
   }
 
-  // Multi-density splash_logo.png
+  // Multi-density splash logos (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi)
   const splashSizes = [
     { folder: 'drawable-mdpi', size: 160 },
     { folder: 'drawable-hdpi', size: 240 },
@@ -217,9 +215,10 @@ async function run() {
   for (const s of splashSizes) {
     const targetDir = path.join(RES_DIR, s.folder);
     if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
-    const splashBuf = await makeCenteredTransparentLogo(s.size, 0.54);
+    const splashBuf = await makeCenteredTransparentLogo(s.size, 0.52);
+    safeWriteFileSync(path.join(targetDir, 'app_logo_splash.png'), splashBuf);
     safeWriteFileSync(path.join(targetDir, 'splash_logo.png'), splashBuf);
-    console.log(`✔ ${s.folder}/splash_logo.png (${s.size}x${s.size})`);
+    console.log(`✔ ${s.folder}/app_logo_splash.png & splash_logo.png (${s.size}x${s.size}, 0.52 safe-zone)`);
   }
 
   // --- SECTION 5: Delete Old Unused Icon Files ---

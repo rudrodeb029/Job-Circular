@@ -166,10 +166,28 @@ async function generateIcons() {
       .png()
       .toFile(path.join(drawableDir, 'ic_launcher_foreground.png'));
 
-    // Splash screen icons (Android 12+ & Native Launch Splash)
-    await sharp(SOURCE_ICON).resize(512, 512).png().toFile(path.join(drawableDir, 'app_logo_splash.png'));
-    await sharp(SOURCE_ICON).resize(512, 512).png().toFile(path.join(drawableDir, 'splash_icon.png'));
-    console.log('✔ drawable/app_logo_splash.png & splash_icon.png generated (512x512).');
+    // Splash screen icons (Android 12+ & Native Launch Splash with 0.52 Safe Zone)
+    const splashInnerSize = Math.round(512 * 0.52);
+    const trimmedSource = await sharp(SOURCE_ICON).trim().toBuffer({ resolveWithObject: true });
+    const splashInnerBuffer = await sharp(trimmedSource.data)
+      .resize(splashInnerSize, splashInnerSize, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .toBuffer();
+
+    const splashFinalBuffer = await sharp({
+      create: {
+        width: 512,
+        height: 512,
+        channels: 4,
+        background: { r: 0, g: 0, b: 0, alpha: 0 }
+      }
+    })
+      .composite([{ input: splashInnerBuffer, gravity: 'center' }])
+      .png()
+      .toBuffer();
+
+    fs.writeFileSync(path.join(drawableDir, 'app_logo_splash.png'), splashFinalBuffer);
+    fs.writeFileSync(path.join(drawableDir, 'splash_icon.png'), splashFinalBuffer);
+    console.log('✔ drawable/app_logo_splash.png & splash_icon.png generated (512x512 with 0.52 safe-zone).');
   }
 
   // 4. Copy Status Bar Notification Icons from Downloads if present

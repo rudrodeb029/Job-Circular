@@ -11,7 +11,7 @@ import {
   isExamUnlockedForUser
 } from '../utils/pointsService';
 import { showRewardedAd, preloadRewardedAd, getRewardedCooldownRemainingSec } from '../utils/admobUtils';
-import { getDeviceId, getSyncDeviceId } from '../utils/deviceHelper';
+import { getDeviceId } from '../utils/deviceHelper';
 import { SUPABASE_CONFIG } from '../services/supabaseClient';
 
 const AppContext = createContext();
@@ -146,7 +146,6 @@ function appReducer(state, action) {
   if (['UPDATE_USER_PROFILE', 'TOGGLE_SAVE_JOB', 'TOGGLE_APPLY_JOB', 'MARK_APPLIED'].includes(action.type)) {
       const { id, ...userData } = newState.user;
       const WORKER_URL = 'https://job-circular-proxy.rudrodeb029.workers.dev';
-      const devId = getSyncDeviceId();
       fetch(`${WORKER_URL}/user/update`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -154,7 +153,6 @@ function appReducer(state, action) {
               userId: id,
               userData: {
                   ...userData,
-                  deviceId: devId || undefined,
                   savedJobs: newState.savedJobs,
                   appliedJobs: newState.appliedJobs,
                   liveExamPoints: newState.liveExamPoints,
