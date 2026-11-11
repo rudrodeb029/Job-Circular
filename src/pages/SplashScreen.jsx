@@ -37,12 +37,6 @@ export default function SplashScreen() {
       WebkitFontSmoothing: 'antialiased',
       userSelect: 'none'
     }}>
-      <style>{`
-        .rainbow-logo-shadow {
-          filter: drop-shadow(0 14px 24px rgba(0, 110, 255, 0.28)) drop-shadow(0 4px 8px rgba(255, 80, 0, 0.2));
-        }
-      `}</style>
-
       {/* Centered Minimal App Logo & Brand Name ONLY */}
       <div style={{
         display: 'flex',
@@ -52,7 +46,7 @@ export default function SplashScreen() {
         padding: '24px'
       }}>
         {/* High-End Rainbow Vector 'LC' Logo */}
-        <div className="rainbow-logo-shadow" style={{ position: 'relative', width: '144px', height: '128px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
+        <div style={{ position: 'relative', width: '144px', height: '128px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '12px' }}>
           <svg style={{ width: '128px', height: '128px' }} viewBox="0 0 140 130" fill="none">
             <defs>
               <linearGradient id="lGrad" x1="0" y1="0" x2="0" y2="1">
@@ -89,7 +83,7 @@ export default function SplashScreen() {
 
         {/* Brand Name */}
         <h1 style={{ fontFamily: '"Poppins", sans-serif', fontWeight: 900, fontSize: '36px', letterSpacing: '-0.5px', margin: 0, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <span style={{ color: '#005aff', filter: 'drop-shadow(0 2px 10px rgba(0,90,255,0.25))' }}>Live</span>
+          <span style={{ color: '#005aff' }}>Live</span>
           <span style={{ color: '#0c1f4a' }}>Circular</span>
         </h1>
 
