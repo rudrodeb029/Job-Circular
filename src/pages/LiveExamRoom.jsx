@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
@@ -471,6 +471,18 @@ export default function LiveExamRoom() {
     return isExamUnlockedForUser(exam, state.pointsState);
   }, [exam, state.pointsState]);
 
+  const handleOptionSelect = useCallback((qIndex, oIndex) => {
+    if (savedResult || submitted || !isRunning) return;
+    setSelectedAnswers(prev => {
+      if (prev[qIndex] === oIndex) return prev;
+      return {
+        ...prev,
+        [qIndex]: oIndex
+      };
+    });
+    saveLocalAnswer(id, qIndex, oIndex);
+  }, [savedResult, submitted, isRunning, id]);
+
   if (loadingExam) {
     return (
       <div className="page" style={{ paddingBottom: '100px', background: 'var(--bg-secondary)' }}>
@@ -531,15 +543,6 @@ export default function LiveExamRoom() {
       </div>
     );
   }
-
-  const handleOptionSelect = (qIndex, oIndex) => {
-    if (savedResult || submitted || !isRunning) return;
-    setSelectedAnswers(prev => ({
-      ...prev,
-      [qIndex]: oIndex
-    }));
-    saveLocalAnswer(id, qIndex, oIndex);
-  };
 
   const handleSubmit = async () => {
     if (savedResult || submitted || submitting) return;
@@ -1165,167 +1168,18 @@ export default function LiveExamRoom() {
               if (!qn) return null;
               const userSelections = (currentResult && currentResult.answers) ? currentResult.answers : (selectedAnswers || {});
               const chosenIndex = userSelections[qIndex];
-              const qOptions = Array.isArray(qn.options) ? qn.options : ['', '', '', ''];
-              const qOptionsEn = Array.isArray(qn.optionsEn) ? qn.optionsEn : ['', '', '', ''];
 
               return (
-                <div
+                <LiveExamQuestionItemCard
                   key={qn.id || `exam-q-${qIndex}`}
-                  style={{
-                    background: isDark
-                      ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-                      : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
-                    border: isDark
-                      ? '1px solid rgba(255, 255, 255, 0.08)'
-                      : '1.2px solid rgba(255, 255, 255, 0.95)',
-                    borderRadius: '12px',
-                    padding: '14px 16px',
-                    boxShadow: isDark
-                      ? '0 6px 18px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.06)'
-                      : '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
-                  }}
-                >
-                  {/* Question Text */}
-                  <h4 style={{
-                    fontSize: '12.5px',
-                    fontWeight: 600,
-                    color: isDark ? '#f1f5f9' : 'var(--text-secondary)',
-                    marginBottom: '10px',
-                    lineHeight: '1.45',
-                    display: 'flex',
-                    gap: '8px',
-                    alignItems: 'baseline'
-                  }}>
-                    <span style={{ flexShrink: 0, color: isDark ? '#94a3b8' : 'inherit' }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
-                    <QuestionContent content={isEn ? (qn.questionEn || qn.question) : qn.question} style={{ flex: 1, color: isDark ? '#f1f5f9' : 'inherit' }} />
-                  </h4>
-
-                  {/* Option Choices */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                    {qOptions.map((option, oIndex) => {
-                      const optText = cleanOptionText(isEn ? (qOptionsEn[oIndex] || option) : option);
-                      const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
-                      const prefix = optionPrefixes[oIndex];
-
-                      let bg = isDark
-                        ? 'rgba(30, 41, 59, 0.7)'
-                        : 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
-                      let color = isDark ? '#e2e8f0' : 'var(--text-primary)';
-                      let border = isDark
-                        ? '1px solid rgba(255, 255, 255, 0.08)'
-                        : '1.2px solid rgba(255, 255, 255, 0.95)';
-                      let boxShadow = isDark
-                        ? '0 2px 4px rgba(0, 0, 0, 0.2)'
-                        : '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
-                      let trailingIcon = null;
-
-                      // Styling based on state
-                      if (currentResult) {
-                        if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
-                          bg = isDark ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
-                          color = isDark ? '#34d399' : '#065f46';
-                          border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1.2px solid rgba(134, 239, 172, 0.8)';
-                          boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
-                          trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#34d399" : "#059669"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          );
-                        } else if (oIndex === chosenIndex) {
-                          bg = isDark ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
-                          color = isDark ? '#f87171' : '#991b1b';
-                          border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1.2px solid rgba(252, 165, 165, 0.8)';
-                          boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
-                          trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#f87171" : "#dc2626"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                              <line x1="18" y1="6" x2="6" y2="18" />
-                              <line x1="6" y1="6" x2="18" y2="18" />
-                            </svg>
-                          );
-                        }
-                      } else {
-                        if (oIndex === chosenIndex) {
-                          bg = isDark ? 'rgba(37, 99, 235, 0.25)' : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)';
-                          color = isDark ? '#60a5fa' : 'var(--primary)';
-                          border = isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1.2px solid rgba(147, 197, 253, 0.9)';
-                          boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(37, 99, 235, 0.14), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(37, 99, 235, 0.1)';
-                          trailingIcon = (
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#60a5fa" : "var(--primary)"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          );
-                        }
-                      }
-
-                      return (
-                        <div
-                          key={oIndex}
-                          onClick={() => handleOptionSelect(qIndex, oIndex)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: '8px 11px',
-                            borderRadius: '10px',
-                            background: bg,
-                            color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
-                            border: border,
-                            boxShadow: boxShadow,
-                            cursor: !currentResult ? 'pointer' : 'default',
-                            fontSize: '12px',
-                            fontWeight: 500,
-                            transition: 'all 0.2s ease',
-                            gap: '8px'
-                          }}
-                        >
-                          <span style={{
-                            width: '22px',
-                            height: '22px',
-                            borderRadius: '7px',
-                            background: isDark ? 'rgba(15, 23, 42, 0.8)' : 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
-                            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.95)',
-                            boxShadow: isDark ? '0 1.5px 4px rgba(0,0,0,0.3)' : '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
-                            color: isDark ? '#e2e8f0' : 'inherit',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '10px',
-                            fontWeight: 700,
-                            flexShrink: 0
-                          }}>
-                            {prefix}
-                          </span>
-                          <span style={{ flex: 1, lineHeight: '1.45' }}>{optText}</span>
-                          {trailingIcon && <span style={{ display: 'inline-flex', alignItems: 'center' }}>{trailingIcon}</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Explanations */}
-                  {currentResult && (qn.explanation || qn.explanationEn) && (
-                    <div style={{
-                      marginTop: '10px',
-                      padding: '12px 14px',
-                      borderRadius: '12px',
-                      background: isDark
-                        ? 'rgba(30, 41, 59, 0.7)'
-                        : 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
-                      border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(191, 219, 254, 0.8)',
-                      borderLeft: isDark ? '4px solid #60a5fa' : '4px solid var(--primary)',
-                      boxShadow: isDark
-                        ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)'
-                        : '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)'
-                    }}>
-                      <h5 style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#60a5fa' : 'var(--primary)', marginBottom: '4px' }}>
-                        💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
-                      </h5>
-                      <ExplanationContent
-                        content={isEn ? (qn.explanationEn || qn.explanation) : qn.explanation}
-                        style={{ fontSize: '12px', color: isDark ? '#cbd5e1' : 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
-                      />
-                    </div>
-                  )}
-                </div>
+                  qn={qn}
+                  qIndex={qIndex}
+                  chosenIndex={chosenIndex}
+                  hasResult={!!currentResult}
+                  isDark={isDark}
+                  isEn={isEn}
+                  onOptionSelect={handleOptionSelect}
+                />
               );
             })}
             {hasMore && (
@@ -1489,80 +1343,16 @@ export default function LiveExamRoom() {
               flexDirection: 'column',
               gap: '12px'
             }}>
-              {leaderboardData.slice(0, visibleLbCount).map((user, idx) => {
-                const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
-                const displayScore = toSafeString(user.score, '0');
-                const displayTotal = toSafeString(user.total, (exam && Array.isArray(exam.questions) ? exam.questions.length : 100));
-
-                return (
-                  <div
-                    key={user.id || idx}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '14px',
-                      padding: '14px 16px',
-                      borderRadius: '12px',
-                      background: isDark
-                        ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-                        : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
-                      border: user.isCurrentUser 
-                        ? (isDark ? '1.5px solid #3b82f6' : '1.5px solid var(--primary)') 
-                        : (isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)'),
-                      boxShadow: user.isCurrentUser
-                        ? (isDark ? '0 6px 18px -2px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08)' : '0 6px 18px -2px rgba(26, 86, 219, 0.15), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(26, 86, 219, 0.08)')
-                        : (isDark ? '0 6px 16px -2px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.06)' : '0 6px 16px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)'),
-                      transition: 'all 0.2s'
-                    }}
-                  >
-                    {/* Avatar */}
-                    <div style={{ position: 'relative', width: '42px', height: '42px', flexShrink: 0 }}>
-                      {isValidAvatar(user.avatar) ? (
-                        <img
-                          src={user.avatar}
-                          alt={displayName}
-                          onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                          style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(255, 255, 255, 0.95)', boxShadow: '0 3px 8px -1px rgba(0,0,0,0.1), inset 0 1px 2px #ffffff' }}
-                        />
-                      ) : null}
-                      <div style={{
-                        width: '100%', height: '100%', borderRadius: '50%',
-                        background: isDark ? 'linear-gradient(145deg, #1e293b 0%, #334155 100%)' : 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)',
-                        color: isDark ? '#60a5fa' : 'var(--primary)',
-                        display: isValidAvatar(user.avatar) ? 'none' : 'flex',
-                        alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800,
-                        border: isDark ? '1.5px solid rgba(255, 255, 255, 0.15)' : '1.5px solid rgba(255, 255, 255, 0.95)',
-                        boxShadow: isDark ? '0 3px 8px -1px rgba(0,0,0,0.3)' : '0 3px 8px -1px rgba(26, 86, 219, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.1)'
-                      }}>
-                        {getInitials(displayName)}
-                      </div>
-                    </div>
-
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <h4 style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#f8fafc' : 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {displayName}
-                      </h4>
-                      <div style={{ display: 'flex', gap: '10px', marginTop: '3px' }}>
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#34d399' : '#059669', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                           <span style={{ fontSize: '12px' }}>✓</span> {isEn ? `${user.score} Correct` : `${toBengaliNumber(user.score)} সঠিক`}
-                        </span>
-                        <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#f87171' : '#ef4444', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                           <span style={{ fontSize: '12px' }}>✗</span> {isEn ? `${user.total - user.score} Wrong` : `${toBengaliNumber(user.total - user.score)} ভুল`}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Score */}
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '14px', fontWeight: 900, color: isDark ? '#f8fafc' : 'var(--text-primary)', lineHeight: 1 }}>
-                        {isEn ? displayScore : toBengaliNumber(displayScore)}
-                      </div>
-                      <div style={{ fontSize: '9px', fontWeight: 800, color: isDark ? '#94a3b8' : 'var(--text-muted)', marginTop: '2px' }}>{isEn ? 'SCORE' : 'নম্বর'}</div>
-                    </div>
-                  </div>
-                );
-              })}
+              {leaderboardData.slice(0, visibleLbCount).map((user, idx) => (
+                <LeaderboardItemRow
+                  key={user.id || `lb-row-${idx}`}
+                  user={user}
+                  idx={idx}
+                  isDark={isDark}
+                  isEn={isEn}
+                  totalQuestions={exam && Array.isArray(exam.questions) ? exam.questions.length : 100}
+                />
+              ))}
               {hasMoreLb && <div ref={lbSentinelRef} style={{ height: '1px' }} aria-hidden="true" />}
 
               {leaderboardData.length === 0 && (
@@ -1721,3 +1511,260 @@ const formatTimeTaken = (timeVal, isEn) => {
   }
   return isEn ? str : toBengaliNumber(str);
 };
+
+// ═══ High-Performance Memoized Live Exam Question Card (Zero Re-render on Timer Ticks / 120fps Scroll) ═══
+const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
+  qn,
+  qIndex,
+  chosenIndex,
+  hasResult,
+  isDark,
+  isEn,
+  onOptionSelect
+}) {
+  const qOptions = Array.isArray(qn.options) ? qn.options : ['', '', '', ''];
+  const qOptionsEn = Array.isArray(qn.optionsEn) ? qn.optionsEn : ['', '', '', ''];
+
+  return (
+    <div
+      style={{
+        background: isDark
+          ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+          : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+        border: isDark
+          ? '1px solid rgba(255, 255, 255, 0.08)'
+          : '1.2px solid rgba(255, 255, 255, 0.95)',
+        borderRadius: '12px',
+        padding: '14px 16px',
+        contain: 'layout style',
+        boxShadow: isDark
+          ? '0 6px 18px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.06)'
+          : '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
+      }}
+    >
+      {/* Question Text */}
+      <h4 style={{
+        fontSize: '12.5px',
+        fontWeight: 600,
+        color: isDark ? '#f1f5f9' : 'var(--text-secondary)',
+        marginBottom: '10px',
+        lineHeight: '1.45',
+        display: 'flex',
+        gap: '8px',
+        alignItems: 'baseline'
+      }}>
+        <span style={{ flexShrink: 0, color: isDark ? '#94a3b8' : 'inherit' }}>{isEn ? `${qIndex + 1}.` : `${toBengaliNumber(qIndex + 1)}.`}</span>
+        <QuestionContent content={isEn ? (qn.questionEn || qn.question) : qn.question} style={{ flex: 1, color: isDark ? '#f1f5f9' : 'inherit' }} />
+      </h4>
+
+      {/* Option Choices */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        {qOptions.map((option, oIndex) => {
+          const optText = cleanOptionText(isEn ? (qOptionsEn[oIndex] || option) : option);
+          const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
+          const prefix = optionPrefixes[oIndex];
+
+          let bg = isDark
+            ? 'rgba(30, 41, 59, 0.7)'
+            : 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
+          let color = isDark ? '#e2e8f0' : 'var(--text-primary)';
+          let border = isDark
+            ? '1px solid rgba(255, 255, 255, 0.08)'
+            : '1.2px solid rgba(255, 255, 255, 0.95)';
+          let boxShadow = isDark
+            ? '0 2px 4px rgba(0, 0, 0, 0.2)'
+            : '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
+          let trailingIcon = null;
+
+          // Styling based on state
+          if (hasResult) {
+            if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
+              bg = isDark ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
+              color = isDark ? '#34d399' : '#065f46';
+              border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1.2px solid rgba(134, 239, 172, 0.8)';
+              boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
+              trailingIcon = (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#34d399" : "#059669"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              );
+            } else if (oIndex === chosenIndex) {
+              bg = isDark ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
+              color = isDark ? '#f87171' : '#991b1b';
+              border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1.2px solid rgba(252, 165, 165, 0.8)';
+              boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
+              trailingIcon = (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#f87171" : "#dc2626"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              );
+            }
+          } else {
+            if (oIndex === chosenIndex) {
+              bg = isDark ? 'rgba(37, 99, 235, 0.25)' : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)';
+              color = isDark ? '#60a5fa' : 'var(--primary)';
+              border = isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1.2px solid rgba(147, 197, 253, 0.9)';
+              boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(37, 99, 235, 0.14), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(37, 99, 235, 0.1)';
+              trailingIcon = (
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#60a5fa" : "var(--primary)"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              );
+            }
+          }
+
+          return (
+            <div
+              key={oIndex}
+              onClick={() => onOptionSelect(qIndex, oIndex)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '8px 11px',
+                borderRadius: '10px',
+                background: bg,
+                color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
+                border: border,
+                boxShadow: boxShadow,
+                cursor: !hasResult ? 'pointer' : 'default',
+                fontSize: '12px',
+                fontWeight: 500,
+                transition: 'all 0.2s ease',
+                gap: '8px'
+              }}
+            >
+              <span style={{
+                width: '22px',
+                height: '22px',
+                borderRadius: '7px',
+                background: isDark ? 'rgba(15, 23, 42, 0.8)' : 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.95)',
+                boxShadow: isDark ? '0 1.5px 4px rgba(0,0,0,0.3)' : '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
+                color: isDark ? '#e2e8f0' : 'inherit',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                fontWeight: 700,
+                flexShrink: 0
+              }}>
+                {prefix}
+              </span>
+              <span style={{ flex: 1, lineHeight: '1.45' }}>{optText}</span>
+              {trailingIcon && <span style={{ display: 'inline-flex', alignItems: 'center' }}>{trailingIcon}</span>}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Explanations */}
+      {hasResult && (qn.explanation || qn.explanationEn) && (
+        <div style={{
+          marginTop: '10px',
+          padding: '12px 14px',
+          borderRadius: '12px',
+          background: isDark
+            ? 'rgba(30, 41, 59, 0.7)'
+            : 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(191, 219, 254, 0.8)',
+          borderLeft: isDark ? '4px solid #60a5fa' : '4px solid var(--primary)',
+          boxShadow: isDark
+            ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)'
+            : '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)'
+        }}>
+          <h5 style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#60a5fa' : 'var(--primary)', marginBottom: '4px' }}>
+            💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
+          </h5>
+          <ExplanationContent
+            content={isEn ? (qn.explanationEn || qn.explanation) : qn.explanation}
+            style={{ fontSize: '12px', color: isDark ? '#cbd5e1' : 'var(--text-secondary)', lineHeight: '1.6', margin: 0 }}
+          />
+        </div>
+      )}
+    </div>
+  );
+});
+
+// ═══ High-Performance Memoized Leaderboard Item Row (Zero Re-render / 120fps Scroll) ═══
+const LeaderboardItemRow = React.memo(function LeaderboardItemRow({
+  user,
+  idx,
+  isDark,
+  isEn,
+  totalQuestions
+}) {
+  const displayName = toSafeString(isEn ? user.nameEn : user.name, isEn ? 'Candidate' : 'পরীক্ষার্থী');
+  const displayScore = toSafeString(user.score, '0');
+  const scoreNum = typeof user.score === 'number' ? user.score : (parseInt(user.score) || 0);
+  const totalNum = typeof user.total === 'number' ? user.total : (parseInt(user.total) || totalQuestions);
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px',
+        padding: '14px 16px',
+        borderRadius: '12px',
+        contain: 'layout style',
+        background: isDark
+          ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
+          : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+        border: user.isCurrentUser 
+          ? (isDark ? '1.5px solid #3b82f6' : '1.5px solid var(--primary)') 
+          : (isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)'),
+        boxShadow: user.isCurrentUser
+          ? (isDark ? '0 6px 18px -2px rgba(0, 0, 0, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.08)' : '0 6px 18px -2px rgba(26, 86, 219, 0.15), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(26, 86, 219, 0.08)')
+          : (isDark ? '0 6px 16px -2px rgba(0, 0, 0, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.06)' : '0 6px 16px -2px rgba(30, 64, 175, 0.07), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.04)'),
+        transition: 'all 0.2s'
+      }}
+    >
+      {/* Avatar */}
+      <div style={{ position: 'relative', width: '42px', height: '42px', flexShrink: 0 }}>
+        {isValidAvatar(user.avatar) ? (
+          <img
+            src={user.avatar}
+            alt={displayName}
+            onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+            style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', border: '1.5px solid rgba(255, 255, 255, 0.95)', boxShadow: '0 3px 8px -1px rgba(0,0,0,0.1), inset 0 1px 2px #ffffff' }}
+          />
+        ) : null}
+        <div style={{
+          width: '100%', height: '100%', borderRadius: '50%',
+          background: isDark ? 'linear-gradient(145deg, #1e293b 0%, #334155 100%)' : 'linear-gradient(145deg, #ffffff 0%, #edf4ff 100%)',
+          color: isDark ? '#60a5fa' : 'var(--primary)',
+          display: isValidAvatar(user.avatar) ? 'none' : 'flex',
+          alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: 800,
+          border: isDark ? '1.5px solid rgba(255, 255, 255, 0.15)' : '1.5px solid rgba(255, 255, 255, 0.95)',
+          boxShadow: isDark ? '0 3px 8px -1px rgba(0,0,0,0.3)' : '0 3px 8px -1px rgba(26, 86, 219, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.1)'
+        }}>
+          {getInitials(displayName)}
+        </div>
+      </div>
+
+      {/* Info */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <h4 style={{ fontSize: '12px', fontWeight: 700, color: isDark ? '#f8fafc' : 'var(--text-primary)', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {displayName}
+        </h4>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '3px' }}>
+          <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#34d399' : '#059669', display: 'flex', alignItems: 'center', gap: '3px' }}>
+             <span style={{ fontSize: '12px' }}>✓</span> {isEn ? `${scoreNum} Correct` : `${toBengaliNumber(scoreNum)} সঠিক`}
+          </span>
+          <span style={{ fontSize: '10px', fontWeight: 700, color: isDark ? '#f87171' : '#ef4444', display: 'flex', alignItems: 'center', gap: '3px' }}>
+             <span style={{ fontSize: '12px' }}>✗</span> {isEn ? `${Math.max(0, totalNum - scoreNum)} Wrong` : `${toBengaliNumber(Math.max(0, totalNum - scoreNum))} ভুল`}
+          </span>
+        </div>
+      </div>
+
+      {/* Score */}
+      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        <div style={{ fontSize: '14px', fontWeight: 900, color: isDark ? '#f8fafc' : 'var(--text-primary)', lineHeight: 1 }}>
+          {isEn ? displayScore : toBengaliNumber(displayScore)}
+        </div>
+        <div style={{ fontSize: '9px', fontWeight: 800, color: isDark ? '#94a3b8' : 'var(--text-muted)', marginTop: '2px' }}>{isEn ? 'SCORE' : 'নম্বর'}</div>
+      </div>
+    </div>
+  );
+});
