@@ -458,12 +458,12 @@ export default function ResultDetails() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '6px',
-                padding: '12px 8px',
+                padding: '8px 8px',
                 borderRadius: '12px',
                 background: 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)',
                 color: '#fff',
                 fontWeight: 700,
-                fontSize: '13px',
+                fontSize: '12px',
                 border: 'none',
                 cursor: 'pointer',
                 boxShadow: '0 4px 14px rgba(124,58,237,0.3)',
@@ -471,7 +471,7 @@ export default function ResultDetails() {
                 whiteSpace: 'nowrap'
               }}
             >
-              <FileText size={16} color="#ffffff" />
+              <FileText size={14} color="#ffffff" />
               {isEn ? 'View Result' : 'ফলাফল দেখুন'} {circularImages.length > 1 ? `(${activeImageIndex + 1})` : ''}
             </button>
 
@@ -480,12 +480,12 @@ export default function ResultDetails() {
               disabled={downloading}
               className="notice-btn-outline"
               style={{
-                padding: '12px 8px',
-                fontSize: '13px',
+                padding: '8px 8px',
+                fontSize: '12px',
                 cursor: downloading ? 'not-allowed' : 'pointer'
               }}
             >
-              {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={16} />}
+              {downloading ? <ButtonSpinner size={14} color="var(--primary)" /> : <Download size={14} />}
               <span>
                 {downloading 
                   ? (isEn ? 'Downloading...' : 'ডাউনলোড হচ্ছে...') 
