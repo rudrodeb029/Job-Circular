@@ -481,24 +481,12 @@ function App() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              textAlign: 'center',
-              color: 'var(--text-primary)',
               padding: '24px',
-              flexDirection: 'column',
               maxWidth: '430px',
               margin: '0 auto'
             }}
           >
-            <ModernOfflineIcon isDark={isDark} size={84} />
-            <h2 style={{
-              margin: '18px 0 0',
-              fontSize: '18px',
-              fontWeight: 700,
-              color: 'var(--text-primary)',
-              letterSpacing: '-0.01em'
-            }}>
-              {state.language === 'en' ? 'No Internet Connection' : 'ইন্টারনেট সংযোগ নেই'}
-            </h2>
+            <ModernOfflineIcon isDark={isDark} size={88} />
           </div>
         )}
 
