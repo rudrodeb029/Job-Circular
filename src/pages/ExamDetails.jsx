@@ -50,7 +50,7 @@ export default function ExamDetails() {
   const { state, dispatch } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalUrl, setModalUrl] = useState('');
-  const [modalType, setModalType] = useState('admit_card');
+  const [modalType, setModalType] = useState('details');
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showFullImage, setShowFullImage] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -191,7 +191,7 @@ export default function ExamDetails() {
   const handleDownloadAdmitCard = () => {
     const link = job.examLink || job.applyLink || 'https://alljobs.teletalk.com.bd';
     setModalUrl(link);
-    setModalType('admit_card');
+    setModalType('details');
     setIsModalOpen(true);
   };
 

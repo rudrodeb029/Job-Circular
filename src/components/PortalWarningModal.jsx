@@ -25,8 +25,10 @@ export default function PortalWarningModal({ isOpen, onClose, url, pageType = 'n
   let buttonLabel = isEn ? 'Apply Now' : 'আবেদন করুন';
   if (pageType === 'result') {
     buttonLabel = isEn ? 'View Result' : 'ফলাফল দেখুন';
-  } else if (pageType === 'admit_card' || pageType === 'exam_date') {
+  } else if (pageType === 'admit_card') {
     buttonLabel = isEn ? 'Admit Card' : 'প্রবেশপত্র';
+  } else if (pageType === 'exam_date' || pageType === 'details') {
+    buttonLabel = isEn ? 'Details' : 'বিস্তারিত';
   }
 
   const copyLink = () => {
