@@ -10,7 +10,23 @@ import StructuredDescriptionCard from '../../components/StructuredDescriptionCar
 import { stripHtmlTags, sanitizeRichHtml, parseTimeAndPeriod } from '../../utils/textUtils';
 
 export default function ManageJobs() {
-  const { state, dispatch } = useAdminContext();
+  const { state, dispatch, refreshData } = useAdminContext();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    try {
+      setIsRefreshing(true);
+      if (refreshData) {
+        await refreshData(true);
+      }
+      showToast('Circulars refreshed from database!');
+    } catch (e) {
+      console.error(e);
+      showToast('Failed to refresh circulars', 'error');
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
   const jobs = state.jobs || [];
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -364,6 +380,9 @@ export default function ManageJobs() {
         type: 'ADD_ACTIVITY', 
         payload: { id: `act_${Date.now()}`, type: 'delete', text: `Deleted circular: ${jobToDelete?.title}`, time: 'Just now' }
       });
+      if (paginatedJobs.length === 1 && currentPage > 1) {
+        setCurrentPage(p => p - 1);
+      }
       showToast('Circular deleted successfully!');
       setShowDeleteConfirm(false);
       setDeletingJobId(null);
@@ -434,6 +453,7 @@ export default function ManageJobs() {
         .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; marginBottom: 8px; }
         .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; borderRadius: 10px; outline: none; transition: border-color 0.2s; }
         .modern-input:focus { border-color: #2563eb; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
       `}</style>
 
       {toast.show && (
@@ -442,7 +462,45 @@ export default function ManageJobs() {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginBottom: '2.5rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '12px', marginBottom: '2.5rem' }}>
+        {!showForm && (
+          <button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 20px',
+              background: '#ffffff',
+              color: '#334155',
+              border: '1.5px solid #e2e8f0',
+              borderRadius: '14px',
+              cursor: isRefreshing ? 'wait' : 'pointer',
+              fontWeight: 700,
+              fontSize: '14px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.03)',
+              transition: 'all 0.2s ease',
+              opacity: isRefreshing ? 0.7 : 1
+            }}
+            title="Reload circulars from server"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              style={{
+                animation: isRefreshing ? 'spin 1s linear infinite' : 'none'
+              }}
+            >
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </button>
+        )}
         <button
           onClick={() => showForm ? handleCloseForm() : handleOpenForm()}
           style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 24px', background: showForm ? '#f1f5f9' : 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: showForm ? '#475569' : 'white', border: 'none', borderRadius: '14px', cursor: 'pointer', fontWeight: 700, boxShadow: showForm ? 'none' : '0 8px 16px rgba(37, 99, 235, 0.2)', transition: 'all 0.2s ease' }}
@@ -1116,7 +1174,38 @@ export default function ManageJobs() {
                   );
                 })}
                 {paginatedJobs.length === 0 && (
-                  <tr><td colSpan="7" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: '15px' }}>No circulars found matching your criteria.</td></tr>
+                  <tr>
+                    <td colSpan="7" style={{ padding: '60px 20px', textAlign: 'center', color: '#64748b' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ fontSize: '32px' }}>📋</div>
+                        <div style={{ fontSize: '15px', fontWeight: 600, color: '#334155' }}>
+                          No circulars found matching your criteria.
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleRefresh}
+                          disabled={isRefreshing}
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            marginTop: '8px',
+                            padding: '10px 20px',
+                            background: '#eff6ff',
+                            color: '#1a56db',
+                            border: '1px solid #bfdbfe',
+                            borderRadius: '10px',
+                            fontWeight: 700,
+                            fontSize: '13px',
+                            cursor: isRefreshing ? 'wait' : 'pointer'
+                          }}
+                        >
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                          {isRefreshing ? 'Reloading...' : 'Reload from Database'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>

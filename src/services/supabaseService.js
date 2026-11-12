@@ -275,6 +275,7 @@ export const syncCoreDataOnStartup = async (force = false) => {
  */
 export const getCollectionCached = async (collectionName, forceServer = false, customTtlMinutes = null) => {
   const cacheKey = `cache_data_${collectionName}`;
+  const timeKey = `cache_time_${collectionName}`;
   const cachedDataStr = localStorage.getItem(cacheKey);
 
   // 1. Parse Cached Data
@@ -287,12 +288,34 @@ export const getCollectionCached = async (collectionName, forceServer = false, c
     }
   }
 
-  // 2. Return local cache instantly if available (0 Network Requests)
-  if (cachedData && Array.isArray(cachedData)) {
+  // 2. Return local cache instantly if available and forceServer is false (0 Network Requests)
+  if (cachedData && Array.isArray(cachedData) && cachedData.length > 0 && !forceServer) {
     return cachedData;
   }
 
-  return [];
+  // 3. Network Fetch Fallback: If cache is empty/missing OR forceServer is true
+  if (navigator.onLine) {
+    try {
+      const data = await getCollection(collectionName, forceServer);
+      if (Array.isArray(data) && data.length > 0) {
+        localStorage.setItem(cacheKey, JSON.stringify(data));
+        localStorage.setItem(timeKey, String(Date.now()));
+        if (collectionName === COLLECTIONS.QUESTIONS) {
+          localStorage.setItem('questions_data', JSON.stringify(data));
+        }
+        _sessionRevalidatedCollections.add(collectionName);
+        return data;
+      } else if (Array.isArray(data) && data.length === 0 && forceServer) {
+        localStorage.setItem(cacheKey, JSON.stringify([]));
+        localStorage.setItem(timeKey, String(Date.now()));
+        return [];
+      }
+    } catch (error) {
+      console.warn(`Network fallback failed for ${collectionName}, returning cache fallback:`, error);
+    }
+  }
+
+  return cachedData || [];
 };
 
 /**
@@ -454,10 +477,25 @@ export const addDocument = async (collectionName, data) => {
       .single();
 
     if (error) throw error;
-    clearCollectionCache(collectionName);
+    
+    const normalized = normalizeDoc(inserted || payload);
+    try {
+      const cacheKey = `cache_data_${collectionName}`;
+      const cachedStr = localStorage.getItem(cacheKey);
+      if (cachedStr) {
+        const items = JSON.parse(cachedStr);
+        if (Array.isArray(items)) {
+          const updated = [normalized, ...items.filter(item => String(item.id) !== String(id))];
+          localStorage.setItem(cacheKey, JSON.stringify(updated));
+          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
+        }
+      }
+    } catch (e) {}
+
+    _sessionRevalidatedCollections.delete(collectionName);
     await triggerKvCacheInvalidation(collectionName);
 
-    return normalizeDoc(inserted || payload);
+    return normalized;
   } catch (error) {
     console.error(`Error adding to ${collectionName}:`, error);
     throw error;
@@ -477,10 +515,26 @@ export const setDocument = async (collectionName, docId, data) => {
       .single();
 
     if (error) throw error;
-    clearCollectionCache(collectionName);
+    
+    const normalized = normalizeDoc(upserted || payload);
+    // Surgically update or prepend document in local cache
+    try {
+      const cacheKey = `cache_data_${collectionName}`;
+      const cachedStr = localStorage.getItem(cacheKey);
+      if (cachedStr) {
+        const items = JSON.parse(cachedStr);
+        if (Array.isArray(items)) {
+          const updated = [normalized, ...items.filter(item => String(item.id) !== String(docId))];
+          localStorage.setItem(cacheKey, JSON.stringify(updated));
+          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
+        }
+      }
+    } catch (e) {}
+
+    _sessionRevalidatedCollections.delete(collectionName);
     await triggerKvCacheInvalidation(collectionName);
 
-    return normalizeDoc(upserted || payload);
+    return normalized;
   } catch (error) {
     console.error(`Error setting ${collectionName}/${docId}:`, error);
     throw error;
@@ -500,10 +554,26 @@ export const updateDocument = async (collectionName, docId, updates) => {
       .single();
 
     if (error) throw error;
-    clearCollectionCache(collectionName);
+    
+    const normalized = normalizeDoc(updated || payload);
+    // Surgically update document in local cache
+    try {
+      const cacheKey = `cache_data_${collectionName}`;
+      const cachedStr = localStorage.getItem(cacheKey);
+      if (cachedStr) {
+        const items = JSON.parse(cachedStr);
+        if (Array.isArray(items)) {
+          const updatedList = items.map(item => String(item.id) === String(docId) ? { ...item, ...normalized } : item);
+          localStorage.setItem(cacheKey, JSON.stringify(updatedList));
+          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
+        }
+      }
+    } catch (e) {}
+
+    _sessionRevalidatedCollections.delete(collectionName);
     await triggerKvCacheInvalidation(collectionName);
 
-    return normalizeDoc(updated || payload);
+    return normalized;
   } catch (error) {
     console.error(`Error updating ${collectionName}/${docId}:`, error);
     throw error;
@@ -521,7 +591,24 @@ export const deleteDocument = async (collectionName, docId) => {
       .eq('id', docId);
 
     if (error) throw error;
-    clearCollectionCache(collectionName);
+    
+    // Surgically remove deleted document from local cache so other items remain intact
+    try {
+      const cacheKey = `cache_data_${collectionName}`;
+      const cachedStr = localStorage.getItem(cacheKey);
+      if (cachedStr) {
+        const items = JSON.parse(cachedStr);
+        if (Array.isArray(items)) {
+          const updated = items.filter(item => String(item.id) !== String(docId));
+          localStorage.setItem(cacheKey, JSON.stringify(updated));
+          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
+        }
+      }
+    } catch (e) {
+      console.warn(`Failed to remove ${docId} from cache ${collectionName}:`, e);
+    }
+
+    _sessionRevalidatedCollections.delete(collectionName);
     await triggerKvCacheInvalidation(collectionName);
 
     return true;

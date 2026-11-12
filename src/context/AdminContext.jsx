@@ -579,7 +579,7 @@ export const AdminProvider = ({ children }) => {
         setLoading(true);
       }
 
-      const [jobsData, notifsData, admitsData, questionsData, liveExamsData, feedPostsData, activitiesData] = await Promise.all([
+      let [jobsData, notifsData, admitsData, questionsData, liveExamsData, feedPostsData, activitiesData] = await Promise.all([
         getCollectionCached(COLLECTIONS.JOBS, forceServer),
         getCollectionCached(COLLECTIONS.NOTIFICATIONS, forceServer),
         getCollectionCached(COLLECTIONS.ADMITS, forceServer),
@@ -588,6 +588,19 @@ export const AdminProvider = ({ children }) => {
         getCollectionCached(COLLECTIONS.FEED_POSTS, forceServer),
         getCollection(COLLECTIONS.ACTIVITIES, forceServer)
       ]);
+
+      // Safety check: if jobsData is unexpectedly empty and we are online, directly query Supabase!
+      if ((!jobsData || jobsData.length === 0) && navigator.onLine) {
+        try {
+          const directJobs = await getCollection(COLLECTIONS.JOBS, true);
+          if (Array.isArray(directJobs) && directJobs.length > 0) {
+            jobsData = directJobs;
+            saveLocalCache(COLLECTIONS.JOBS, directJobs);
+          }
+        } catch (e) {
+          console.warn('Direct jobs fetch error:', e);
+        }
+      }
 
       dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(jobsData) });
       dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(notifsData) });
@@ -660,9 +673,12 @@ export const AdminProvider = ({ children }) => {
       try {
         unsubscribeJobs = onCollectionSnapshot(COLLECTIONS.JOBS, (jobsData) => {
           if (Array.isArray(jobsData) && isMounted) {
-            const sortedJobs = mapWithTimestamps(jobsData).sort(sortByCreatedAt);
-            dispatch({ type: 'SET_JOBS', payload: sortedJobs });
-            saveLocalCache(COLLECTIONS.JOBS, sortedJobs);
+            // Guard: Only replace if fresh jobs exist or if previous state was also near empty
+            if (jobsData.length > 0 || state.jobs.length <= 1) {
+              const sortedJobs = mapWithTimestamps(jobsData).sort(sortByCreatedAt);
+              dispatch({ type: 'SET_JOBS', payload: sortedJobs });
+              saveLocalCache(COLLECTIONS.JOBS, sortedJobs);
+            }
           }
         });
       } catch (e) {
