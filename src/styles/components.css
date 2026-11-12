@@ -553,8 +553,8 @@
   min-width: 0;
 }
 .job-card-title {
-  font-size: 12.5px;
-  font-weight: 700;
+  font-size: 11.5px;
+  font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 2px;
   overflow: hidden;
@@ -2088,13 +2088,18 @@ mark {
 
 /* Job Card Title Category Mark / Icon */
 .job-card-title-icon {
-  font-size: 15px;
+  font-size: 13px;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--card-icon-color, var(--primary));
   transition: color 0.2s ease, filter 0.2s ease;
+}
+
+.job-card-title-icon svg {
+  width: 13px;
+  height: 13px;
 }
 
 [data-theme='dark'] .job-card-title-icon {

@@ -152,7 +152,7 @@ export default function AdmitCardResult() {
 
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span className="job-card-title-icon job-card-title-icon-exam" style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669', '--card-icon-color': '#059669', '--card-icon-color-dark': '#34d399' }}>{displayIcon}</span>
+                        <span className="job-card-title-icon job-card-title-icon-exam" style={{ fontSize: '13px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669', '--card-icon-color': '#059669', '--card-icon-color-dark': '#34d399' }}>{displayIcon}</span>
                         <span>{orgName}</span>
                       </h4>
                       <p className="job-card-org" style={{
@@ -248,7 +248,7 @@ export default function AdmitCardResult() {
 
                   <div className="job-card-content">
                     <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="job-card-title-icon job-card-title-icon-result" style={{ fontSize: '15px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed', '--card-icon-color': '#7c3aed', '--card-icon-color-dark': '#c084fc' }}>{displayIcon}</span>
+                      <span className="job-card-title-icon job-card-title-icon-result" style={{ fontSize: '13px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#7c3aed', '--card-icon-color': '#7c3aed', '--card-icon-color-dark': '#c084fc' }}>{displayIcon}</span>
                       <span>{orgName}</span>
                     </h4>
                     <p className="job-card-org" style={{

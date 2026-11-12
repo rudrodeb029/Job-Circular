@@ -117,7 +117,7 @@ function JobCard({ job, showBookmark = true, showIcon = false, isAppliedView = f
           <span
             className="job-card-title-icon"
             style={{
-              fontSize: '15px',
+              fontSize: '13px',
               flexShrink: 0,
               display: 'inline-flex',
               alignItems: 'center',
