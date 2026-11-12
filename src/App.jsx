@@ -6,6 +6,7 @@ import { StatusBar, Style } from '@capacitor/status-bar'
 import { useAppContext } from './context/AppContext'
 import VersionUpdateModal from './components/VersionUpdateModal'
 import ConnectivityBanner from './components/ConnectivityBanner'
+import ModernOfflineIcon from './components/ModernOfflineIcon'
 import ErrorBoundary from './components/ErrorBoundary'
 import ModernLoader from './components/ModernLoader'
 import { initializePushNotifications } from './utils/notifications'
@@ -451,6 +452,11 @@ function App() {
     });
   }, [location.pathname]);
 
+  const isDark = state.theme === 'dark';
+  const OFFLINE_ALLOWED = ['/saved', '/profile', '/settings', '/about', '/privacy', '/terms', '/edit-profile'];
+  const isOfflineAllowed = OFFLINE_ALLOWED.some(r => location.pathname.startsWith(r));
+  const showOfflineOverlay = isOffline && !isAdminRoute && !isOfflineAllowed;
+
   return (
     <ErrorBoundary>
       <GlobalLoaderProvider>
@@ -459,57 +465,42 @@ function App() {
           data-theme={state.theme}
           data-nav-direction={direction}
         >
-        {!isAdminRoute && <ConnectivityBanner />}
+        {!isAdminRoute && !showOfflineOverlay && <ConnectivityBanner />}
 
-        {/* ═══ Phase 3: Selective Offline Overlay (AdMob Protected) ═══ */}
-        {/* Blocks new content browsing offline but allows cached personal pages */}
-        {isOffline && !isAdminRoute && (() => {
-          const OFFLINE_ALLOWED = ['/saved', '/profile', '/settings', '/about', '/privacy', '/terms', '/edit-profile'];
-          const isAllowed = OFFLINE_ALLOWED.some(r => location.pathname.startsWith(r));
-          if (!isAllowed) {
-            return (
-              <div style={{
-                position:'fixed',top:0,left:0,right:0,
-                bottom:'calc(56px + var(--safe-area-bottom, 0px))',
-                zIndex:99999,
-                background:'var(--bg)',
-                display:'flex',alignItems:'center',justifyContent:'center',
-                textAlign:'center',color:'var(--text-primary)',padding:'24px',
-                flexDirection:'column',maxWidth:'430px',margin:'0 auto'
-              }}>
-                <div style={{
-                  width:'112px',height:'112px',borderRadius:'50%',
-                  background:'linear-gradient(135deg, rgba(26,86,219,0.12) 0%, rgba(59,130,246,0.06) 100%)',
-                  border:'1px solid rgba(26,86,219,0.18)',
-                  display:'flex',alignItems:'center',justifyContent:'center',
-                  marginBottom:'24px'
-                }}>
-                  <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#1a56db" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="2" y1="2" x2="22" y2="22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/>
-                  </svg>
-                </div>
-                <h2 style={{margin:'0 0 8px',fontSize:'19px',fontWeight:700,color:'var(--text-primary)',letterSpacing:0}}>
-                  {state.language === 'en' ? 'No Internet Connection' : 'ইন্টারনেট সংযোগ নেই'}
-                </h2>
-                <p style={{margin:'0 0 22px',color:'var(--text-secondary)',fontSize:'14px',lineHeight:1.7,maxWidth:'290px'}}>
-                  {state.language === 'en'
-                    ? 'An internet connection is required to view new content. Your saved jobs are available from the bottom menu.'
-                    : 'নতুন তথ্য দেখতে ইন্টারনেট সংযোগ প্রয়োজন। সংরক্ষিত চাকরি নিচের মেনু থেকে দেখতে পারবেন।'}
-                </p>
-                <div style={{
-                  display:'inline-flex',alignItems:'center',gap:'8px',
-                  padding:'8px 16px',borderRadius:'999px',
-                  background:'rgba(245,158,11,0.12)',color:'#b45309',
-                  fontSize:'12.5px',fontWeight:600
-                }}>
-                  <span style={{width:'8px',height:'8px',borderRadius:'50%',background:'#f59e0b',animation:'pulse 1.4s ease-in-out infinite'}} />
-                  {state.language === 'en' ? 'Waiting for connection…' : 'সংযোগের অপেক্ষায়…'}
-                </div>
-              </div>
-            );
-          }
-          return null;
-        })()}
+        {/* ═══ Phase 3: Modern Layer-by-Layer Offline Overlay ═══ */}
+        {showOfflineOverlay && (
+          <div 
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 99999,
+              background: isDark ? '#0b0f19' : '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              textAlign: 'center',
+              color: 'var(--text-primary)',
+              padding: '24px',
+              flexDirection: 'column',
+              maxWidth: '430px',
+              margin: '0 auto'
+            }}
+          >
+            <ModernOfflineIcon isDark={isDark} size={84} />
+            <h2 style={{
+              margin: '18px 0 0',
+              fontSize: '18px',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              letterSpacing: '-0.01em'
+            }}>
+              {state.language === 'en' ? 'No Internet Connection' : 'ইন্টারনেট সংযোগ নেই'}
+            </h2>
+          </div>
+        )}
 
         <PageTransition isBack={isBack} locationKey={location.key} pathname={location.pathname}>
           <Routes location={location}>
@@ -550,7 +541,7 @@ function App() {
         </PageTransition>
 
         {/* ═══ Phase 5: Centralized BottomNav — on 5 main tab pages ═══ */}
-        {isTabRoute && (
+        {isTabRoute && !showOfflineOverlay && (
           <BottomNav />
         )}
 
