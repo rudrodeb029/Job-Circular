@@ -58,6 +58,28 @@ async function safeKvPut(kv, key, val, options) {
   }
 }
 
+// Helper: Get answer key for an exam (supports consolidated map and legacy single key)
+async function getExamAnswerKey(env, examId) {
+  if (!examId) return null;
+  const examIdStr = String(examId);
+
+  // 1. Try consolidated map from KV (0 extra KV keys)
+  try {
+    const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null);
+    if (allKeys && allKeys[examIdStr]) {
+      return allKeys[examIdStr];
+    }
+  } catch (e) {}
+
+  // 2. Fallback to legacy single key if exists
+  try {
+    const single = await env.CACHE_KV?.get(`answer_key_${examIdStr}`, 'json').catch(() => null);
+    if (single) return single;
+  } catch (e) {}
+
+  return null;
+}
+
 // ══════════════════════════════════════
 // HMAC-SHA256 VERIFICATION (Phase 2C)
 // Verifies client request signatures with 5-minute replay window
@@ -360,8 +382,8 @@ export default {
           return new Response(JSON.stringify({ error: 'Missing required fields: examId, answers, timeTakenSec' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
         }
 
-        // ১. KV থেকে Answer Key পড়ো
-        const answerKey = await env.CACHE_KV?.get(`answer_key_${examId}`, 'json').catch(() => null);
+        // ১. KV থেকে Answer Key পড়ো (Consolidated map + fallback)
+        const answerKey = await getExamAnswerKey(env, examId);
         if (!answerKey) {
           return new Response(JSON.stringify({ error: 'Exam answer key not found. Please try again.' }), { status: 404, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
         }
@@ -396,8 +418,16 @@ export default {
 
         const rank = rankResult?.rank || 1;
 
-        // ৫. লিডারবোর্ড KV ইনভ্যালিডেট (ব্যাকগ্রাউন্ডে)
-        ctx.waitUntil(env.CACHE_KV?.delete(`leaderboard_${examId}`).catch(() => {}));
+        // ৫. লিডারবোর্ড ক্যাশ ইনভ্যালিডেট (Cache API - ০ KV কোটা খরচ!)
+        ctx.waitUntil((async () => {
+          try {
+            const cache = caches.default;
+            await cache.delete(new Request(`${url.origin}/leaderboard?exam_id=${examId}`));
+            await cache.delete(new Request(`${url.origin}/leaderboard/${examId}`));
+            await cache.delete(new Request(`${url.origin}/leaderboard?exam_id=global`));
+            await cache.delete(new Request(`${url.origin}/leaderboard`));
+          } catch (e) {}
+        })());
 
         console.log(`✅ Exam submit: ${userName} scored ${correct}/${total} (${scaledScore}%) rank #${rank} for exam ${examId}`);
 
@@ -429,7 +459,7 @@ export default {
           return new Response(JSON.stringify({ error: 'Missing exam_id' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
         }
 
-        const answerKey = await env.CACHE_KV?.get(`answer_key_${examId}`, 'json').catch(() => null);
+        const answerKey = await getExamAnswerKey(env, examId);
         if (!answerKey) {
           return new Response(JSON.stringify({ error: 'Solutions not found' }), { status: 404, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
         }
@@ -621,18 +651,20 @@ export default {
         const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null) || {};
         let list = kvData[table] || [];
 
-        // ★ Answer Key Separation: live_exams INSERT/UPDATE হলে answer key আলাদা করে KV-তে সেভ
+        // ★ Answer Key Separation: live_exams INSERT/UPDATE হলে answer key consolidated map-এ সেভ
         let processedRecord = record;
         if (table === 'live_exams' && record && (type === 'INSERT' || type === 'UPDATE')) {
           if (record.questions && Array.isArray(record.questions) && record.questions.length > 0) {
-            // Answer Key আলাদা করে KV-তে সেভ (শুধু Worker পড়তে পারবে)
+            // Consolidated map-এ সেভ (০ অতিরিক্ত KV কি)
             const answerKey = record.questions.map((q, i) => ({
               index: i,
               correctIndex: q.correctIndex,
               explanation: q.explanation || ''
             }));
-            await safeKvPut(env.CACHE_KV, `answer_key_${record.id}`, JSON.stringify(answerKey));
-            console.log(`🔐 Answer key saved for exam ${record.id} (${answerKey.length} questions)`);
+            const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null) || {};
+            allKeys[String(record.id)] = answerKey;
+            await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys));
+            console.log(`🔐 Consolidated answer key saved for exam ${record.id} (${answerKey.length} questions)`);
 
             // Questions থেকে correctIndex মুছে দাও (শিক্ষার্থী দেখতে পারবে না!)
             processedRecord = {
@@ -648,9 +680,13 @@ export default {
         if (type === 'DELETE') {
           const deleteId = old_record?.id || record?.id;
           list = list.filter(item => item.id !== deleteId);
-          // live_exams ডিলিট হলে answer key ও মুছো
+          // live_exams ডিলিট হলে consolidated map থেকেও মুছো
           if (table === 'live_exams' && deleteId) {
-            ctx.waitUntil(env.CACHE_KV?.delete(`answer_key_${deleteId}`).catch(() => {}));
+            const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null) || {};
+            if (allKeys[String(deleteId)]) {
+              delete allKeys[String(deleteId)];
+              ctx.waitUntil(safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys)));
+            }
           }
         } else {
           // INSERT or UPDATE — processedRecord ব্যবহার করো (correctIndex বাদ)
@@ -760,17 +796,20 @@ export default {
         bootstrapPayload[col] = Array.isArray(results[i]) ? results[i] : [];
       });
 
-      // Bootstrap live_exams answer key separation
+      // Bootstrap live_exams answer key separation (Consolidated into EXACTLY 1 KV PUT!)
       if (Array.isArray(bootstrapPayload.live_exams) && bootstrapPayload.live_exams.length) {
+        const answerKeysMap = {};
         for (const exam of bootstrapPayload.live_exams) {
           if (Array.isArray(exam.questions) && exam.questions.length) {
-            const answerKey = exam.questions.map((q, idx) => ({
+            answerKeysMap[String(exam.id)] = exam.questions.map((q, idx) => ({
               index: idx,
               correctIndex: q.correctIndex,
               explanation: q.explanation || ''
             }));
-            await safeKvPut(env.CACHE_KV, `answer_key_${exam.id}`, JSON.stringify(answerKey));
           }
+        }
+        if (Object.keys(answerKeysMap).length > 0) {
+          await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(answerKeysMap));
         }
         bootstrapPayload.live_exams = stripAnswerKeys(bootstrapPayload.live_exams);
       }
@@ -780,8 +819,7 @@ export default {
       
       ctx.waitUntil(Promise.all([
         safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(bootstrapPayload)),
-        safeKvPut(env.CACHE_KV, 'last_sync_timestamp', masterLastUpdated),
-        safeKvPut(env.CACHE_KV, 'last_updated_by', isBypass ? 'admin-bypass-invalidation' : 'bootstrap')
+        safeKvPut(env.CACHE_KV, 'last_sync_timestamp', masterLastUpdated)
       ]));
 
       return new Response(JSON.stringify(bootstrapPayload), {
@@ -812,13 +850,15 @@ export default {
         if (pathExamId) examId = pathExamId;
       }
 
-      const kvKey = `leaderboard_${examId}`;
-      const cachedBoard = await env.CACHE_KV?.get(kvKey, 'json').catch(() => null);
-      if (cachedBoard) {
-        return new Response(JSON.stringify(cachedBoard), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=60', 'X-Edge-Cache': 'KV-HIT', 'X-Supabase-Queries': '0' } });
+      // Check Cloudflare Cache API (FREE & UNLIMITED — ০ KV কোটা খরচ!)
+      const cache = caches.default;
+      const cacheKey = new Request(url.toString(), { method: 'GET' });
+      const cachedResp = await cache.match(cacheKey);
+      if (cachedResp) {
+        return cachedResp;
       }
 
-      // ★ KV miss → D1 থেকে লিডারবোর্ড তৈরি করো (সুপাবেসে ০ রিকোয়েস্ট!)
+      // ★ D1 থেকে লিডারবোর্ড তৈরি করো (সুপাবেসে ০ রিকোয়েস্ট!)
       try {
         const query = examId !== 'global'
           ? `SELECT id, exam_id, user_name, user_photo, score, total, scaled_score, time_taken, time_taken_sec, created_at FROM exam_submissions WHERE exam_id = ? ORDER BY scaled_score DESC, time_taken_sec ASC LIMIT 100`
@@ -841,8 +881,19 @@ export default {
           createdAt: r.created_at
         }));
 
-        ctx.waitUntil(safeKvPut(env.CACHE_KV, kvKey, JSON.stringify(leaderboard), { expirationTtl: 3600 }));
-        return new Response(JSON.stringify(leaderboard), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'X-Edge-Cache': 'D1-CALCULATED', 'X-Supabase-Queries': '0' } });
+        const response = new Response(JSON.stringify(leaderboard), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=120',
+            'X-Edge-Cache': 'D1-CALCULATED',
+            'X-Supabase-Queries': '0'
+          }
+        });
+
+        ctx.waitUntil(cache.put(cacheKey, response.clone()));
+        return response;
       } catch (d1Err) {
         console.error('D1 leaderboard error, falling back to Supabase:', d1Err);
         // D1 ফেইল হলে সুপাবেস ফলব্যাক
@@ -850,8 +901,17 @@ export default {
           ? `${SUPABASE_ORIGIN}/rest/v1/activities?select=*&type=eq.live_exam_submission&examId=eq.${examId}&order=score.desc,timeTakenSec.asc&limit=100`
           : `${SUPABASE_ORIGIN}/rest/v1/activities?select=*&type=eq.live_exam_submission&order=score.desc,timeTakenSec.asc&limit=100`;
         const lbData = await fetch(lbTarget, { headers: originHeaders }).then(r => r.ok ? r.json() : []).catch(() => []);
-        ctx.waitUntil(safeKvPut(env.CACHE_KV, kvKey, JSON.stringify(lbData), { expirationTtl: 3600 }));
-        return new Response(JSON.stringify(lbData), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'X-Edge-Cache': 'SUPABASE-FALLBACK' } });
+        const fallbackResp = new Response(JSON.stringify(lbData), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=30, s-maxage=60',
+            'X-Edge-Cache': 'SUPABASE-FALLBACK'
+          }
+        });
+        ctx.waitUntil(cache.put(cacheKey, fallbackResp.clone()));
+        return fallbackResp;
       }
     }
 
@@ -913,7 +973,7 @@ export default {
           if (request.method === 'DELETE') {
             const idMatch = url.search.match(/id=eq\.([^&]+)/);
             const deletedId = idMatch ? decodeURIComponent(idMatch[1]) : null;
-            if (targetTable && deletedId && env.CACHE_KV) {
+            if (targetTable && deletedId && CORE_COLLECTIONS.includes(targetTable) && env.CACHE_KV) {
               const kvData = await env.CACHE_KV.get('sync_all_data', 'json').catch(() => null);
               if (kvData && Array.isArray(kvData[targetTable])) {
                 kvData[targetTable] = kvData[targetTable].filter(item => String(item.id) !== String(deletedId));
@@ -921,18 +981,15 @@ export default {
                 kvData.masterLastUpdated = newTimestamp;
                 await Promise.all([
                   safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(kvData)),
-                  safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
-                  safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-delete-action')
+                  safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp)
                 ]);
                 console.log(`🗑️ KV Sync: Removed deleted record "${deletedId}" from table "${targetTable}".`);
               }
             }
-          } else if (['POST', 'PATCH', 'PUT'].includes(request.method)) {
+          } else if (['POST', 'PATCH', 'PUT'].includes(request.method) && CORE_COLLECTIONS.includes(targetTable) && isAdminClient) {
+            // ONLY core tables edited by Admin should touch sync timestamps! (০ KV waste on user activity/points)
             const newTimestamp = new Date().toISOString();
-            await Promise.all([
-              safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
-              safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-write-action')
-            ]);
+            await safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp);
           }
         } catch (e) {
           console.error('Failed to sync KV on REST write/delete:', e);
@@ -1231,15 +1288,20 @@ export default {
       const newIds = new Set(newRows.map(r => r.id));
       existingData[col] = [...newRows, ...existing.filter(r => !newIds.has(r.id))];
 
-      // ★ live_exams sync-এও answer key strip করো
+      // ★ live_exams sync-এও answer key consolidated map-এ রাখো
       if (col === 'live_exams') {
+        const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null) || {};
+        let keysChanged = false;
         for (const exam of newRows) {
           if (exam.questions?.length) {
-            const answerKey = exam.questions.map((q, idx) => ({
+            allKeys[String(exam.id)] = exam.questions.map((q, idx) => ({
               index: idx, correctIndex: q.correctIndex, explanation: q.explanation || ''
             }));
-            await safeKvPut(env.CACHE_KV, `answer_key_${exam.id}`, JSON.stringify(answerKey));
+            keysChanged = true;
           }
+        }
+        if (keysChanged) {
+          await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys));
         }
         existingData[col] = stripAnswerKeys(existingData[col]);
       }
@@ -1250,8 +1312,7 @@ export default {
 
     await Promise.all([
       safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(existingData)),
-      safeKvPut(env.CACHE_KV, 'last_sync_timestamp', row.last_updated),
-      safeKvPut(env.CACHE_KV, 'last_updated_by', row.updated_by || 'system')
+      safeKvPut(env.CACHE_KV, 'last_sync_timestamp', row.last_updated)
     ]).catch(e => console.error('KV put error:', e));
 
     console.log('Cron: Incremental sync complete!');
@@ -1266,40 +1327,49 @@ export default {
 
     // ══════════════════════════════════════
     // Phase 4: DEADLINE REMINDER — 2 days before job deadline
-    // Sends OneSignal push to all users when a job's deadline is ~2 days away
+    // Uses D1 for sent notification tracking (০ KV কোটা খরচ!)
     // ══════════════════════════════════════
     try {
+      await env.EXAM_DB.prepare(
+        'CREATE TABLE IF NOT EXISTS sent_notifications (id TEXT PRIMARY KEY, type TEXT, sent_at TEXT)'
+      ).run().catch(() => {});
+
       const cached = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
       if (cached?.jobs?.length) {
         const now = new Date();
-        const today = now.toISOString().slice(0, 10);
-        const sentKey = `deadline_sent_${today}`;
-        const alreadySent = JSON.parse(await env.CACHE_KV?.get(sentKey) || '[]');
 
         for (const job of cached.jobs) {
           const deadlineStr = job.deadline;
-          if (!deadlineStr || alreadySent.includes(job.id)) continue;
+          if (!deadlineStr) continue;
 
-          // Parse deadline (format: YYYY-MM-DD)
-          const deadline = new Date(`${deadlineStr}T23:59:59`);
+          // Check if already sent in D1
+          const sentRow = await env.EXAM_DB.prepare(
+            'SELECT id FROM sent_notifications WHERE id = ?'
+          ).bind(`deadline_${job.id}`).first().catch(() => null);
+          if (sentRow) continue;
+
+          // Parse deadline (format: YYYY-MM-DD or DD/MM/YYYY)
+          let deadline = new Date(`${deadlineStr}T23:59:59`);
+          if (isNaN(deadline.getTime())) {
+            const dmy = deadlineStr.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+            if (dmy) deadline = new Date(parseInt(dmy[3]), parseInt(dmy[2]) - 1, parseInt(dmy[1]), 23, 59, 59);
+          }
           if (isNaN(deadline.getTime())) continue;
 
           const hoursLeft = (deadline - now) / (1000 * 60 * 60);
 
-          // Send if deadline is 44-52 hours away (≈2 days, window covers both cron runs)
+          // Send if deadline is 44-52 hours away (≈2 days)
           if (hoursLeft >= 44 && hoursLeft <= 52) {
             await sendWorkerPush(env, {
               title: '⏰ আবেদনের সময়সীমা শেষ হচ্ছে!',
               message: `"${job.title || job.titleEn || 'Job Circular'}" এর আবেদনের শেষ তারিখ আর মাত্র ২ দিন বাকি। এখনই আবেদন করুন!`,
               data: { jobId: job.id, type: 'deadline' }
             });
-            alreadySent.push(job.id);
+            await env.EXAM_DB.prepare(
+              'INSERT OR REPLACE INTO sent_notifications (id, type, sent_at) VALUES (?, ?, ?)'
+            ).bind(`deadline_${job.id}`, 'deadline', now.toISOString()).run().catch(() => {});
             console.log(`📬 Deadline reminder sent for job: ${job.id}`);
           }
-        }
-
-        if (alreadySent.length > 0) {
-          await safeKvPut(env.CACHE_KV, sentKey, JSON.stringify(alreadySent), { expirationTtl: 259200 });
         }
       }
     } catch (e) { console.error('Deadline reminder check failed:', e); }

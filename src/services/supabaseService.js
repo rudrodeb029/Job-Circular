@@ -406,29 +406,37 @@ const sanitizePayload = (collectionName, docId, data) => {
   return sanitized;
 };
 
-const triggerKvCacheInvalidation = async (collectionName = '') => {
+let kvDebounceTimer = null;
+const triggerKvCacheInvalidation = (collectionName = '') => {
   // Skip KV invalidation for user-specific non-core tables (users, activities)
   if (collectionName === COLLECTIONS.USERS || collectionName === COLLECTIONS.ACTIVITIES) return;
 
-  console.log('⚡ Admin change detected: Invalidating & refreshing Cloudflare KV cache...');
-  const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
-  try {
-    const res = await fetch(`${proxyUrl}/sync-all?cache=bypass&t=${Date.now()}`, {
-      headers: {
-        'apikey': SUPABASE_CONFIG.anonKey,
-        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
-        'X-App-Client': 'live-circular-admin',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache'
-      },
-      cache: 'no-store'
-    });
-    if (res.ok) {
-      console.log('⚡ Cloudflare KV cache successfully updated in realtime!');
-    }
-  } catch (err) {
-    console.warn('Failed to invalidate Cloudflare KV cache:', err);
+  if (kvDebounceTimer) {
+    clearTimeout(kvDebounceTimer);
   }
+
+  kvDebounceTimer = setTimeout(async () => {
+    kvDebounceTimer = null;
+    console.log('⚡ Admin change detected: Debounced invalidating & refreshing Cloudflare KV cache...');
+    const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
+    try {
+      const res = await fetch(`${proxyUrl}/sync-all?cache=bypass&t=${Date.now()}`, {
+        headers: {
+          'apikey': SUPABASE_CONFIG.anonKey,
+          'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+          'X-App-Client': 'live-circular-admin',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        },
+        cache: 'no-store'
+      });
+      if (res.ok) {
+        console.log('⚡ Cloudflare KV cache successfully updated in realtime!');
+      }
+    } catch (err) {
+      console.warn('Failed to invalidate Cloudflare KV cache:', err);
+    }
+  }, 2500); // 2.5s debounce: batches multiple rapid admin actions into exactly 1 sync!
 };
 
 /**

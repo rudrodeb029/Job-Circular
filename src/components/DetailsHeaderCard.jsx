@@ -104,17 +104,44 @@ const parseTargetTimestamp = (dateStr, timeStr) => {
   const clean = bengaliToEnglishDigits(dateStr).trim();
 
   let targetDate = null;
-  const isoMatch = clean.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+
+  // 1. Try ISO: YYYY-MM-DD or YYYY/MM/DD
+  const isoMatch = clean.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
   if (isoMatch) {
     const y = parseInt(isoMatch[1], 10);
     const m = parseInt(isoMatch[2], 10) - 1;
     const d = parseInt(isoMatch[3], 10);
     targetDate = new Date(y, m, d);
   } else {
-    // Check for month names in string
+    // 2. Try DD-MM-YYYY or DD/MM/YYYY or DD.MM.YYYY (e.g. 14/11/2026 or ১৪/১১/২০২৬)
+    const dmyMatch = clean.match(/^(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})$/);
+    if (dmyMatch) {
+      let p1 = parseInt(dmyMatch[1], 10);
+      let p2 = parseInt(dmyMatch[2], 10);
+      const y = parseInt(dmyMatch[3], 10);
+      let d, m;
+      if (p1 > 12) {
+        // First part > 12 -> must be Day
+        d = p1;
+        m = p2 - 1;
+      } else if (p2 > 12) {
+        // Second part > 12 -> must be Day
+        m = p1 - 1;
+        d = p2;
+      } else {
+        // Bangladesh standard format is DD/MM/YYYY
+        d = p1;
+        m = p2 - 1;
+      }
+      targetDate = new Date(y, m, d);
+    }
+  }
+
+  // 3. Check for month names in string (e.g. '১৪ নভেম্বর ২০২৬')
+  if (!targetDate) {
     for (let i = 0; i < bengaliMonths.length; i++) {
       if (dateStr.includes(bengaliMonths[i])) {
-        const parts = clean.split(/\s+/).filter(p => !isNaN(p));
+        const parts = clean.split(/[\s,/-]+/).filter(p => !isNaN(p) && p.length > 0);
         if (parts.length >= 2) {
           const d = parseInt(parts[0], 10);
           const y = parseInt(parts[1], 10) || new Date().getFullYear();
@@ -123,10 +150,12 @@ const parseTargetTimestamp = (dateStr, timeStr) => {
         }
       }
     }
-    if (!targetDate) {
-      const parsed = Date.parse(clean);
-      if (!isNaN(parsed)) targetDate = new Date(parsed);
-    }
+  }
+
+  // 4. Standard Date.parse fallback
+  if (!targetDate) {
+    const parsed = Date.parse(clean);
+    if (!isNaN(parsed)) targetDate = new Date(parsed);
   }
 
   if (!targetDate || isNaN(targetDate.getTime())) return null;
@@ -137,17 +166,18 @@ const parseTargetTimestamp = (dateStr, timeStr) => {
   let secs = 59;
 
   if (timeStr) {
-    const cleanTime = bengaliToEnglishDigits(timeStr);
-    const match = cleanTime.match(/(\d{1,2}):(\d{2})/);
+    const cleanTime = bengaliToEnglishDigits(timeStr).trim();
+    const match = cleanTime.match(/(\d{1,2})(?:[:.](\d{1,2}))?/);
     if (match) {
       hours = parseInt(match[1], 10);
-      mins = parseInt(match[2], 10);
+      mins = match[2] ? parseInt(match[2], 10) : 0;
+      secs = 0;
       if (/pm|রাত|বিকাল|সন্ধ্যা|দুপুর/i.test(timeStr) && hours < 12) hours += 12;
       if (/am|সকাল|ভোর/i.test(timeStr) && hours === 12) hours = 0;
     }
   }
 
-  targetDate.setHours(hours, mins, secs, 999);
+  targetDate.setHours(hours, mins, secs, 0);
   return targetDate.getTime();
 };
 
