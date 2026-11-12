@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Bookmark, BookmarkCheck, Calendar, Briefcase, Download, Eye } from '../components/Icons';
+import { ArrowLeft, Bookmark, BookmarkCheck, Calendar, Briefcase, Download, Eye, FileText } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { jobs } from '../data/jobs';
@@ -334,7 +334,7 @@ export default function ExamDetails() {
                     {state.language === 'en' ? 'Preview Not Available' : 'প্রিভিউ দেখা যাচ্ছে না?'}
                   </span>
                   <span style={{ fontSize: '11.5px', color: 'var(--text-muted)', fontWeight: 600 }}>
-                    {state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
+                    {state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'বিস্তারিত বা নোটিশ দেখতে নিচের বাটনে চাপ দিন! 👇'}
                   </span>
                 </div>
               </div>
@@ -343,7 +343,7 @@ export default function ExamDetails() {
                 src={circularImages[activeImageIndex]}
                 alt={`Exam Notice Page ${activeImageIndex + 1}`}
                 onClick={() => setShowFullImage(!showFullImage)}
-                fallbackTitle={state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'প্রবেশপত্র বা নোটিশ ডাউনলোড করতে নিচের বাটনে চাপ দিন! 👇'}
+                fallbackTitle={state.language === 'en' ? 'Please click the button below to view or download! 👇' : 'বিস্তারিত বা নোটিশ দেখতে নিচের বাটনে চাপ দিন! 👇'}
                 downloadUrl={rawImagesList[activeImageIndex] || circularImages[activeImageIndex]}
                 objectFit="contain"
                 style={{
@@ -491,8 +491,8 @@ export default function ExamDetails() {
                 whiteSpace: 'nowrap'
               }}
             >
-              <Download size={14} color="#ffffff" />
-              {state.language === 'en' ? 'Admit Card' : 'প্রবেশপত্র'}
+              <FileText size={14} color="#ffffff" />
+              {state.language === 'en' ? 'Details' : 'বিস্তারিত'}
             </button>
           </div>
         </div>
