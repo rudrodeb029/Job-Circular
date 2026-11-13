@@ -27,16 +27,17 @@ export default function ClayDisclaimerCard({ style = {} }) {
       className="clay-disclaimer-card"
       style={{
         position: 'relative',
-        borderRadius: '8px',
+        borderRadius: '12px',
         background: isDark
-          ? 'linear-gradient(145deg, #1e293b 0%, #131d2e 100%)'
-          : 'linear-gradient(145deg, #ffffff 0%, #f4f7fb 100%)',
+          ? 'var(--card-bg, #1e293b)'
+          : '#ffffff',
         border: isDark
           ? '1px solid rgba(255, 255, 255, 0.08)'
-          : '1.5px solid rgba(255, 255, 255, 0.95)',
+          : '1px solid #e2e8f0',
         boxShadow: isDark
-          ? '0 8px 20px -4px rgba(0, 0, 0, 0.5), 0 3px 6px -2px rgba(0, 0, 0, 0.3), inset 0 1.5px 2px rgba(255, 255, 255, 0.1), inset 0 -2px 4px rgba(0, 0, 0, 0.5)'
-          : '0 8px 20px -4px rgba(30, 64, 175, 0.07), 0 3px 6px -2px rgba(15, 23, 42, 0.03), inset 0 2px 4px rgba(255, 255, 255, 0.95), inset 0 -2px 4px rgba(30, 64, 175, 0.04)',
+          ? '0 1px 3px rgba(0, 0, 0, 0.2)'
+          : '0 1px 3px rgba(0, 0, 0, 0.04)',
+        contain: 'content',
         padding: '13px 15px',
         marginBottom: 'var(--space-lg, 16px)',
         overflow: 'hidden',
@@ -47,16 +48,14 @@ export default function ClayDisclaimerCard({ style = {} }) {
       {/* Disclaimer Notice Text (Tactile Clay Inset Box) */}
       <div
         style={{
-          borderRadius: '12px',
+          borderRadius: '10px',
           background: isDark
-            ? 'linear-gradient(145deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%)'
-            : 'linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%)',
+            ? 'rgba(245, 158, 11, 0.12)'
+            : '#fffbeb',
           border: isDark
-            ? '1px solid rgba(245, 158, 11, 0.2)'
-            : '1px solid rgba(251, 191, 36, 0.45)',
-          boxShadow: isDark
-            ? 'inset 0 1px 2px rgba(255, 255, 255, 0.05), inset 0 -1.5px 2px rgba(0, 0, 0, 0.3)'
-            : '0 2px 6px rgba(245, 158, 11, 0.06), inset 0 1.5px 2px #ffffff, inset 0 -1px 2px rgba(217, 119, 6, 0.1)',
+            ? '1px solid rgba(245, 158, 11, 0.25)'
+            : '1px solid #fef3c7',
+          boxShadow: 'none',
           padding: '10px 12px',
           marginBottom: '9px'
         }}
@@ -129,16 +128,14 @@ export default function ClayDisclaimerCard({ style = {} }) {
           justifyContent: 'center',
           gap: '6px',
           padding: '6px 10px',
-          borderRadius: '12px',
+          borderRadius: '8px',
           background: isDark
-            ? 'linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.6) 100%)'
-            : 'linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%)',
+            ? 'rgba(51, 65, 85, 0.35)'
+            : '#f8fafc',
           border: isDark
-            ? '1px solid rgba(255, 255, 255, 0.06)'
-            : '1px solid rgba(226, 232, 240, 0.9)',
-          boxShadow: isDark
-            ? '0 2px 4px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.05)'
-            : '0 2px 4px rgba(0, 0, 0, 0.02), inset 0 1px 1px #ffffff',
+            ? '1px solid rgba(255, 255, 255, 0.08)'
+            : '1px solid #e2e8f0',
+          boxShadow: 'none',
           color: isDark ? '#cbd5e1' : '#475569',
           fontSize: '10px',
           fontWeight: 700,
