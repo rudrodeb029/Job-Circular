@@ -1066,21 +1066,17 @@ export default function LiveExamRoom() {
           </div>
         )}
         
-        {/* Result Header Panel - Tactile Claymorphism Style */}
+        {/* Result Header Panel */}
         {currentResult && activeRoomTab === 'solutions' && (
           <div style={{
-            background: isDark
-              ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-              : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+            background: isDark ? 'var(--card-bg, #1e293b)' : '#ffffff',
             border: isDark
               ? '1px solid rgba(255, 255, 255, 0.1)'
-              : (isDidNotAttend ? '1.2px solid rgba(255, 255, 255, 0.95)' : '1.5px solid rgba(37, 99, 235, 0.25)'),
+              : '1px solid #e2e8f0',
             borderRadius: '14px',
-            padding: '12px 14px',
-            marginBottom: '12px',
-            boxShadow: isDark
-              ? '0 8px 24px -3px rgba(0, 0, 0, 0.6), inset 0 1.5px 2px rgba(255, 255, 255, 0.08)'
-              : '0 8px 24px -3px rgba(30, 64, 175, 0.08), 0 3px 6px -1px rgba(15, 23, 42, 0.04), inset 0 2.5px 3.5px #ffffff, inset 0 -2.5px 3.5px rgba(30, 64, 175, 0.05)',
+            padding: '16px 18px',
+            marginBottom: '14px',
+            boxShadow: isDark ? '0 1px 3px rgba(0, 0, 0, 0.2)' : '0 1px 3px rgba(0, 0, 0, 0.04)',
             textAlign: 'center'
           }}>
             <span style={{ fontSize: '24px', display: 'block', marginBottom: '2px' }}>
@@ -1091,7 +1087,7 @@ export default function LiveExamRoom() {
                 ? (isEn ? 'Did Not Participate' : 'অংশগ্রহণ করেননি')
                 : (isEn ? 'Exam Results' : 'পরীক্ষার ফলাফল')}
             </h2>
-            <p style={{ fontSize: '11.5px', color: isDark ? '#94a3b8' : 'var(--text-secondary)', marginBottom: '8px', lineHeight: 1.35 }}>
+            <p style={{ fontSize: '11.5px', color: isDark ? '#94a3b8' : 'var(--text-secondary)', marginBottom: '12px', lineHeight: 1.35 }}>
               {isDidNotAttend
                 ? (isEn 
                     ? 'You did not participate in this live exam. However, you can review all correct answers and detailed solutions below.' 
@@ -1108,21 +1104,16 @@ export default function LiveExamRoom() {
               padding: '0'
             }}>
               <div style={{
-                background: isDark
-                  ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-                  : 'linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%)',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(255, 255, 255, 0.95)',
+                background: isDark ? 'rgba(51, 65, 85, 0.35)' : '#f8fafc',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
                 borderRadius: '8px',
-                padding: '5px 8px',
-                boxShadow: isDark
-                  ? '0 2px 6px -1px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.06)'
-                  : '0 2px 6px -1px rgba(0,0,0,0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0,0,0,0.04)',
+                padding: '6px 10px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <span style={{ fontSize: '10.5px', color: isDark ? '#94a3b8' : 'var(--text-muted)', display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
+                <span style={{ fontSize: '10.5px', color: isDark ? '#94a3b8' : 'var(--text-muted)', display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '2px' }}>
                   {isEn ? 'Total Questions' : 'মোট প্রশ্ন'}
                 </span>
                 <strong style={{ fontSize: '15px', color: isDark ? '#f8fafc' : 'var(--text-primary)', fontWeight: 800, lineHeight: 1.1 }}>
@@ -1131,24 +1122,19 @@ export default function LiveExamRoom() {
               </div>
               <div style={{
                 background: isDidNotAttend 
-                  ? (isDark ? 'rgba(239, 68, 68, 0.18)' : 'linear-gradient(145deg, #fff5f5 0%, #fee2e2 100%)')
-                  : (isDark ? 'rgba(16, 185, 129, 0.18)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)'),
+                  ? (isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2')
+                  : (isDark ? 'rgba(16, 185, 129, 0.15)' : '#f0fdf4'),
                 border: isDidNotAttend 
-                  ? (isDark ? '1px solid rgba(239, 68, 68, 0.35)' : '1.2px solid rgba(254, 202, 202, 0.7)')
-                  : (isDark ? '1px solid rgba(16, 185, 129, 0.35)' : '1.2px solid rgba(187, 247, 208, 0.8)'),
+                  ? (isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid #fca5a5')
+                  : (isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid #86efac'),
                 borderRadius: '8px',
-                padding: '5px 8px',
-                boxShadow: isDark
-                  ? '0 2px 6px -1px rgba(0, 0, 0, 0.3)'
-                  : (isDidNotAttend 
-                      ? '0 2px 6px -1px rgba(239, 68, 68, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.08)'
-                      : '0 2px 6px -1px rgba(34, 197, 94, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.08)'),
+                padding: '6px 10px',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <span style={{ fontSize: '10.5px', color: isDidNotAttend ? (isDark ? '#fca5a5' : '#991b1b') : (isDark ? '#86efac' : '#166534'), display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '1px' }}>
+                <span style={{ fontSize: '10.5px', color: isDidNotAttend ? (isDark ? '#fca5a5' : '#991b1b') : (isDark ? '#86efac' : '#166534'), display: 'block', fontWeight: 600, lineHeight: 1.2, marginBottom: '2px' }}>
                   {isDidNotAttend ? (isEn ? 'Status' : 'অবস্থা') : (isEn ? 'Your Score' : 'প্রাপ্ত নম্বর')}
                 </span>
                 <strong style={{ fontSize: isDidNotAttend ? '12px' : '15px', color: isDidNotAttend ? (isDark ? '#f87171' : '#ef4444') : (isDark ? '#34d399' : 'var(--success)'), fontWeight: 800, lineHeight: 1.1 }}>
@@ -1528,23 +1514,19 @@ const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
   return (
     <div
       style={{
-        background: isDark
-          ? 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)'
-          : 'linear-gradient(145deg, #ffffff 0%, #f8faff 100%)',
+        background: isDark ? 'var(--card-bg, #1e293b)' : '#ffffff',
         border: isDark
           ? '1px solid rgba(255, 255, 255, 0.08)'
-          : '1.2px solid rgba(255, 255, 255, 0.95)',
+          : '1px solid #e2e8f0',
         borderRadius: '12px',
         padding: '14px 16px',
-        contain: 'layout style',
-        boxShadow: isDark
-          ? '0 6px 18px -2px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.06)'
-          : '0 6px 18px -2px rgba(30, 64, 175, 0.06), 0 2px 5px -1px rgba(15, 23, 42, 0.03), inset 0 2px 3px #ffffff, inset 0 -2px 3px rgba(30, 64, 175, 0.03)'
+        contain: 'content',
+        boxShadow: isDark ? '0 1px 3px rgba(0, 0, 0, 0.2)' : '0 1px 3px rgba(0, 0, 0, 0.04)'
       }}
     >
       {/* Question Text */}
       <h4 style={{
-        fontSize: '12.5px',
+        fontSize: '13px',
         fontWeight: 600,
         color: isDark ? '#f1f5f9' : 'var(--text-secondary)',
         marginBottom: '10px',
@@ -1564,35 +1546,26 @@ const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
           const optionPrefixes = isEn ? ['A', 'B', 'C', 'D'] : ['ক', 'খ', 'গ', 'ঘ'];
           const prefix = optionPrefixes[oIndex];
 
-          let bg = isDark
-            ? 'rgba(30, 41, 59, 0.7)'
-            : 'linear-gradient(145deg, #ffffff 0%, #f3f6fa 100%)';
+          let bg = isDark ? 'rgba(51, 65, 85, 0.35)' : '#f8fafc';
           let color = isDark ? '#e2e8f0' : 'var(--text-primary)';
-          let border = isDark
-            ? '1px solid rgba(255, 255, 255, 0.08)'
-            : '1.2px solid rgba(255, 255, 255, 0.95)';
-          let boxShadow = isDark
-            ? '0 2px 4px rgba(0, 0, 0, 0.2)'
-            : '0 2px 6px -1px rgba(0, 0, 0, 0.04), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(0, 0, 0, 0.03)';
+          let border = isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #e2e8f0';
           let trailingIcon = null;
 
           // Styling based on state
           if (hasResult) {
             if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
-              bg = isDark ? 'rgba(16, 185, 129, 0.2)' : 'linear-gradient(145deg, #f0fdf4 0%, #dcfce7 100%)';
-              color = isDark ? '#34d399' : '#065f46';
-              border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1.2px solid rgba(134, 239, 172, 0.8)';
-              boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(22, 163, 74, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(34, 197, 94, 0.1)';
+              bg = isDark ? 'rgba(16, 185, 129, 0.15)' : '#f0fdf4';
+              color = isDark ? '#34d399' : '#15803d';
+              border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #86efac';
               trailingIcon = (
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#34d399" : "#059669"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               );
             } else if (oIndex === chosenIndex) {
-              bg = isDark ? 'rgba(239, 68, 68, 0.2)' : 'linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)';
-              color = isDark ? '#f87171' : '#991b1b';
-              border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1.2px solid rgba(252, 165, 165, 0.8)';
-              boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(220, 38, 38, 0.12), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(239, 68, 68, 0.1)';
+              bg = isDark ? 'rgba(239, 68, 68, 0.15)' : '#fef2f2';
+              color = isDark ? '#f87171' : '#b91c1c';
+              border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid #fca5a5';
               trailingIcon = (
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#f87171" : "#dc2626"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <line x1="18" y1="6" x2="6" y2="18" />
@@ -1602,10 +1575,9 @@ const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
             }
           } else {
             if (oIndex === chosenIndex) {
-              bg = isDark ? 'rgba(37, 99, 235, 0.25)' : 'linear-gradient(145deg, #eff6ff 0%, #dbeafe 100%)';
+              bg = isDark ? 'rgba(37, 99, 235, 0.15)' : '#eff6ff';
               color = isDark ? '#60a5fa' : 'var(--primary)';
-              border = isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1.2px solid rgba(147, 197, 253, 0.9)';
-              boxShadow = isDark ? '0 3px 8px -1px rgba(0, 0, 0, 0.3)' : '0 3px 8px -1px rgba(37, 99, 235, 0.14), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(37, 99, 235, 0.1)';
+              border = isDark ? '1px solid rgba(96, 165, 250, 0.4)' : '1px solid #93c5fd';
               trailingIcon = (
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#60a5fa" : "var(--primary)"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <polyline points="20 6 9 17 4 12" />
@@ -1622,30 +1594,28 @@ const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
                 display: 'flex',
                 alignItems: 'center',
                 padding: '8px 11px',
-                borderRadius: '10px',
+                borderRadius: '8px',
                 background: bg,
                 color: color === 'var(--text-primary)' ? 'var(--text-secondary)' : color,
                 border: border,
-                boxShadow: boxShadow,
                 cursor: !hasResult ? 'pointer' : 'default',
                 fontSize: '12px',
                 fontWeight: 500,
-                transition: 'all 0.2s ease',
+                transition: 'background-color 0.15s ease, border-color 0.15s ease',
                 gap: '8px'
               }}
             >
               <span style={{
                 width: '22px',
                 height: '22px',
-                borderRadius: '7px',
-                background: isDark ? 'rgba(15, 23, 42, 0.8)' : 'linear-gradient(145deg, #ffffff 0%, #edf2f7 100%)',
-                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(255, 255, 255, 0.95)',
-                boxShadow: isDark ? '0 1.5px 4px rgba(0,0,0,0.3)' : '0 1.5px 4px rgba(0,0,0,0.04), inset 0 1px 1px #ffffff, inset 0 -1px 1px rgba(0,0,0,0.04)',
+                borderRadius: '6px',
+                background: isDark ? 'rgba(15, 23, 42, 0.6)' : '#ffffff',
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #cbd5e1',
                 color: isDark ? '#e2e8f0' : 'inherit',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '10px',
+                fontSize: '10.5px',
                 fontWeight: 700,
                 flexShrink: 0
               }}>
@@ -1663,15 +1633,12 @@ const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
         <div style={{
           marginTop: '10px',
           padding: '12px 14px',
-          borderRadius: '12px',
+          borderRadius: '10px',
           background: isDark
-            ? 'rgba(30, 41, 59, 0.7)'
-            : 'linear-gradient(145deg, #eff6ff 0%, #e0edff 100%)',
-          border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1.2px solid rgba(191, 219, 254, 0.8)',
-          borderLeft: isDark ? '4px solid #60a5fa' : '4px solid var(--primary)',
-          boxShadow: isDark
-            ? '0 4px 12px -2px rgba(0, 0, 0, 0.3)'
-            : '0 4px 12px -2px rgba(26, 86, 219, 0.08), inset 0 1.5px 2px #ffffff, inset 0 -1.5px 2px rgba(26, 86, 219, 0.05)'
+            ? 'rgba(30, 41, 59, 0.5)'
+            : '#eff6ff',
+          border: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #bfdbfe',
+          borderLeft: isDark ? '4px solid #3b82f6' : '4px solid var(--primary)'
         }}>
           <h5 style={{ fontSize: '12px', fontWeight: 800, color: isDark ? '#60a5fa' : 'var(--primary)', marginBottom: '4px' }}>
             💡 {isEn ? 'Explanation' : 'ব্যাখ্যা ও বিশ্লেষণ'}
