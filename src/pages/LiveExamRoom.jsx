@@ -1124,9 +1124,7 @@ export default function LiveExamRoom() {
                 background: isDidNotAttend 
                   ? (isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2')
                   : (isDark ? 'rgba(16, 185, 129, 0.15)' : '#f0fdf4'),
-                border: isDidNotAttend 
-                  ? (isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid #fca5a5')
-                  : (isDark ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid #86efac'),
+                border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
                 borderRadius: '8px',
                 padding: '6px 10px',
                 display: 'flex',
@@ -1556,7 +1554,7 @@ const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
             if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
               bg = isDark ? 'rgba(16, 185, 129, 0.15)' : '#f0fdf4';
               color = isDark ? '#34d399' : '#15803d';
-              border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #86efac';
+              // clean subtle border retained
               trailingIcon = (
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#34d399" : "#059669"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <polyline points="20 6 9 17 4 12" />
@@ -1565,7 +1563,7 @@ const LiveExamQuestionItemCard = React.memo(function LiveExamQuestionItemCard({
             } else if (oIndex === chosenIndex) {
               bg = isDark ? 'rgba(239, 68, 68, 0.15)' : '#fef2f2';
               color = isDark ? '#f87171' : '#b91c1c';
-              border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid #fca5a5';
+              // clean subtle border retained
               trailingIcon = (
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={isDark ? "#f87171" : "#dc2626"} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
                   <line x1="18" y1="6" x2="6" y2="18" />

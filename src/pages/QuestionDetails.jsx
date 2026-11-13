@@ -336,7 +336,7 @@ export default function QuestionDetails() {
                   width: '100%',
                   padding: '8px',
                   borderRadius: '8px',
-                  border: isDark ? '1px solid rgba(239, 68, 68, 0.3)' : '1px solid #fca5a5',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #e2e8f0',
                   background: isDark ? 'rgba(239, 68, 68, 0.12)' : '#fee2e2',
                   color: isDark ? '#f87171' : 'var(--danger)',
                   fontSize: '12px',
@@ -432,7 +432,7 @@ const QuestionItemCard = React.memo(function QuestionItemCard({
             if (typeof qn.correctIndex === "number" && qn.correctIndex >= 0 && qn.correctIndex < 4 && oIndex === qn.correctIndex) {
               bg = isDark ? 'rgba(16, 185, 129, 0.15)' : '#f0fdf4';
               color = isDark ? '#34d399' : '#15803d';
-              border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #86efac';
+              // clean subtle border retained
               prefixIcon = '✅';
             }
           } else if (mode === 'practice' && hasAnswered) {
@@ -440,13 +440,13 @@ const QuestionItemCard = React.memo(function QuestionItemCard({
               // Highlight correct answer in green
               bg = isDark ? 'rgba(16, 185, 129, 0.15)' : '#f0fdf4';
               color = isDark ? '#34d399' : '#15803d';
-              border = isDark ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #86efac';
+              // clean subtle border retained
               prefixIcon = '✅';
             } else if (oIndex === chosenIndex) {
               // Highlight wrong selection in red
               bg = isDark ? 'rgba(239, 68, 68, 0.15)' : '#fef2f2';
               color = isDark ? '#f87171' : '#b91c1c';
-              border = isDark ? '1px solid rgba(239, 68, 68, 0.4)' : '1px solid #fca5a5';
+              // clean subtle border retained
               prefixIcon = '❌';
             }
           }
