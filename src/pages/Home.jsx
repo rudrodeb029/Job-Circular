@@ -162,7 +162,7 @@ export default function Home() {
     <div className="page">
       <AppHeader />
       <PullToRefresh onRefresh={refreshData}>
-        <div className="page-content" style={{ paddingTop: '2px' }}>
+        <div className="page-content" style={{ paddingTop: '5px' }}>
 
         <div style={{ marginBottom: '8px', cursor: 'pointer' }} onClick={() => navigate('/search')}>
           <SearchBar value="" onChange={() => {}} placeholder="Search jobs..." />

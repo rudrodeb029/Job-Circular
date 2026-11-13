@@ -57,7 +57,7 @@ const AppHeader = React.memo(function AppHeader() {
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
-        marginBottom: '2px',
+        marginBottom: '3px',
         boxSizing: 'border-box'
       }}>
         {/* Left: Hamburger Menu Icon Button */}
