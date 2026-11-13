@@ -176,7 +176,7 @@ export default function Home() {
           borderRadius: '12px',
           padding: '12px 18px',
           position: 'relative',
-          marginBottom: '16px',
+          marginBottom: '10px',
           overflow: 'hidden',
           boxShadow: '0 8px 22px rgba(26, 86, 219, 0.16)',
           minHeight: '120px',
@@ -310,8 +310,8 @@ export default function Home() {
           }}></div>
         </div>
 
-        <div style={{ marginBottom: '16px' }}>
-          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '8px', border: 'none', boxShadow: 'none' }}>
+        <div style={{ marginBottom: '11px' }}>
+          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '5px', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'visible', border: 'none' }}>
               <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Questions & Answers' : 'প্রশ্নপত্র এবং উত্তর'}
@@ -325,7 +325,7 @@ export default function Home() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Scrolling part - 5 Categories only */}
-            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '6px 0' }}>
+            <div className="scrolling-container" style={{ flex: 1, margin: 0, padding: '2px 0' }}>
               <div className="scrolling-content" style={{ gap: '8px' }}>
                 {[
                   { id: 'bcs', name: 'বিসিএস', nameEn: 'BCS', icon: <BcsIcon size={20} />, color: 'rgba(26, 86, 219, 0.08)' },
@@ -375,7 +375,7 @@ export default function Home() {
         </div>
 
         <div>
-          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '10px', border: 'none', boxShadow: 'none' }}>
+          <div className="section-header" style={{ background: 'transparent', padding: '0', marginBottom: '6px', border: 'none', boxShadow: 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', background: 'transparent', padding: '0', position: 'relative', overflow: 'visible', border: 'none' }}>
               <h3 className="section-title" style={{ margin: 0 }}>
                 {isEn ? 'Latest Job Circulars' : 'সাম্প্রতিক সার্কুলার'}
@@ -387,7 +387,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '9px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
             {paginatedFeed.map(item => {
               if (item.feedType === 'job') {
                 return <JobCard key={item.id} job={item} />;
@@ -406,7 +406,7 @@ export default function Home() {
                 const cleanDesc = item.description ? stripHtmlTags(item.description) : '';
                 const displayDesc = cleanDesc || descriptionSentence;
                 return (
-                  <div key={item.id} className="job-card" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '10px 12px', gap: '10px' }}>
+                  <div key={item.id} className="job-card" onClick={() => navigate(`/exam-details/${item.originalId || item.id}`)} style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '9px 11px', gap: '10px' }}>
                     <div style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: '4px', background: 'linear-gradient(to bottom, #10b981, #34d399)', borderRadius: '4px 0 0 4px' }}></div>
                     <div className="job-card-content">
                       <h4 className="job-card-title" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><span className="job-card-title-icon job-card-title-icon-exam" style={{ fontSize: '13px', flexShrink: 0, display: 'inline-flex', alignItems: 'center', color: '#059669', '--card-icon-color': '#059669', '--card-icon-color-dark': '#34d399' }}>{displayIcon}</span><span>{orgName}</span></h4>
