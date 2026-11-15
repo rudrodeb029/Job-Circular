@@ -248,7 +248,7 @@ function CleanSelect({
         </div>
       </div>
 
-      {/* Modern Curved Modal Sheet for Options */}
+      {/* Modern Curved Modal Dialog Centered in Middle */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
@@ -256,28 +256,29 @@ function CleanSelect({
             position: 'fixed',
             inset: 0,
             zIndex: 9999,
-            background: 'rgba(15, 23, 42, 0.45)',
+            background: 'rgba(15, 23, 42, 0.55)',
             backdropFilter: 'blur(4px)',
             WebkitBackdropFilter: 'blur(4px)',
             display: 'flex',
-            alignItems: 'flex-end',
+            alignItems: 'center',
             justifyContent: 'center',
-            padding: '16px'
+            padding: '20px'
           }}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
               width: '100%',
-              maxWidth: '440px',
-              maxHeight: '70vh',
+              maxWidth: '380px',
+              maxHeight: '62vh',
               background: isDark ? '#1e293b' : '#ffffff',
-              borderRadius: '16px',
+              borderRadius: '14px',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.35)',
               display: 'flex',
               flexDirection: 'column',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              margin: 'auto'
             }}
           >
             {/* Modal Header (Reduced Height) */}
@@ -428,6 +429,7 @@ export default function EditProfile() {
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
   const [isUsernameAvailable, setIsUsernameAvailable] = useState(Boolean(savedUsername));
   const usernameCheckTimerRef = useRef(null);
+  const coverFileInputRef = useRef(null);
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -598,11 +600,34 @@ export default function EditProfile() {
 
     setUploadingCover(true);
     try {
-      const dataUrl = await compressImageFile(file, 960, 0.8);
+      const cloudName = CLOUDINARY_CONFIG?.cloudName;
+      const uploadPreset = CLOUDINARY_CONFIG?.uploadPreset;
+
+      if (cloudName && uploadPreset && cloudName !== 'dqy39gghx') {
+        const data = new FormData();
+        data.append('file', file);
+        data.append('upload_preset', uploadPreset);
+        const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+          method: 'POST',
+          body: data
+        });
+        const fileData = await res.json();
+        if (fileData.secure_url) {
+          const optimizedUrl = optimizeCloudinaryUrl(fileData.secure_url);
+          setFormData(prev => ({ ...prev, coverPhoto: optimizedUrl }));
+          return;
+        }
+      }
+      const dataUrl = await compressImageFile(file, 800, 0.8);
       setFormData(prev => ({ ...prev, coverPhoto: dataUrl }));
     } catch (err) {
-      console.error(err);
-      alert('Cover upload failed');
+      console.error('Cover upload error:', err);
+      try {
+        const dataUrl = await compressImageFile(file, 800, 0.8);
+        setFormData(prev => ({ ...prev, coverPhoto: dataUrl }));
+      } catch (fallbackErr) {
+        alert('Cover upload failed: ' + (err.message || 'Error'));
+      }
     } finally {
       setUploadingCover(false);
       if (e.target) e.target.value = '';
@@ -751,14 +776,6 @@ export default function EditProfile() {
 
         {/* Spacer to keep Title centered */}
         <div style={{ width: '40px', height: '40px', flexShrink: 0 }} />
-        <input
-          id="cover-file-input"
-          type="file"
-          accept="image/*"
-          onChange={handleCoverUpload}
-          disabled={uploadingCover}
-          style={{ display: 'none' }}
-        />
       </div>
 
       {/* Main Content Area */}
@@ -766,30 +783,37 @@ export default function EditProfile() {
         maxWidth: '460px',
         width: '100%',
         margin: '0 auto',
-        padding: '0 20px',
+        padding: '0 20px 120px 20px',
         flex: 1
       }}>
         <form id="edit-profile-form" onSubmit={handleSubmit}>
 
+          {/* Hidden File Input for Cover Photo */}
+          <input
+            ref={coverFileInputRef}
+            id="cover-file-input"
+            type="file"
+            accept="image/*"
+            onChange={handleCoverUpload}
+            disabled={uploadingCover}
+            style={{ display: 'none' }}
+          />
+
           {/* ═════ Visible Cover Photo Banner (Reduced Corner Curvness: 6px) ═════ */}
-          <div
-            onClick={() => !formData.coverPhoto && document.getElementById('cover-file-input')?.click()}
-            style={{
-              position: 'relative',
-              width: '100%',
-              height: formData.coverPhoto ? '140px' : '85px',
-              borderRadius: '6px',
-              overflow: 'hidden',
-              marginTop: '8px',
-              background: formData.coverPhoto
-                ? 'transparent'
-                : (isDark ? 'linear-gradient(135deg, #1e293b, #334155)' : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)'),
-              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-              transition: 'height 0.25s ease',
-              cursor: formData.coverPhoto ? 'default' : 'pointer'
-            }}
-          >
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            height: formData.coverPhoto ? '140px' : '85px',
+            borderRadius: '6px',
+            overflow: 'hidden',
+            marginTop: '8px',
+            background: formData.coverPhoto
+              ? 'transparent'
+              : (isDark ? 'linear-gradient(135deg, #1e293b, #334155)' : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)'),
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+            transition: 'height 0.25s ease'
+          }}>
             {formData.coverPhoto && (
               <img
                 src={formData.coverPhoto}
@@ -803,10 +827,11 @@ export default function EditProfile() {
               />
             )}
 
-            {/* Side Corner Upload Icon when Cover is NOT present */}
+            {/* Side Corner Upload Button when Cover is NOT present */}
             {!formData.coverPhoto && (
-              <label
-                htmlFor="cover-file-input"
+              <button
+                type="button"
+                onClick={() => coverFileInputRef.current?.click()}
                 title="Add Cover Photo"
                 style={{
                   position: 'absolute',
@@ -815,20 +840,24 @@ export default function EditProfile() {
                   width: '32px',
                   height: '32px',
                   borderRadius: '6px',
-                  background: isDark ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
+                  background: isDark ? 'rgba(15, 23, 42, 0.75)' : 'rgba(255, 255, 255, 0.92)',
                   backdropFilter: 'blur(4px)',
                   color: isDark ? '#cbd5e1' : '#475569',
-                  border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 0, 0, 0.08)',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.2)' : '1px solid rgba(0, 0, 0, 0.12)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
-                  zIndex: 3
+                  boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+                  zIndex: 5
                 }}
               >
-                <CameraIcon size={16} />
-              </label>
+                {uploadingCover ? (
+                  <span style={{ fontSize: '10px', fontWeight: 700 }}>...</span>
+                ) : (
+                  <CameraIcon size={16} />
+                )}
+              </button>
             )}
 
             {/* Change & Remove Buttons when Cover is Present */}
@@ -840,12 +869,13 @@ export default function EditProfile() {
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                zIndex: 3
+                zIndex: 5
               }}>
-                <label
-                  htmlFor="cover-file-input"
+                <button
+                  type="button"
+                  onClick={() => coverFileInputRef.current?.click()}
                   style={{
-                    background: 'rgba(15, 23, 42, 0.7)',
+                    background: 'rgba(15, 23, 42, 0.75)',
                     backdropFilter: 'blur(6px)',
                     color: '#ffffff',
                     padding: '4px 8px',
@@ -856,12 +886,12 @@ export default function EditProfile() {
                     alignItems: 'center',
                     gap: '4px',
                     cursor: 'pointer',
-                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                    border: '1px solid rgba(255, 255, 255, 0.25)'
                   }}
                 >
                   <CameraIcon size={11} />
                   <span>{uploadingCover ? '...' : 'Change'}</span>
-                </label>
+                </button>
 
                 <button
                   type="button"
@@ -1134,8 +1164,8 @@ export default function EditProfile() {
 
           {/* ═════ Save Button (Reduced Corner Curvness: 6px) ═════ */}
           <div style={{
-            marginTop: '24px',
-            marginBottom: 'calc(var(--safe-area-bottom, 0px) + 30px)'
+            marginTop: '28px',
+            marginBottom: 'calc(var(--admob-bottom-spacing, 70px) + 80px)'
           }}>
             <button
               type="submit"
