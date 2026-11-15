@@ -792,21 +792,25 @@ export default function EditProfile() {
         <form id="edit-profile-form" onSubmit={handleSubmit}>
 
           {/* ═════ Visible Cover Photo Banner (Reduced Corner Curvness: 6px) ═════ */}
-          <div style={{
-            position: 'relative',
-            width: '100%',
-            height: formData.coverPhoto ? '140px' : '85px',
-            borderRadius: '6px',
-            overflow: 'hidden',
-            marginTop: '8px',
-            background: formData.coverPhoto
-              ? 'transparent'
-              : (isDark ? 'linear-gradient(135deg, #1e293b, #334155)' : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)'),
-            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-            transition: 'height 0.25s ease'
-          }}>
-            {formData.coverPhoto ? (
+          <div
+            onClick={() => !formData.coverPhoto && document.getElementById('cover-file-input')?.click()}
+            style={{
+              position: 'relative',
+              width: '100%',
+              height: formData.coverPhoto ? '140px' : '85px',
+              borderRadius: '6px',
+              overflow: 'hidden',
+              marginTop: '8px',
+              background: formData.coverPhoto
+                ? 'transparent'
+                : (isDark ? 'linear-gradient(135deg, #1e293b, #334155)' : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)'),
+              border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+              transition: 'height 0.25s ease',
+              cursor: formData.coverPhoto ? 'default' : 'pointer'
+            }}
+          >
+            {formData.coverPhoto && (
               <img
                 src={formData.coverPhoto}
                 alt="Cover Photo"
@@ -817,25 +821,33 @@ export default function EditProfile() {
                   display: 'block'
                 }}
               />
-            ) : (
+            )}
+
+            {/* Side Corner Upload Icon when Cover is NOT present */}
+            {!formData.coverPhoto && (
               <label
                 htmlFor="cover-file-input"
+                title="Add Cover Photo"
                 style={{
-                  width: '100%',
-                  height: '100%',
+                  position: 'absolute',
+                  top: '8px',
+                  right: '8px',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '6px',
+                  background: isDark ? 'rgba(15, 23, 42, 0.65)' : 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(4px)',
+                  color: isDark ? '#cbd5e1' : '#475569',
+                  border: isDark ? '1px solid rgba(255, 255, 255, 0.15)' : '1px solid rgba(0, 0, 0, 0.08)',
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '3px',
                   cursor: 'pointer',
-                  color: isDark ? '#94a3b8' : '#64748b'
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
+                  zIndex: 3
                 }}
               >
-                <CameraIcon size={18} />
-                <span style={{ fontSize: '11px', fontWeight: 600 }}>
-                  {uploadingCover ? 'Uploading...' : 'Add Cover Photo'}
-                </span>
+                <CameraIcon size={16} />
               </label>
             )}
 
