@@ -280,24 +280,24 @@ function CleanSelect({
               overflow: 'hidden'
             }}
           >
-            {/* Modal Header */}
+            {/* Modal Header (Reduced Height) */}
             <div style={{
-              padding: '16px 20px',
+              padding: '10px 16px',
               borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #f1f5f9',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               background: isDark ? '#0f172a' : '#f8fafc'
             }}>
-              <h4 style={{ fontSize: '14px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+              <h4 style={{ fontSize: '12.5px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
                 {label}
               </h4>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
                 style={{
-                  width: '28px',
-                  height: '28px',
+                  width: '24px',
+                  height: '24px',
                   borderRadius: '50%',
                   background: isDark ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0',
                   border: 'none',
@@ -307,20 +307,20 @@ function CleanSelect({
                   justifyContent: 'center',
                   cursor: 'pointer',
                   fontWeight: 800,
-                  fontSize: '13px'
+                  fontSize: '11px'
                 }}
               >
                 ✕
               </button>
             </div>
 
-            {/* Options List */}
+            {/* Options List (Reduced Text Size, Clean English) */}
             <div style={{
-              padding: '12px',
+              padding: '10px 12px',
               overflowY: 'auto',
               display: 'flex',
               flexDirection: 'column',
-              gap: '6px',
+              gap: '5px',
               maxHeight: '52vh'
             }}>
               {/* Optional Reset Option */}
@@ -330,9 +330,9 @@ function CleanSelect({
                   setIsOpen(false);
                 }}
                 style={{
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  fontSize: '13px',
+                  padding: '9px 14px',
+                  borderRadius: '6px',
+                  fontSize: '11.5px',
                   fontWeight: 500,
                   cursor: 'pointer',
                   background: value === '' ? (isDark ? 'rgba(20, 184, 166, 0.15)' : '#ccfbf1') : 'transparent',
@@ -350,7 +350,7 @@ function CleanSelect({
 
               {options.map((opt) => {
                 const isSelected = value === opt.value || (value && opt.labelEn && opt.labelEn.toLowerCase() === value.toLowerCase());
-                const itemLabel = opt.labelEn ? `${opt.labelEn} (${opt.label})` : opt.label;
+                const itemLabel = opt.labelEn || opt.label || opt.value;
                 return (
                   <div
                     key={opt.value}
@@ -359,10 +359,10 @@ function CleanSelect({
                       setIsOpen(false);
                     }}
                     style={{
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      fontWeight: isSelected ? 700 : 500,
+                      padding: '9px 14px',
+                      borderRadius: '6px',
+                      fontSize: '11.5px',
+                      fontWeight: isSelected ? 600 : 500,
                       cursor: 'pointer',
                       background: isSelected
                         ? (isDark ? 'rgba(20, 184, 166, 0.2)' : '#f0fdfa')
@@ -378,15 +378,15 @@ function CleanSelect({
                     <span>{itemLabel}</span>
                     {isSelected && (
                       <div style={{
-                        width: '20px',
-                        height: '20px',
+                        width: '18px',
+                        height: '18px',
                         borderRadius: '50%',
                         background: '#14b8a6',
                         color: 'white',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        fontSize: '11px',
+                        fontSize: '10px',
                         fontWeight: 800
                       }}>
                         ✓
@@ -485,25 +485,25 @@ export default function EditProfile() {
     };
   }, [currentUserId]);
 
-  // Qualification Options (English primary)
+  // Qualification Options (English only)
   const qualificationOptions = [
-    { value: 'Bachelor (স্নাতক)', label: 'স্নাতক', labelEn: 'Bachelor' },
-    { value: 'Master (স্নাতকোত্তর)', label: 'স্নাতকোত্তর', labelEn: 'Master' },
-    { value: 'HSC (এইচএসসি)', label: 'এইচএসসি', labelEn: 'HSC' },
-    { value: 'SSC (এসএসসি)', label: 'এসএসসি', labelEn: 'SSC' },
-    { value: 'Diploma (ডিপ্লোমা)', label: 'ডিপ্লোমা', labelEn: 'Diploma' }
+    { value: 'Bachelor', label: 'Bachelor', labelEn: 'Bachelor' },
+    { value: 'Master', label: 'Master', labelEn: 'Master' },
+    { value: 'HSC', label: 'HSC', labelEn: 'HSC' },
+    { value: 'SSC', label: 'SSC', labelEn: 'SSC' },
+    { value: 'Diploma', label: 'Diploma', labelEn: 'Diploma' }
   ];
 
-  // Location / District Options (English primary)
+  // Location / District Options (English only)
   const locationOptions = [
-    { value: 'Dhaka', label: 'ঢাকা', labelEn: 'Dhaka' },
-    { value: 'Chattogram', label: 'চট্টগ্রাম', labelEn: 'Chattogram' },
-    { value: 'Rajshahi', label: 'রাজশাহী', labelEn: 'Rajshahi' },
-    { value: 'Khulna', label: 'খুলনা', labelEn: 'Khulna' },
-    { value: 'Sylhet', label: 'সিলেট', labelEn: 'Sylhet' },
-    { value: 'Barishal', label: 'বরিশাল', labelEn: 'Barishal' },
-    { value: 'Rangpur', label: 'রংপুর', labelEn: 'Rangpur' },
-    { value: 'Mymensingh', label: 'ময়মনসিংহ', labelEn: 'Mymensingh' }
+    { value: 'Dhaka', label: 'Dhaka', labelEn: 'Dhaka' },
+    { value: 'Chattogram', label: 'Chattogram', labelEn: 'Chattogram' },
+    { value: 'Rajshahi', label: 'Rajshahi', labelEn: 'Rajshahi' },
+    { value: 'Khulna', label: 'Khulna', labelEn: 'Khulna' },
+    { value: 'Sylhet', label: 'Sylhet', labelEn: 'Sylhet' },
+    { value: 'Barishal', label: 'Barishal', labelEn: 'Barishal' },
+    { value: 'Rangpur', label: 'Rangpur', labelEn: 'Rangpur' },
+    { value: 'Mymensingh', label: 'Mymensingh', labelEn: 'Mymensingh' }
   ];
 
   const handleFieldChange = (field, value) => {
@@ -749,28 +749,8 @@ export default function EditProfile() {
           Edit Profile
         </h1>
 
-        {/* Cover Photo Camera Button */}
-        <label
-          htmlFor="cover-file-input"
-          title="Change Cover Photo"
-          style={{
-            width: '40px',
-            height: '40px',
-            minWidth: '40px',
-            minHeight: '40px',
-            borderRadius: '50%',
-            background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
-            color: isDark ? '#cbd5e1' : '#64748b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            flexShrink: 0,
-            zIndex: 10
-          }}
-        >
-          <CameraIcon size={18} />
-        </label>
+        {/* Spacer to keep Title centered */}
+        <div style={{ width: '40px', height: '40px', flexShrink: 0 }} />
         <input
           id="cover-file-input"
           type="file"
