@@ -5,67 +5,29 @@ import { CLOUDINARY_CONFIG } from '../cloudinary';
 import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import { compressImageFile } from '../utils/mediaUtils';
 
-// Precise custom SVG icons matching the reference design style
-const ChevronLeftIcon = ({ size = 22, color = 'currentColor' }) => (
+// Precise custom SVG icons
+const ChevronLeftIcon = ({ size = 20, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="m15 18-6-6 6-6" />
   </svg>
 );
 
-const PencilIcon = ({ size = 13, color = 'white' }) => (
+const PencilIcon = ({ size = 12, color = 'white' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
   </svg>
 );
 
-const UserIcon = ({ size = 17, color = '#64748b' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-    <circle cx="12" cy="7" r="4" />
-  </svg>
-);
-
-const PhoneIcon = ({ size = 17, color = '#64748b' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-  </svg>
-);
-
-const FileTextIcon = ({ size = 17, color = '#64748b' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-    <polyline points="14 2 14 8 20 8" />
-    <line x1="16" y1="13" x2="8" y2="13" />
-    <line x1="16" y1="17" x2="8" y2="17" />
-    <polyline points="10 9 9 9 8 9" />
-  </svg>
-);
-
-const GraduationCapIcon = ({ size = 17, color = '#64748b' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
-    <path d="M6 12v5c3 3 9 3 12 0v-5" />
-  </svg>
-);
-
-const MapPinIcon = ({ size = 17, color = '#64748b' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-    <circle cx="12" cy="10" r="3" />
-  </svg>
-);
-
-const CameraIcon = ({ size = 16, color = 'currentColor' }) => (
+const CameraIcon = ({ size = 18, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
     <circle cx="12" cy="13" r="4" />
   </svg>
 );
 
-// Clean styled form field matching the mockup
+// Clean styled form field with reduced corner curvness and removed icon
 function CleanField({
   label,
-  icon,
   type = 'text',
   value,
   onChange,
@@ -81,62 +43,44 @@ function CleanField({
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <label style={{
-        fontSize: '13px',
+        fontSize: '11.5px',
         fontWeight: 600,
-        color: isDark ? '#e2e8f0' : '#1e293b',
-        marginBottom: '6px'
+        color: isDark ? '#cbd5e1' : '#475569',
+        marginBottom: '5px'
       }}>
         {label}
       </label>
-      <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-        {icon && (
-          <div style={{
-            position: 'absolute',
-            left: '14px',
-            color: isFocused ? '#14b8a6' : '#64748b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            pointerEvents: 'none',
-            transition: 'color 0.2s ease',
-            zIndex: 2
-          }}>
-            {icon}
-          </div>
-        )}
-        <input
-          type={type}
-          value={value}
-          onChange={onChange}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
-          placeholder={placeholder}
-          required={required}
-          style={{
-            width: '100%',
-            height: '46px',
-            paddingLeft: icon ? '44px' : '14px',
-            paddingRight: '14px',
-            fontSize: '14px',
-            fontWeight: 500,
-            color: isDark ? '#f8fafc' : '#0f172a',
-            background: bg,
-            border: `1px solid ${borderColor}`,
-            borderRadius: '10px',
-            outline: 'none',
-            boxShadow: isFocused ? '0 0 0 3px rgba(20, 184, 166, 0.12)' : 'none',
-            transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
-          }}
-        />
-      </div>
+      <input
+        type={type}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        placeholder={placeholder}
+        required={required}
+        style={{
+          width: '100%',
+          height: '42px',
+          paddingLeft: '14px',
+          paddingRight: '14px',
+          fontSize: '13px',
+          fontWeight: 500,
+          color: isDark ? '#f8fafc' : '#0f172a',
+          background: bg,
+          border: `1px solid ${borderColor}`,
+          borderRadius: '6px',
+          outline: 'none',
+          boxShadow: isFocused ? '0 0 0 2.5px rgba(20, 184, 166, 0.12)' : 'none',
+          transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+        }}
+      />
     </div>
   );
 }
 
-// Clean Dropdown selector styled in the exact same style
+// Clean Dropdown selector with reduced corner curvness and removed icon
 function CleanSelect({
   label,
-  icon,
   value,
   onChange,
   options = [],
@@ -162,10 +106,10 @@ function CleanSelect({
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <label style={{
-        fontSize: '13px',
+        fontSize: '11.5px',
         fontWeight: 600,
-        color: isDark ? '#e2e8f0' : '#1e293b',
-        marginBottom: '6px'
+        color: isDark ? '#cbd5e1' : '#475569',
+        marginBottom: '5px'
       }}>
         {label}
       </label>
@@ -176,31 +120,20 @@ function CleanSelect({
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
-          height: '46px',
-          paddingLeft: '44px',
+          height: '42px',
+          paddingLeft: '14px',
           paddingRight: '36px',
           background: bg,
           border: `1px solid ${borderColor}`,
-          borderRadius: '10px',
+          borderRadius: '6px',
           cursor: 'pointer',
-          boxShadow: isOpen ? '0 0 0 3px rgba(20, 184, 166, 0.12)' : 'none',
+          boxShadow: isOpen ? '0 0 0 2.5px rgba(20, 184, 166, 0.12)' : 'none',
           transition: 'all 0.2s ease',
           userSelect: 'none'
         }}
       >
-        <div style={{
-          position: 'absolute',
-          left: '14px',
-          color: isOpen ? '#14b8a6' : '#64748b',
-          display: 'flex',
-          alignItems: 'center',
-          pointerEvents: 'none'
-        }}>
-          {icon}
-        </div>
-
         <span style={{
-          fontSize: '14px',
+          fontSize: '13px',
           fontWeight: selectedOption || value ? 500 : 400,
           color: (selectedOption || value) ? (isDark ? '#f8fafc' : '#0f172a') : '#94a3b8',
           whiteSpace: 'nowrap',
@@ -250,7 +183,7 @@ function CleanSelect({
               maxWidth: '440px',
               maxHeight: '70vh',
               background: isDark ? '#1e293b' : '#ffffff',
-              borderRadius: '20px',
+              borderRadius: '16px',
               border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
               boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
               display: 'flex',
@@ -267,7 +200,7 @@ function CleanSelect({
               justifyContent: 'space-between',
               background: isDark ? '#0f172a' : '#f8fafc'
             }}>
-              <h4 style={{ fontSize: '15px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
+              <h4 style={{ fontSize: '14px', fontWeight: 700, color: isDark ? '#f8fafc' : '#0f172a', margin: 0 }}>
                 {label}
               </h4>
               <button
@@ -309,7 +242,7 @@ function CleanSelect({
                 }}
                 style={{
                   padding: '12px 16px',
-                  borderRadius: '10px',
+                  borderRadius: '8px',
                   fontSize: '13px',
                   fontWeight: 500,
                   cursor: 'pointer',
@@ -338,8 +271,8 @@ function CleanSelect({
                     }}
                     style={{
                       padding: '12px 16px',
-                      borderRadius: '10px',
-                      fontSize: '13.5px',
+                      borderRadius: '8px',
+                      fontSize: '13px',
                       fontWeight: isSelected ? 700 : 500,
                       cursor: 'pointer',
                       background: isSelected
@@ -502,13 +435,13 @@ export default function EditProfile() {
       flexDirection: 'column',
       position: 'relative'
     }}>
-      {/* Top Header Bar matching the reference mockup */}
+      {/* Reduced Height Top Header Bar */}
       <div style={{
         position: 'sticky',
         top: 0,
         zIndex: 50,
         background: isDark ? '#0f172a' : '#ffffff',
-        padding: 'calc(var(--safe-area-top, 0px) + 12px) 16px 12px 16px',
+        padding: 'calc(var(--safe-area-top, 0px) + 6px) 14px 6px 14px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -521,7 +454,7 @@ export default function EditProfile() {
           style={{
             background: 'none',
             border: 'none',
-            padding: '6px',
+            padding: '4px',
             color: isDark ? '#f8fafc' : '#0f172a',
             cursor: 'pointer',
             display: 'flex',
@@ -530,16 +463,16 @@ export default function EditProfile() {
             borderRadius: '50%'
           }}
         >
-          <ChevronLeftIcon size={24} />
+          <ChevronLeftIcon size={20} />
         </button>
 
-        {/* Header Title (Always English) */}
+        {/* Header Title (Reduced Text Size, Always English) */}
         <h1 style={{
-          fontSize: '17px',
+          fontSize: '15px',
           fontWeight: 700,
           color: isDark ? '#f8fafc' : '#0f172a',
           margin: 0,
-          letterSpacing: '-0.2px'
+          letterSpacing: '-0.1px'
         }}>
           Edit Profile
         </h1>
@@ -549,7 +482,7 @@ export default function EditProfile() {
           htmlFor="cover-file-input"
           title="Change Cover Photo"
           style={{
-            padding: '6px',
+            padding: '4px',
             borderRadius: '50%',
             color: isDark ? '#cbd5e1' : '#64748b',
             display: 'flex',
@@ -558,7 +491,7 @@ export default function EditProfile() {
             cursor: 'pointer'
           }}
         >
-          <CameraIcon size={20} />
+          <CameraIcon size={18} />
         </label>
         <input
           id="cover-file-input"
@@ -580,19 +513,19 @@ export default function EditProfile() {
       }}>
         <form id="edit-profile-form" onSubmit={handleSubmit}>
 
-          {/* ═════ Visible Cover Photo Banner ═════ */}
+          {/* ═════ Visible Cover Photo Banner (Reduced Corner Curvness: 6px) ═════ */}
           <div style={{
             position: 'relative',
             width: '100%',
-            height: formData.coverPhoto ? '145px' : '90px',
-            borderRadius: '16px',
+            height: formData.coverPhoto ? '140px' : '85px',
+            borderRadius: '6px',
             overflow: 'hidden',
-            marginTop: '14px',
+            marginTop: '8px',
             background: formData.coverPhoto
               ? 'transparent'
               : (isDark ? 'linear-gradient(135deg, #1e293b, #334155)' : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)'),
             border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
             transition: 'height 0.25s ease'
           }}>
             {formData.coverPhoto ? (
@@ -616,13 +549,13 @@ export default function EditProfile() {
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '4px',
+                  gap: '3px',
                   cursor: 'pointer',
                   color: isDark ? '#94a3b8' : '#64748b'
                 }}
               >
-                <CameraIcon size={20} />
-                <span style={{ fontSize: '11.5px', fontWeight: 600 }}>
+                <CameraIcon size={18} />
+                <span style={{ fontSize: '11px', fontWeight: 600 }}>
                   {uploadingCover ? 'Uploading...' : 'Add Cover Photo'}
                 </span>
               </label>
@@ -632,8 +565,8 @@ export default function EditProfile() {
             {formData.coverPhoto && (
               <div style={{
                 position: 'absolute',
-                top: '10px',
-                right: '10px',
+                top: '8px',
+                right: '8px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
@@ -645,9 +578,9 @@ export default function EditProfile() {
                     background: 'rgba(15, 23, 42, 0.7)',
                     backdropFilter: 'blur(6px)',
                     color: '#ffffff',
-                    padding: '5px 10px',
-                    borderRadius: '8px',
-                    fontSize: '11px',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    fontSize: '10.5px',
                     fontWeight: 600,
                     display: 'flex',
                     alignItems: 'center',
@@ -656,7 +589,7 @@ export default function EditProfile() {
                     border: '1px solid rgba(255, 255, 255, 0.2)'
                   }}
                 >
-                  <CameraIcon size={12} />
+                  <CameraIcon size={11} />
                   <span>{uploadingCover ? '...' : 'Change'}</span>
                 </label>
 
@@ -668,9 +601,9 @@ export default function EditProfile() {
                     backdropFilter: 'blur(6px)',
                     color: '#ffffff',
                     border: 'none',
-                    padding: '5px 8px',
-                    borderRadius: '8px',
-                    fontSize: '11px',
+                    padding: '4px 7px',
+                    borderRadius: '4px',
+                    fontSize: '10.5px',
                     fontWeight: 700,
                     cursor: 'pointer'
                   }}
@@ -688,22 +621,22 @@ export default function EditProfile() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: '-58px',
-            marginBottom: '26px',
+            marginTop: '-56px',
+            marginBottom: '22px',
             position: 'relative',
             zIndex: 5
           }}>
             <div style={{
               position: 'relative',
-              width: '116px',
-              height: '116px'
+              width: '112px',
+              height: '112px'
             }}>
               {/* Avatar Circle */}
               <div
                 onClick={() => document.getElementById('avatar-file-input')?.click()}
                 style={{
-                  width: '116px',
-                  height: '116px',
+                  width: '112px',
+                  height: '112px',
                   borderRadius: '50%',
                   border: isDark ? '3px solid #0f172a' : '3px solid #ffffff',
                   outline: '2.5px solid #14b8a6',
@@ -735,7 +668,7 @@ export default function EditProfile() {
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#0f766e',
-                    fontSize: '38px',
+                    fontSize: '36px',
                     fontWeight: 700
                   }}>
                     {formData.name ? formData.name[0].toUpperCase() : 'U'}
@@ -797,12 +730,11 @@ export default function EditProfile() {
             </div>
           </div>
 
-          {/* ═════ Form Fields Stack (Always English Labels) ═════ */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          {/* ═════ Form Fields Stack (Reduced Corner Curvness: 6px, No Icons, Reduced Text Size) ═════ */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {/* 1. Full Name */}
             <CleanField
               label="Full Name"
-              icon={<UserIcon size={17} />}
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
               placeholder=""
@@ -813,7 +745,6 @@ export default function EditProfile() {
             {/* 2. Phone Number */}
             <CleanField
               label="Phone Number"
-              icon={<PhoneIcon size={17} />}
               type="tel"
               value={formData.phone}
               onChange={(e) => handleFieldChange('phone', e.target.value)}
@@ -824,7 +755,6 @@ export default function EditProfile() {
             {/* 3. Bio / Short Description */}
             <CleanField
               label="Bio / Short Description"
-              icon={<FileTextIcon size={17} />}
               type="text"
               value={formData.bio}
               onChange={(e) => handleFieldChange('bio', e.target.value)}
@@ -835,7 +765,6 @@ export default function EditProfile() {
             {/* 4. Qualification (Select Dropdown) */}
             <CleanSelect
               label="Educational Qualification"
-              icon={<GraduationCapIcon size={17} />}
               value={formData.qualification}
               onChange={(val) => handleFieldChange('qualification', val)}
               options={qualificationOptions}
@@ -846,7 +775,6 @@ export default function EditProfile() {
             {/* 5. Location / District (Select Dropdown) */}
             <CleanSelect
               label="District / Location"
-              icon={<MapPinIcon size={17} />}
               value={formData.location}
               onChange={(val) => handleFieldChange('location', val)}
               options={locationOptions}
@@ -855,28 +783,28 @@ export default function EditProfile() {
             />
           </div>
 
-          {/* ═════ Save Button in proper position right below the form fields ═════ */}
+          {/* ═════ Save Button (Reduced Corner Curvness: 6px) ═════ */}
           <div style={{
-            marginTop: '28px',
-            marginBottom: 'calc(var(--safe-area-bottom, 0px) + 36px)'
+            marginTop: '24px',
+            marginBottom: 'calc(var(--safe-area-bottom, 0px) + 30px)'
           }}>
             <button
               type="submit"
               disabled={uploadingImage || uploadingCover}
               style={{
                 width: '100%',
-                height: '48px',
-                borderRadius: '10px',
+                height: '44px',
+                borderRadius: '6px',
                 background: savedSuccess ? '#0d9488' : '#136368',
                 color: '#ffffff',
-                fontSize: '15.5px',
+                fontSize: '14.5px',
                 fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(19, 99, 104, 0.28)',
+                boxShadow: '0 3px 10px rgba(19, 99, 104, 0.24)',
                 transition: 'all 0.2s ease'
               }}
             >
