@@ -317,7 +317,7 @@ function CleanSelect({
                   transition: 'all 0.15s'
                 }}
               >
-                <span>{placeholder}</span>
+                <span>{placeholder || (isEn ? 'None / Clear' : 'ফাঁকা রাখুন')}</span>
                 {value === '' && <span style={{ fontWeight: 800, color: '#14b8a6' }}>✓</span>}
               </div>
 
@@ -527,16 +527,6 @@ export default function EditProfile() {
           <ChevronLeftIcon size={24} />
         </button>
 
-        <h1 style={{
-          fontSize: '17px',
-          fontWeight: 700,
-          color: isDark ? '#f8fafc' : '#0f172a',
-          margin: 0,
-          letterSpacing: '-0.2px'
-        }}>
-          {isEn ? 'Edit Profile' : 'প্রোফাইল সম্পাদনা'}
-        </h1>
-
         {/* Cover Photo Button */}
         <label
           htmlFor="cover-file-input"
@@ -720,7 +710,7 @@ export default function EditProfile() {
               icon={<UserIcon size={17} />}
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
-              placeholder={isEn ? 'Enter your name' : 'আপনার নাম লিখুন'}
+              placeholder=""
               isDark={isDark}
               required
             />
@@ -732,7 +722,7 @@ export default function EditProfile() {
               type="tel"
               value={formData.phone}
               onChange={(e) => handleFieldChange('phone', e.target.value)}
-              placeholder={isEn ? 'Enter phone number' : 'মোবাইল নম্বর লিখুন'}
+              placeholder=""
               isDark={isDark}
             />
 
@@ -743,7 +733,7 @@ export default function EditProfile() {
               type="text"
               value={formData.bio}
               onChange={(e) => handleFieldChange('bio', e.target.value)}
-              placeholder={isEn ? 'e.g. BCS & Bank Job Candidate' : 'যেমন: সরকারি ও ব্যাংক চাকরি প্রত্যাশী'}
+              placeholder=""
               isDark={isDark}
             />
 
@@ -754,7 +744,7 @@ export default function EditProfile() {
               value={formData.qualification}
               onChange={(val) => handleFieldChange('qualification', val)}
               options={qualificationOptions}
-              placeholder={isEn ? 'Select Qualification' : 'শিক্ষাগত যোগ্যতা নির্বাচন করুন'}
+              placeholder=""
               isDark={isDark}
               isEn={isEn}
             />
@@ -766,7 +756,7 @@ export default function EditProfile() {
               value={formData.location}
               onChange={(val) => handleFieldChange('location', val)}
               options={locationOptions}
-              placeholder={isEn ? 'Select Location' : 'অবস্থান নির্বাচন করুন'}
+              placeholder=""
               isDark={isDark}
               isEn={isEn}
             />
