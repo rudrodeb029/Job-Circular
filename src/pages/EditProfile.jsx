@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import { db } from '../firebase';
+import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
 import { CLOUDINARY_CONFIG } from '../cloudinary';
 import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import { compressImageFile } from '../utils/mediaUtils';
@@ -25,7 +27,74 @@ const CameraIcon = ({ size = 18, color = 'currentColor' }) => (
   </svg>
 );
 
-// Clean styled form field with reduced corner curvness and removed icon
+// Helper: Sanitize string to lowercase alphanumeric & underscore
+const sanitizeUsername = (val = '') => {
+  return String(val)
+    .replace(/^@+/, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9_]/g, '')
+    .slice(0, 20);
+};
+
+// Check if a username is already taken by another user in Firestore
+const checkUsernameInFirestore = async (rawUsername, currentUserId) => {
+  const clean = sanitizeUsername(rawUsername);
+  if (!clean || clean.length < 3) {
+    return { available: false, error: 'Username must be at least 3 characters' };
+  }
+
+  try {
+    const q = query(
+      collection(db, 'users'),
+      where('username', '==', clean)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      return { available: true, clean };
+    }
+
+    // Check if the only matched user is the current user themselves
+    const matchesOtherUser = snap.docs.some(docSnap => {
+      const data = docSnap.data();
+      const docId = docSnap.id;
+      return docId !== currentUserId && data.id !== currentUserId;
+    });
+
+    if (matchesOtherUser) {
+      return { available: false, error: 'This user name already exists' };
+    }
+
+    return { available: true, clean };
+  } catch (err) {
+    console.warn('Firestore username check notice:', err);
+    // If offline/error, allow validation
+    return { available: true, clean };
+  }
+};
+
+// Generate an auto available unique username
+const generateUniqueUsername = async (baseName, currentUserId) => {
+  let seed = sanitizeUsername(baseName) || 'user';
+  if (seed.length < 3) seed = (seed + 'user').slice(0, 10);
+
+  // Try candidate variations with random suffixes
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const randomSuffix = attempt === 0
+      ? Math.floor(10 + Math.random() * 90)
+      : Math.floor(100 + Math.random() * 900);
+    const candidate = `${seed}${randomSuffix}`.slice(0, 20);
+
+    const result = await checkUsernameInFirestore(candidate, currentUserId);
+    if (result.available) {
+      return `@${candidate}`;
+    }
+  }
+
+  // Fallback unique with timestamp
+  return `@${seed}${Date.now().toString().slice(-4)}`;
+};
+
+// Clean styled form field with reduced corner curvness
 function CleanField({
   label,
   type = 'text',
@@ -78,7 +147,7 @@ function CleanField({
   );
 }
 
-// Clean Dropdown selector with reduced corner curvness and removed icon
+// Clean Dropdown selector with reduced corner curvness
 function CleanSelect({
   label,
   value,
@@ -319,9 +388,12 @@ export default function EditProfile() {
   const { state, dispatch } = useAppContext();
   const isDark = state.theme === 'dark';
 
-  // Keep ALL original user profile data intact
+  const currentUserId = state.user?.id || localStorage.getItem('user_id') || 'user_guest';
+
+  // Keep ALL user profile data intact with username support
   const [formData, setFormData] = useState({
     name: state.user?.name || '',
+    username: state.user?.username || '',
     phone: state.user?.phone || '',
     bio: state.user?.bio || '',
     qualification: state.user?.qualification || '',
@@ -330,9 +402,31 @@ export default function EditProfile() {
     coverPhoto: state.user?.coverPhoto || null
   });
 
+  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
+  const [isCheckingUsername, setIsCheckingUsername] = useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
+  const usernameCheckTimerRef = useRef(null);
+
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Auto-generate unique username on mount if user does not have one
+  useEffect(() => {
+    if (!state.user?.username && !formData.username) {
+      (async () => {
+        setIsCheckingUsername(true);
+        const auto = await generateUniqueUsername(formData.name || state.user?.name || 'user', currentUserId);
+        setFormData(prev => ({ ...prev, username: auto }));
+        setIsUsernameAvailable(true);
+        setUsernameError('');
+        setIsCheckingUsername(false);
+      })();
+    } else if (formData.username) {
+      setIsUsernameAvailable(true);
+    }
+  }, []);
 
   // Qualification Options (English primary)
   const qualificationOptions = [
@@ -357,6 +451,53 @@ export default function EditProfile() {
 
   const handleFieldChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Handle Username Typing with live uniqueness verification
+  const handleUsernameChange = (e) => {
+    let val = e.target.value;
+    if (!val.startsWith('@')) {
+      val = '@' + val.replace(/^@+/, '');
+    }
+    // Only allow lowercase a-z, 0-9, and underscore
+    const cleanChars = '@' + val.slice(1).replace(/[^a-z0-9_]/gi, '').toLowerCase();
+    setFormData(prev => ({ ...prev, username: cleanChars }));
+
+    const cleanRaw = cleanChars.slice(1);
+    if (cleanRaw.length < 3) {
+      setIsUsernameAvailable(false);
+      setUsernameError('Username must be at least 3 characters');
+      return;
+    }
+
+    setIsCheckingUsername(true);
+    setUsernameError('');
+
+    if (usernameCheckTimerRef.current) {
+      clearTimeout(usernameCheckTimerRef.current);
+    }
+
+    usernameCheckTimerRef.current = setTimeout(async () => {
+      const result = await checkUsernameInFirestore(cleanRaw, currentUserId);
+      setIsCheckingUsername(false);
+      if (result.available) {
+        setIsUsernameAvailable(true);
+        setUsernameError('');
+      } else {
+        setIsUsernameAvailable(false);
+        setUsernameError(result.error || 'This user name already exists');
+      }
+    }, 380);
+  };
+
+  // Button to auto-generate a new unique available username
+  const handleAutoGenerateUsername = async () => {
+    setIsCheckingUsername(true);
+    setUsernameError('');
+    const auto = await generateUniqueUsername(formData.name || state.user?.name || 'user', currentUserId);
+    setFormData(prev => ({ ...prev, username: auto }));
+    setIsUsernameAvailable(true);
+    setIsCheckingUsername(false);
   };
 
   const handleImageUpload = async (e) => {
@@ -416,9 +557,57 @@ export default function EditProfile() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch({ type: 'UPDATE_USER_PROFILE', payload: formData });
+
+    if (usernameError) {
+      alert(usernameError);
+      return;
+    }
+
+    const cleanUser = sanitizeUsername(formData.username);
+    if (!cleanUser || cleanUser.length < 3) {
+      alert('Please provide a valid username of at least 3 characters.');
+      return;
+    }
+
+    // Final check for uniqueness before saving
+    setIsCheckingUsername(true);
+    const result = await checkUsernameInFirestore(cleanUser, currentUserId);
+    setIsCheckingUsername(false);
+
+    if (!result.available) {
+      setUsernameError(result.error || 'This user name already exists');
+      alert(result.error || 'This user name already exists');
+      return;
+    }
+
+    const finalProfileData = {
+      ...formData,
+      username: `@${cleanUser}`
+    };
+
+    // Update global state & localStorage
+    dispatch({ type: 'UPDATE_USER_PROFILE', payload: finalProfileData });
+
+    // Store in Firestore collection 'users' so other users cannot take this username
+    try {
+      await setDoc(doc(db, 'users', currentUserId), {
+        id: currentUserId,
+        name: finalProfileData.name,
+        username: cleanUser,
+        phone: finalProfileData.phone,
+        bio: finalProfileData.bio,
+        qualification: finalProfileData.qualification,
+        location: finalProfileData.location,
+        avatar: finalProfileData.avatar,
+        coverPhoto: finalProfileData.coverPhoto,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (fsErr) {
+      console.warn('Firestore user doc sync warning:', fsErr);
+    }
+
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
@@ -730,7 +919,7 @@ export default function EditProfile() {
             </div>
           </div>
 
-          {/* ═════ Form Fields Stack (Reduced Corner Curvness: 6px, No Icons, Reduced Text Size) ═════ */}
+          {/* ═════ Form Fields Stack (Always English Labels, No Icons, Reduced Text Size) ═════ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {/* 1. Full Name */}
             <CleanField
@@ -742,7 +931,124 @@ export default function EditProfile() {
               required
             />
 
-            {/* 2. Phone Number */}
+            {/* 2. Username (Directly under Full Name with Auto-generation & Uniqueness Check) */}
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '5px'
+              }}>
+                <label style={{
+                  fontSize: '11.5px',
+                  fontWeight: 600,
+                  color: isDark ? '#cbd5e1' : '#475569'
+                }}>
+                  Username
+                </label>
+
+                {/* Auto-generate / Suggest Button */}
+                <button
+                  type="button"
+                  onClick={handleAutoGenerateUsername}
+                  disabled={isCheckingUsername}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#0d9488',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                  title="Generate unique available username"
+                >
+                  <span>🎲 Generate</span>
+                </button>
+              </div>
+
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={handleUsernameChange}
+                  onFocus={() => setIsUsernameFocused(true)}
+                  onBlur={() => setIsUsernameFocused(false)}
+                  placeholder="@username"
+                  style={{
+                    width: '100%',
+                    height: '42px',
+                    paddingLeft: '14px',
+                    paddingRight: '36px',
+                    fontSize: '13px',
+                    fontWeight: 500,
+                    color: isDark ? '#f8fafc' : '#0f172a',
+                    background: isDark ? 'rgba(30, 41, 59, 0.7)' : '#fcfbfc',
+                    border: `1px solid ${
+                      usernameError
+                        ? '#ef4444'
+                        : isUsernameFocused
+                          ? '#14b8a6'
+                          : (isDark ? 'rgba(255, 255, 255, 0.14)' : '#e2e8f0')
+                    }`,
+                    borderRadius: '6px',
+                    outline: 'none',
+                    boxShadow: usernameError
+                      ? '0 0 0 2.5px rgba(239, 68, 68, 0.12)'
+                      : isUsernameFocused
+                        ? '0 0 0 2.5px rgba(20, 184, 166, 0.12)'
+                        : 'none',
+                    transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
+                  }}
+                />
+
+                {/* Status Indicator */}
+                <div style={{
+                  position: 'absolute',
+                  right: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  pointerEvents: 'none'
+                }}>
+                  {isCheckingUsername ? (
+                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>...</span>
+                  ) : usernameError ? (
+                    <span style={{ fontSize: '13px', color: '#ef4444', fontWeight: 800 }}>✕</span>
+                  ) : isUsernameAvailable && formData.username ? (
+                    <span style={{ fontSize: '13px', color: '#10b981', fontWeight: 800 }}>✓</span>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Error / Available Message */}
+              {usernameError ? (
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  color: '#ef4444',
+                  marginTop: '4px',
+                  marginLeft: '2px'
+                }}>
+                  {usernameError}
+                </span>
+              ) : isUsernameAvailable && formData.username ? (
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  color: '#10b981',
+                  marginTop: '4px',
+                  marginLeft: '2px'
+                }}>
+                  ✓ Available
+                </span>
+              ) : null}
+            </div>
+
+            {/* 3. Phone Number */}
             <CleanField
               label="Phone Number"
               type="tel"
@@ -752,9 +1058,9 @@ export default function EditProfile() {
               isDark={isDark}
             />
 
-            {/* 3. Bio / Short Description */}
+            {/* 4. Bio */}
             <CleanField
-              label="Bio / Short Description"
+              label="Bio"
               type="text"
               value={formData.bio}
               onChange={(e) => handleFieldChange('bio', e.target.value)}
@@ -762,9 +1068,9 @@ export default function EditProfile() {
               isDark={isDark}
             />
 
-            {/* 4. Qualification (Select Dropdown) */}
+            {/* 5. Qualification */}
             <CleanSelect
-              label="Educational Qualification"
+              label="Qualification"
               value={formData.qualification}
               onChange={(val) => handleFieldChange('qualification', val)}
               options={qualificationOptions}
@@ -772,9 +1078,9 @@ export default function EditProfile() {
               isDark={isDark}
             />
 
-            {/* 5. Location / District (Select Dropdown) */}
+            {/* 6. Location */}
             <CleanSelect
-              label="District / Location"
+              label="Location"
               value={formData.location}
               onChange={(val) => handleFieldChange('location', val)}
               options={locationOptions}
@@ -790,21 +1096,23 @@ export default function EditProfile() {
           }}>
             <button
               type="submit"
-              disabled={uploadingImage || uploadingCover}
+              disabled={uploadingImage || uploadingCover || isCheckingUsername || Boolean(usernameError)}
               style={{
                 width: '100%',
                 height: '44px',
                 borderRadius: '6px',
-                background: savedSuccess ? '#0d9488' : '#136368',
+                background: (isCheckingUsername || Boolean(usernameError))
+                  ? '#94a3b8'
+                  : (savedSuccess ? '#0d9488' : '#136368'),
                 color: '#ffffff',
                 fontSize: '14.5px',
                 fontWeight: 700,
                 border: 'none',
-                cursor: 'pointer',
+                cursor: (isCheckingUsername || Boolean(usernameError)) ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: '0 3px 10px rgba(19, 99, 104, 0.24)',
+                boxShadow: (isCheckingUsername || Boolean(usernameError)) ? 'none' : '0 3px 10px rgba(19, 99, 104, 0.24)',
                 transition: 'all 0.2s ease'
               }}
             >
