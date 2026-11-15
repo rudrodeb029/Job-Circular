@@ -19,6 +19,7 @@ const AppContext = createContext();
 const initialUser = {
   id: localStorage.getItem('user_id') || `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
   name: '',
+  username: localStorage.getItem('user_username') || '',
   phone: '',
   qualification: '',
   category: 'gov',
@@ -33,6 +34,9 @@ if (!localStorage.getItem('user_id')) {
 }
 
 const savedUser = JSON.parse(localStorage.getItem('job_user')) || initialUser;
+if (!savedUser.username && localStorage.getItem('user_username')) {
+  savedUser.username = localStorage.getItem('user_username');
+}
 const initialPointsState = loadLocalPointsState();
 
 const initialState = {

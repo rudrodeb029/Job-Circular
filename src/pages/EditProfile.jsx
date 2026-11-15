@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { db } from '../firebase';
-import { collection, query, where, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, setDoc } from 'firebase/firestore';
 import { CLOUDINARY_CONFIG } from '../cloudinary';
 import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import { compressImageFile } from '../utils/mediaUtils';
@@ -82,26 +82,36 @@ const checkUsernameInFirestore = async (rawUsername, currentUserId) => {
   }
 };
 
-// Generate an auto available unique username
+// Generate a permanent unique available username (Deterministic per user so it NEVER auto-changes)
 const generateUniqueUsername = async (baseName, currentUserId) => {
   let seed = sanitizeUsername(baseName) || 'user';
   if (seed.length < 3) seed = (seed + 'user').slice(0, 10);
 
-  // Try candidate variations with random suffixes
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const randomSuffix = attempt === 0
-      ? Math.floor(10 + Math.random() * 90)
-      : Math.floor(100 + Math.random() * 900);
-    const candidate = `${seed}${randomSuffix}`.slice(0, 20);
+  // Derive stable deterministic suffix from user id
+  let hash = 0;
+  const idStr = String(currentUserId || 'user');
+  for (let i = 0; i < idStr.length; i++) {
+    hash = (hash * 31 + idStr.charCodeAt(i)) % 900;
+  }
+  const baseNum = 10 + (Math.abs(hash) % 90);
 
+  // Try stable candidate
+  const primaryCandidate = `${seed}${baseNum}`.slice(0, 20);
+  const primaryResult = await checkUsernameInFirestore(primaryCandidate, currentUserId);
+  if (primaryResult.available) {
+    return `@${primaryCandidate}`;
+  }
+
+  // If primary taken, try deterministic sequence
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    const candidate = `${seed}${(baseNum + attempt * 13) % 900 + 10}`.slice(0, 20);
     const result = await checkUsernameInFirestore(candidate, currentUserId);
     if (result.available) {
       return `@${candidate}`;
     }
   }
 
-  // Fallback unique with timestamp
-  return `@${seed}${Date.now().toString().slice(-4)}`;
+  return `@${seed}${baseNum}`;
 };
 
 // Clean styled form field with reduced corner curvness
@@ -399,11 +409,12 @@ export default function EditProfile() {
   const isDark = state.theme === 'dark';
 
   const currentUserId = state.user?.id || localStorage.getItem('user_id') || 'user_guest';
+  const savedUsername = state.user?.username || localStorage.getItem('user_username') || '';
 
   // Keep ALL user profile data intact with username support
   const [formData, setFormData] = useState({
     name: state.user?.name || '',
-    username: state.user?.username || '',
+    username: savedUsername,
     phone: state.user?.phone || '',
     bio: state.user?.bio || '',
     qualification: state.user?.qualification || '',
@@ -415,28 +426,64 @@ export default function EditProfile() {
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [usernameError, setUsernameError] = useState('');
   const [isCheckingUsername, setIsCheckingUsername] = useState(false);
-  const [isUsernameAvailable, setIsUsernameAvailable] = useState(false);
+  const [isUsernameAvailable, setIsUsernameAvailable] = useState(Boolean(savedUsername));
   const usernameCheckTimerRef = useRef(null);
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  // Auto-generate unique username on mount if user does not have one
+  // Preserve & load username: Once selected/generated, it NEVER auto-changes
   useEffect(() => {
-    if (!state.user?.username && !formData.username) {
-      (async () => {
+    // 1. If user already has a saved username in state or localStorage, lock it in place
+    const existing = state.user?.username || localStorage.getItem('user_username');
+    if (existing) {
+      if (!formData.username) {
+        setFormData(prev => ({ ...prev, username: existing }));
+      }
+      setIsUsernameAvailable(true);
+      return;
+    }
+
+    let isCancelled = false;
+    (async () => {
+      // 2. Check if Firestore already has a username registered for this user
+      try {
+        const userDocRef = doc(db, 'users', currentUserId);
+        const userSnap = await getDoc(userDocRef);
+        if (userSnap.exists() && userSnap.data()?.username) {
+          const fsUser = userSnap.data().username;
+          const formatted = fsUser.startsWith('@') ? fsUser : `@${fsUser}`;
+          if (!isCancelled) {
+            setFormData(prev => ({ ...prev, username: formatted }));
+            localStorage.setItem('user_username', formatted);
+            setIsUsernameAvailable(true);
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn('Firestore user fetch notice:', err);
+      }
+
+      // 3. Only if user has NO username at all, generate one permanent unique username
+      if (!isCancelled && !formData.username) {
         setIsCheckingUsername(true);
         const auto = await generateUniqueUsername(formData.name || state.user?.name || 'user', currentUserId);
-        setFormData(prev => ({ ...prev, username: auto }));
-        setIsUsernameAvailable(true);
-        setUsernameError('');
-        setIsCheckingUsername(false);
-      })();
-    } else if (formData.username) {
-      setIsUsernameAvailable(true);
-    }
-  }, []);
+        if (!isCancelled) {
+          setFormData(prev => ({ ...prev, username: auto }));
+          // Immediately save in localStorage so subsequent reloads or visits NEVER change it
+          localStorage.setItem('user_username', auto);
+          setIsUsernameAvailable(true);
+          setUsernameError('');
+          setIsCheckingUsername(false);
+        }
+      }
+    })();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentUserId]);
 
   // Qualification Options (English primary)
   const qualificationOptions = [
@@ -473,6 +520,11 @@ export default function EditProfile() {
     const cleanChars = '@' + val.slice(1).replace(/[^a-z0-9_]/gi, '').toLowerCase();
     setFormData(prev => ({ ...prev, username: cleanChars }));
 
+    // Lock and persist the user-selected username immediately so it never auto-changes
+    if (cleanChars.length > 1) {
+      localStorage.setItem('user_username', cleanChars);
+    }
+
     const cleanRaw = cleanChars.slice(1);
     if (cleanRaw.length < 3) {
       setIsUsernameAvailable(false);
@@ -498,16 +550,6 @@ export default function EditProfile() {
         setUsernameError(result.error || 'This user name already exists');
       }
     }, 380);
-  };
-
-  // Button to auto-generate a new unique available username
-  const handleAutoGenerateUsername = async () => {
-    setIsCheckingUsername(true);
-    setUsernameError('');
-    const auto = await generateUniqueUsername(formData.name || state.user?.name || 'user', currentUserId);
-    setFormData(prev => ({ ...prev, username: auto }));
-    setIsUsernameAvailable(true);
-    setIsCheckingUsername(false);
   };
 
   const handleImageUpload = async (e) => {
@@ -596,6 +638,8 @@ export default function EditProfile() {
       ...formData,
       username: `@${cleanUser}`
     };
+
+    localStorage.setItem('user_username', `@${cleanUser}`);
 
     // Update global state & localStorage
     dispatch({ type: 'UPDATE_USER_PROFILE', payload: finalProfileData });
@@ -978,42 +1022,14 @@ export default function EditProfile() {
 
             {/* 2. Username (Directly under Full Name with Auto-generation & Uniqueness Check) */}
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+              <label style={{
+                fontSize: '11.5px',
+                fontWeight: 600,
+                color: isDark ? '#cbd5e1' : '#475569',
                 marginBottom: '5px'
               }}>
-                <label style={{
-                  fontSize: '11.5px',
-                  fontWeight: 600,
-                  color: isDark ? '#cbd5e1' : '#475569'
-                }}>
-                  Username
-                </label>
-
-                {/* Auto-generate / Suggest Button */}
-                <button
-                  type="button"
-                  onClick={handleAutoGenerateUsername}
-                  disabled={isCheckingUsername}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    padding: 0,
-                    fontSize: '11px',
-                    fontWeight: 600,
-                    color: '#0d9488',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                  title="Generate unique available username"
-                >
-                  <span>🎲 Generate</span>
-                </button>
-              </div>
+                Username
+              </label>
 
               <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                 <input
@@ -1069,8 +1085,8 @@ export default function EditProfile() {
                 </div>
               </div>
 
-              {/* Error / Available Message */}
-              {usernameError ? (
+              {/* Error Message (Only shown in red when taken or invalid) */}
+              {usernameError && (
                 <span style={{
                   fontSize: '11px',
                   fontWeight: 500,
@@ -1080,17 +1096,7 @@ export default function EditProfile() {
                 }}>
                   {usernameError}
                 </span>
-              ) : isUsernameAvailable && formData.username ? (
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: 500,
-                  color: '#10b981',
-                  marginTop: '4px',
-                  marginLeft: '2px'
-                }}>
-                  ✓ Available
-                </span>
-              ) : null}
+              )}
             </div>
 
             {/* 3. Phone Number */}
