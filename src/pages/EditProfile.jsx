@@ -1,317 +1,140 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, User, Edit, FileText, MapPin, Camera } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { CLOUDINARY_CONFIG } from '../cloudinary';
 import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import { compressImageFile } from '../utils/mediaUtils';
 
-const PhoneIcon = ({ size = 15, color = 'currentColor' }) => (
+// Precise custom SVG icons matching the mockup
+const ChevronLeftIcon = ({ size = 22, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m15 18-6-6 6-6" />
+  </svg>
+);
+
+const PencilIcon = ({ size = 13, color = 'white' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+  </svg>
+);
+
+const MailIcon = ({ size = 17, color = '#64748b' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+  </svg>
+);
+
+const GlobeIcon = ({ size = 17, color = '#64748b' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="10" />
+    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+    <path d="M2 12h20" />
+  </svg>
+);
+
+const PhoneIcon = ({ size = 17, color = '#64748b' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
   </svg>
 );
 
-function FormInput({ label, icon, type = 'text', value, onChange, placeholder, required = false, isOptional = false, isEn = false, autoComplete = 'off' }) {
+const CalendarIcon = ({ size = 17, color = '#64748b' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
+function CleanField({
+  label,
+  icon,
+  type = 'text',
+  value,
+  onChange,
+  placeholder,
+  errorText = '',
+  isDark = false,
+  required = false
+}) {
   const [isFocused, setIsFocused] = useState(false);
+
+  const hasError = Boolean(errorText);
+
+  let borderColor = isDark ? 'rgba(255, 255, 255, 0.14)' : '#e2e8f0';
+  if (hasError) {
+    borderColor = '#f87171';
+  } else if (isFocused) {
+    borderColor = '#14b8a6';
+  }
+
+  const bg = isDark ? 'rgba(30, 41, 59, 0.7)' : '#fcfbfc';
+
   return (
-    <div style={{ marginBottom: '14px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
       <label style={{
-        fontSize: '12px',
-        fontWeight: 700,
-        color: 'var(--text-secondary)',
-        marginBottom: '6px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px'
+        fontSize: '13px',
+        fontWeight: 600,
+        color: isDark ? '#e2e8f0' : '#1e293b',
+        marginBottom: '6px'
       }}>
-        <span>{label}</span>
-        {isOptional && (
-          <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>
-            ({isEn ? 'Optional' : 'ঐচ্ছিক'})
-          </span>
-        )}
+        {label}
       </label>
       <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-        <div style={{
-          position: 'absolute',
-          left: '12px',
-          color: isFocused ? 'var(--primary)' : 'var(--text-muted)',
-          display: 'flex',
-          alignItems: 'center',
-          pointerEvents: 'none',
-          transition: 'color 0.2s',
-          zIndex: 2
-        }}>
-          {icon}
-        </div>
+        {icon && (
+          <div style={{
+            position: 'absolute',
+            left: '14px',
+            color: hasError ? '#ef4444' : (isFocused ? '#14b8a6' : '#64748b'),
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            pointerEvents: 'none',
+            transition: 'color 0.2s ease',
+            zIndex: 2
+          }}>
+            {icon}
+          </div>
+        )}
         <input
           type={type}
           value={value}
           onChange={onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          required={required}
           placeholder={placeholder}
-          autoComplete={autoComplete}
+          required={required}
           style={{
             width: '100%',
-            height: '42px',
-            padding: '8px 12px 8px 36px',
-            fontSize: '13px',
-            fontWeight: 600,
-            background: isFocused ? 'var(--card-bg, #ffffff)' : 'var(--bg-secondary)',
-            border: isFocused ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-            borderRadius: '12px',
-            color: 'var(--text-primary)',
-            boxShadow: isFocused ? '0 0 0 3px rgba(26, 86, 219, 0.08)' : 'none',
-            transition: 'all 0.2s',
-            outline: 'none'
+            height: '46px',
+            paddingLeft: icon ? '44px' : '14px',
+            paddingRight: '14px',
+            fontSize: '14px',
+            fontWeight: 500,
+            color: isDark ? '#f8fafc' : '#0f172a',
+            background: bg,
+            border: `1px solid ${borderColor}`,
+            borderRadius: '10px',
+            outline: 'none',
+            boxShadow: hasError
+              ? '0 0 0 3px rgba(239, 68, 68, 0.1)'
+              : (isFocused ? '0 0 0 3px rgba(20, 184, 166, 0.12)' : 'none'),
+            transition: 'border-color 0.2s ease, box-shadow 0.2s ease'
           }}
         />
       </div>
-    </div>
-  );
-}
-
-function ModernSelect({ label, icon, value, onChange, options = [], placeholder = '', isOptional = false, isEn = false }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const selectedOption = options.find(opt => opt.value === value);
-  const displayLabel = selectedOption
-    ? (isEn && selectedOption.labelEn ? selectedOption.labelEn : selectedOption.label)
-    : placeholder;
-
-  return (
-    <div style={{ marginBottom: '14px' }}>
-      <label style={{
-        fontSize: '12px',
-        fontWeight: 700,
-        color: 'var(--text-secondary)',
-        marginBottom: '6px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px'
-      }}>
-        <span>{label}</span>
-        {isOptional && (
-          <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text-muted)' }}>
-            ({isEn ? 'Optional' : 'ঐচ্ছিক'})
-          </span>
-        )}
-      </label>
-
-      <div
-        onClick={() => setIsOpen(true)}
-        style={{
-          position: 'relative',
-          display: 'flex',
-          alignItems: 'center',
-          height: '42px',
-          padding: '8px 30px 8px 36px',
-          background: isOpen ? 'var(--card-bg, #ffffff)' : 'var(--bg-secondary)',
-          border: isOpen ? '1.5px solid var(--primary)' : '1px solid var(--border)',
-          borderRadius: '12px',
-          cursor: 'pointer',
-          boxShadow: isOpen ? '0 4px 14px rgba(26, 86, 219, 0.1)' : 'none',
-          transition: 'all 0.2s ease',
-          userSelect: 'none'
-        }}
-      >
-        <div style={{
-          position: 'absolute',
-          left: '12px',
-          color: isOpen ? 'var(--primary)' : 'var(--text-muted)',
-          display: 'flex',
-          alignItems: 'center',
-          pointerEvents: 'none'
-        }}>
-          {icon}
-        </div>
-
+      {hasError && (
         <span style={{
-          fontSize: '13px',
-          fontWeight: 600,
-          color: selectedOption ? 'var(--text-primary)' : 'var(--text-muted)',
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          flex: 1
+          fontSize: '11.5px',
+          fontWeight: 500,
+          color: '#ef4444',
+          marginTop: '4px',
+          marginLeft: '2px'
         }}>
-          {displayLabel}
+          {errorText}
         </span>
-
-        <div style={{
-          position: 'absolute',
-          right: '10px',
-          color: isOpen ? 'var(--primary)' : '#94a3b8',
-          display: 'flex',
-          alignItems: 'center',
-          transition: 'transform 0.2s ease',
-          transform: isOpen ? 'rotate(180deg)' : 'none'
-        }}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </div>
-      </div>
-
-      {/* Modern Curved Modal Sheet for Options */}
-      {isOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 9999,
-            background: 'rgba(15, 23, 42, 0.45)',
-            backdropFilter: 'blur(4px)',
-            WebkitBackdropFilter: 'blur(4px)',
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'center',
-            padding: '16px',
-            animation: 'fadeIn 0.2s ease'
-          }}
-          onClick={() => setIsOpen(false)}
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: '100%',
-              maxWidth: '440px',
-              maxHeight: '70vh',
-              background: 'var(--card-bg, #ffffff)',
-              borderRadius: '24px',
-              border: '1px solid var(--border)',
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.25)',
-              display: 'flex',
-              flexDirection: 'column',
-              overflow: 'hidden',
-              animation: 'slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
-            }}
-          >
-            {/* Modal Header */}
-            <div style={{
-              padding: '16px 20px 12px 20px',
-              borderBottom: '1px solid var(--border)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              background: 'var(--bg-secondary)'
-            }}>
-              <div>
-                <h4 style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>
-                  {label}
-                </h4>
-              </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                style={{
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  background: 'var(--border)',
-                  border: 'none',
-                  color: 'var(--text-muted)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  fontWeight: 800,
-                  fontSize: '13px'
-                }}
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Options List */}
-            <div style={{
-              padding: '12px',
-              overflowY: 'auto',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '6px',
-              maxHeight: '52vh'
-            }}>
-              {/* Optional Reset Option */}
-              <div
-                onClick={() => {
-                  onChange('');
-                  setIsOpen(false);
-                }}
-                style={{
-                  padding: '12px 16px',
-                  borderRadius: '14px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  background: value === '' ? 'var(--primary-bg, #eff6ff)' : 'transparent',
-                  color: value === '' ? 'var(--primary)' : 'var(--text-muted)',
-                  border: value === '' ? '1.5px solid rgba(26, 86, 219, 0.3)' : '1px dashed var(--border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  transition: 'all 0.15s'
-                }}
-              >
-                <span>{placeholder}</span>
-                {value === '' && <span style={{ fontWeight: 800, color: 'var(--primary)' }}>✓</span>}
-              </div>
-
-              {options.map((opt) => {
-                const isSelected = value === opt.value;
-                const itemLabel = isEn && opt.labelEn ? opt.labelEn : opt.label;
-                return (
-                  <div
-                    key={opt.value}
-                    onClick={() => {
-                      onChange(opt.value);
-                      setIsOpen(false);
-                    }}
-                    style={{
-                      padding: '12px 16px',
-                      borderRadius: '14px',
-                      fontSize: '13.5px',
-                      fontWeight: isSelected ? 700 : 600,
-                      cursor: 'pointer',
-                      background: isSelected
-                        ? 'linear-gradient(135deg, rgba(26, 86, 219, 0.1) 0%, rgba(37, 99, 235, 0.15) 100%)'
-                        : 'var(--bg-secondary)',
-                      color: isSelected ? 'var(--primary)' : 'var(--text-primary)',
-                      border: isSelected ? '1.5px solid var(--primary)' : '1px solid transparent',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      transition: 'all 0.15s'
-                    }}
-                  >
-                    <span>{itemLabel}</span>
-                    {isSelected && (
-                      <div style={{
-                        width: '22px',
-                        height: '22px',
-                        borderRadius: '50%',
-                        background: 'var(--primary)',
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '12px',
-                        fontWeight: 800
-                      }}>
-                        ✓
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
       )}
     </div>
   );
@@ -320,53 +143,49 @@ function ModernSelect({ label, icon, value, onChange, options = [], placeholder 
 export default function EditProfile() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
+  const isDark = state.theme === 'dark';
   const isEn = state.language === 'en';
 
+  const defaultUsername = state.user?.username || (state.user?.name ? `@${state.user.name.toLowerCase().replace(/[^a-z0-9]/g, '')}` : '@');
+
   const [formData, setFormData] = useState({
-    name: state.user.name || '',
-    phone: state.user.phone || '',
-    qualification: state.user.qualification || '',
-    location: state.user.location || '',
-    avatar: state.user.avatar || null,
-    coverPhoto: state.user.coverPhoto || null,
-    bio: state.user.bio || ''
+    name: state.user?.name || '',
+    username: defaultUsername,
+    email: state.user?.email || '',
+    website: state.user?.website || '',
+    phone: state.user?.phone || '',
+    dob: state.user?.dob || '',
+    avatar: state.user?.avatar || null,
+    // Preserve existing fields for backward compatibility
+    coverPhoto: state.user?.coverPhoto || null,
+    bio: state.user?.bio || '',
+    qualification: state.user?.qualification || '',
+    location: state.user?.location || ''
   });
 
-  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [usernameError, setUsernameError] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [uploadingCover, setUploadingCover] = useState(false);
+  const [savedSuccess, setSavedSuccess] = useState(false);
 
-  const qualificationOptions = [
-    { value: 'স্নাতক (Bachelor)', label: 'স্নাতক (Bachelor)', labelEn: 'Bachelor (স্নাতক)' },
-    { value: 'স্নাতকোত্তর (Master)', label: 'স্নাতকোত্তর (Master)', labelEn: 'Master (স্নাতকোত্তর)' },
-    { value: 'এইচএসসি (HSC)', label: 'এইচএসসি (HSC)', labelEn: 'HSC (এইচএসসি)' },
-    { value: 'এসএসসি (SSC)', label: 'এসএসসি (SSC)', labelEn: 'SSC (এসএসসি)' },
-    { value: 'ডিপ্লোমা (Diploma)', label: 'ডিপ্লোমা (Diploma)', labelEn: 'Diploma (ডিপ্লোমা)' }
-  ];
-
-  const locationOptions = [
-    { value: 'ঢাকা', label: 'Dhaka (ঢাকা)', labelEn: 'Dhaka (ঢাকা)' },
-    { value: 'চট্টগ্রাম', label: 'Chattogram (চট্টগ্রাম)', labelEn: 'Chattogram (চট্টগ্রাম)' },
-    { value: 'রাজশাহী', label: 'Rajshahi (রাজশাহী)', labelEn: 'Rajshahi (রাজশাহী)' },
-    { value: 'খুলনা', label: 'Khulna (খুলনা)', labelEn: 'Khulna (খুলনা)' },
-    { value: 'সিলেট', label: 'Sylhet (সিলেট)', labelEn: 'Sylhet (সিলেট)' },
-    { value: 'বরিশাল', label: 'Barishal (বরিশাল)', labelEn: 'Barishal (বরিশাল)' },
-    { value: 'রংপুর', label: 'Rangpur (রংপুর)', labelEn: 'Rangpur (রংপুর)' },
-    { value: 'ময়মনসিংহ', label: 'Mymensingh (ময়মনসিংহ)', labelEn: 'Mymensingh (ময়মনসিংহ)' }
-  ];
-
-  const handleChange = (field, value) => {
+  const handleFieldChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'username') {
+      if (value.includes(' ')) {
+        setUsernameError(isEn ? 'Username cannot contain spaces' : 'ইউজারনেমে স্পেস থাকতে পারবে না');
+      } else {
+        setUsernameError('');
+      }
+    }
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
     if (!file) return;
 
     setUploadingImage(true);
     try {
-      const cloudName = CLOUDINARY_CONFIG.cloudName;
-      const uploadPreset = CLOUDINARY_CONFIG.uploadPreset;
+      const cloudName = CLOUDINARY_CONFIG?.cloudName;
+      const uploadPreset = CLOUDINARY_CONFIG?.uploadPreset;
 
       if (cloudName && uploadPreset && cloudName !== 'dqy39gghx') {
         const data = new FormData();
@@ -398,296 +217,295 @@ export default function EditProfile() {
     }
   };
 
-  const handleCoverUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    setUploadingCover(true);
-    try {
-      const dataUrl = await compressImageFile(file, 960, 0.8);
-      setFormData(prev => ({ ...prev, coverPhoto: dataUrl }));
-    } catch (err) {
-      console.error(err);
-      alert('Cover upload failed');
-    } finally {
-      setUploadingCover(false);
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch({ type: 'UPDATE_USER_PROFILE', payload: formData });
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
-      navigate('/profile');
-    }, 1200);
+      navigate(-1);
+    }, 700);
   };
 
   return (
-    <div className="page" style={{ background: 'var(--bg)', paddingBottom: '85px' }}>
-      {/* Glassmorphism Gradient Hero Header / Cover */}
+    <div style={{
+      minHeight: '100vh',
+      background: isDark ? '#0f172a' : '#ffffff',
+      color: isDark ? '#f8fafc' : '#0f172a',
+      display: 'flex',
+      flexDirection: 'column',
+      position: 'relative'
+    }}>
+      {/* Top Header Bar */}
       <div style={{
-        background: formData.coverPhoto
-          ? `linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.7)), url(${formData.coverPhoto}) center/cover no-repeat`
-          : 'linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #2563eb 100%)',
-        padding: 'calc(var(--safe-area-top) + 10px) 16px 40px 16px',
-        color: 'white',
-        textAlign: 'center',
-        borderRadius: '0 0 16px 16px',
-        position: 'relative',
-        boxShadow: '0 8px 25px -4px rgba(26, 86, 219, 0.3)',
-        overflow: 'hidden'
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        background: isDark ? '#0f172a' : '#ffffff',
+        padding: 'calc(var(--safe-area-top, 0px) + 12px) 16px 12px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #f8fafc'
       }}>
-        {/* Decorative Background Rings */}
-        <div style={{
-          position: 'absolute',
-          top: '-40px',
-          right: '-40px',
-          width: '140px',
-          height: '140px',
-          borderRadius: '50%',
-          background: 'rgba(255, 255, 255, 0.08)',
-          pointerEvents: 'none'
-        }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '-30px',
-          left: '-30px',
-          width: '100px',
-          height: '100px',
-          borderRadius: '50%',
-          background: 'rgba(255, 255, 255, 0.05)',
-          pointerEvents: 'none'
-        }} />
-
-        {/* Top Header Controls */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '8px',
-          position: 'relative',
-          zIndex: 2
-        }}>
-          <button
-            onClick={() => navigate(-1)}
-            aria-label="Go back"
-            style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.18)',
-              backdropFilter: 'blur(8px)',
-              color: 'white',
-              border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer'
-            }}
-          >
-            <ArrowLeft size={18} />
-          </button>
-
-          {/* Change Cover Button */}
-          <label htmlFor="edit-cover-upload" style={{
-            padding: '5px 10px',
-            borderRadius: '8px',
-            background: 'rgba(15, 23, 42, 0.55)',
-            backdropFilter: 'blur(8px)',
-            color: 'white',
-            border: '1px solid rgba(255, 255, 255, 0.35)',
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+          style={{
+            background: 'none',
+            border: 'none',
+            padding: '6px',
+            color: isDark ? '#f8fafc' : '#0f172a',
+            cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '5px',
-            fontSize: '11px',
-            fontWeight: 700,
-            cursor: 'pointer',
-            boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
-          }}>
-            <Camera size={13} />
-            <span>{uploadingCover ? '...' : (isEn ? 'Cover Photo' : 'কভার ছবি')}</span>
-          </label>
-          <input
-            id="edit-cover-upload"
-            type="file"
-            accept="image/*"
-            onChange={handleCoverUpload}
-            style={{ display: 'none' }}
-            disabled={uploadingCover}
-          />
-        </div>
+            justifyContent: 'center',
+            borderRadius: '50%'
+          }}
+        >
+          <ChevronLeftIcon size={24} />
+        </button>
 
-        {/* Integrated Avatar Section */}
-        <div style={{ textAlign: 'center', position: 'relative', zIndex: 2 }}>
-          <div style={{
-            position: 'relative',
-            width: '74px',
-            height: '74px',
-            margin: '0 auto'
-          }}>
-            {formData.avatar ? (
-              <img
-                src={formData.avatar}
-                alt="Profile"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '3px solid #ffffff',
-                  boxShadow: '0 6px 18px rgba(0,0,0,0.22)',
-                  opacity: uploadingImage ? 0.5 : 1
-                }}
-              />
-            ) : (
-              <div style={{
-                width: '100%',
-                height: '100%',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.25)',
-                backdropFilter: 'blur(10px)',
-                color: 'white',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '26px',
-                fontWeight: 800,
-                border: '3px solid #ffffff',
-                boxShadow: '0 6px 18px rgba(0,0,0,0.22)',
-                opacity: uploadingImage ? 0.5 : 1
-              }}>
-                {formData.name ? formData.name[0].toUpperCase() : 'U'}
-              </div>
-            )}
+        <h1 style={{
+          fontSize: '17px',
+          fontWeight: 700,
+          color: isDark ? '#f8fafc' : '#0f172a',
+          margin: 0,
+          letterSpacing: '-0.2px'
+        }}>
+          Edit Profile
+        </h1>
 
-            {uploadingImage && (
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(0,0,0,0.5)',
-                borderRadius: '50%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                fontSize: '9px',
-                fontWeight: 800
-              }}>
-                {isEn ? 'Uploading...' : 'আপলোড হচ্ছে...'}
-              </div>
-            )}
-
-            <label htmlFor="avatar-upload" style={{
-              position: 'absolute',
-              bottom: '1px',
-              right: '1px',
-              width: '28px',
-              height: '28px',
-              borderRadius: '50%',
-              background: '#ffffff',
-              color: '#2563eb',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              boxShadow: '0 3px 10px rgba(0,0,0,0.22)'
-            }}>
-              <Edit size={14} />
-            </label>
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              style={{ display: 'none' }}
-              disabled={uploadingImage}
-            />
-          </div>
-        </div>
+        {/* Placeholder to balance back button */}
+        <div style={{ width: '36px' }} />
       </div>
 
-      <div className="page-content animate-fade-in" style={{ padding: '0 16px 16px 16px', marginTop: '-18px', position: 'relative', zIndex: 3 }}>
-        <form onSubmit={handleSubmit}>
+      {/* Main Content Area */}
+      <div style={{
+        maxWidth: '460px',
+        width: '100%',
+        margin: '0 auto',
+        padding: '0 20px 110px 20px',
+        flex: 1
+      }}>
+        <form id="edit-profile-form" onSubmit={handleSubmit}>
+          {/* Centered Circular Avatar with Teal Border and Floating Badge */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '20px',
+            marginBottom: '28px'
+          }}>
+            <div style={{
+              position: 'relative',
+              width: '116px',
+              height: '116px'
+            }}>
+              {/* Avatar circle */}
+              <div
+                onClick={() => document.getElementById('avatar-file-input')?.click()}
+                style={{
+                  width: '116px',
+                  height: '116px',
+                  borderRadius: '50%',
+                  border: '2.5px solid #14b8a6',
+                  overflow: 'hidden',
+                  background: isDark ? '#1e293b' : '#f1f5f9',
+                  boxShadow: '0 4px 14px rgba(20, 184, 166, 0.15)',
+                  cursor: 'pointer',
+                  position: 'relative'
+                }}
+              >
+                {formData.avatar ? (
+                  <img
+                    src={formData.avatar}
+                    alt="Profile"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      opacity: uploadingImage ? 0.4 : 1,
+                      transition: 'opacity 0.2s ease'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '100%',
+                    height: '100%',
+                    background: 'linear-gradient(135deg, #ccfbf1 0%, #99f6e4 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#0f766e',
+                    fontSize: '38px',
+                    fontWeight: 700
+                  }}>
+                    {formData.name ? formData.name[0].toUpperCase() : 'U'}
+                  </div>
+                )}
 
-          {/* Form Fields Card */}
-          <div className="card" style={{ padding: '16px 16px 6px 16px', borderRadius: '12px', boxShadow: '0 4px 18px rgba(0, 0, 0, 0.04)', border: '1px solid var(--border)' }}>
-            <FormInput
-              label={isEn ? 'Full name' : 'পূর্ণ নাম'}
-              icon={<User size={16} />}
+                {/* Uploading Spinner Overlay */}
+                {uploadingImage && (
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0, 0, 0, 0.45)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#ffffff',
+                    fontSize: '11px',
+                    fontWeight: 700
+                  }}>
+                    ...
+                  </div>
+                )}
+              </div>
+
+              {/* Floating Teal Edit Pencil Badge */}
+              <label
+                htmlFor="avatar-file-input"
+                style={{
+                  position: 'absolute',
+                  bottom: '3px',
+                  right: '3px',
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: '#14b8a6',
+                  border: isDark ? '2.5px solid #0f172a' : '2.5px solid #ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
+                  transition: 'transform 0.15s ease'
+                }}
+                title="Change Photo"
+              >
+                <PencilIcon size={12} color="#ffffff" />
+              </label>
+
+              {/* Hidden File Input */}
+              <input
+                id="avatar-file-input"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                disabled={uploadingImage}
+                style={{ display: 'none' }}
+              />
+            </div>
+          </div>
+
+          {/* Form Fields Stack */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* 1. Full Name */}
+            <CleanField
+              label="Full Name"
               value={formData.name}
-              onChange={(e) => handleChange('name', e.target.value)}
-              placeholder={isEn ? 'Enter your name' : 'আপনার নাম লিখুন'}
+              onChange={(e) => handleFieldChange('name', e.target.value)}
+              placeholder="Ahmed Marwan"
+              isDark={isDark}
               required
             />
 
-            <FormInput
-              label={isEn ? 'Phone number' : 'মোবাইল নম্বর'}
-              icon={<PhoneIcon size={15} />}
+            {/* 2. Username */}
+            <CleanField
+              label="Username"
+              value={formData.username}
+              onChange={(e) => handleFieldChange('username', e.target.value)}
+              placeholder="@ahhmedd123"
+              errorText={usernameError}
+              isDark={isDark}
+            />
+
+            {/* 3. E-mail */}
+            <CleanField
+              label="E-mail"
+              icon={<MailIcon size={17} />}
+              type="email"
+              value={formData.email}
+              onChange={(e) => handleFieldChange('email', e.target.value)}
+              placeholder="example123@gmail.com"
+              isDark={isDark}
+            />
+
+            {/* 4. Website */}
+            <CleanField
+              label="Website"
+              icon={<GlobeIcon size={17} />}
+              type="text"
+              value={formData.website}
+              onChange={(e) => handleFieldChange('website', e.target.value)}
+              placeholder="www.example123.com"
+              isDark={isDark}
+            />
+
+            {/* 5. Phone */}
+            <CleanField
+              label="Phone"
+              icon={<PhoneIcon size={17} />}
               type="tel"
               value={formData.phone}
-              onChange={(e) => handleChange('phone', e.target.value)}
-              placeholder={isEn ? 'Enter phone number' : 'মোবাইল নম্বর লিখুন'}
-              isOptional
-              isEn={isEn}
+              onChange={(e) => handleFieldChange('phone', e.target.value)}
+              placeholder="+20100******"
+              isDark={isDark}
             />
 
-            <FormInput
-              label={isEn ? 'Bio / Short Description' : 'বায়ো / পরিচয়'}
-              icon={<FileText size={15} />}
-              value={formData.bio}
-              onChange={(e) => handleChange('bio', e.target.value)}
-              placeholder={isEn ? 'e.g. BCS & Bank Job Candidate' : 'যেমন: সরকারি ও ব্যাংক চাকরি প্রত্যাশী'}
-              isOptional
-              isEn={isEn}
+            {/* 6. Date of birth */}
+            <CleanField
+              label="Date of birth"
+              icon={<CalendarIcon size={17} />}
+              type="text"
+              value={formData.dob}
+              onChange={(e) => handleFieldChange('dob', e.target.value)}
+              placeholder="08/10/2000"
+              isDark={isDark}
             />
-
-            <ModernSelect
-              label={isEn ? 'Qualification' : 'শিক্ষাগত যোগ্যতা'}
-              icon={<FileText size={16} />}
-              value={formData.qualification}
-              onChange={(val) => handleChange('qualification', val)}
-              options={qualificationOptions}
-              placeholder={isEn ? 'Select Qualification' : 'শিক্ষাগত যোগ্যতা নির্বাচন করুন'}
-              isOptional
-              isEn={isEn}
-            />
-
-            <ModernSelect
-              label={isEn ? 'Location' : 'জেলা / অবস্থান'}
-              icon={<MapPin size={16} />}
-              value={formData.location}
-              onChange={(val) => handleChange('location', val)}
-              options={locationOptions}
-              placeholder={isEn ? 'Select Location' : 'অবস্থান নির্বাচন করুন'}
-              isOptional
-              isEn={isEn}
-            />
-          </div>
-
-          <div style={{ marginTop: '18px' }}>
-            <button
-              type="submit"
-              className="btn btn-primary btn-block"
-              style={{
-                background: savedSuccess ? '#10b981' : 'linear-gradient(135deg, var(--primary) 0%, #2563eb 100%)',
-                height: '44px',
-                borderRadius: '14px',
-                fontSize: '14px',
-                fontWeight: 700,
-                boxShadow: savedSuccess ? '0 6px 16px rgba(16,185,129,0.25)' : '0 6px 16px rgba(26,86,219,0.25)'
-              }}
-            >
-              {savedSuccess
-                ? (isEn ? '✓ Profile Updated!' : '✓ সফলভাবে আপডেট হয়েছে!')
-                : (isEn ? 'Save' : 'সংরক্ষণ করুন')}
-            </button>
           </div>
         </form>
+      </div>
+
+      {/* Fixed Bottom Save Button Bar */}
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: isDark ? '#0f172a' : '#ffffff',
+        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #f1f5f9',
+        padding: '12px 20px calc(var(--safe-area-bottom, 0px) + 14px) 20px',
+        zIndex: 50,
+        boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.03)'
+      }}>
+        <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
+          <button
+            type="submit"
+            form="edit-profile-form"
+            disabled={uploadingImage}
+            style={{
+              width: '100%',
+              height: '48px',
+              borderRadius: '10px',
+              background: savedSuccess ? '#0d9488' : '#136368',
+              color: '#ffffff',
+              fontSize: '15.5px',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(19, 99, 104, 0.28)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            {savedSuccess ? '✓ Saved!' : 'Save'}
+          </button>
+        </div>
       </div>
     </div>
   );
