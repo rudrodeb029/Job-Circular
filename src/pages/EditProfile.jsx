@@ -568,7 +568,7 @@ export default function EditProfile() {
         maxWidth: '460px',
         width: '100%',
         margin: '0 auto',
-        padding: '0 20px 110px 20px',
+        padding: '0 20px',
         flex: 1
       }}>
         <form id="edit-profile-form" onSubmit={handleSubmit}>
@@ -771,48 +771,38 @@ export default function EditProfile() {
               isEn={isEn}
             />
           </div>
-        </form>
-      </div>
 
-      {/* Fixed Bottom Save Button Bar (Exact Mockup Style) */}
-      <div style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        background: isDark ? '#0f172a' : '#ffffff',
-        borderTop: isDark ? '1px solid rgba(255, 255, 255, 0.08)' : '1px solid #f1f5f9',
-        padding: '12px 20px calc(var(--safe-area-bottom, 0px) + 14px) 20px',
-        zIndex: 50,
-        boxShadow: '0 -4px 16px rgba(0, 0, 0, 0.03)'
-      }}>
-        <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
-          <button
-            type="submit"
-            form="edit-profile-form"
-            disabled={uploadingImage || uploadingCover}
-            style={{
-              width: '100%',
-              height: '48px',
-              borderRadius: '10px',
-              background: savedSuccess ? '#0d9488' : '#136368',
-              color: '#ffffff',
-              fontSize: '15.5px',
-              fontWeight: 700,
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(19, 99, 104, 0.28)',
-              transition: 'all 0.2s ease'
-            }}
-          >
-            {savedSuccess
-              ? (isEn ? '✓ Saved!' : '✓ সংরক্ষিত হয়েছে!')
-              : (isEn ? 'Save' : 'Save')}
-          </button>
-        </div>
+          {/* Save Button in proper position right below the form fields (Matching Mockup) */}
+          <div style={{
+            marginTop: '28px',
+            marginBottom: 'calc(var(--safe-area-bottom, 0px) + 36px)'
+          }}>
+            <button
+              type="submit"
+              disabled={uploadingImage || uploadingCover}
+              style={{
+                width: '100%',
+                height: '48px',
+                borderRadius: '10px',
+                background: savedSuccess ? '#0d9488' : '#136368',
+                color: '#ffffff',
+                fontSize: '15.5px',
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 14px rgba(19, 99, 104, 0.28)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {savedSuccess
+                ? (isEn ? '✓ Saved!' : '✓ সংরক্ষিত হয়েছে!')
+                : (isEn ? 'Save' : 'Save')}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
