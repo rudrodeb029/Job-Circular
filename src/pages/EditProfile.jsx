@@ -8,8 +8,18 @@ import { optimizeCloudinaryUrl } from '../utils/cloudinaryUtils';
 import { compressImageFile } from '../utils/mediaUtils';
 
 // Precise custom SVG icons
-const ChevronLeftIcon = ({ size = 20, color = 'currentColor' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+const ChevronLeftIcon = ({ size = 22, color = 'currentColor' }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke={color}
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    style={{ pointerEvents: 'none', display: 'block' }}
+  >
     <path d="m15 18-6-6 6-6" />
   </svg>
 );
@@ -611,8 +621,25 @@ export default function EditProfile() {
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
-      navigate(-1);
+      handleBack();
     }, 700);
+  };
+
+  // Reliable Back Navigation Handler with fallback to /profile
+  const handleBack = (e) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    try {
+      if (window.history.length > 1 && window.history.state && window.history.state.idx > 0) {
+        navigate(-1);
+      } else {
+        navigate('/profile');
+      }
+    } catch {
+      navigate('/profile');
+    }
   };
 
   return (
@@ -636,32 +663,44 @@ export default function EditProfile() {
         justifyContent: 'space-between',
         borderBottom: isDark ? '1px solid rgba(255, 255, 255, 0.06)' : '1px solid #f8fafc'
       }}>
+        {/* Back Button with comfortable 40px touch target & visual feedback */}
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
           aria-label="Go back"
+          className="back-btn"
           style={{
-            background: 'none',
+            width: '40px',
+            height: '40px',
+            minWidth: '40px',
+            minHeight: '40px',
+            background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
             border: 'none',
-            padding: '4px',
             color: isDark ? '#f8fafc' : '#0f172a',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: '50%'
+            borderRadius: '50%',
+            WebkitTapHighlightColor: 'transparent',
+            touchAction: 'manipulation',
+            flexShrink: 0,
+            zIndex: 10
           }}
         >
-          <ChevronLeftIcon size={20} />
+          <ChevronLeftIcon size={22} />
         </button>
 
-        {/* Header Title (Reduced Text Size, Always English) */}
+        {/* Header Title (Centered, pointerEvents none so buttons receive all taps) */}
         <h1 style={{
           fontSize: '15px',
           fontWeight: 700,
           color: isDark ? '#f8fafc' : '#0f172a',
           margin: 0,
-          letterSpacing: '-0.1px'
+          letterSpacing: '-0.1px',
+          textAlign: 'center',
+          flex: 1,
+          pointerEvents: 'none'
         }}>
           Edit Profile
         </h1>
@@ -671,13 +710,19 @@ export default function EditProfile() {
           htmlFor="cover-file-input"
           title="Change Cover Photo"
           style={{
-            padding: '4px',
+            width: '40px',
+            height: '40px',
+            minWidth: '40px',
+            minHeight: '40px',
             borderRadius: '50%',
+            background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)',
             color: isDark ? '#cbd5e1' : '#64748b',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            flexShrink: 0,
+            zIndex: 10
           }}
         >
           <CameraIcon size={18} />
