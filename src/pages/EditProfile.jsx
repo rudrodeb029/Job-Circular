@@ -55,7 +55,7 @@ const MapPinIcon = ({ size = 17, color = '#64748b' }) => (
   </svg>
 );
 
-const CameraIcon = ({ size = 14, color = 'currentColor' }) => (
+const CameraIcon = ({ size = 16, color = 'currentColor' }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
     <circle cx="12" cy="13" r="4" />
@@ -69,7 +69,7 @@ function CleanField({
   type = 'text',
   value,
   onChange,
-  placeholder,
+  placeholder = '',
   isDark = false,
   required = false
 }) {
@@ -141,15 +141,20 @@ function CleanSelect({
   onChange,
   options = [],
   placeholder = '',
-  isDark = false,
-  isEn = false
+  isDark = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedOption = options.find(opt => opt.value === value);
+  // Match selected option by value, English label, or partial text
+  const selectedOption = options.find(opt => 
+    opt.value === value || 
+    (value && opt.labelEn && opt.labelEn.toLowerCase() === value.toLowerCase()) ||
+    (value && opt.label && (opt.label === value || opt.label.includes(value) || value.includes(opt.label)))
+  );
+
   const displayLabel = selectedOption
-    ? (isEn && selectedOption.labelEn ? selectedOption.labelEn : selectedOption.label)
-    : placeholder;
+    ? (selectedOption.labelEn || selectedOption.label)
+    : (value || placeholder);
 
   const bg = isDark ? 'rgba(30, 41, 59, 0.7)' : '#fcfbfc';
   const borderColor = isOpen ? '#14b8a6' : (isDark ? 'rgba(255, 255, 255, 0.14)' : '#e2e8f0');
@@ -196,8 +201,8 @@ function CleanSelect({
 
         <span style={{
           fontSize: '14px',
-          fontWeight: selectedOption ? 500 : 400,
-          color: selectedOption ? (isDark ? '#f8fafc' : '#0f172a') : '#94a3b8',
+          fontWeight: selectedOption || value ? 500 : 400,
+          color: (selectedOption || value) ? (isDark ? '#f8fafc' : '#0f172a') : '#94a3b8',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -317,18 +322,18 @@ function CleanSelect({
                   transition: 'all 0.15s'
                 }}
               >
-                <span>{placeholder || (isEn ? 'None / Clear' : 'ফাঁকা রাখুন')}</span>
+                <span>None / Clear</span>
                 {value === '' && <span style={{ fontWeight: 800, color: '#14b8a6' }}>✓</span>}
               </div>
 
               {options.map((opt) => {
-                const isSelected = value === opt.value;
-                const itemLabel = isEn && opt.labelEn ? opt.labelEn : opt.label;
+                const isSelected = value === opt.value || (value && opt.labelEn && opt.labelEn.toLowerCase() === value.toLowerCase());
+                const itemLabel = opt.labelEn ? `${opt.labelEn} (${opt.label})` : opt.label;
                 return (
                   <div
                     key={opt.value}
                     onClick={() => {
-                      onChange(opt.value);
+                      onChange(opt.labelEn || opt.value);
                       setIsOpen(false);
                     }}
                     style={{
@@ -380,7 +385,6 @@ export default function EditProfile() {
   const navigate = useNavigate();
   const { state, dispatch } = useAppContext();
   const isDark = state.theme === 'dark';
-  const isEn = state.language === 'en';
 
   // Keep ALL original user profile data intact
   const [formData, setFormData] = useState({
@@ -397,25 +401,25 @@ export default function EditProfile() {
   const [uploadingCover, setUploadingCover] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  // Original Qualification Options
+  // Qualification Options (English primary)
   const qualificationOptions = [
-    { value: 'স্নাতক (Bachelor)', label: 'স্নাতক (Bachelor)', labelEn: 'Bachelor (স্নাতক)' },
-    { value: 'স্নাতকোত্তর (Master)', label: 'স্নাতকোত্তর (Master)', labelEn: 'Master (স্নাতকোত্তর)' },
-    { value: 'এইচএসসি (HSC)', label: 'এইচএসসি (HSC)', labelEn: 'HSC (এইচএসসি)' },
-    { value: 'এসএসসি (SSC)', label: 'এসএসসি (SSC)', labelEn: 'SSC (এসএসসি)' },
-    { value: 'ডিপ্লোমা (Diploma)', label: 'ডিপ্লোমা (Diploma)', labelEn: 'Diploma (ডিপ্লোমা)' }
+    { value: 'Bachelor (স্নাতক)', label: 'স্নাতক', labelEn: 'Bachelor' },
+    { value: 'Master (স্নাতকোত্তর)', label: 'স্নাতকোত্তর', labelEn: 'Master' },
+    { value: 'HSC (এইচএসসি)', label: 'এইচএসসি', labelEn: 'HSC' },
+    { value: 'SSC (এসএসসি)', label: 'এসএসসি', labelEn: 'SSC' },
+    { value: 'Diploma (ডিপ্লোমা)', label: 'ডিপ্লোমা', labelEn: 'Diploma' }
   ];
 
-  // Original Location / District Options
+  // Location / District Options (English primary)
   const locationOptions = [
-    { value: 'ঢাকা', label: 'Dhaka (ঢাকা)', labelEn: 'Dhaka (ঢাকা)' },
-    { value: 'চট্টগ্রাম', label: 'Chattogram (চট্টগ্রাম)', labelEn: 'Chattogram (চট্টগ্রাম)' },
-    { value: 'রাজশাহী', label: 'Rajshahi (রাজশাহী)', labelEn: 'Rajshahi (রাজশাহী)' },
-    { value: 'খুলনা', label: 'Khulna (খুলনা)', labelEn: 'Khulna (খুলনা)' },
-    { value: 'সিলেট', label: 'Sylhet (সিলেট)', labelEn: 'Sylhet (সিলেট)' },
-    { value: 'বরিশাল', label: 'Barishal (বরিশাল)', labelEn: 'Barishal (বরিশাল)' },
-    { value: 'রংপুর', label: 'Rangpur (রংপুর)', labelEn: 'Rangpur (রংপুর)' },
-    { value: 'ময়মনসিংহ', label: 'Mymensingh (ময়মনসিংহ)', labelEn: 'Mymensingh (ময়মনসিংহ)' }
+    { value: 'Dhaka', label: 'ঢাকা', labelEn: 'Dhaka' },
+    { value: 'Chattogram', label: 'চট্টগ্রাম', labelEn: 'Chattogram' },
+    { value: 'Rajshahi', label: 'রাজশাহী', labelEn: 'Rajshahi' },
+    { value: 'Khulna', label: 'খুলনা', labelEn: 'Khulna' },
+    { value: 'Sylhet', label: 'সিলেট', labelEn: 'Sylhet' },
+    { value: 'Barishal', label: 'বরিশাল', labelEn: 'Barishal' },
+    { value: 'Rangpur', label: 'রংপুর', labelEn: 'Rangpur' },
+    { value: 'Mymensingh', label: 'ময়মনসিংহ', labelEn: 'Mymensingh' }
   ];
 
   const handleFieldChange = (field, value) => {
@@ -458,6 +462,7 @@ export default function EditProfile() {
       }
     } finally {
       setUploadingImage(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -474,6 +479,7 @@ export default function EditProfile() {
       alert('Cover upload failed');
     } finally {
       setUploadingCover(false);
+      if (e.target) e.target.value = '';
     }
   };
 
@@ -527,10 +533,21 @@ export default function EditProfile() {
           <ChevronLeftIcon size={24} />
         </button>
 
-        {/* Cover Photo Button */}
+        {/* Header Title (Always English) */}
+        <h1 style={{
+          fontSize: '17px',
+          fontWeight: 700,
+          color: isDark ? '#f8fafc' : '#0f172a',
+          margin: 0,
+          letterSpacing: '-0.2px'
+        }}>
+          Edit Profile
+        </h1>
+
+        {/* Cover Photo Camera Button */}
         <label
           htmlFor="cover-file-input"
-          title={isEn ? 'Change Cover Photo' : 'কভার ছবি পরিবর্তন'}
+          title="Change Cover Photo"
           style={{
             padding: '6px',
             borderRadius: '50%',
@@ -541,7 +558,7 @@ export default function EditProfile() {
             cursor: 'pointer'
           }}
         >
-          <CameraIcon size={18} />
+          <CameraIcon size={20} />
         </label>
         <input
           id="cover-file-input"
@@ -562,14 +579,119 @@ export default function EditProfile() {
         flex: 1
       }}>
         <form id="edit-profile-form" onSubmit={handleSubmit}>
-          {/* Centered Circular Avatar with Teal Border and Floating Badge (Exact Mockup Style) */}
+
+          {/* ═════ Visible Cover Photo Banner ═════ */}
+          <div style={{
+            position: 'relative',
+            width: '100%',
+            height: formData.coverPhoto ? '145px' : '90px',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            marginTop: '14px',
+            background: formData.coverPhoto
+              ? 'transparent'
+              : (isDark ? 'linear-gradient(135deg, #1e293b, #334155)' : 'linear-gradient(135deg, #f1f5f9, #e2e8f0)'),
+            border: isDark ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid #e2e8f0',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.06)',
+            transition: 'height 0.25s ease'
+          }}>
+            {formData.coverPhoto ? (
+              <img
+                src={formData.coverPhoto}
+                alt="Cover Photo"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block'
+                }}
+              />
+            ) : (
+              <label
+                htmlFor="cover-file-input"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  color: isDark ? '#94a3b8' : '#64748b'
+                }}
+              >
+                <CameraIcon size={20} />
+                <span style={{ fontSize: '11.5px', fontWeight: 600 }}>
+                  {uploadingCover ? 'Uploading...' : 'Add Cover Photo'}
+                </span>
+              </label>
+            )}
+
+            {/* Change & Remove Buttons when Cover is Present */}
+            {formData.coverPhoto && (
+              <div style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                zIndex: 3
+              }}>
+                <label
+                  htmlFor="cover-file-input"
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.7)',
+                    backdropFilter: 'blur(6px)',
+                    color: '#ffffff',
+                    padding: '5px 10px',
+                    borderRadius: '8px',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    cursor: 'pointer',
+                    border: '1px solid rgba(255, 255, 255, 0.2)'
+                  }}
+                >
+                  <CameraIcon size={12} />
+                  <span>{uploadingCover ? '...' : 'Change'}</span>
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => handleFieldChange('coverPhoto', null)}
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.85)',
+                    backdropFilter: 'blur(6px)',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '5px 8px',
+                    borderRadius: '8px',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                  title="Remove Cover Photo"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* ═════ Centered Circular Avatar with Teal Border and Floating Badge ═════ */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: '20px',
-            marginBottom: '26px'
+            marginTop: '-58px',
+            marginBottom: '26px',
+            position: 'relative',
+            zIndex: 5
           }}>
             <div style={{
               position: 'relative',
@@ -583,10 +705,11 @@ export default function EditProfile() {
                   width: '116px',
                   height: '116px',
                   borderRadius: '50%',
-                  border: '2.5px solid #14b8a6',
+                  border: isDark ? '3px solid #0f172a' : '3px solid #ffffff',
+                  outline: '2.5px solid #14b8a6',
                   overflow: 'hidden',
                   background: isDark ? '#1e293b' : '#f1f5f9',
-                  boxShadow: '0 4px 14px rgba(20, 184, 166, 0.15)',
+                  boxShadow: '0 4px 14px rgba(20, 184, 166, 0.18)',
                   cursor: 'pointer',
                   position: 'relative'
                 }}
@@ -654,14 +777,15 @@ export default function EditProfile() {
                   justifyContent: 'center',
                   cursor: 'pointer',
                   boxShadow: '0 2px 6px rgba(0, 0, 0, 0.2)',
-                  transition: 'transform 0.15s ease'
+                  transition: 'transform 0.15s ease',
+                  zIndex: 6
                 }}
-                title={isEn ? 'Change Photo' : 'ছবি পরিবর্তন'}
+                title="Change Photo"
               >
                 <PencilIcon size={12} color="#ffffff" />
               </label>
 
-              {/* Hidden File Input */}
+              {/* Hidden File Input for Avatar */}
               <input
                 id="avatar-file-input"
                 type="file"
@@ -671,42 +795,13 @@ export default function EditProfile() {
                 style={{ display: 'none' }}
               />
             </div>
-
-            {/* Optional Cover Photo Preview or Notice */}
-            {formData.coverPhoto && (
-              <div style={{
-                marginTop: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <span style={{ fontSize: '11.5px', color: '#64748b', fontWeight: 600 }}>
-                  {isEn ? 'Cover photo set' : 'কভার ছবি যুক্ত আছে'}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleFieldChange('coverPhoto', null)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#ef4444',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    padding: '2px 4px'
-                  }}
-                >
-                  {isEn ? 'Remove' : 'মুছুন'}
-                </button>
-              </div>
-            )}
           </div>
 
-          {/* Form Fields Stack (All Original Info & Content Kept Unchanged) */}
+          {/* ═════ Form Fields Stack (Always English Labels) ═════ */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {/* 1. Full Name */}
             <CleanField
-              label={isEn ? 'Full Name' : 'পূর্ণ নাম'}
+              label="Full Name"
               icon={<UserIcon size={17} />}
               value={formData.name}
               onChange={(e) => handleFieldChange('name', e.target.value)}
@@ -717,7 +812,7 @@ export default function EditProfile() {
 
             {/* 2. Phone Number */}
             <CleanField
-              label={isEn ? 'Phone Number' : 'মোবাইল নম্বর'}
+              label="Phone Number"
               icon={<PhoneIcon size={17} />}
               type="tel"
               value={formData.phone}
@@ -728,7 +823,7 @@ export default function EditProfile() {
 
             {/* 3. Bio / Short Description */}
             <CleanField
-              label={isEn ? 'Bio / Short Description' : 'বায়ো / পরিচয়'}
+              label="Bio / Short Description"
               icon={<FileTextIcon size={17} />}
               type="text"
               value={formData.bio}
@@ -739,30 +834,28 @@ export default function EditProfile() {
 
             {/* 4. Qualification (Select Dropdown) */}
             <CleanSelect
-              label={isEn ? 'Educational Qualification' : 'শিক্ষাগত যোগ্যতা'}
+              label="Educational Qualification"
               icon={<GraduationCapIcon size={17} />}
               value={formData.qualification}
               onChange={(val) => handleFieldChange('qualification', val)}
               options={qualificationOptions}
               placeholder=""
               isDark={isDark}
-              isEn={isEn}
             />
 
             {/* 5. Location / District (Select Dropdown) */}
             <CleanSelect
-              label={isEn ? 'District / Location' : 'জেলা / অবস্থান'}
+              label="District / Location"
               icon={<MapPinIcon size={17} />}
               value={formData.location}
               onChange={(val) => handleFieldChange('location', val)}
               options={locationOptions}
               placeholder=""
               isDark={isDark}
-              isEn={isEn}
             />
           </div>
 
-          {/* Save Button in proper position right below the form fields (Matching Mockup) */}
+          {/* ═════ Save Button in proper position right below the form fields ═════ */}
           <div style={{
             marginTop: '28px',
             marginBottom: 'calc(var(--safe-area-bottom, 0px) + 36px)'
@@ -787,9 +880,7 @@ export default function EditProfile() {
                 transition: 'all 0.2s ease'
               }}
             >
-              {savedSuccess
-                ? (isEn ? '✓ Saved!' : '✓ সংরক্ষিত হয়েছে!')
-                : (isEn ? 'Save' : 'Save')}
+              {savedSuccess ? '✓ Saved!' : 'Save'}
             </button>
           </div>
         </form>
