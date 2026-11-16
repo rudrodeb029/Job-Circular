@@ -123,7 +123,7 @@ const AppHeader = React.memo(function AppHeader() {
               justifyContent: 'center',
               cursor: 'pointer',
               color: '#1a56db',
-              background: 'rgba(26, 86, 219, 0.05)',
+              background: 'transparent',
               border: 'none',
               position: 'relative'
             }}
