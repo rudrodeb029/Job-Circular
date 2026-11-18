@@ -365,11 +365,12 @@ export default function ManageQuestions() {
         .q-table th { background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 11px; padding: 16px; }
         .q-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
         .cat-pill { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; background: #eff6ff; color: #1a56db; }
-        .last-updated-summary { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); border: 1px solid #dbeafe; border-left: 4px solid #2563eb; border-radius: 16px; padding: 18px 24px; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
-        .timestamp-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; }
+        .last-updated-summary { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); border: 1px solid #dbeafe; border-left: 3px solid #2563eb; border-radius: 12px; padding: 12px 16px; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+        .last-updated-summary .cat-pill { padding: 2px 7px; border-radius: 5px; font-size: 9.5px; font-weight: 500; }
+        .timestamp-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 6px; font-size: 10px; font-weight: 400; background: #f8fafc; color: #475569; border: 1px solid #e2e8f0; }
         .timestamp-pill.is-updated { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-        .updated-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; background: #dcfce7; color: #15803d; }
-        .created-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; background: #eff6ff; color: #1d4ed8; }
+        .updated-badge { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 999px; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.02em; background: #dcfce7; color: #15803d; }
+        .created-badge { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 999px; font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.02em; background: #eff6ff; color: #1d4ed8; }
         .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; }
         .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; outline: none; transition: border-color 0.2s; }
         .modern-input:focus { border-color: #2563eb; }
@@ -545,13 +546,13 @@ export default function ManageQuestions() {
       ) : (
         <>
           <div className="last-updated-summary" data-testid="last-updated-summary">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <polyline points="12 6 12 12 16 14"></polyline>
                 </svg>
-                <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#1d4ed8' }}>
+                <span style={{ fontSize: '9.5px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em', color: '#1d4ed8' }}>
                   Last Updated Question Paper
                 </span>
                 {latestUpdatedPaper && (
@@ -561,39 +562,39 @@ export default function ManageQuestions() {
                 )}
               </div>
               {latestUpdatedPaper ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a' }}>
                     {latestUpdatedPaper.title || latestUpdatedPaper.titleEn || 'Untitled Paper'}
                   </span>
                   {latestUpdatedPaper.titleEn && latestUpdatedPaper.title && latestUpdatedPaper.titleEn !== latestUpdatedPaper.title && (
-                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+                    <span style={{ fontSize: '10.5px', fontWeight: 400, color: '#475569' }}>
                       ({latestUpdatedPaper.titleEn})
                     </span>
                   )}
                   <span className="cat-pill">{getCategoryLabel(latestUpdatedPaper.category || '')}</span>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748b' }}>
+                  <span style={{ fontSize: '10px', fontWeight: 400, color: '#64748b' }}>
                     {Array.isArray(latestUpdatedPaper.questions) ? latestUpdatedPaper.questions.length : (latestUpdatedPaper.totalQuestions || 0)} MCQs
                   </span>
                 </div>
               ) : (
-                <div style={{ fontSize: '14px', fontWeight: 600, color: '#64748b' }}>
+                <div style={{ fontSize: '11px', fontWeight: 400, color: '#64748b' }}>
                   No question papers recorded yet.
                 </div>
               )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '3px' }}>
               {latestUpdatedPaper ? (
                 <>
                   <span className={`timestamp-pill ${isPaperUpdated(latestUpdatedPaper) ? 'is-updated' : ''}`}>
                     {formatExactDateTime(getPaperUpdatedMs(latestUpdatedPaper))}
                   </span>
-                  <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748b' }}>
+                  <span style={{ fontSize: '9.5px', fontWeight: 400, color: '#64748b' }}>
                     {formatTimeAgo(getPaperUpdatedMs(latestUpdatedPaper), true)} • {papers.length} Total Papers
                   </span>
                 </>
               ) : (
-                <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>0 Total Papers</span>
+                <span style={{ fontSize: '10px', fontWeight: 400, color: '#64748b' }}>0 Total Papers</span>
               )}
             </div>
           </div>
@@ -650,7 +651,7 @@ export default function ManageQuestions() {
                               </span>
                               {updated && <span className="updated-badge">Updated</span>}
                             </div>
-                            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                            <span style={{ fontSize: '9.5px', color: '#64748b', fontWeight: 400 }}>
                               {formatTimeAgo(lastUpdatedMs, true)}
                             </span>
                           </div>
