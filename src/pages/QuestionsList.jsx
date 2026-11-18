@@ -5,8 +5,10 @@ import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionsByCategory } from '../data/questionsData';
 import SearchBar from '../components/SearchBar';
+import PullToRefresh from '../components/PullToRefresh';
 import QuestionCard from '../components/QuestionCard';
 import useProgressiveList from '../hooks/useProgressiveList';
+import { formatTimeAgo } from '../utils/timeUtils';
 
 const categoryTitlesBn = {
   bcs: 'বিসিএস প্রিলিমিনারি প্রশ্নপত্র',
@@ -102,7 +104,7 @@ export default function QuestionsList() {
   const { category } = useParams();
   const navigate = useNavigate();
   const { state } = useAppContext();
-  const { state: adminState } = useAdminContext();
+  const { state: adminState, refreshData, lastSyncTime } = useAdminContext();
   const isEn = state.language === 'en';
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -112,8 +114,9 @@ export default function QuestionsList() {
     if (Array.isArray(adminState?.questions) && adminState.questions.length > 0) {
       return adminState.questions.filter(q => q.category === targetCategory || (targetCategory === 'recent' && q.category === 'admission') || (targetCategory === 'admission' && q.category === 'recent'));
     }
+    if (adminState?.firestoreReady) return [];
     return getQuestionsByCategory(targetCategory);
-  }, [category, adminState?.questions]);
+  }, [category, adminState?.questions, adminState?.firestoreReady]);
 
   const filteredPapers = useMemo(() => {
     if (!searchQuery.trim()) return papers;
@@ -146,47 +149,73 @@ export default function QuestionsList() {
         <h1 style={{ flex: 1, fontSize: '15px', fontWeight: 800 }}>{displayTitle}</h1>
       </div>
 
-      <div className="page-content">
-        {/* Search */}
-        <div style={{ marginBottom: '8px' }}>
-          <SearchBar
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={isEn ? "Search question papers..." : "প্রশ্নপত্র খুঁজুন..."}
-          />
-        </div>
+      <PullToRefresh onRefresh={() => refreshData(true)}>
+        <div className="page-content">
+          {/* Search */}
+          <div style={{ marginBottom: '8px' }}>
+            <SearchBar
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={isEn ? "Search question papers..." : "প্রশ্নপত্র খুঁজুন..."}
+            />
+          </div>
 
-        {/* Papers Grid */}
-        <div style={{
-          display: filteredPapers.length > 0 ? 'grid' : 'flex',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '8px'
-        }}>
-          {filteredPapers.length > 0 ? (
-            <>
-              {filteredPapers.slice(0, visiblePapersCount).map(paper => (
-                <QuestionCard
-                  key={paper.id}
-                  paper={paper}
-                  categoryIcon={renderCategoryIcon(category)}
-                  isEn={isEn}
-                  onClick={() => navigate(`/question-details/${paper.id}`)}
-                />
-              ))}
-              {hasMorePapers && <div ref={papersSentinelRef} style={{ height: '1px', gridColumn: '1 / -1' }} aria-hidden="true" />}
-            </>
-          ) : (
-            <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '12px', opacity: 0.5 }}>
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-              </svg>
-              <p style={{ fontSize: '13px', fontWeight: 600 }}>
-                {isEn ? 'No question papers found' : 'কোনো প্রশ্নপত্র পাওয়া যায়নি'}
-              </p>
-            </div>
-          )}
+          {/* Subtle Count & Fresh Sync Status */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            fontSize: '11px',
+            color: 'var(--text-muted)',
+            marginBottom: '8px',
+            padding: '0 2px'
+          }}>
+            <span style={{ fontWeight: 600 }}>
+              {isEn
+                ? `${filteredPapers.length} paper${filteredPapers.length === 1 ? '' : 's'}`
+                : `${toBengaliNumber(filteredPapers.length)}টি প্রশ্নপত্র`}
+            </span>
+            {lastSyncTime && (
+              <span>
+                {isEn
+                  ? `Synced ${formatTimeAgo(lastSyncTime, true)}`
+                  : `আপডেট: ${formatTimeAgo(lastSyncTime, false)}`}
+              </span>
+            )}
+          </div>
+
+          {/* Papers Grid */}
+          <div style={{
+            display: filteredPapers.length > 0 ? 'grid' : 'flex',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: '8px'
+          }}>
+            {filteredPapers.length > 0 ? (
+              <>
+                {filteredPapers.slice(0, visiblePapersCount).map(paper => (
+                  <QuestionCard
+                    key={paper.id}
+                    paper={paper}
+                    categoryIcon={renderCategoryIcon(category)}
+                    isEn={isEn}
+                    onClick={() => navigate(`/question-details/${paper.id}`)}
+                  />
+                ))}
+                {hasMorePapers && <div ref={papersSentinelRef} style={{ height: '1px', gridColumn: '1 / -1' }} aria-hidden="true" />}
+              </>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)', gridColumn: '1 / -1' }}>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '12px', opacity: 0.5 }}>
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <p style={{ fontSize: '13px', fontWeight: 600 }}>
+                  {isEn ? 'No question papers found' : 'কোনো প্রশ্নপত্র পাওয়া যায়নি'}
+                </p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </PullToRefresh>
     </div>
   );
 }

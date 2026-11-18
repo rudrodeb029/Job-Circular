@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock } from '../components/Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
 import { getQuestionById } from '../data/questionsData';
 import ModernLoader, { ModernPageSkeleton } from '../components/ModernLoader';
+import PullToRefresh from '../components/PullToRefresh';
 import { supabase } from '../services/supabaseClient';
 import { normalizeDoc } from '../services/supabaseService';
 import { stripHtmlTags, cleanOptionText, sanitizeQuestionHtml } from '../utils/textUtils';
@@ -16,7 +17,7 @@ export default function QuestionDetails() {
   const navigate = useNavigate();
 
   const { state } = useAppContext();
-  const { state: adminState, dispatch: adminDispatch } = useAdminContext();
+  const { state: adminState, dispatch: adminDispatch, refreshData } = useAdminContext();
   const isEn = state.language === 'en';
   const isDark = state.theme === 'dark';
 
@@ -31,18 +32,73 @@ export default function QuestionDetails() {
   const [pageLoading, setPageLoading] = useState(true);
   const [isSwitchingMode, setIsSwitchingMode] = useState(false);
   const [paper, setPaper] = useState(null);
-  const [loadingQuestions, setLoadingQuestions] = useState(false);
+  const checkedFreshIdRef = useRef(null);
 
   useEffect(() => {
     preloadInterstitialAd();
   }, []);
 
+  const fetchFullPaper = useCallback(async (isInitialLoad = false) => {
+    try {
+      const { data, error } = await supabase
+        .from('questions')
+        .select('*')
+        .eq('id', id)
+        .setHeader('Cache-Control', 'no-cache')
+        .setHeader('Pragma', 'no-cache')
+        .single();
+
+      if (error) throw error;
+      if (data) {
+        const normalized = normalizeDoc(data);
+        setPaper(normalized);
+        adminDispatch({ type: 'CACHE_FULL_QUESTION_PAPER', payload: normalized });
+        return normalized;
+      }
+    } catch (err) {
+      console.error('Error fetching full paper questions:', err);
+    } finally {
+      if (isInitialLoad) {
+        setPageLoading(false);
+      }
+    }
+    return null;
+  }, [id, adminDispatch]);
+
   useEffect(() => {
     // 1. Check if we have it in adminState.questions and it has questions
     const fromContext = (adminState?.questions || []).find(q => String(q.id) === String(id));
     if (fromContext && Array.isArray(fromContext.questions) && fromContext.questions.length > 0) {
-      setPaper(fromContext);
+      setPaper(prev => {
+        if (
+          !prev ||
+          String(prev.id) !== String(fromContext.id) ||
+          prev.updatedAt !== fromContext.updatedAt ||
+          (prev.questions?.length || 0) !== fromContext.questions.length ||
+          prev !== fromContext
+        ) {
+          return fromContext;
+        }
+        return prev;
+      });
       setPageLoading(false);
+
+      // Silently verify whether server has a newer updatedAt once per paper visit
+      if (navigator.onLine && checkedFreshIdRef.current !== String(id)) {
+        checkedFreshIdRef.current = String(id);
+        supabase
+          .from('questions')
+          .select('id, updatedAt')
+          .eq('id', id)
+          .setHeader('Cache-Control', 'no-cache')
+          .single()
+          .then(({ data }) => {
+            if (data?.updatedAt && data.updatedAt !== fromContext.updatedAt) {
+              fetchFullPaper(false);
+            }
+          })
+          .catch(() => {});
+      }
       return;
     }
 
@@ -54,33 +110,16 @@ export default function QuestionDetails() {
       return;
     }
 
-    // 3. Otherwise query the full row from Supabase
-    const fetchFullPaper = async () => {
-      setLoadingQuestions(true);
-      try {
-        const { data, error } = await supabase
-          .from('questions')
-          .select('*')
-          .eq('id', id)
-          .setHeader('Cache-Control', 'no-cache')
-          .single();
+    // 3. Otherwise query the full row from Supabase (e.g. metadata-only cache or direct link)
+    fetchFullPaper(true);
+  }, [id, adminState?.questions, fetchFullPaper]);
 
-        if (error) throw error;
-        if (data) {
-          const normalized = normalizeDoc(data);
-          setPaper(normalized);
-          adminDispatch({ type: 'CACHE_FULL_QUESTION_PAPER', payload: normalized });
-        }
-      } catch (err) {
-        console.error('Error fetching full paper questions:', err);
-      } finally {
-        setLoadingQuestions(false);
-        setPageLoading(false);
-      }
-    };
-
-    fetchFullPaper();
-  }, [id, adminState?.questions]);
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([
+      typeof refreshData === 'function' ? refreshData(true) : Promise.resolve(),
+      fetchFullPaper(false)
+    ]);
+  }, [refreshData, fetchFullPaper]);
 
   // 'practice' or 'read'
   const [mode, setMode] = useState('practice');
@@ -190,7 +229,8 @@ export default function QuestionDetails() {
         </h1>
       </div>
 
-      <div className="page-content" style={{ padding: '16px' }}>
+      <PullToRefresh onRefresh={handleRefresh}>
+        <div className="page-content" style={{ padding: '16px' }}>
         {/* Info & Mode Selector Header Card */}
         <div style={{
           background: 'linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%)',
@@ -370,7 +410,8 @@ export default function QuestionDetails() {
         </div>
           </>
         )}
-      </div>
+        </div>
+      </PullToRefresh>
     </div>
   );
 }
