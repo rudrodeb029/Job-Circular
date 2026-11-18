@@ -1,4 +1,9 @@
 import { supabase, SUPABASE_CONFIG } from './supabaseClient';
+import {
+  setPersistentCollection,
+  getPersistentCollection,
+  deletePersistentCollection
+} from './sqliteService';
 
 // ─── Table / Collection Constants ──────────────────────────────
 export const COLLECTIONS = {
@@ -24,6 +29,174 @@ const SHORT_CACHE_COLLECTIONS = [
 ];
 const SHORT_TTL_MINUTES = 60; // 1 Hour
 const DEFAULT_TTL_MINUTES = 1440; // 24 Hours
+
+// In-memory full collection cache (always holds non-stripped documents for current session)
+const _memoryCollectionCache = new Map();
+
+// Safe character threshold (~3MB UTF-16) above which heavy MCQ arrays are stripped from localStorage
+const MAX_LOCALSTORAGE_CHARS = 1500000;
+
+/**
+ * Safely write a string key to localStorage without throwing QuotaExceededError.
+ * Automatically evicts legacy duplicate `questions_data` key on quota pressure and retries once.
+ */
+const safeSetLocalStorageItem = (key, value) => {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (err) {
+    try {
+      if (localStorage.getItem('questions_data') !== null) {
+        localStorage.removeItem('questions_data');
+        localStorage.setItem(key, value);
+        return true;
+      }
+    } catch (retryErr) {
+      console.warn(`⚠️ localStorage write failed for "${key}":`, retryErr?.message || retryErr);
+      return false;
+    }
+    console.warn(`⚠️ localStorage write failed for "${key}":`, err?.message || err);
+    return false;
+  }
+};
+
+/**
+ * Strip heavy `questions` MCQ arrays into lightweight metadata-only entries for localStorage.
+ * Full documents with all MCQs are always stored in IndexedDB / native SQLite.
+ */
+const stripHeavyFieldsForLocalStorage = (collectionName, items) => {
+  if (!Array.isArray(items)) return items;
+  if (collectionName !== COLLECTIONS.QUESTIONS && collectionName !== COLLECTIONS.LIVE_EXAMS) {
+    return items;
+  }
+  return items.map((item) => {
+    if (!item || typeof item !== 'object' || !Array.isArray(item.questions)) return item;
+    const { questions, ...meta } = item;
+    return {
+      ...meta,
+      totalQuestions: item.totalQuestions ?? questions.length,
+      _questionsStripped: true
+    };
+  });
+};
+
+/**
+ * Safely mirror a collection into localStorage, stripping heavy `questions` arrays into
+ * metadata-only if the full JSON exceeds quota or threshold. Never writes duplicate `questions_data`.
+ */
+const safeWriteCollectionToLocalStorage = (collectionName, items) => {
+  const cacheKey = `cache_data_${collectionName}`;
+  const timeKey = `cache_time_${collectionName}`;
+
+  if (collectionName === COLLECTIONS.QUESTIONS) {
+    try {
+      localStorage.removeItem('questions_data');
+    } catch (e) {}
+  }
+
+  let jsonStr = '';
+  try {
+    jsonStr = JSON.stringify(items);
+  } catch (e) {
+    return { ok: false, stripped: false };
+  }
+
+  const isHeavyCollection = collectionName === COLLECTIONS.QUESTIONS || collectionName === COLLECTIONS.LIVE_EXAMS;
+  if (!isHeavyCollection || jsonStr.length <= MAX_LOCALSTORAGE_CHARS) {
+    if (safeSetLocalStorageItem(cacheKey, jsonStr)) {
+      safeSetLocalStorageItem(timeKey, String(Date.now()));
+      return { ok: true, stripped: false };
+    }
+  }
+
+  if (isHeavyCollection) {
+    try {
+      const strippedItems = stripHeavyFieldsForLocalStorage(collectionName, items);
+      const strippedJson = JSON.stringify(strippedItems);
+      if (safeSetLocalStorageItem(cacheKey, strippedJson)) {
+        safeSetLocalStorageItem(timeKey, String(Date.now()));
+        return { ok: true, stripped: true };
+      }
+    } catch (e) {}
+  }
+
+  return { ok: false, stripped: false };
+};
+
+/**
+ * Persist full collection items to in-memory map, IndexedDB / native SQLite, and safe localStorage.
+ * Returns true only if full (non-stripped) data was durably persisted to IndexedDB/SQLite or localStorage.
+ */
+const persistCollectionCache = async (collectionName, items) => {
+  if (!Array.isArray(items)) return false;
+  _memoryCollectionCache.set(collectionName, items);
+
+  const persistentOk = await setPersistentCollection(collectionName, items);
+  const localRes = safeWriteCollectionToLocalStorage(collectionName, items);
+
+  return Boolean(persistentOk || (localRes.ok && !localRes.stripped));
+};
+
+/**
+ * Expose synchronous in-memory collection cache (used by legacy sync accessors like questionsData.js).
+ */
+export const getMemoryCollectionCache = (collectionName) => {
+  const cached = _memoryCollectionCache.get(collectionName);
+  return Array.isArray(cached) ? cached : null;
+};
+
+/**
+ * Async persistent cache reader for startup hydration (AdminContext, etc.).
+ * Reads full documents from IndexedDB / native SQLite first, falling back to memory and localStorage.
+ * @param {string} collectionName
+ * @returns {Promise<Array>}
+ */
+export const getPersistentCache = async (collectionName) => {
+  if (!collectionName) return [];
+
+  try {
+    const persistent = await getPersistentCollection(collectionName);
+    if (Array.isArray(persistent)) {
+      _memoryCollectionCache.set(collectionName, persistent);
+      return persistent;
+    }
+  } catch (e) {
+    console.warn(`getPersistentCache(${collectionName}) failed:`, e);
+  }
+
+  const mem = _memoryCollectionCache.get(collectionName);
+  if (Array.isArray(mem)) {
+    return mem;
+  }
+
+  try {
+    const raw = localStorage.getItem(`cache_data_${collectionName}`)
+      || (collectionName === COLLECTIONS.QUESTIONS ? localStorage.getItem('questions_data') : null);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const hasStripped = parsed.some((item) => item && item._questionsStripped);
+        if (!hasStripped) {
+          _memoryCollectionCache.set(collectionName, parsed);
+          // Lazily migrate legacy full localStorage cache into IndexedDB/SQLite
+          setPersistentCollection(collectionName, parsed).catch(() => {});
+        }
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn(`LocalStorage fallback parse error for ${collectionName}:`, e);
+  }
+
+  return [];
+};
+
+/**
+ * Persist a collection array directly to the persistent cache (IndexedDB/SQLite + safe localStorage).
+ */
+export const setPersistentCache = async (collectionName, items) => {
+  return persistCollectionCache(collectionName, items);
+};
 
 /**
  * Normalizes document record output to ensure clean JSON object format
@@ -59,6 +232,26 @@ export const normalizeDoc = (row) => {
 
 // ─── Generic CRUD Helpers ───────────────────────────────────────
 
+const _fetchCollectionStrict = async (collectionName, forceServer = false) => {
+  let selectCols = '*';
+  if (collectionName === COLLECTIONS.LIVE_EXAMS) {
+    selectCols = 'id, title, titleEn, duration, totalQuestions, subjects, status, scheduledAt, createdAt, updatedAt, raw_data';
+  }
+  let query = supabase.from(collectionName).select(selectCols);
+
+  if (collectionName === COLLECTIONS.QUESTIONS) {
+    query = query.order('createdAt', { ascending: false }).limit(1000);
+  }
+
+  if (forceServer) {
+    query = query.setHeader('Cache-Control', 'no-cache').setHeader('Pragma', 'no-cache');
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return (data || []).map(normalizeDoc);
+};
+
 /**
  * Fetch all rows from a Supabase table.
  * @param {string} collectionName - Supabase table name
@@ -66,24 +259,7 @@ export const normalizeDoc = (row) => {
  */
 export const getCollection = async (collectionName, forceServer = false) => {
   try {
-    let selectCols = '*';
-    if (collectionName === COLLECTIONS.LIVE_EXAMS) {
-      selectCols = 'id, title, titleEn, duration, totalQuestions, subjects, status, scheduledAt, createdAt, updatedAt, raw_data';
-    }
-    let query = supabase.from(collectionName).select(selectCols);
-    
-    if (collectionName === COLLECTIONS.QUESTIONS) {
-      query = query.order('createdAt', { ascending: false }).limit(1000);
-    }
-    
-    // Add bypass headers if forceServer is true
-    if (forceServer) {
-      query = query.setHeader('Cache-Control', 'no-cache').setHeader('Pragma', 'no-cache');
-    }
-
-    const { data, error } = await query;
-    if (error) throw error;
-    return (data || []).map(normalizeDoc);
+    return await _fetchCollectionStrict(collectionName, forceServer);
   } catch (error) {
     console.error(`Error fetching ${collectionName} from Supabase:`, error);
     return [];
@@ -98,20 +274,22 @@ let _activeStartupSyncPromise = null;
 
 /**
  * Global app initialization sync.
- * Fetches core data when the app opens or when a forced refresh is needed (e.g. floating loader click or push notification).
- * @param {boolean|string} force - If true/'admin_force'/'push_force', bypasses conditional/HTTP cache and fetches fresh data immediately.
+ * Fetches core data when the app opens or when a forced refresh is needed (e.g. floating loader click, pull-to-refresh, or push notification).
+ * @param {boolean|string} forceServer - If true/'admin_force'/'push_force', bypasses cooldown & HTTP/KV cache and fetches fresh data immediately.
  */
-export const syncCoreDataOnStartup = async (force = false) => {
+export const syncCoreDataOnStartup = async (forceServer = false) => {
   if (!navigator.onLine) return null;
 
-  const isExplicitForce = Boolean(force);
-  const isExplicitBypass = isExplicitForce || force === 'admin_force' || force === 'push_force';
+  const isExplicitBypass = forceServer === true || forceServer === 'admin_force' || forceServer === 'push_force' || Boolean(forceServer);
 
   // 30-minute client sync cooldown: If local data exists and was synced recently, skip network sync!
-  // 100% of reads are served from local SQLite / LocalStorage cache with 0 Cloudflare requests.
   const SYNC_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
   const lastSync = Number(localStorage.getItem('last_client_sync_time') || 0);
-  const hasLocalData = localStorage.getItem('cache_data_jobs') || localStorage.getItem('last_updated_server');
+  const hasLocalData = Boolean(
+    localStorage.getItem('cache_data_jobs') ||
+    localStorage.getItem('last_updated_server') ||
+    _memoryCollectionCache.size > 0
+  );
 
   if (!isExplicitBypass && hasLocalData && Date.now() - lastSync < SYNC_COOLDOWN_MS) {
     console.log(`⚡ SQLite/Local-First: Synced ${Math.round((Date.now() - lastSync) / 60000)}m ago. Serving 100% from local database (0 Cloudflare requests).`);
@@ -120,10 +298,10 @@ export const syncCoreDataOnStartup = async (force = false) => {
   }
 
   if (_isStartupSyncing && _activeStartupSyncPromise) {
-    if (!isExplicitForce) {
+    if (!isExplicitBypass) {
       return _activeStartupSyncPromise;
     }
-    // For forced syncs (e.g. push notification arrived/clicked during boot), wait for current sync then run forced bypass sync
+    // For forced syncs, wait for in-flight sync then execute a fresh cache-bypass sync
     try {
       await _activeStartupSyncPromise;
     } catch (e) {}
@@ -142,13 +320,13 @@ export const syncCoreDataOnStartup = async (force = false) => {
     COLLECTIONS.APP_CONFIG
   ];
 
-  console.log(isExplicitForce ? '🔄 Loader / Push Forced Refresh: Fetching fresh data from Cloudflare Worker...' : '🚀 Startup Sync: Checking Cloudflare KV with 304 conditional check...');
+  console.log(isExplicitBypass ? '🔄 Forced Refresh: Fetching fresh data from Cloudflare Worker (?cache=bypass)...' : '🚀 Startup Sync: Checking Cloudflare KV with 304 conditional check...');
 
   const runSync = async () => {
     try {
       const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
       const syncUrl = `${proxyUrl}/sync-all${isExplicitBypass ? `?cache=bypass&t=${Date.now()}` : ''}`;
-      
+
       const headers = {
         'apikey': SUPABASE_CONFIG.anonKey,
         'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
@@ -167,10 +345,10 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
       const response = await fetch(syncUrl, { headers, cache: isExplicitBypass ? 'no-store' : 'default' });
 
-      if (response.status === 304) {
+      if (!isExplicitBypass && response.status === 304) {
         console.log('⚡ 304 Not Modified: Server timestamp matches local data! 0 bytes downloaded from Cloudflare KV.');
-        localStorage.setItem('last_client_sync_time', String(Date.now()));
-        localStorage.setItem('last_sync_timestamp', String(Date.now()));
+        safeSetLocalStorageItem('last_client_sync_time', String(Date.now()));
+        safeSetLocalStorageItem('last_sync_timestamp', String(Date.now()));
         _appInitialized = true;
         _isStartupSyncing = false;
         window.dispatchEvent(new CustomEvent('app_sync_finished'));
@@ -179,8 +357,8 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
       if (response.ok) {
         const data = await response.json();
-        if (data && (data.jobs || data.questions || data.notifications || data.live_exams || data.feed_posts)) {
-          const collectionsMap = {
+        if (data && typeof data === 'object' && coreCollections.some(col => Array.isArray(data[col]))) {
+          const rawCollectionsMap = {
             [COLLECTIONS.JOBS]: data.jobs,
             [COLLECTIONS.NOTIFICATIONS]: data.notifications,
             [COLLECTIONS.ADMITS]: data.admits,
@@ -190,30 +368,44 @@ export const syncCoreDataOnStartup = async (force = false) => {
             [COLLECTIONS.APP_CONFIG]: data.app_config,
           };
 
-          Object.entries(collectionsMap).forEach(([col, items]) => {
-            if (Array.isArray(items)) {
-              try {
-                const normalizedItems = items.map(normalizeDoc);
-                localStorage.setItem(`cache_data_${col}`, JSON.stringify(normalizedItems));
-                localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-                if (col === COLLECTIONS.QUESTIONS) {
-                  localStorage.setItem('questions_data', JSON.stringify(normalizedItems));
-                }
-                _sessionRevalidatedCollections.add(col);
-                window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: normalizedItems }));
-              } catch (storageErr) {
-                console.warn(`⚠️ LocalStorage write failed for ${col} (likely storage limit exceeded):`, storageErr.message || storageErr);
-              }
-            }
-          });
+          const normalizedCollectionsMap = {};
+          let persistedCount = 0;
+          let allPersisted = true;
 
-          const serverSyncTime = data.masterLastUpdated || data.syncedAt || new Date().toISOString();
-          if (serverSyncTime) {
-            localStorage.setItem('last_updated_server', serverSyncTime);
+          await Promise.all(
+            Object.entries(rawCollectionsMap).map(async ([col, items]) => {
+              if (!Array.isArray(items)) return;
+              const normalizedItems = items.map(normalizeDoc);
+              normalizedCollectionsMap[col] = normalizedItems;
+
+              const persisted = await persistCollectionCache(col, normalizedItems);
+              if (persisted) {
+                persistedCount += 1;
+              } else {
+                allPersisted = false;
+              }
+
+              _sessionRevalidatedCollections.add(col);
+              window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: normalizedItems }));
+            })
+          );
+
+          // NEVER update sync timestamps unless fetched data was actually persisted
+          if (persistedCount > 0 && allPersisted) {
+            const serverSyncTime = data.masterLastUpdated || data.syncedAt || new Date().toISOString();
+            safeSetLocalStorageItem('last_updated_server', serverSyncTime);
+            safeSetLocalStorageItem('last_sync_timestamp', String(Date.now()));
+            safeSetLocalStorageItem('last_client_sync_time', String(Date.now()));
+          } else {
+            console.warn('⚠️ Skipping sync timestamp update because persistent storage failed for one or more collections.');
           }
-          window.dispatchEvent(new CustomEvent('force_app_data_reload'));
-          localStorage.setItem('last_sync_timestamp', String(Date.now()));
-          localStorage.setItem('last_client_sync_time', String(Date.now()));
+
+          window.dispatchEvent(new CustomEvent('force_app_data_reload', {
+            detail: {
+              collections: normalizedCollectionsMap,
+              forceServer: isExplicitBypass
+            }
+          }));
 
           _appInitialized = true;
           _isStartupSyncing = false;
@@ -234,26 +426,52 @@ export const syncCoreDataOnStartup = async (force = false) => {
     // Fallback: If /sync-all endpoint is unavailable, sync core collections directly
     if (!syncSuccess) {
       console.warn('⚠️ Running direct GET fallback to Supabase because sync-all was unsuccessful or incomplete.');
+      const fallbackCollectionsMap = {};
+      let persistedCount = 0;
+      let allPersisted = true;
+
       try {
         await Promise.all(coreCollections.map(async (col) => {
-          const data = await getCollection(col, true);
-          if (Array.isArray(data) && data.length > 0) {
-            localStorage.setItem(`cache_data_${col}`, JSON.stringify(data));
-            localStorage.setItem(`cache_time_${col}`, String(Date.now()));
-            if (col === COLLECTIONS.QUESTIONS) {
-              localStorage.setItem('questions_data', JSON.stringify(data));
+          try {
+            const data = await _fetchCollectionStrict(col, true);
+            if (Array.isArray(data)) {
+              fallbackCollectionsMap[col] = data;
+              const persisted = await persistCollectionCache(col, data);
+              if (persisted) {
+                persistedCount += 1;
+              } else {
+                allPersisted = false;
+              }
+              _sessionRevalidatedCollections.add(col);
+              window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
             }
-            _sessionRevalidatedCollections.add(col);
-            window.dispatchEvent(new CustomEvent(`${col}_updated`, { detail: data }));
+          } catch (colErr) {
+            allPersisted = false;
+            console.warn(`Fallback fetch failed for ${col}:`, colErr?.message || colErr);
           }
         }));
+
+        if (persistedCount > 0 && allPersisted) {
+          safeSetLocalStorageItem('last_updated_server', new Date().toISOString());
+          safeSetLocalStorageItem('last_sync_timestamp', String(Date.now()));
+          safeSetLocalStorageItem('last_client_sync_time', String(Date.now()));
+        }
         _appInitialized = true;
       } catch (e) {
         console.error('Fallback core sync failed:', e);
       } finally {
         _isStartupSyncing = false;
-        window.dispatchEvent(new CustomEvent('force_app_data_reload'));
+        window.dispatchEvent(new CustomEvent('force_app_data_reload', {
+          detail: {
+            collections: fallbackCollectionsMap,
+            forceServer: isExplicitBypass
+          }
+        }));
         window.dispatchEvent(new CustomEvent('app_sync_finished'));
+      }
+
+      if (Object.keys(fallbackCollectionsMap).length > 0) {
+        return { ...fallbackCollectionsMap, syncedAt: new Date().toISOString() };
       }
     }
     return null;
@@ -269,53 +487,42 @@ export const syncCoreDataOnStartup = async (force = false) => {
 
 /**
  * Multi-Tier Caching Collection Fetcher
- * - Tier 1: Device localStorage (Indefinite Offline Cache)
+ * - Tier 1: IndexedDB / Native SQLite + Memory + safe localStorage
  * - Tier 2: Cloudflare Global Edge CDN
  * - Tier 3: Supabase PostgreSQL Database
  */
 export const getCollectionCached = async (collectionName, forceServer = false, customTtlMinutes = null) => {
-  const cacheKey = `cache_data_${collectionName}`;
-  const timeKey = `cache_time_${collectionName}`;
-  const cachedDataStr = localStorage.getItem(cacheKey);
+  const cachedData = await getPersistentCache(collectionName);
 
-  // 1. Parse Cached Data
-  let cachedData = null;
-  if (cachedDataStr) {
-    try {
-      cachedData = JSON.parse(cachedDataStr);
-    } catch (e) {
-      console.warn(`Cache parse error for ${collectionName}:`, e);
+  // Check optional custom TTL if caller explicitly provided one
+  let isCustomTtlExpired = false;
+  if (customTtlMinutes !== null && Number.isFinite(Number(customTtlMinutes))) {
+    const cachedAt = Number(localStorage.getItem(`cache_time_${collectionName}`) || 0);
+    if (!cachedAt || (Date.now() - cachedAt) >= Number(customTtlMinutes) * 60 * 1000) {
+      isCustomTtlExpired = true;
     }
   }
 
-  // 2. Return local cache instantly if available and forceServer is false (0 Network Requests)
-  if (cachedData && Array.isArray(cachedData) && cachedData.length > 0 && !forceServer) {
+  // 1. Return persistent local cache instantly if available, forceServer is false, and not expired
+  if (!forceServer && !isCustomTtlExpired && Array.isArray(cachedData) && cachedData.length > 0) {
     return cachedData;
   }
 
-  // 3. Network Fetch Fallback: If cache is empty/missing OR forceServer is true
+  // 2. Network Fetch: When forceServer is true OR local cache is empty/expired
   if (navigator.onLine) {
     try {
-      const data = await getCollection(collectionName, forceServer);
-      if (Array.isArray(data) && data.length > 0) {
-        localStorage.setItem(cacheKey, JSON.stringify(data));
-        localStorage.setItem(timeKey, String(Date.now()));
-        if (collectionName === COLLECTIONS.QUESTIONS) {
-          localStorage.setItem('questions_data', JSON.stringify(data));
-        }
+      const data = await _fetchCollectionStrict(collectionName, true);
+      if (Array.isArray(data) && (data.length > 0 || forceServer)) {
+        await persistCollectionCache(collectionName, data);
         _sessionRevalidatedCollections.add(collectionName);
         return data;
-      } else if (Array.isArray(data) && data.length === 0 && forceServer) {
-        localStorage.setItem(cacheKey, JSON.stringify([]));
-        localStorage.setItem(timeKey, String(Date.now()));
-        return [];
       }
     } catch (error) {
-      console.warn(`Network fallback failed for ${collectionName}, returning cache fallback:`, error);
+      console.warn(`Network fetch failed for ${collectionName}, returning persistent cache fallback:`, error);
     }
   }
 
-  return cachedData || [];
+  return Array.isArray(cachedData) ? cachedData : [];
 };
 
 /**
@@ -325,7 +532,7 @@ export const getDocument = async (collectionName, docId, forceServer = false) =>
   try {
     let query = supabase.from(collectionName).select('*').eq('id', docId);
     if (forceServer) {
-      query = query.setHeader('Cache-Control', 'no-cache');
+      query = query.setHeader('Cache-Control', 'no-cache').setHeader('Pragma', 'no-cache');
     }
     const { data, error } = await query.single();
     if (error) throw error;
@@ -337,17 +544,21 @@ export const getDocument = async (collectionName, docId, forceServer = false) =>
 };
 
 /**
- * Invalidate Tier 1 localStorage cache for a specific collection
+ * Invalidate Tier 1 cache (Memory, localStorage, IndexedDB & SQLite) for a specific collection
  */
 export const clearCollectionCache = (collectionName) => {
+  _memoryCollectionCache.delete(collectionName);
   try {
     localStorage.removeItem(`cache_data_${collectionName}`);
     localStorage.removeItem(`cache_time_${collectionName}`);
-    // Also remove from session tracker so it's allowed to re-sync once
+    if (collectionName === COLLECTIONS.QUESTIONS) {
+      localStorage.removeItem('questions_data');
+    }
     _sessionRevalidatedCollections.delete(collectionName);
   } catch (e) {
     console.warn(`Failed to clear cache for ${collectionName}:`, e);
   }
+  return deletePersistentCollection(collectionName).catch(() => false);
 };
 
 // ─── Table Column Mappings ─────────────────────────────────────
@@ -429,37 +640,115 @@ const sanitizePayload = (collectionName, docId, data) => {
   return sanitized;
 };
 
-let kvDebounceTimer = null;
-const triggerKvCacheInvalidation = (collectionName = '') => {
-  // Skip KV invalidation for user-specific non-core tables (users, activities)
-  if (collectionName === COLLECTIONS.USERS || collectionName === COLLECTIONS.ACTIVITIES) return;
+const KV_DEBOUNCE_MS = 300;
+let _kvDebounceTimer = null;
+let _kvInFlightPromise = null;
+let _kvNeedsTrailingRun = false;
+let _kvWaiters = [];
 
-  if (kvDebounceTimer) {
-    clearTimeout(kvDebounceTimer);
+const _executeKvRefresh = async () => {
+  const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
+  try {
+    const res = await fetch(`${proxyUrl}/sync-all?cache=bypass&t=${Date.now()}`, {
+      headers: {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+        'X-App-Client': 'live-circular-admin',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      },
+      cache: 'no-store',
+      keepalive: true
+    });
+    if (res.ok) {
+      console.log('⚡ Cloudflare KV cache successfully updated in realtime!');
+      return true;
+    }
+    console.warn(`Failed to invalidate Cloudflare KV cache: HTTP ${res.status}`);
+    return false;
+  } catch (err) {
+    console.warn('Failed to invalidate Cloudflare KV cache:', err);
+    return false;
+  }
+};
+
+const _flushKvInvalidation = async () => {
+  if (_kvDebounceTimer) {
+    clearTimeout(_kvDebounceTimer);
+    _kvDebounceTimer = null;
   }
 
-  kvDebounceTimer = setTimeout(async () => {
-    kvDebounceTimer = null;
-    console.log('⚡ Admin change detected: Debounced invalidating & refreshing Cloudflare KV cache...');
-    const proxyUrl = SUPABASE_CONFIG.cloudflareProxyUrl || 'https://job-circular-proxy.rudrodeb029.workers.dev';
+  if (_kvInFlightPromise) {
+    _kvNeedsTrailingRun = true;
+    return _kvInFlightPromise;
+  }
+
+  const batchWaiters = _kvWaiters;
+  _kvWaiters = [];
+
+  _kvInFlightPromise = (async () => {
+    let ok = false;
     try {
-      const res = await fetch(`${proxyUrl}/sync-all?cache=bypass&t=${Date.now()}`, {
-        headers: {
-          'apikey': SUPABASE_CONFIG.anonKey,
-          'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
-          'X-App-Client': 'live-circular-admin',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache'
-        },
-        cache: 'no-store'
-      });
-      if (res.ok) {
-        console.log('⚡ Cloudflare KV cache successfully updated in realtime!');
+      ok = await _executeKvRefresh();
+      while (_kvNeedsTrailingRun) {
+        _kvNeedsTrailingRun = false;
+        ok = await _executeKvRefresh();
       }
-    } catch (err) {
-      console.warn('Failed to invalidate Cloudflare KV cache:', err);
+    } finally {
+      _kvInFlightPromise = null;
+      const remainingWaiters = _kvWaiters;
+      _kvWaiters = [];
+      [...batchWaiters, ...remainingWaiters].forEach(resolve => {
+        try { resolve(ok); } catch (e) {}
+      });
     }
-  }, 2500); // 2.5s debounce: batches multiple rapid admin actions into exactly 1 sync!
+    return ok;
+  })();
+
+  return _kvInFlightPromise;
+};
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', () => {
+    if (_kvDebounceTimer || _kvWaiters.length > 0) {
+      _flushKvInvalidation();
+    }
+  });
+}
+
+/**
+ * Reliably invalidate & refresh Cloudflare KV cache after admin mutations.
+ * Batches synchronous/rapid edits in a 300ms window without losing trailing mutations,
+ * uses keepalive: true, and returns a Promise that resolves once the refresh completes.
+ */
+const triggerKvCacheInvalidation = (collectionName = '', options = {}) => {
+  // Skip KV invalidation for user-specific non-core tables (users, activities)
+  if (collectionName === COLLECTIONS.USERS || collectionName === COLLECTIONS.ACTIVITIES) {
+    return Promise.resolve(true);
+  }
+
+  if (options?.immediate) {
+    return _flushKvInvalidation();
+  }
+
+  return new Promise((resolve) => {
+    _kvWaiters.push(resolve);
+
+    if (_kvInFlightPromise) {
+      _kvNeedsTrailingRun = true;
+      return;
+    }
+
+    if (_kvDebounceTimer) {
+      clearTimeout(_kvDebounceTimer);
+    }
+
+    _kvDebounceTimer = setTimeout(() => {
+      _kvDebounceTimer = null;
+      console.log('⚡ Admin change detected: Invalidating & refreshing Cloudflare KV cache...');
+      _flushKvInvalidation();
+    }, KV_DEBOUNCE_MS);
+  });
 };
 
 /**
@@ -468,7 +757,13 @@ const triggerKvCacheInvalidation = (collectionName = '') => {
 export const addDocument = async (collectionName, data) => {
   try {
     const id = data.id || `${collectionName}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const payload = sanitizePayload(collectionName, id, data);
+    const nowIso = new Date().toISOString();
+    const dataWithTimestamps = {
+      ...data,
+      createdAt: data.createdAt || nowIso,
+      updatedAt: data.updatedAt || nowIso
+    };
+    const payload = sanitizePayload(collectionName, id, dataWithTimestamps);
     
     const { data: inserted, error } = await supabase
       .from(collectionName)
@@ -478,18 +773,17 @@ export const addDocument = async (collectionName, data) => {
 
     if (error) throw error;
     
-    const normalized = normalizeDoc(inserted || payload);
+    const rawNormalized = normalizeDoc(inserted || payload);
+    const normalized = {
+      ...rawNormalized,
+      createdAt: rawNormalized.createdAt || dataWithTimestamps.createdAt,
+      updatedAt: rawNormalized.updatedAt || dataWithTimestamps.updatedAt
+    };
+
     try {
-      const cacheKey = `cache_data_${collectionName}`;
-      const cachedStr = localStorage.getItem(cacheKey);
-      if (cachedStr) {
-        const items = JSON.parse(cachedStr);
-        if (Array.isArray(items)) {
-          const updated = [normalized, ...items.filter(item => String(item.id) !== String(id))];
-          localStorage.setItem(cacheKey, JSON.stringify(updated));
-          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
-        }
-      }
+      const existing = await getPersistentCache(collectionName);
+      const updated = [normalized, ...(Array.isArray(existing) ? existing.filter(item => String(item.id) !== String(id)) : [])];
+      await persistCollectionCache(collectionName, updated);
     } catch (e) {}
 
     _sessionRevalidatedCollections.delete(collectionName);
@@ -503,11 +797,16 @@ export const addDocument = async (collectionName, data) => {
 };
 
 /**
- * Set or upsert a document by ID
+ * Set or upsert a document by ID (always preserves/sets updatedAt)
  */
 export const setDocument = async (collectionName, docId, data) => {
   try {
-    const payload = sanitizePayload(collectionName, docId, data);
+    const nowIso = new Date().toISOString();
+    const dataWithTimestamps = {
+      ...(data || {}),
+      updatedAt: (data && data.updatedAt) ? data.updatedAt : nowIso
+    };
+    const payload = sanitizePayload(collectionName, docId, dataWithTimestamps);
     const { data: upserted, error } = await supabase
       .from(collectionName)
       .upsert(payload)
@@ -516,19 +815,17 @@ export const setDocument = async (collectionName, docId, data) => {
 
     if (error) throw error;
     
-    const normalized = normalizeDoc(upserted || payload);
-    // Surgically update or prepend document in local cache
+    const rawNormalized = normalizeDoc(upserted || payload);
+    const normalized = {
+      ...rawNormalized,
+      updatedAt: rawNormalized.updatedAt || dataWithTimestamps.updatedAt
+    };
+
+    // Surgically update or prepend document in persistent & local cache
     try {
-      const cacheKey = `cache_data_${collectionName}`;
-      const cachedStr = localStorage.getItem(cacheKey);
-      if (cachedStr) {
-        const items = JSON.parse(cachedStr);
-        if (Array.isArray(items)) {
-          const updated = [normalized, ...items.filter(item => String(item.id) !== String(docId))];
-          localStorage.setItem(cacheKey, JSON.stringify(updated));
-          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
-        }
-      }
+      const existing = await getPersistentCache(collectionName);
+      const updated = [normalized, ...(Array.isArray(existing) ? existing.filter(item => String(item.id) !== String(docId)) : [])];
+      await persistCollectionCache(collectionName, updated);
     } catch (e) {}
 
     _sessionRevalidatedCollections.delete(collectionName);
@@ -542,11 +839,16 @@ export const setDocument = async (collectionName, docId, data) => {
 };
 
 /**
- * Update an existing document by ID
+ * Update an existing document by ID (always preserves/sets updatedAt)
  */
 export const updateDocument = async (collectionName, docId, updates) => {
   try {
-    const payload = sanitizePayload(collectionName, docId, updates);
+    const nowIso = new Date().toISOString();
+    const updatesWithTimestamp = {
+      ...(updates || {}),
+      updatedAt: (updates && updates.updatedAt) ? updates.updatedAt : nowIso
+    };
+    const payload = sanitizePayload(collectionName, docId, updatesWithTimestamp);
     const { data: updated, error } = await supabase
       .from(collectionName)
       .upsert(payload)
@@ -555,18 +857,21 @@ export const updateDocument = async (collectionName, docId, updates) => {
 
     if (error) throw error;
     
-    const normalized = normalizeDoc(updated || payload);
-    // Surgically update document in local cache
+    const rawNormalized = normalizeDoc(updated || payload);
+    const normalized = {
+      ...rawNormalized,
+      updatedAt: rawNormalized.updatedAt || updatesWithTimestamp.updatedAt
+    };
+
+    // Surgically update document in persistent & local cache
     try {
-      const cacheKey = `cache_data_${collectionName}`;
-      const cachedStr = localStorage.getItem(cacheKey);
-      if (cachedStr) {
-        const items = JSON.parse(cachedStr);
-        if (Array.isArray(items)) {
-          const updatedList = items.map(item => String(item.id) === String(docId) ? { ...item, ...normalized } : item);
-          localStorage.setItem(cacheKey, JSON.stringify(updatedList));
-          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
-        }
+      const existing = await getPersistentCache(collectionName);
+      if (Array.isArray(existing) && existing.length > 0) {
+        const hasMatch = existing.some(item => String(item.id) === String(docId));
+        const updatedList = hasMatch
+          ? existing.map(item => String(item.id) === String(docId) ? { ...item, ...normalized } : item)
+          : [normalized, ...existing];
+        await persistCollectionCache(collectionName, updatedList);
       }
     } catch (e) {}
 
@@ -592,17 +897,12 @@ export const deleteDocument = async (collectionName, docId) => {
 
     if (error) throw error;
     
-    // Surgically remove deleted document from local cache so other items remain intact
+    // Surgically remove deleted document from persistent & local cache so other items remain intact
     try {
-      const cacheKey = `cache_data_${collectionName}`;
-      const cachedStr = localStorage.getItem(cacheKey);
-      if (cachedStr) {
-        const items = JSON.parse(cachedStr);
-        if (Array.isArray(items)) {
-          const updated = items.filter(item => String(item.id) !== String(docId));
-          localStorage.setItem(cacheKey, JSON.stringify(updated));
-          localStorage.setItem(`cache_time_${collectionName}`, String(Date.now()));
-        }
+      const existing = await getPersistentCache(collectionName);
+      if (Array.isArray(existing)) {
+        const updated = existing.filter(item => String(item.id) !== String(docId));
+        await persistCollectionCache(collectionName, updated);
       }
     } catch (e) {
       console.warn(`Failed to remove ${docId} from cache ${collectionName}:`, e);
@@ -706,14 +1006,20 @@ export const onCollectionSnapshot = (collectionName, callback) => {
 export const batchSetDocuments = async (collectionName, items) => {
   try {
     if (!items || items.length === 0) return true;
-    const sanitizedItems = items.map(item => sanitizePayload(collectionName, item.id, item));
+    const nowIso = new Date().toISOString();
+    const sanitizedItems = items.map(item =>
+      sanitizePayload(collectionName, item.id, {
+        ...item,
+        updatedAt: item.updatedAt || nowIso
+      })
+    );
     const { error } = await supabase
       .from(collectionName)
       .upsert(sanitizedItems);
 
     if (error) throw error;
-    clearCollectionCache(collectionName);
-    triggerKvCacheInvalidation();
+    await clearCollectionCache(collectionName);
+    await triggerKvCacheInvalidation(collectionName);
 
     return true;
   } catch (error) {
