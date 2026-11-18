@@ -20,11 +20,38 @@ const BLOCKED_USER_AGENTS = [
   'axios', 'postmanruntime'
 ];
 
+const DEFAULT_SUPABASE_ANON_KEY = 'sb_publishable_6U3mjliIxh7zfUdlBYp0aA_joaBHdPd';
+
 const CORE_COLLECTIONS = [
   'jobs', 'notifications', 'admits',
   'questions', 'live_exams', 'feed_posts', 'app_config',
   'offline_feed'
 ];
+
+// Collections that track both createdAt and updatedAt columns in PostgreSQL
+const DUAL_TS_COLLECTIONS = new Set(['questions', 'jobs', 'live_exams', 'feed_posts']);
+const CREATED_ONLY_COLLECTIONS = new Set(['notifications', 'admits']);
+const UPDATED_ONLY_COLLECTIONS = new Set(['app_config']);
+
+// Cloudflare KV hard limit is 25 MiB per key; stay safely under it
+const KV_MAX_SAFE_BYTES = 24 * 1024 * 1024;
+const KV_CHUNK_TARGET_BYTES = 16 * 1024 * 1024;
+const CRON_LOOKBACK_MS = 15 * 60 * 1000;
+
+function getUtf8ByteLength(str) {
+  return new TextEncoder().encode(str).length;
+}
+
+function getSupabaseServiceHeaders(env) {
+  const apiKey = env?.SUPABASE_ANON_KEY || DEFAULT_SUPABASE_ANON_KEY;
+  return new Headers({
+    'apikey': apiKey,
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache, no-store',
+    'Pragma': 'no-cache'
+  });
+}
 
 // Helper: সময় ফরম্যাট (সেকেন্ড → "Xm Ys")
 function formatTime(totalSec) {
@@ -48,14 +75,291 @@ function stripAnswerKeys(exams) {
   });
 }
 
-// Helper: Safe KV Put wrapper (prevents 429 quota exhaustion from throwing errors or breaking worker requests)
+// Helper: Safe KV Put wrapper (enforces 25 MiB limit and prevents quota errors from breaking requests)
 async function safeKvPut(kv, key, val, options) {
   try {
-    if (!kv) return;
+    if (!kv) return { ok: false, reason: 'no_kv' };
+    if (typeof val === 'string' && getUtf8ByteLength(val) > KV_MAX_SAFE_BYTES) {
+      console.warn(`[KV-Safe] Value for ${key} exceeds safe byte limit (${getUtf8ByteLength(val)} bytes)`);
+      return { ok: false, reason: 'size_limit' };
+    }
     await kv.put(key, val, options);
+    return { ok: true };
   } catch (err) {
     console.warn(`[KV-Safe] Put skipped for ${key}:`, err?.message || err);
+    return { ok: false, reason: 'kv_error', error: err?.message || String(err) };
   }
+}
+
+async function safeKvDelete(kv, key) {
+  try {
+    if (!kv) return false;
+    await kv.delete(key);
+    return true;
+  } catch (err) {
+    console.warn(`[KV-Safe] Delete failed for ${key}:`, err?.message || err);
+    return false;
+  }
+}
+
+// Deterministic ordering per table so pagination never skips or duplicates rows
+function getCollectionOrderParam(col) {
+  if (col === 'app_config' || col === 'offline_feed') return 'id.asc';
+  return 'createdAt.desc,id.asc';
+}
+
+// Fetch all rows for a collection from Supabase with pagination (handles >1000 rows cleanly)
+async function fetchAllRowsFromSupabase(col, headers, filterQuery = '') {
+  const PAGE_SIZE = 1000;
+  const MAX_PAGES = 20;
+  const orderParam = getCollectionOrderParam(col);
+  const allRows = [];
+  let useOrder = true;
+
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const offset = page * PAGE_SIZE;
+    const parts = ['select=*', `limit=${PAGE_SIZE}`, `offset=${offset}`];
+    if (filterQuery) parts.push(filterQuery);
+    if (useOrder && orderParam) parts.push(`order=${orderParam}`);
+    const queryUrl = `${SUPABASE_ORIGIN}/rest/v1/${col}?${parts.join('&')}`;
+
+    try {
+      let res = await fetch(queryUrl, { headers });
+      if (!res.ok && res.status === 400 && useOrder) {
+        // Fallback if a table lacks createdAt/id ordering column
+        useOrder = false;
+        const fallbackParts = ['select=*', `limit=${PAGE_SIZE}`, `offset=${offset}`];
+        if (filterQuery) fallbackParts.push(filterQuery);
+        res = await fetch(`${SUPABASE_ORIGIN}/rest/v1/${col}?${fallbackParts.join('&')}`, { headers });
+      }
+      if (!res.ok) {
+        console.warn(`[Supabase] Fetch failed for ${col} (page ${page}): HTTP ${res.status}`);
+        return { ok: false, rows: [] };
+      }
+      const data = await res.json();
+      if (!Array.isArray(data)) {
+        return { ok: false, rows: [] };
+      }
+      allRows.push(...data);
+      if (data.length < PAGE_SIZE) break;
+    } catch (err) {
+      console.warn(`[Supabase] Fetch error for ${col}:`, err?.message || err);
+      return { ok: false, rows: [] };
+    }
+  }
+
+  return { ok: true, rows: allRows };
+}
+
+// Merge/upsert rows into an existing collection array by String(id), preserving updatedAt
+function upsertRows(existingList, newRows, col) {
+  const existing = Array.isArray(existingList) ? existingList : [];
+  const incoming = Array.isArray(newRows) ? newRows : [];
+  if (incoming.length === 0) return existing;
+
+  const incomingById = new Map();
+  for (const row of incoming) {
+    if (row && row.id !== undefined && row.id !== null) {
+      incomingById.set(String(row.id), row);
+    }
+  }
+
+  const matchedIds = new Set();
+  const updatedExisting = existing.map(item => {
+    const key = item && item.id !== undefined && item.id !== null ? String(item.id) : null;
+    if (key && incomingById.has(key)) {
+      matchedIds.add(key);
+      return incomingById.get(key);
+    }
+    return item;
+  });
+
+  const brandNew = [];
+  for (const row of incoming) {
+    const key = row && row.id !== undefined && row.id !== null ? String(row.id) : null;
+    if (!key || !matchedIds.has(key)) {
+      brandNew.push(row);
+    }
+  }
+
+  const merged = [...brandNew, ...updatedExisting];
+
+  if (col === 'questions' || col === 'notifications' || col === 'admits' || col === 'jobs' || col === 'feed_posts' || col === 'live_exams') {
+    merged.sort((a, b) => {
+      const ta = a?.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const tb = b?.createdAt ? new Date(b.createdAt).getTime() : 0;
+      if (isNaN(ta) && isNaN(tb)) return 0;
+      if (isNaN(tb)) return -1;
+      if (isNaN(ta)) return 1;
+      return tb - ta;
+    });
+  }
+
+  return merged;
+}
+
+// Extract and save live_exams answer keys into consolidated KV map
+async function syncLiveExamAnswerKeys(env, exams, { replaceAll = false } = {}) {
+  if (!Array.isArray(exams) || exams.length === 0) return;
+  const answerKeysMap = replaceAll
+    ? {}
+    : (await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null)) || {};
+
+  let changed = replaceAll;
+  for (const exam of exams) {
+    if (exam && exam.id !== undefined && Array.isArray(exam.questions) && exam.questions.length > 0) {
+      const hasKeys = exam.questions.some(q => q && q.correctIndex !== undefined);
+      if (hasKeys) {
+        answerKeysMap[String(exam.id)] = exam.questions.map((q, idx) => ({
+          index: idx,
+          correctIndex: q.correctIndex,
+          explanation: q.explanation || ''
+        }));
+        changed = true;
+      }
+    }
+  }
+
+  if (changed && Object.keys(answerKeysMap).length > 0) {
+    await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(answerKeysMap));
+  }
+}
+
+// Read sync_all_data cleanly, transparently handling sharded/chunked KV storage
+async function readSyncAllFromKv(env, sbHeaders, onlyCollections = null) {
+  const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+  if (!kvData || typeof kvData !== 'object') return null;
+
+  if (!kvData.__sharded) {
+    return kvData;
+  }
+
+  const targetCols = onlyCollections || CORE_COLLECTIONS;
+  const result = {
+    masterLastUpdated: kvData.masterLastUpdated,
+    syncedAt: kvData.syncedAt || kvData.masterLastUpdated
+  };
+
+  for (const col of targetCols) {
+    const meta = kvData.collections?.[col];
+    if (!meta) return null;
+
+    if (meta.mode === 'live') {
+      const fetched = await fetchAllRowsFromSupabase(col, sbHeaders || getSupabaseServiceHeaders(env));
+      if (!fetched.ok) return null;
+      result[col] = col === 'live_exams' ? stripAnswerKeys(fetched.rows) : fetched.rows;
+    } else if (meta.mode === 'single') {
+      const colData = await env.CACHE_KV?.get(`sync_col_${col}`, 'json').catch(() => null);
+      if (!Array.isArray(colData)) return null;
+      result[col] = colData;
+    } else if (meta.mode === 'chunked') {
+      const partCount = Number(meta.parts) || 0;
+      if (partCount <= 0) return null;
+      const partPromises = [];
+      for (let i = 0; i < partCount; i++) {
+        partPromises.push(env.CACHE_KV?.get(`sync_col_${col}_p${i}`, 'json').catch(() => null));
+      }
+      const parts = await Promise.all(partPromises);
+      if (parts.some(p => !Array.isArray(p))) return null;
+      result[col] = parts.flat();
+    } else {
+      return null;
+    }
+  }
+
+  return result;
+}
+
+// Write sync_all_data safely to KV; automatically shards/chunks if >24 MiB so stale/truncated data is never served
+async function writeSyncAllToKv(env, payloadObj, changedCols = null) {
+  if (!env?.CACHE_KV || !payloadObj || typeof payloadObj !== 'object') {
+    return { ok: false, reason: 'invalid_input' };
+  }
+
+  const safePayload = { ...payloadObj };
+  delete safePayload.__sharded;
+  delete safePayload.collections;
+  if (Array.isArray(safePayload.live_exams)) {
+    safePayload.live_exams = stripAnswerKeys(safePayload.live_exams);
+  }
+
+  const fullJson = JSON.stringify(safePayload);
+  if (getUtf8ByteLength(fullJson) <= KV_MAX_SAFE_BYTES) {
+    const putRes = await safeKvPut(env.CACHE_KV, 'sync_all_data', fullJson);
+    if (!putRes.ok) {
+      await safeKvDelete(env.CACHE_KV, 'sync_all_data');
+    }
+    return putRes;
+  }
+
+  // Payload exceeds single-key KV limit -> shard per collection (and chunk oversized arrays)
+  console.warn(`[KV-Safe] sync_all_data (${getUtf8ByteLength(fullJson)} bytes) exceeds safe limit; sharding across per-collection KV keys.`);
+  const existingPointer = await env.CACHE_KV.get('sync_all_data', 'json').catch(() => null);
+  const wasSharded = Boolean(existingPointer?.__sharded);
+  const collectionsMeta = wasSharded && existingPointer.collections ? { ...existingPointer.collections } : {};
+  const colsToWrite = (!wasSharded || !Array.isArray(changedCols)) ? CORE_COLLECTIONS : changedCols;
+
+  for (const col of CORE_COLLECTIONS) {
+    const rows = Array.isArray(safePayload[col]) ? safePayload[col] : [];
+    if (!colsToWrite.includes(col) && collectionsMeta[col]) {
+      continue;
+    }
+
+    const colJson = JSON.stringify(rows);
+    if (getUtf8ByteLength(colJson) <= KV_MAX_SAFE_BYTES) {
+      const colPut = await safeKvPut(env.CACHE_KV, `sync_col_${col}`, colJson);
+      collectionsMeta[col] = colPut.ok ? { mode: 'single' } : { mode: 'live' };
+    } else {
+      // Split oversized array into <=16 MiB chunks
+      const chunks = [];
+      let currentChunk = [];
+      let currentBytes = 2; // '[]'
+
+      for (const row of rows) {
+        const rowJson = JSON.stringify(row);
+        const rowBytes = getUtf8ByteLength(rowJson) + 1;
+        if (rowBytes > KV_MAX_SAFE_BYTES) {
+          currentChunk = null;
+          break;
+        }
+        if (currentChunk.length > 0 && currentBytes + rowBytes > KV_CHUNK_TARGET_BYTES) {
+          chunks.push(currentChunk);
+          currentChunk = [row];
+          currentBytes = 2 + rowBytes;
+        } else {
+          currentChunk.push(row);
+          currentBytes += rowBytes;
+        }
+      }
+      if (currentChunk && currentChunk.length > 0) chunks.push(currentChunk);
+
+      if (!currentChunk) {
+        collectionsMeta[col] = { mode: 'live' };
+      } else {
+        let allPartsOk = true;
+        for (let i = 0; i < chunks.length; i++) {
+          const partPut = await safeKvPut(env.CACHE_KV, `sync_col_${col}_p${i}`, JSON.stringify(chunks[i]));
+          if (!partPut.ok) {
+            allPartsOk = false;
+            break;
+          }
+        }
+        collectionsMeta[col] = allPartsOk ? { mode: 'chunked', parts: chunks.length } : { mode: 'live' };
+      }
+    }
+  }
+
+  const pointer = {
+    __sharded: true,
+    masterLastUpdated: safePayload.masterLastUpdated || new Date().toISOString(),
+    syncedAt: safePayload.syncedAt || safePayload.masterLastUpdated || new Date().toISOString(),
+    collections: collectionsMeta
+  };
+  const ptrPut = await safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(pointer));
+  if (!ptrPut.ok) {
+    await safeKvDelete(env.CACHE_KV, 'sync_all_data');
+  }
+  return ptrPut;
 }
 
 // Helper: Get answer key for an exam (supports consolidated map and legacy single key)
@@ -478,7 +782,7 @@ export default {
 
         // 2. Check if the exam has ended
         if (!authorized) {
-          const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+          const kvData = await readSyncAllFromKv(env, getSupabaseServiceHeaders(env), ['live_exams']);
           let exam = (kvData?.live_exams || []).find(e => String(e.id) === String(examId));
           
           if (!exam) {
@@ -553,7 +857,7 @@ export default {
             `SELECT SUM(delta) as total_delta FROM feed_likes_queue WHERE post_id = ?`
           ).bind(String(postId)).first();
           const queueDelta = Number(d1Likes?.total_delta) || 0;
-          const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+          const kvData = await readSyncAllFromKv(env, getSupabaseServiceHeaders(env), ['feed_posts']);
           const post = kvData?.feed_posts?.find(p => String(p.id) === String(postId));
           const baseLikes = Number(post?.likes) || 0;
           finalLikes = Math.max(0, baseLikes + queueDelta);
@@ -648,25 +952,14 @@ export default {
           return new Response(`Skipping unsupported collection: ${table}`, { status: 200 });
         }
 
-        const kvData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null) || {};
-        let list = kvData[table] || [];
+        const sbHeaders = getSupabaseServiceHeaders(env);
+        const kvData = await readSyncAllFromKv(env, sbHeaders);
 
         // ★ Answer Key Separation: live_exams INSERT/UPDATE হলে answer key consolidated map-এ সেভ
         let processedRecord = record;
         if (table === 'live_exams' && record && (type === 'INSERT' || type === 'UPDATE')) {
+          await syncLiveExamAnswerKeys(env, [record]);
           if (record.questions && Array.isArray(record.questions) && record.questions.length > 0) {
-            // Consolidated map-এ সেভ (০ অতিরিক্ত KV কি)
-            const answerKey = record.questions.map((q, i) => ({
-              index: i,
-              correctIndex: q.correctIndex,
-              explanation: q.explanation || ''
-            }));
-            const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null) || {};
-            allKeys[String(record.id)] = answerKey;
-            await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys));
-            console.log(`🔐 Consolidated answer key saved for exam ${record.id} (${answerKey.length} questions)`);
-
-            // Questions থেকে correctIndex মুছে দাও (শিক্ষার্থী দেখতে পারবে না!)
             processedRecord = {
               ...record,
               questions: record.questions.map(q => {
@@ -677,36 +970,44 @@ export default {
           }
         }
 
-        if (type === 'DELETE') {
-          const deleteId = old_record?.id || record?.id;
-          list = list.filter(item => item.id !== deleteId);
-          // live_exams ডিলিট হলে consolidated map থেকেও মুছো
-          if (table === 'live_exams' && deleteId) {
-            const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null) || {};
-            if (allKeys[String(deleteId)]) {
-              delete allKeys[String(deleteId)];
-              ctx.waitUntil(safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys)));
+        const newTimestamp = new Date().toISOString();
+
+        if (kvData && typeof kvData === 'object' && Array.isArray(kvData[table])) {
+          let list = kvData[table];
+          if (type === 'DELETE') {
+            const deleteId = old_record?.id || record?.id;
+            list = list.filter(item => String(item.id) !== String(deleteId));
+            // live_exams ডিলিট হলে consolidated map থেকেও মুছো
+            if (table === 'live_exams' && deleteId) {
+              const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null) || {};
+              if (allKeys[String(deleteId)]) {
+                delete allKeys[String(deleteId)];
+                ctx.waitUntil(safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys)));
+              }
             }
+          } else if (processedRecord) {
+            list = upsertRows(list, [processedRecord], table);
+          }
+
+          kvData[table] = list;
+          kvData.masterLastUpdated = newTimestamp;
+          kvData.syncedAt = newTimestamp;
+
+          const writeRes = await writeSyncAllToKv(env, kvData, [table]);
+          if (writeRes.ok) {
+            await Promise.all([
+              safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+              safeKvPut(env.CACHE_KV, 'last_updated_by', 'supabase-webhook')
+            ]);
           }
         } else {
-          // INSERT or UPDATE — processedRecord ব্যবহার করো (correctIndex বাদ)
-          list = [
-            processedRecord,
-            ...list.filter(item => item.id !== processedRecord.id)
-          ];
+          // Cache empty or missing table — avoid writing a partial 1-item sync_all_data
+          await Promise.all([
+            safeKvDelete(env.CACHE_KV, 'sync_all_data'),
+            safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+            safeKvPut(env.CACHE_KV, 'last_updated_by', 'supabase-webhook')
+          ]);
         }
-
-        kvData[table] = list;
-        const newTimestamp = new Date().toISOString();
-        kvData.masterLastUpdated = newTimestamp;
-
-        const updatePromises = [
-          safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(kvData)),
-          safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
-          safeKvPut(env.CACHE_KV, 'last_updated_by', 'supabase-webhook')
-        ];
-
-        await Promise.all(updatePromises);
 
         console.log(`🔔 Webhook: Successfully synced ${type} on table "${table}" to Cloudflare KV.`);
         return new Response(JSON.stringify({ success: true, table, type, timestamp: newTimestamp }), {
@@ -723,7 +1024,7 @@ export default {
     }
 
     // Rule 9: /check-updates -> KV (0 Supabase!)
-    if (url.pathname === '/check-updates' || url.pathname.includes('app_sync_control')) {
+    if ((url.pathname === '/check-updates' || url.pathname.includes('app_sync_control')) && request.method === 'GET') {
       const kvTs = await env.CACHE_KV?.get('last_sync_timestamp').catch(() => null);
       const kvBy = await env.CACHE_KV?.get('last_updated_by').catch(() => null);
       if (kvTs) {
@@ -750,6 +1051,7 @@ export default {
     // Rule 10: /sync-all -> KV (0 Supabase!) + Answer Keys stripped
     if (url.pathname === '/sync-all' || url.pathname === '/rest/v1/sync-all') {
       const isBypass = url.searchParams.get('cache') === 'bypass' || url.searchParams.get('force') === 'true';
+      const sbHeaders = getSupabaseServiceHeaders(env);
 
       // 304 check (only if not bypassing cache)
       if (!isBypass && ifModifiedSince) {
@@ -757,79 +1059,98 @@ export default {
         if (kvTs) {
           const serverTime = new Date(kvTs).getTime();
           const clientTime = new Date(ifModifiedSince).getTime();
-          if (serverTime > 0 && clientTime >= serverTime) {
+          if (!isNaN(serverTime) && !isNaN(clientTime) && serverTime > 0 && clientTime >= serverTime) {
             return new Response(null, { status: 304, headers: { 'Access-Control-Allow-Origin': '*', 'X-Edge-Cache': '304-NOT-MODIFIED' } });
           }
         }
       }
 
-      const kvData = isBypass ? null : await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+      const kvData = isBypass ? null : await readSyncAllFromKv(env, sbHeaders);
       if (kvData && typeof kvData === 'object') {
         const safeData = { ...kvData };
         if (Array.isArray(safeData.live_exams)) {
           safeData.live_exams = stripAnswerKeys(safeData.live_exams);
         }
-        return new Response(JSON.stringify(safeData), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'public, max-age=60, s-maxage=60', 'Last-Modified': kvData.masterLastUpdated || new Date().toISOString(), 'X-Edge-Cache': 'KV-HIT-CDN-60s', 'X-Supabase-Queries': '0' } });
+        return new Response(JSON.stringify(safeData), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'public, max-age=30, s-maxage=30, must-revalidate',
+            'Last-Modified': kvData.masterLastUpdated || new Date().toISOString(),
+            'X-Edge-Cache': 'KV-HIT-CDN-30s',
+            'X-Supabase-Queries': '0'
+          }
+        });
       }
 
-      // KV empty or bypass — fetch fresh data from Supabase
-      const fetchAll = CORE_COLLECTIONS.map(col => {
-        const q = col === 'questions'
-          ? `${SUPABASE_ORIGIN}/rest/v1/questions?select=*&order=createdAt.desc&limit=1000`
-          : `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*`;
-        return fetch(q, { headers: originHeaders })
-          .then(r => r.ok ? r.json() : [])
-          .then(res => Array.isArray(res) ? res : [])
-          .catch(() => []);
-      });
-
-      const controlFetch = fetch(`${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated&id=eq.1`, { headers: originHeaders })
+      // KV empty or bypass — fetch all active rows cleanly from Supabase with pagination
+      const fetchAll = CORE_COLLECTIONS.map(col => fetchAllRowsFromSupabase(col, sbHeaders));
+      const controlFetch = fetch(`${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated&id=eq.1`, { headers: sbHeaders })
         .then(r => r.ok ? r.json() : [])
         .then(res => Array.isArray(res) ? res : [])
         .catch(() => []);
 
       const results = await Promise.all([...fetchAll, controlFetch]);
+      const colResults = results.slice(0, CORE_COLLECTIONS.length);
       const controlData = results[results.length - 1];
-      const masterLastUpdated = isBypass ? new Date().toISOString() : (controlData?.[0]?.last_updated || new Date().toISOString());
+      const allColsOk = colResults.every(r => r && r.ok);
+
+      const fallbackKv = allColsOk ? null : await readSyncAllFromKv(env, sbHeaders).catch(() => null);
+      const masterLastUpdated = isBypass
+        ? new Date().toISOString()
+        : (controlData?.[0]?.last_updated || new Date().toISOString());
+
       const bootstrapPayload = {};
       CORE_COLLECTIONS.forEach((col, i) => {
-        bootstrapPayload[col] = Array.isArray(results[i]) ? results[i] : [];
+        const res = colResults[i];
+        if (res && res.ok) {
+          bootstrapPayload[col] = res.rows;
+        } else if (fallbackKv && Array.isArray(fallbackKv[col])) {
+          bootstrapPayload[col] = fallbackKv[col];
+        } else {
+          bootstrapPayload[col] = [];
+        }
       });
 
       // Bootstrap live_exams answer key separation (Consolidated into EXACTLY 1 KV PUT!)
       if (Array.isArray(bootstrapPayload.live_exams) && bootstrapPayload.live_exams.length) {
-        const answerKeysMap = {};
-        for (const exam of bootstrapPayload.live_exams) {
-          if (Array.isArray(exam.questions) && exam.questions.length) {
-            answerKeysMap[String(exam.id)] = exam.questions.map((q, idx) => ({
-              index: idx,
-              correctIndex: q.correctIndex,
-              explanation: q.explanation || ''
-            }));
-          }
-        }
-        if (Object.keys(answerKeysMap).length > 0) {
-          await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(answerKeysMap));
-        }
+        await syncLiveExamAnswerKeys(env, bootstrapPayload.live_exams, { replaceAll: allColsOk });
         bootstrapPayload.live_exams = stripAnswerKeys(bootstrapPayload.live_exams);
       }
 
       bootstrapPayload.masterLastUpdated = masterLastUpdated;
       bootstrapPayload.syncedAt = masterLastUpdated;
-      
-      ctx.waitUntil(Promise.all([
-        safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(bootstrapPayload)),
-        safeKvPut(env.CACHE_KV, 'last_sync_timestamp', masterLastUpdated)
-      ]));
+
+      if (allColsOk) {
+        const persistKv = async () => {
+          const writeRes = await writeSyncAllToKv(env, bootstrapPayload);
+          if (writeRes.ok) {
+            const puts = [
+              safeKvPut(env.CACHE_KV, 'last_sync_timestamp', masterLastUpdated),
+              safeKvPut(env.CACHE_KV, 'last_updated_by', isBypass ? 'sync-bypass' : 'sync-bootstrap')
+            ];
+            if (controlData?.[0]?.last_updated) {
+              puts.push(safeKvPut(env.CACHE_KV, 'last_control_sync_ts', controlData[0].last_updated));
+            }
+            await Promise.all(puts);
+          }
+        };
+        if (isBypass) {
+          await persistKv();
+        } else {
+          ctx.waitUntil(persistKv());
+        }
+      }
 
       return new Response(JSON.stringify(bootstrapPayload), {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, max-age=60, s-maxage=60',
+          'Cache-Control': isBypass ? 'no-cache, no-store, must-revalidate' : 'public, max-age=30, s-maxage=30, must-revalidate',
           'Last-Modified': masterLastUpdated,
-          'X-Edge-Cache': isBypass ? 'KV-BYPASS-SUPABASE-REVALIDATED' : 'KV-MISS-SUPABASE-BOOTSTRAP'
+          'X-Edge-Cache': isBypass ? 'KV-BYPASS-SUPABASE-REVALIDATED' : (allColsOk ? 'KV-MISS-SUPABASE-BOOTSTRAP' : 'KV-PARTIAL-SUPABASE-FALLBACK')
         }
       });
     }
@@ -946,7 +1267,9 @@ export default {
     }
 
     // STRICT GET CACHE LOCK (Candidate App only; Admin requests with no-cache or admin client header can bypass)
-    const isNoCache = request.headers.get('Cache-Control')?.includes('no-cache');
+    const cacheControlHeader = (request.headers.get('Cache-Control') || '').toLowerCase();
+    const pragmaHeader = (request.headers.get('Pragma') || '').toLowerCase();
+    const isNoCache = cacheControlHeader.includes('no-cache') || cacheControlHeader.includes('no-store') || pragmaHeader.includes('no-cache');
     const isAdminClient = appClientHeader.includes('admin') || request.headers.get('referer')?.includes('/admin') || isNoCache;
 
     if (request.method === 'GET' && CORE_COLLECTIONS.includes(targetTable) && !isAdminClient) {
@@ -960,36 +1283,178 @@ export default {
     const targetUrl = new URL(url.pathname + url.search, SUPABASE_ORIGIN);
     const headers = new Headers(request.headers);
     headers.set('Host', new URL(SUPABASE_ORIGIN).host);
+    if (!headers.has('apikey') && apiKey) headers.set('apikey', apiKey);
+    if (!headers.has('Authorization') && authHeader) headers.set('Authorization', authHeader);
+    if (request.method === 'GET' && CORE_COLLECTIONS.includes(targetTable)) {
+      headers.set('Cache-Control', 'no-cache, no-store');
+      headers.set('Pragma', 'no-cache');
+    }
+
     const originResponse = await fetch(targetUrl.toString(), {
       method: request.method,
       headers: headers,
       body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
       redirect: 'follow',
     });
-    // Real-time KV Cache Cleanup on DELETE / POST / PATCH
-    if (originResponse.ok) {
+
+    const isCoreMutation = originResponse.ok &&
+      ['POST', 'PATCH', 'PUT', 'DELETE'].includes(request.method) &&
+      CORE_COLLECTIONS.includes(targetTable);
+
+    // Real-time KV Cache Sync on DELETE / POST / PATCH / PUT for synced tables
+    if (isCoreMutation && env.CACHE_KV) {
+      const responseClone = originResponse.clone();
       ctx.waitUntil((async () => {
         try {
+          const sbHeaders = getSupabaseServiceHeaders(env);
+          const newTimestamp = new Date().toISOString();
+          const kvData = await readSyncAllFromKv(env, sbHeaders);
+
+          const resText = await responseClone.text().catch(() => '');
+          let returnedRows = [];
+          if (resText) {
+            try {
+              const parsed = JSON.parse(resText);
+              returnedRows = Array.isArray(parsed)
+                ? parsed
+                : (parsed && typeof parsed === 'object' ? [parsed] : []);
+            } catch (e) {}
+          }
+
           if (request.method === 'DELETE') {
-            const idMatch = url.search.match(/id=eq\.([^&]+)/);
-            const deletedId = idMatch ? decodeURIComponent(idMatch[1]) : null;
-            if (targetTable && deletedId && CORE_COLLECTIONS.includes(targetTable) && env.CACHE_KV) {
-              const kvData = await env.CACHE_KV.get('sync_all_data', 'json').catch(() => null);
-              if (kvData && Array.isArray(kvData[targetTable])) {
-                kvData[targetTable] = kvData[targetTable].filter(item => String(item.id) !== String(deletedId));
-                const newTimestamp = new Date().toISOString();
-                kvData.masterLastUpdated = newTimestamp;
-                await Promise.all([
-                  safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(kvData)),
-                  safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp)
-                ]);
-                console.log(`🗑️ KV Sync: Removed deleted record "${deletedId}" from table "${targetTable}".`);
+            const deleteIds = new Set();
+            const eqMatch = url.search.match(/[?&]id=eq\.([^&]+)/);
+            if (eqMatch) {
+              deleteIds.add(decodeURIComponent(eqMatch[1]));
+            }
+            const inMatch = url.search.match(/[?&]id=in\.\(([^)]+)\)/);
+            if (inMatch) {
+              decodeURIComponent(inMatch[1])
+                .split(',')
+                .map(s => s.trim().replace(/^"|"$/g, ''))
+                .filter(Boolean)
+                .forEach(id => deleteIds.add(id));
+            }
+            for (const row of returnedRows) {
+              if (row && row.id !== undefined && row.id !== null) {
+                deleteIds.add(String(row.id));
               }
             }
-          } else if (['POST', 'PATCH', 'PUT'].includes(request.method) && CORE_COLLECTIONS.includes(targetTable) && isAdminClient) {
-            // ONLY core tables edited by Admin should touch sync timestamps! (০ KV waste on user activity/points)
-            const newTimestamp = new Date().toISOString();
-            await safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp);
+
+            if (kvData && Array.isArray(kvData[targetTable])) {
+              if (deleteIds.size > 0) {
+                kvData[targetTable] = kvData[targetTable].filter(item => !deleteIds.has(String(item.id)));
+                if (targetTable === 'live_exams') {
+                  const allKeys = await env.CACHE_KV.get('all_exam_answer_keys', 'json').catch(() => null);
+                  if (allKeys && typeof allKeys === 'object') {
+                    let keysChanged = false;
+                    for (const id of deleteIds) {
+                      if (allKeys[id]) {
+                        delete allKeys[id];
+                        keysChanged = true;
+                      }
+                    }
+                    if (keysChanged) {
+                      await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys));
+                    }
+                  }
+                }
+                kvData.masterLastUpdated = newTimestamp;
+                kvData.syncedAt = newTimestamp;
+                const writeRes = await writeSyncAllToKv(env, kvData, [targetTable]);
+                if (writeRes.ok) {
+                  await Promise.all([
+                    safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                    safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-delete')
+                  ]);
+                }
+                console.log(`🗑️ KV Sync: Removed ${deleteIds.size} deleted record(s) from table "${targetTable}".`);
+              } else {
+                // Non-ID DELETE filter without returned rows -> re-fetch table or invalidate KV
+                const fresh = await fetchAllRowsFromSupabase(targetTable, sbHeaders);
+                if (fresh.ok) {
+                  kvData[targetTable] = targetTable === 'live_exams' ? stripAnswerKeys(fresh.rows) : fresh.rows;
+                  kvData.masterLastUpdated = newTimestamp;
+                  kvData.syncedAt = newTimestamp;
+                  const writeRes = await writeSyncAllToKv(env, kvData, [targetTable]);
+                  if (writeRes.ok) {
+                    await Promise.all([
+                      safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                      safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-delete')
+                    ]);
+                  }
+                } else {
+                  await safeKvDelete(env.CACHE_KV, 'sync_all_data');
+                  await safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp);
+                }
+              }
+            } else {
+              await Promise.all([
+                safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-delete')
+              ]);
+            }
+          } else {
+            // POST / PATCH / PUT on a core table
+            if (returnedRows.length > 0) {
+              if (targetTable === 'live_exams') {
+                await syncLiveExamAnswerKeys(env, returnedRows);
+              }
+              const safeMutatedRows = targetTable === 'live_exams'
+                ? stripAnswerKeys(returnedRows)
+                : returnedRows;
+
+              if (kvData && Array.isArray(kvData[targetTable])) {
+                kvData[targetTable] = upsertRows(kvData[targetTable], safeMutatedRows, targetTable);
+                kvData.masterLastUpdated = newTimestamp;
+                kvData.syncedAt = newTimestamp;
+                const writeRes = await writeSyncAllToKv(env, kvData, [targetTable]);
+                if (writeRes.ok) {
+                  await Promise.all([
+                    safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                    safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-sync')
+                  ]);
+                }
+                console.log(`⚡ KV Sync: Upserted ${safeMutatedRows.length} record(s) into "${targetTable}".`);
+              } else {
+                // Avoid writing partial sync_all_data; clear any incomplete cache & bump timestamp
+                await Promise.all([
+                  safeKvDelete(env.CACHE_KV, 'sync_all_data'),
+                  safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                  safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-sync')
+                ]);
+              }
+            } else if (kvData && Array.isArray(kvData[targetTable])) {
+              // Prefer: return=minimal (e.g. batch upsert without .select()) -> re-fetch table cleanly or invalidate
+              const fresh = await fetchAllRowsFromSupabase(targetTable, sbHeaders);
+              if (fresh.ok) {
+                if (targetTable === 'live_exams') {
+                  await syncLiveExamAnswerKeys(env, fresh.rows, { replaceAll: true });
+                }
+                kvData[targetTable] = targetTable === 'live_exams' ? stripAnswerKeys(fresh.rows) : fresh.rows;
+                kvData.masterLastUpdated = newTimestamp;
+                kvData.syncedAt = newTimestamp;
+                const writeRes = await writeSyncAllToKv(env, kvData, [targetTable]);
+                if (writeRes.ok) {
+                  await Promise.all([
+                    safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                    safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-sync')
+                  ]);
+                }
+                console.log(`⚡ KV Sync: Refreshed table "${targetTable}" (${fresh.rows.length} rows) after minimal write.`);
+              } else {
+                await Promise.all([
+                  safeKvDelete(env.CACHE_KV, 'sync_all_data'),
+                  safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                  safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-sync')
+                ]);
+              }
+            } else {
+              await Promise.all([
+                safeKvPut(env.CACHE_KV, 'last_sync_timestamp', newTimestamp),
+                safeKvPut(env.CACHE_KV, 'last_updated_by', 'admin-rest-sync')
+              ]);
+            }
           }
         } catch (e) {
           console.error('Failed to sync KV on REST write/delete:', e);
@@ -999,6 +1464,8 @@ export default {
 
     const newHeaders = new Headers(originResponse.headers);
     newHeaders.set('Access-Control-Allow-Origin', '*');
+    newHeaders.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    newHeaders.set('Pragma', 'no-cache');
     newHeaders.set('X-Edge-Cache', 'BYPASS');
     newHeaders.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
     newHeaders.set('X-Content-Type-Options', 'nosniff');
@@ -1255,67 +1722,118 @@ export default {
       }
     } catch (e) { console.error('Cron User Profiles sync failed:', e); }
 
-    // ══════════ Incremental KV Sync (unchanged) ══════════
-    const controlRes = await fetch(
-      `${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated,updated_by&id=eq.1`,
-      { headers: h }
-    ).catch(() => null);
-    if (!controlRes?.ok) return;
-    const [row] = await controlRes.json().catch(() => []);
-    if (!row?.last_updated) return;
+    // ══════════ Incremental KV Sync (with updatedAt + lookback window) ══════════
+    try {
+      const controlRes = await fetch(
+        `${SUPABASE_ORIGIN}/rest/v1/app_sync_control?select=last_updated,updated_by&id=eq.1`,
+        { headers: h }
+      ).catch(() => null);
+      const [row] = controlRes?.ok ? await controlRes.json().catch(() => []) : [];
 
-    const cachedTs = await env.CACHE_KV?.get('last_sync_timestamp').catch(() => null);
-    if (cachedTs === row.last_updated) {
-      console.log('Cron: No KV change. Fresh. 0 extra queries.');
-      return;
-    }
+      if (row?.last_updated) {
+        const [cachedTs, lastControlTs, existingData] = await Promise.all([
+          env.CACHE_KV?.get('last_sync_timestamp').catch(() => null),
+          env.CACHE_KV?.get('last_control_sync_ts').catch(() => null),
+          readSyncAllFromKv(env, h)
+        ]);
+        const cachedMs = cachedTs ? new Date(cachedTs).getTime() : 0;
+        const controlMs = new Date(row.last_updated).getTime();
+        const isKvUpToDate = Boolean(
+          existingData &&
+          lastControlTs &&
+          lastControlTs === row.last_updated
+        );
 
-    const sinceTs = cachedTs || '1970-01-01T00:00:00Z';
-    const existingData = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null) || {};
-    console.log(`Cron: Incremental sync since ${sinceTs}`);
+        if (isKvUpToDate) {
+          console.log('Cron: No KV change. Fresh. 0 extra queries.');
+        } else {
+          // Safe lookback window prevents skipping client-timestamped or out-of-order rows
+          const baseTs = lastControlTs || cachedTs;
+          const baseMs = baseTs ? new Date(baseTs).getTime() : 0;
+          let sinceTs = '1970-01-01T00:00:00.000Z';
+          if (baseTs && !isNaN(baseMs) && baseMs > CRON_LOOKBACK_MS) {
+            sinceTs = new Date(baseMs - CRON_LOOKBACK_MS).toISOString();
+          }
+          const encodedSince = encodeURIComponent(sinceTs);
+          const nextData = (existingData && typeof existingData === 'object') ? { ...existingData } : {};
+          const changedCols = [];
+          let allSyncOk = true;
 
-    for (const col of CORE_COLLECTIONS) {
-      const queryUrl = (col === 'questions' || col === 'notifications' || col === 'admits')
-        ? `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&createdAt=gt.${sinceTs}&order=createdAt.desc&limit=1000`
-        : `${SUPABASE_ORIGIN}/rest/v1/${col}?select=*&updatedAt=gt.${sinceTs}&order=updatedAt.desc`;
+          console.log(`Cron: Incremental sync since ${sinceTs} (control: ${row.last_updated})`);
 
-      const newRows = await fetch(queryUrl, { headers: h })
-        .then(r => r.ok ? r.json() : []).catch(() => []);
+          for (const col of CORE_COLLECTIONS) {
+            const hasExisting = Array.isArray(nextData[col]);
+            let fetched;
 
-      if (newRows.length === 0) continue;
+            if (!hasExisting) {
+              // Missing collection in KV -> full fetch instead of partial incremental slice
+              fetched = await fetchAllRowsFromSupabase(col, h);
+            } else if (DUAL_TS_COLLECTIONS.has(col)) {
+              const orFilter = `or=(createdAt.gt.${encodedSince},updatedAt.gt.${encodedSince})`;
+              fetched = await fetchAllRowsFromSupabase(col, h, orFilter);
+              if (!fetched.ok) {
+                // Fallback if a table lacks updatedAt in schema
+                fetched = await fetchAllRowsFromSupabase(col, h, `createdAt=gt.${encodedSince}`);
+              }
+            } else if (CREATED_ONLY_COLLECTIONS.has(col)) {
+              fetched = await fetchAllRowsFromSupabase(col, h, `createdAt=gt.${encodedSince}`);
+            } else if (UPDATED_ONLY_COLLECTIONS.has(col)) {
+              fetched = await fetchAllRowsFromSupabase(col, h, `updatedAt=gt.${encodedSince}`);
+            } else if (col === 'offline_feed') {
+              fetched = await fetchAllRowsFromSupabase(col, h, `updated_at=gt.${encodedSince}`);
+              if (!fetched.ok) {
+                fetched = await fetchAllRowsFromSupabase(col, h);
+              }
+            } else {
+              fetched = await fetchAllRowsFromSupabase(col, h);
+            }
 
-      const existing = existingData[col] || [];
-      const newIds = new Set(newRows.map(r => r.id));
-      existingData[col] = [...newRows, ...existing.filter(r => !newIds.has(r.id))];
+            if (!fetched.ok) {
+              allSyncOk = false;
+              continue;
+            }
 
-      // ★ live_exams sync-এও answer key consolidated map-এ রাখো
-      if (col === 'live_exams') {
-        const allKeys = await env.CACHE_KV?.get('all_exam_answer_keys', 'json').catch(() => null) || {};
-        let keysChanged = false;
-        for (const exam of newRows) {
-          if (exam.questions?.length) {
-            allKeys[String(exam.id)] = exam.questions.map((q, idx) => ({
-              index: idx, correctIndex: q.correctIndex, explanation: q.explanation || ''
-            }));
-            keysChanged = true;
+            if (!hasExisting) {
+              nextData[col] = col === 'live_exams' ? stripAnswerKeys(fetched.rows) : fetched.rows;
+              if (col === 'live_exams') {
+                await syncLiveExamAnswerKeys(env, fetched.rows, { replaceAll: true });
+              }
+              changedCols.push(col);
+            } else if (fetched.rows.length > 0) {
+              if (col === 'live_exams') {
+                await syncLiveExamAnswerKeys(env, fetched.rows);
+                nextData[col] = upsertRows(nextData[col], stripAnswerKeys(fetched.rows), col);
+              } else {
+                nextData[col] = upsertRows(nextData[col], fetched.rows, col);
+              }
+              changedCols.push(col);
+            }
+          }
+
+          if (allSyncOk) {
+            const finalTs = (!isNaN(cachedMs) && !isNaN(controlMs) && cachedMs > controlMs)
+              ? cachedTs
+              : row.last_updated;
+            nextData.masterLastUpdated = finalTs;
+            nextData.syncedAt = finalTs;
+
+            const writeRes = await writeSyncAllToKv(env, nextData, changedCols.length > 0 ? changedCols : null);
+            if (writeRes.ok) {
+              await Promise.all([
+                safeKvPut(env.CACHE_KV, 'last_sync_timestamp', finalTs),
+                safeKvPut(env.CACHE_KV, 'last_control_sync_ts', row.last_updated),
+                safeKvPut(env.CACHE_KV, 'last_updated_by', row.updated_by || 'cron-sync')
+              ]);
+              console.log(`Cron: Incremental sync complete! Updated collections: ${changedCols.join(', ') || 'none'}`);
+            }
+          } else {
+            console.warn('Cron: One or more collection fetches failed; skipping KV timestamp advance to retry next run.');
           }
         }
-        if (keysChanged) {
-          await safeKvPut(env.CACHE_KV, 'all_exam_answer_keys', JSON.stringify(allKeys));
-        }
-        existingData[col] = stripAnswerKeys(existingData[col]);
       }
+    } catch (e) {
+      console.error('Cron Incremental KV Sync failed:', e);
     }
-
-    existingData.masterLastUpdated = row.last_updated;
-    existingData.syncedAt = row.last_updated;
-
-    await Promise.all([
-      safeKvPut(env.CACHE_KV, 'sync_all_data', JSON.stringify(existingData)),
-      safeKvPut(env.CACHE_KV, 'last_sync_timestamp', row.last_updated)
-    ]).catch(e => console.error('KV put error:', e));
-
-    console.log('Cron: Incremental sync complete!');
 
     // ══════════════════════════════════════
     // Phase 2B: Clean old rate limit entries (older than 5 minutes)
@@ -1334,7 +1852,7 @@ export default {
         'CREATE TABLE IF NOT EXISTS sent_notifications (id TEXT PRIMARY KEY, type TEXT, sent_at TEXT)'
       ).run().catch(() => {});
 
-      const cached = await env.CACHE_KV?.get('sync_all_data', 'json').catch(() => null);
+      const cached = await readSyncAllFromKv(env, h, ['jobs']);
       if (cached?.jobs?.length) {
         const now = new Date();
 
