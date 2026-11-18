@@ -5,9 +5,129 @@ import { supabase } from './supabaseClient';
 const isNative = Capacitor.isNativePlatform();
 let sqliteConnection = null;
 let dbInstance = null;
+let initDbPromise = null;
 
 // Global Mutex Lock to prevent duplicate concurrent network requests
 let isDeltaSyncing = false;
+
+// ══════════════════════════════════════
+// IndexedDB Persistent Collection Cache
+// Stores large collections (e.g. full `questions` MCQ bank) without 5MB localStorage limits
+// ══════════════════════════════════════
+const IDB_NAME = 'live_circular_cache_db';
+const IDB_VERSION = 1;
+const IDB_STORE = 'collections';
+let idbOpenPromise = null;
+
+const openCacheDb = () => {
+  if (typeof indexedDB === 'undefined') return Promise.resolve(null);
+  if (idbOpenPromise) return idbOpenPromise;
+
+  idbOpenPromise = new Promise((resolve) => {
+    try {
+      const request = indexedDB.open(IDB_NAME, IDB_VERSION);
+      request.onupgradeneeded = (event) => {
+        const db = event.target.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE, { keyPath: 'collectionName' });
+        }
+      };
+      request.onsuccess = () => {
+        const db = request.result;
+        db.onversionchange = () => {
+          try { db.close(); } catch (e) {}
+          idbOpenPromise = null;
+        };
+        db.onclose = () => {
+          idbOpenPromise = null;
+        };
+        resolve(db);
+      };
+      request.onerror = () => {
+        console.warn('IndexedDB open failed:', request.error);
+        idbOpenPromise = null;
+        resolve(null);
+      };
+      request.onblocked = () => {
+        console.warn('IndexedDB open blocked');
+        idbOpenPromise = null;
+        resolve(null);
+      };
+    } catch (err) {
+      console.warn('IndexedDB unavailable:', err);
+      idbOpenPromise = null;
+      resolve(null);
+    }
+  });
+
+  return idbOpenPromise;
+};
+
+const idbGetCollectionRecord = async (collectionName) => {
+  const db = await openCacheDb();
+  if (!db) return null;
+
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const store = tx.objectStore(IDB_STORE);
+      const req = store.get(collectionName);
+      req.onsuccess = () => {
+        const rec = req.result;
+        if (rec && Array.isArray(rec.data)) {
+          resolve({ data: rec.data, updatedAt: Number(rec.updatedAt) || 0 });
+        } else {
+          resolve(null);
+        }
+      };
+      req.onerror = () => resolve(null);
+    } catch (e) {
+      resolve(null);
+    }
+  });
+};
+
+const idbSetCollectionRecord = async (collectionName, items) => {
+  const db = await openCacheDb();
+  if (!db) return false;
+
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      const store = tx.objectStore(IDB_STORE);
+      store.put({
+        collectionName,
+        data: items,
+        updatedAt: Date.now()
+      });
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => {
+        console.warn(`IndexedDB write error for ${collectionName}:`, tx.error);
+        resolve(false);
+      };
+      tx.onabort = () => resolve(false);
+    } catch (e) {
+      console.warn(`IndexedDB transaction error for ${collectionName}:`, e);
+      resolve(false);
+    }
+  });
+};
+
+const idbDeleteCollectionRecord = async (collectionName) => {
+  const db = await openCacheDb();
+  if (!db) return false;
+
+  return new Promise((resolve) => {
+    try {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).delete(collectionName);
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = () => resolve(false);
+    } catch (e) {
+      resolve(false);
+    }
+  });
+};
 
 // Mock Web Fallback Database (IndexedDB / LocalMemory based)
 let mockDatabase = [];
@@ -25,7 +145,11 @@ const loadMockData = () => {
         { id: 'mock-2', title: 'প্রাইমারি শিক্ষক নিয়োগ ২০২৬', content: 'প্রাইমারি সহকারী শিক্ষক নিয়োগ পরীক্ষার সময়সূচী ও প্রবেশপত্র ডাউনলোডের আপডেট।', updated_at: Date.now() - 7200000 },
         { id: 'mock-3', title: 'ব্যাংক জব প্রিপারেশন', content: 'রাষ্ট্রায়ত্ত ব্যাংকসমূহের সিনিয়র অফিসার পদের লিখিত পরীক্ষার তারিখ ঘোষণা।', updated_at: Date.now() - 10800000 }
       ];
-      localStorage.setItem('sqlite_mock_offline_feed', JSON.stringify(mockDatabase));
+      try {
+        localStorage.setItem('sqlite_mock_offline_feed', JSON.stringify(mockDatabase));
+      } catch (storageErr) {
+        console.warn('Mock offline_feed localStorage write skipped:', storageErr);
+      }
     }
   } catch (e) {
     console.warn('Failed to load mock SQLite database:', e);
@@ -45,122 +169,273 @@ export const getLocalSyncData = () => {
   const getItem = (key) => {
     try {
       const val = localStorage.getItem(key);
-      return val ? JSON.parse(val) : [];
+      if (!val) return null;
+      const parsed = JSON.parse(val);
+      return Array.isArray(parsed) ? parsed : null;
     } catch (e) {
-      return [];
+      return null;
     }
   };
 
+  const questions = getItem('cache_data_questions');
   return {
-    jobs: getItem('cache_data_jobs'),
-    notifications: getItem('cache_data_notifications'),
-    admits: getItem('cache_data_admits'),
-    questions: getItem('cache_data_questions') || getItem('questions_data'),
-    liveExams: getItem('cache_data_live_exams'),
-    feedPosts: getItem('cache_data_feed_posts'),
-    appConfig: getItem('cache_data_app_config'),
+    jobs: getItem('cache_data_jobs') || [],
+    notifications: getItem('cache_data_notifications') || [],
+    admits: getItem('cache_data_admits') || [],
+    questions: (questions && questions.length > 0) ? questions : (getItem('questions_data') || []),
+    liveExams: getItem('cache_data_live_exams') || [],
+    feedPosts: getItem('cache_data_feed_posts') || [],
+    appConfig: getItem('cache_data_app_config') || [],
     lastSyncTimestamp: Number(localStorage.getItem('last_sync_timestamp') || 0)
   };
 };
 
 /**
- * Initialize SQLite Database & Tables
+ * Initialize SQLite Database & Tables (with singleton lock against concurrent calls)
  */
 export const initDb = async () => {
   if (!isNative) {
     console.log('🔌 Running on Web: Initializing mock SQLite IndexedDB Fallback.');
     loadMockData();
+    await openCacheDb();
     return true;
   }
 
-  try {
-    if (!sqliteConnection) {
-      sqliteConnection = new SQLiteConnection(CapacitorSQLite);
+  if (dbInstance) return true;
+  if (initDbPromise) return initDbPromise;
+
+  initDbPromise = (async () => {
+    try {
+      if (!sqliteConnection) {
+        sqliteConnection = new SQLiteConnection(CapacitorSQLite);
+      }
+
+      // Create / Open Connection
+      dbInstance = await sqliteConnection.createConnection(
+        'text_cache_db',
+        false, // encrypted
+        'no-encryption',
+        1, // version
+        false // readonly
+      );
+
+      await dbInstance.open();
+
+      // ═══ HIGH-SPEED DB CONFIG (Phase 1A) ═══
+      // WAL = lag-free parallel reads during writes
+      // synchronous=NORMAL = 2x faster, safe with WAL
+      // cache_size=-8000 = 8MB page cache (reduces disk I/O)
+      // temp_store=MEMORY = temp tables in RAM
+      await dbInstance.execute('PRAGMA journal_mode=WAL;');
+      await dbInstance.execute('PRAGMA synchronous=NORMAL;');
+      await dbInstance.execute('PRAGMA cache_size=-8000;');
+      await dbInstance.execute('PRAGMA temp_store=MEMORY;');
+      console.log('🚀 SQLite WAL Mode + Performance PRAGMAs Applied.');
+      console.log('💾 Native SQLite Connection Opened Successfully.');
+
+      // 1. Create offline_feed Table
+      const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS offline_feed (
+          id TEXT PRIMARY KEY,
+          title TEXT NOT NULL,
+          content TEXT NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+      `;
+      await dbInstance.execute(createTableQuery);
+
+      // 2. Create B-Tree Index on updated_at
+      const createIndexQuery = `
+        CREATE INDEX IF NOT EXISTS idx_offline_feed_updated_at 
+        ON offline_feed (updated_at);
+      `;
+      await dbInstance.execute(createIndexQuery);
+      console.log('📈 SQLite Table & updated_at B-Tree Index Verified.');
+
+      // 3. Live Exam Tables (অফলাইন পরীক্ষা সাপোর্ট)
+      await dbInstance.execute(`
+        CREATE TABLE IF NOT EXISTS local_exams (
+          id TEXT PRIMARY KEY,
+          title TEXT, title_en TEXT,
+          duration INTEGER, total_questions INTEGER,
+          questions TEXT,
+          status TEXT, scheduled_at TEXT, created_at TEXT
+        );
+      `);
+      await dbInstance.execute(`
+        CREATE TABLE IF NOT EXISTS local_answers (
+          exam_id TEXT NOT NULL,
+          question_index INTEGER NOT NULL,
+          selected_option INTEGER NOT NULL,
+          answered_at TEXT NOT NULL,
+          PRIMARY KEY (exam_id, question_index)
+        );
+      `);
+      await dbInstance.execute(`
+        CREATE TABLE IF NOT EXISTS exam_results (
+          exam_id TEXT PRIMARY KEY,
+          score INTEGER, total INTEGER, scaled_score REAL,
+          rank INTEGER, time_taken TEXT, submitted_at TEXT
+        );
+      `);
+      await dbInstance.execute(`
+        CREATE TABLE IF NOT EXISTS leaderboard_cache (
+          exam_id TEXT NOT NULL, rank INTEGER NOT NULL,
+          user_name TEXT, user_photo TEXT,
+          score INTEGER, total INTEGER, scaled_score REAL, time_taken_sec INTEGER,
+          PRIMARY KEY (exam_id, rank)
+        );
+      `);
+
+      // 4. Persistent Full Collection Cache (for large collections like `questions`)
+      await dbInstance.execute(`
+        CREATE TABLE IF NOT EXISTS collection_cache (
+          collection_name TEXT PRIMARY KEY,
+          data TEXT NOT NULL,
+          updated_at INTEGER NOT NULL
+        );
+      `);
+      console.log('🏆 Live Exam & Collection Cache SQLite Tables Verified.');
+
+      return true;
+    } catch (err) {
+      console.error('❌ Failed to initialize native SQLite database:', err);
+      dbInstance = null;
+      return false;
+    } finally {
+      initDbPromise = null;
     }
+  })();
 
-    // Create / Open Connection
-    dbInstance = await sqliteConnection.createConnection(
-      'text_cache_db',
-      false, // encrypted
-      'no-encryption',
-      1, // version
-      false // readonly
-    );
+  return initDbPromise;
+};
 
-    await dbInstance.open();
+/**
+ * Persist a full collection array into IndexedDB (always) and native SQLite (when on native platform).
+ * Eliminates 5MB localStorage QuotaExceededError freezes for large MCQ banks.
+ * @param {string} collectionName
+ * @param {Array} items
+ * @returns {Promise<boolean>} true if at least one persistent store succeeded
+ */
+export const setPersistentCollection = async (collectionName, items) => {
+  if (!collectionName || !Array.isArray(items)) return false;
 
-    // ═══ HIGH-SPEED DB CONFIG (Phase 1A) ═══
-    // WAL = lag-free parallel reads during writes
-    // synchronous=NORMAL = 2x faster, safe with WAL
-    // cache_size=-8000 = 8MB page cache (reduces disk I/O)
-    // temp_store=MEMORY = temp tables in RAM
-    await dbInstance.execute('PRAGMA journal_mode=WAL;');
-    await dbInstance.execute('PRAGMA synchronous=NORMAL;');
-    await dbInstance.execute('PRAGMA cache_size=-8000;');
-    await dbInstance.execute('PRAGMA temp_store=MEMORY;');
-    console.log('🚀 SQLite WAL Mode + Performance PRAGMAs Applied.');
-    console.log('💾 Native SQLite Connection Opened Successfully.');
+  const now = Date.now();
+  const idbOk = await idbSetCollectionRecord(collectionName, items);
 
-    // 1. Create offline_feed Table
-    const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS offline_feed (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        updated_at INTEGER NOT NULL
-      );
-    `;
-    await dbInstance.execute(createTableQuery);
-
-    // 2. Create B-Tree Index on updated_at
-    const createIndexQuery = `
-      CREATE INDEX IF NOT EXISTS idx_offline_feed_updated_at 
-      ON offline_feed (updated_at);
-    `;
-    await dbInstance.execute(createIndexQuery);
-    console.log('📈 SQLite Table & updated_at B-Tree Index Verified.');
-
-    // 3. Live Exam Tables (অফলাইন পরীক্ষা সাপোর্ট)
-    await dbInstance.execute(`
-      CREATE TABLE IF NOT EXISTS local_exams (
-        id TEXT PRIMARY KEY,
-        title TEXT, title_en TEXT,
-        duration INTEGER, total_questions INTEGER,
-        questions TEXT,
-        status TEXT, scheduled_at TEXT, created_at TEXT
-      );
-    `);
-    await dbInstance.execute(`
-      CREATE TABLE IF NOT EXISTS local_answers (
-        exam_id TEXT NOT NULL,
-        question_index INTEGER NOT NULL,
-        selected_option INTEGER NOT NULL,
-        answered_at TEXT NOT NULL,
-        PRIMARY KEY (exam_id, question_index)
-      );
-    `);
-    await dbInstance.execute(`
-      CREATE TABLE IF NOT EXISTS exam_results (
-        exam_id TEXT PRIMARY KEY,
-        score INTEGER, total INTEGER, scaled_score REAL,
-        rank INTEGER, time_taken TEXT, submitted_at TEXT
-      );
-    `);
-    await dbInstance.execute(`
-      CREATE TABLE IF NOT EXISTS leaderboard_cache (
-        exam_id TEXT NOT NULL, rank INTEGER NOT NULL,
-        user_name TEXT, user_photo TEXT,
-        score INTEGER, total INTEGER, scaled_score REAL, time_taken_sec INTEGER,
-        PRIMARY KEY (exam_id, rank)
-      );
-    `);
-    console.log('🏆 Live Exam SQLite Tables Verified.');
-
-    return true;
-  } catch (err) {
-    console.error('❌ Failed to initialize native SQLite database:', err);
-    return false;
+  let sqliteOk = false;
+  if (isNative) {
+    try {
+      const ready = await initDb();
+      if (ready && dbInstance) {
+        await dbInstance.run(
+          `INSERT OR REPLACE INTO collection_cache (collection_name, data, updated_at) VALUES (?, ?, ?);`,
+          [String(collectionName), JSON.stringify(items), now]
+        );
+        sqliteOk = true;
+      }
+    } catch (e) {
+      console.warn(`SQLite collection_cache write fallback to IndexedDB for ${collectionName}:`, e);
+    }
   }
+
+  return idbOk || sqliteOk;
+};
+
+/**
+ * Read a full collection array asynchronously from IndexedDB / native SQLite.
+ * Returns null if no persistent record has been stored yet.
+ * @param {string} collectionName
+ * @returns {Promise<Array|null>}
+ */
+export const getPersistentCollection = async (collectionName) => {
+  if (!collectionName) return null;
+
+  const idbRec = await idbGetCollectionRecord(collectionName);
+  let sqliteRec = null;
+
+  if (isNative) {
+    try {
+      const ready = await initDb();
+      if (ready && dbInstance) {
+        const res = await dbInstance.query(
+          `SELECT data, updated_at FROM collection_cache WHERE collection_name = ?;`,
+          [String(collectionName)]
+        );
+        const row = res?.values?.[0];
+        if (row && typeof row.data === 'string') {
+          const parsed = JSON.parse(row.data);
+          if (Array.isArray(parsed)) {
+            sqliteRec = { data: parsed, updatedAt: Number(row.updated_at) || 0 };
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(`SQLite collection_cache read fallback to IndexedDB for ${collectionName}:`, e);
+    }
+  }
+
+  if (idbRec && sqliteRec) {
+    return sqliteRec.updatedAt > idbRec.updatedAt ? sqliteRec.data : idbRec.data;
+  }
+  if (idbRec) return idbRec.data;
+  if (sqliteRec) return sqliteRec.data;
+  return null;
+};
+
+/**
+ * Delete a persisted collection from IndexedDB and native SQLite.
+ * @param {string} collectionName
+ * @returns {Promise<boolean>}
+ */
+export const deletePersistentCollection = async (collectionName) => {
+  if (!collectionName) return false;
+  const idbOk = await idbDeleteCollectionRecord(collectionName);
+  let sqliteOk = false;
+  if (isNative) {
+    try {
+      const ready = await initDb();
+      if (ready && dbInstance) {
+        await dbInstance.run(`DELETE FROM collection_cache WHERE collection_name = ?;`, [String(collectionName)]);
+        sqliteOk = true;
+      }
+    } catch (e) {
+      console.warn(`SQLite collection_cache delete error for ${collectionName}:`, e);
+    }
+  }
+  return idbOk || sqliteOk;
+};
+
+/**
+ * Async version of getLocalSyncData() that reads full collections from IndexedDB / SQLite first.
+ */
+export const getLocalSyncDataAsync = async () => {
+  const syncFallback = getLocalSyncData();
+  const readCol = async (col, fallbackArr) => {
+    const persistent = await getPersistentCollection(col);
+    return Array.isArray(persistent) ? persistent : fallbackArr;
+  };
+
+  const [jobs, notifications, admits, questions, liveExams, feedPosts, appConfig] = await Promise.all([
+    readCol('jobs', syncFallback.jobs),
+    readCol('notifications', syncFallback.notifications),
+    readCol('admits', syncFallback.admits),
+    readCol('questions', syncFallback.questions),
+    readCol('live_exams', syncFallback.liveExams),
+    readCol('feed_posts', syncFallback.feedPosts),
+    readCol('app_config', syncFallback.appConfig)
+  ]);
+
+  return {
+    jobs,
+    notifications,
+    admits,
+    questions,
+    liveExams,
+    feedPosts,
+    appConfig,
+    lastSyncTimestamp: syncFallback.lastSyncTimestamp
+  };
 };
 
 // ══════════════════════════════════════
@@ -339,7 +614,11 @@ export const triggerDeltaSync = async () => {
           mockDatabase.push(row);
         }
       });
-      localStorage.setItem('sqlite_mock_offline_feed', JSON.stringify(mockDatabase));
+      try {
+        localStorage.setItem('sqlite_mock_offline_feed', JSON.stringify(mockDatabase));
+      } catch (storageErr) {
+        console.warn('Mock offline_feed localStorage write skipped:', storageErr);
+      }
     } else {
       const statements = newRows.map(row => ({
         statement: 'INSERT OR REPLACE INTO offline_feed (id, title, content, updated_at) VALUES (?, ?, ?, ?);',

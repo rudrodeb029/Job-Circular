@@ -4,6 +4,8 @@ import { broadcastPush, sendExamCountdownPush } from '../utils/oneSignalWrapper'
 import {
   getCollection,
   getCollectionCached,
+  getPersistentCache,
+  setPersistentCache,
   syncCoreDataOnStartup,
   clearCollectionCache,
   onCollectionSnapshot,
@@ -19,16 +21,25 @@ import { auth } from '../firebase';
 
 const AdminContext = createContext();
 
+const normalizeTimestampField = (val) => {
+  if (!val) return val;
+  if (typeof val === 'object' && val.seconds) {
+    return new Date(val.seconds * 1000).toISOString();
+  }
+  if (typeof val.toDate === 'function') {
+    return val.toDate().toISOString();
+  }
+  return val;
+};
+
 const mapWithTimestamps = (items) => {
+  if (!Array.isArray(items)) return [];
   return items.map(item => ({
     ...item,
     createdAt: item.createdAt
-      ? (typeof item.createdAt === 'object' && item.createdAt.seconds
-          ? new Date(item.createdAt.seconds * 1000).toISOString()
-          : typeof item.createdAt.toDate === 'function'
-            ? item.createdAt.toDate().toISOString()
-            : item.createdAt)
-      : new Date(getItemTimestamp(item) || Date.now()).toISOString()
+      ? normalizeTimestampField(item.createdAt)
+      : new Date(getItemTimestamp(item) || Date.now()).toISOString(),
+    ...(item.updatedAt ? { updatedAt: normalizeTimestampField(item.updatedAt) } : {})
   }));
 };
 
@@ -44,10 +55,16 @@ const getLocalCache = (key) => {
 
 const saveLocalCache = (key, data) => {
   try {
+    if (typeof setPersistentCache === 'function') {
+      setPersistentCache(key, data).catch((err) => {
+        console.warn(`Error saving persistent cache for ${key}:`, err);
+      });
+      return;
+    }
     localStorage.setItem(`cache_data_${key}`, JSON.stringify(data));
     localStorage.setItem(`cache_time_${key}`, Date.now().toString());
   } catch (e) {
-    console.error('Error saving local cache:', e);
+    console.warn(`Error saving local cache for ${key}:`, e);
   }
 };
 
@@ -331,27 +348,6 @@ const adminReducer = (state, action) => {
       return newState;
     }
 
-    case 'ADD_QUESTION':
-    case 'UPDATE_QUESTION': {
-      const qItem = action.payload;
-      setDocument(COLLECTIONS.QUESTIONS, qItem.id, qItem).catch(console.error);
-      if (action.type === 'ADD_QUESTION') {
-        newState.questions = [qItem, ...state.questions.filter(item => item.id !== qItem.id)].sort(sortByCreatedAt);
-      } else {
-        newState.questions = state.questions.map(item => item.id === qItem.id ? qItem : item).sort(sortByCreatedAt);
-      }
-      saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
-      return newState;
-    }
-
-    case 'DELETE_QUESTION': {
-      registerPendingDelete(action.payload);
-      deleteDocument(COLLECTIONS.QUESTIONS, action.payload).catch(console.error);
-      newState.questions = state.questions.filter(item => item.id !== action.payload);
-      saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
-      return newState;
-    }
-
     case 'ADD_LIVE_EXAM':
     case 'ADD_EXAM':
     case 'UPDATE_LIVE_EXAM':
@@ -413,7 +409,13 @@ const adminReducer = (state, action) => {
 
     case 'ADD_QUESTION_PAPER':
     case 'UPDATE_QUESTION_PAPER': {
-      const paperItem = action.payload;
+      const rawPaper = action.payload || {};
+      const nowIso = new Date().toISOString();
+      const paperItem = {
+        ...rawPaper,
+        createdAt: rawPaper.createdAt || nowIso,
+        updatedAt: rawPaper.updatedAt || nowIso
+      };
 
       if (action.type === 'ADD_QUESTION_PAPER') {
         logActivity('add', `Created question paper: ${paperItem.title}`);
@@ -428,7 +430,7 @@ const adminReducer = (state, action) => {
           message: `${paperItem.title} - প্রস্তুতি নিন এখনই!`,
           type: 'new_paper',
           paperId: paperItem.id,
-          createdAt: paperItem.createdAt || new Date().toISOString()
+          createdAt: paperItem.createdAt || nowIso
         };
 
         // Save question paper + notification & refresh KV cache FIRST, then send push notification
@@ -448,11 +450,15 @@ const adminReducer = (state, action) => {
 
         newState.notifications = [notifObj, ...(newState.notifications || state.notifications).filter(n => n.id !== notifId)].sort(sortByCreatedAt);
         saveLocalCache(COLLECTIONS.NOTIFICATIONS, newState.notifications);
-        newState.questions = [paperItem, ...state.questions.filter(p => p.id !== paperItem.id)].sort(sortByCreatedAt);
+        newState.questions = [paperItem, ...state.questions.filter(p => String(p.id) !== String(paperItem.id))].sort(sortByCreatedAt);
       } else {
         setDocument(COLLECTIONS.QUESTIONS, paperItem.id, paperItem).catch(console.error);
         logActivity('update', `Updated question paper: ${paperItem.title}`);
-        newState.questions = state.questions.map(p => p.id === paperItem.id ? paperItem : p).sort(sortByCreatedAt);
+        const exists = state.questions.some(p => String(p.id) === String(paperItem.id));
+        newState.questions = (exists
+          ? state.questions.map(p => String(p.id) === String(paperItem.id) ? paperItem : p)
+          : [paperItem, ...state.questions]
+        ).sort(sortByCreatedAt);
       }
       saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
       return newState;
@@ -460,16 +466,24 @@ const adminReducer = (state, action) => {
 
     case 'CACHE_FULL_QUESTION_PAPER': {
       const paperItem = action.payload;
-      newState.questions = (newState.questions || state.questions).map(p => p.id === paperItem.id ? paperItem : p);
-      saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
+      if (paperItem && paperItem.id) {
+        const currentList = newState.questions || state.questions || [];
+        const exists = currentList.some(p => String(p.id) === String(paperItem.id));
+        newState.questions = (exists
+          ? currentList.map(p => String(p.id) === String(paperItem.id) ? paperItem : p)
+          : [paperItem, ...currentList]
+        ).sort(sortByCreatedAt);
+        saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
+      }
       return newState;
     }
 
     case 'DELETE_QUESTION_PAPER': {
+      registerPendingDelete(action.payload);
       deleteDocument(COLLECTIONS.QUESTIONS, action.payload).catch(console.error);
-      const deletedPaper = state.questions.find(p => p.id === action.payload);
+      const deletedPaper = state.questions.find(p => String(p.id) === String(action.payload));
       logActivity('delete', `Deleted question paper: ${deletedPaper?.title || 'Question Paper'}`);
-      newState.questions = state.questions.filter(p => p.id !== action.payload);
+      newState.questions = state.questions.filter(p => String(p.id) !== String(action.payload));
       saveLocalCache(COLLECTIONS.QUESTIONS, newState.questions);
       return newState;
     }
@@ -572,6 +586,7 @@ export const AdminProvider = ({ children }) => {
   const [loading, setLoading] = useState(!hasInitialCache);
   const [authChecked, setAuthChecked] = useState(false);
   const [initialSyncComplete, setInitialSyncComplete] = useState(hasInitialCache);
+  const [lastSyncTime, setLastSyncTime] = useState(() => Number(localStorage.getItem('last_client_sync_time')) || null);
 
   const loadAllData = async (forceServer = false, isBackground = false) => {
     try {
@@ -602,6 +617,30 @@ export const AdminProvider = ({ children }) => {
         }
       }
 
+      // Safety check for questions: try persistent cache if stripped, or direct server fetch if empty/forceServer
+      if (!forceServer && Array.isArray(questionsData) && questionsData.some(q => q?._questionsStripped)) {
+        try {
+          const persistentQuestions = await getPersistentCache(COLLECTIONS.QUESTIONS);
+          if (Array.isArray(persistentQuestions) && persistentQuestions.length > 0 && !persistentQuestions.some(q => q?._questionsStripped)) {
+            questionsData = persistentQuestions;
+          }
+        } catch (e) {
+          console.warn('Persistent questions fallback error:', e);
+        }
+      }
+
+      if (((!questionsData || questionsData.length === 0) || (forceServer && questionsData.some(q => q?._questionsStripped))) && navigator.onLine) {
+        try {
+          const directQuestions = await getCollection(COLLECTIONS.QUESTIONS, true);
+          if (Array.isArray(directQuestions) && directQuestions.length > 0) {
+            questionsData = directQuestions;
+            saveLocalCache(COLLECTIONS.QUESTIONS, directQuestions);
+          }
+        } catch (e) {
+          console.warn('Direct questions fetch error:', e);
+        }
+      }
+
       dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(jobsData) });
       dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(notifsData) });
       dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(admitsData) });
@@ -613,6 +652,7 @@ export const AdminProvider = ({ children }) => {
         saveLocalCache(COLLECTIONS.ACTIVITIES, mapWithTimestamps(activitiesData));
       }
       dispatch({ type: 'SET_FIRESTORE_READY' });
+      setLastSyncTime(Number(localStorage.getItem('last_client_sync_time')) || Date.now());
     } catch (err) {
       console.error('Error fetching cached data:', err);
     } finally {
@@ -656,8 +696,40 @@ export const AdminProvider = ({ children }) => {
       if (isMounted) setAuthChecked(true);
     }, 1200);
 
-    // 2. Initial fetch from local cache (Background sync if cache exists)
-    loadAllData(false, hasInitialCache).catch(console.error);
+    // 2. Hydrate from async persistent cache (IndexedDB/SQLite) first so full questions load even if localStorage stripped/overflowed, then run loadAllData
+    const hydrateAndLoad = async () => {
+      try {
+        if (typeof getPersistentCache === 'function') {
+          const [pJobs, pNotifs, pAdmits, pQuestions, pLiveExams, pFeedPosts] = await Promise.all([
+            getPersistentCache(COLLECTIONS.JOBS),
+            getPersistentCache(COLLECTIONS.NOTIFICATIONS),
+            getPersistentCache(COLLECTIONS.ADMITS),
+            getPersistentCache(COLLECTIONS.QUESTIONS),
+            getPersistentCache(COLLECTIONS.LIVE_EXAMS),
+            getPersistentCache(COLLECTIONS.FEED_POSTS)
+          ]);
+          if (isMounted) {
+            if (Array.isArray(pJobs) && pJobs.length > 0) dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(pJobs) });
+            if (Array.isArray(pNotifs) && pNotifs.length > 0) dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(pNotifs) });
+            if (Array.isArray(pAdmits) && pAdmits.length > 0) dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(pAdmits) });
+            if (Array.isArray(pQuestions) && pQuestions.length > 0) dispatch({ type: 'SET_QUESTIONS', payload: mapWithTimestamps(pQuestions) });
+            if (Array.isArray(pLiveExams) && pLiveExams.length > 0) dispatch({ type: 'SET_LIVE_EXAMS', payload: mapWithTimestamps(pLiveExams) });
+            if (Array.isArray(pFeedPosts) && pFeedPosts.length > 0) dispatch({ type: 'SET_FEED_POSTS', payload: mapWithTimestamps(pFeedPosts) });
+            if ((pJobs && pJobs.length > 0) || (pQuestions && pQuestions.length > 0)) {
+              setLoading(false);
+              setInitialSyncComplete(true);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Persistent cache hydration warning:', e);
+      } finally {
+        if (isMounted) {
+          loadAllData(false, hasInitialCache).catch(console.error);
+        }
+      }
+    };
+    hydrateAndLoad();
 
     // 3. Real-time snapshot listeners (Exclusively activated for Admin Panel, 0 socket load on mobile candidates)
     const isAdminRoute = window.location.pathname.startsWith('/admin');
@@ -763,12 +835,38 @@ export const AdminProvider = ({ children }) => {
     }
 
     // Listen for instant data reload events dispatched by floating loader or syncCoreDataOnStartup
-    const handleInstantReload = () => {
-      if (isMounted) {
-        console.log('⚡ AdminContext: Re-loading state from cache for instant UI update...');
-        setInitialSyncComplete(true);
-        loadAllData(false, true);
+    const handleInstantReload = (event) => {
+      if (!isMounted) return;
+      console.log('⚡ AdminContext: Re-loading state from sync event for instant UI update...');
+      setInitialSyncComplete(true);
+
+      const collections = event?.detail?.collections;
+      if (collections && typeof collections === 'object') {
+        if (Array.isArray(collections[COLLECTIONS.JOBS])) {
+          dispatch({ type: 'SET_JOBS', payload: mapWithTimestamps(collections[COLLECTIONS.JOBS]) });
+        }
+        if (Array.isArray(collections[COLLECTIONS.NOTIFICATIONS])) {
+          dispatch({ type: 'SET_NOTIFICATIONS', payload: mapWithTimestamps(collections[COLLECTIONS.NOTIFICATIONS]) });
+        }
+        if (Array.isArray(collections[COLLECTIONS.ADMITS])) {
+          dispatch({ type: 'SET_ADMITS', payload: mapWithTimestamps(collections[COLLECTIONS.ADMITS]) });
+        }
+        if (Array.isArray(collections[COLLECTIONS.QUESTIONS])) {
+          dispatch({ type: 'SET_QUESTIONS', payload: mapWithTimestamps(collections[COLLECTIONS.QUESTIONS]) });
+        }
+        if (Array.isArray(collections[COLLECTIONS.LIVE_EXAMS])) {
+          dispatch({ type: 'SET_LIVE_EXAMS', payload: mapWithTimestamps(collections[COLLECTIONS.LIVE_EXAMS]) });
+        }
+        if (Array.isArray(collections[COLLECTIONS.FEED_POSTS])) {
+          dispatch({ type: 'SET_FEED_POSTS', payload: mapWithTimestamps(collections[COLLECTIONS.FEED_POSTS]) });
+        }
+        dispatch({ type: 'SET_FIRESTORE_READY' });
+        setLastSyncTime(Number(localStorage.getItem('last_client_sync_time')) || Date.now());
+        setLoading(false);
+        return;
       }
+
+      loadAllData(Boolean(event?.detail?.forceServer), true);
     };
     window.addEventListener('force_app_data_reload', handleInstantReload);
 
@@ -787,14 +885,16 @@ export const AdminProvider = ({ children }) => {
     };
   }, []);
 
-  const refreshData = async (forceServer = false) => {
-    await syncCoreDataOnStartup(forceServer);
-    await loadAllData(false, true);
+  const refreshData = async (forceServer = true) => {
+    const shouldForceServer = typeof forceServer === 'boolean' ? forceServer : true;
+    await syncCoreDataOnStartup(shouldForceServer);
+    await loadAllData(shouldForceServer, true);
+    setLastSyncTime(Number(localStorage.getItem('last_client_sync_time')) || Date.now());
   };
 
   return (
     <div className="admin-context-provider">
-        <AdminContext.Provider value={{ state, dispatch, loading, authChecked, refreshData, initialSyncComplete }}>
+        <AdminContext.Provider value={{ state, dispatch, loading, authChecked, refreshData, initialSyncComplete, lastSyncTime }}>
         {children}
         </AdminContext.Provider>
     </div>

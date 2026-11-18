@@ -1,17 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAdminContext } from '../../context/AdminContext';
-import { getDocument, COLLECTIONS } from '../../services/supabaseService';
+import { getDocument, setDocument, updateDocument, COLLECTIONS } from '../../services/supabaseService';
+import { formatTimeAgo } from '../../utils/timeUtils';
 import RichTextEditor, { RichTextToolbar, RichInput } from '../../components/RichTextEditor';
+
+const parseTimestampMs = (val) => {
+  if (!val) return 0;
+  if (typeof val === 'number') return Number.isFinite(val) && val > 0 ? val : 0;
+  if (typeof val?.toDate === 'function') {
+    const ms = val.toDate().getTime();
+    return Number.isFinite(ms) && ms > 0 ? ms : 0;
+  }
+  if (typeof val?.seconds === 'number') return val.seconds * 1000;
+  const ms = new Date(val).getTime();
+  return Number.isFinite(ms) && ms > 0 ? ms : 0;
+};
+
+const getPaperUpdatedMs = (paper) => {
+  if (!paper) return 0;
+  const updatedMs = parseTimestampMs(paper.updatedAt);
+  if (updatedMs > 0) return updatedMs;
+  const createdMs = parseTimestampMs(paper.createdAt);
+  if (createdMs > 0) return createdMs;
+  const idMatch = paper.id ? String(paper.id).match(/\d{10,13}/) : null;
+  return idMatch ? parseInt(idMatch[0], 10) : 0;
+};
+
+const getPaperCreatedMs = (paper) => {
+  if (!paper) return 0;
+  const createdMs = parseTimestampMs(paper.createdAt);
+  if (createdMs > 0) return createdMs;
+  const idMatch = paper.id ? String(paper.id).match(/\d{10,13}/) : null;
+  return idMatch ? parseInt(idMatch[0], 10) : 0;
+};
+
+const isPaperUpdated = (paper) => {
+  const updatedMs = parseTimestampMs(paper?.updatedAt);
+  const createdMs = parseTimestampMs(paper?.createdAt);
+  return updatedMs > 0 && createdMs > 0 && (updatedMs - createdMs > 1000);
+};
+
+const formatExactDateTime = (timestamp) => {
+  const ms = parseTimestampMs(timestamp);
+  if (!ms) return 'N/A';
+  return new Date(ms).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
+};
 
 export default function ManageQuestions() {
   const { state, dispatch } = useAdminContext();
   const papers = state.questions || [];
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState('updatedAt');
   const [showForm, setShowForm] = useState(false);
   const [currentPaper, setCurrentPaper] = useState(null);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [loadingPaper, setLoadingPaper] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Fields for adding/editing paper
   const [title, setTitle] = useState('');
@@ -205,8 +258,9 @@ export default function ManageQuestions() {
     }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
+    if (saving) return;
 
     const generateBengaliTime = (timeStr) => {
       if (!timeStr) return '';
@@ -217,7 +271,11 @@ export default function ManageQuestions() {
       return converted;
     };
 
-    const newPaper = {
+    const nowIso = new Date().toISOString();
+    const { raw_data, ...existingPaperFields } = currentPaper || {};
+
+    const paperData = {
+      ...existingPaperFields,
       id: currentPaper ? currentPaper.id : `paper-${Date.now()}`,
       category,
       title,
@@ -228,19 +286,56 @@ export default function ManageQuestions() {
       timeLimit: generateBengaliTime(timeLimitEn),
       timeLimitEn,
       questions,
-      createdAt: currentPaper ? (currentPaper.createdAt || new Date().toISOString()) : new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: currentPaper ? (currentPaper.createdAt || nowIso) : nowIso,
+      updatedAt: nowIso
     };
 
-    if (currentPaper) {
-      dispatch({ type: 'ADD_QUESTION_PAPER', payload: newPaper });
-      triggerToast('Question paper updated successfully!');
-    } else {
-      dispatch({ type: 'ADD_QUESTION_PAPER', payload: newPaper });
-      triggerToast('New question paper created successfully!');
+    setSaving(true);
+    try {
+      if (currentPaper) {
+        await updateDocument(COLLECTIONS.QUESTIONS, paperData.id, paperData);
+        dispatch({ type: 'UPDATE_QUESTION_PAPER', payload: paperData });
+        triggerToast('Question paper updated successfully!');
+      } else {
+        await setDocument(COLLECTIONS.QUESTIONS, paperData.id, paperData);
+        dispatch({ type: 'ADD_QUESTION_PAPER', payload: paperData });
+        triggerToast('New question paper created successfully!');
+      }
+      setShowForm(false);
+    } catch (error) {
+      console.error('Failed to save question paper:', error);
+      triggerToast('Failed to save question paper. Please try again.', 'error');
+    } finally {
+      setSaving(false);
     }
-    setShowForm(false);
   };
+
+  const latestUpdatedPaper = useMemo(() => {
+    if (!papers || papers.length === 0) return null;
+    return papers.reduce((latest, paper) => {
+      if (!latest) return paper;
+      return getPaperUpdatedMs(paper) > getPaperUpdatedMs(latest) ? paper : latest;
+    }, null);
+  }, [papers]);
+
+  const sortedFilteredPapers = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return papers
+      .filter((p) => {
+        const matchesCat = categoryFilter === 'all' || p.category === categoryFilter;
+        const matchesQuery =
+          !query ||
+          (p.title || '').toLowerCase().includes(query) ||
+          (p.titleEn || '').toLowerCase().includes(query);
+        return matchesCat && matchesQuery;
+      })
+      .sort((a, b) => {
+        const tsA = sortBy === 'createdAt' ? getPaperCreatedMs(a) : getPaperUpdatedMs(a);
+        const tsB = sortBy === 'createdAt' ? getPaperCreatedMs(b) : getPaperUpdatedMs(b);
+        if (tsB !== tsA) return tsB - tsA;
+        return String(b.id || '').localeCompare(String(a.id || ''));
+      });
+  }, [papers, categoryFilter, searchQuery, sortBy]);
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this question paper?')) {
@@ -270,15 +365,20 @@ export default function ManageQuestions() {
         .q-table th { background: #f8fafc; color: #64748b; font-weight: 700; text-transform: uppercase; font-size: 11px; padding: 16px; }
         .q-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
         .cat-pill { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; background: #eff6ff; color: #1a56db; }
-        .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; marginBottom: 8px; }
-        .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; borderRadius: 10px; outline: none; transition: border-color 0.2s; }
+        .last-updated-summary { background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%); border: 1px solid #dbeafe; border-left: 4px solid #2563eb; border-radius: 16px; padding: 18px 24px; margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; }
+        .timestamp-pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; }
+        .timestamp-pill.is-updated { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+        .updated-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; background: #dcfce7; color: #15803d; }
+        .created-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; background: #eff6ff; color: #1d4ed8; }
+        .input-group label { display: block; font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 8px; }
+        .modern-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; outline: none; transition: border-color 0.2s; }
         .modern-input:focus { border-color: #2563eb; }
         .q-row-card { background: #f8fafc; border-radius: 16px; border: 1.5px solid #e2e8f0; padding: 24px; margin-bottom: 24px; position: relative; }
         @keyframes spin { to { transform: rotate(360deg); } }
       `}</style>
 
       {toast.show && (
-        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 3000, background: '#10b981', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'slideInRight 0.3s' }}>
+        <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 3000, background: toast.type === 'error' ? '#ef4444' : '#10b981', color: 'white', padding: '12px 24px', borderRadius: '12px', fontWeight: 700, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'slideInRight 0.3s' }}>
           {toast.message}
         </div>
       )}
@@ -310,8 +410,15 @@ export default function ManageQuestions() {
         <>
           <RichTextToolbar />
           <div className="admin-card animate-fade-in" style={{ padding: '40px' }}>
-          <div style={{ marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0 }}>{currentPaper ? 'Edit Question Paper' : 'New Question Paper'}</h2>
+          <div style={{ marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', margin: 0 }}>{currentPaper ? 'Edit Question Paper' : 'New Question Paper'}</h2>
+              {currentPaper && (
+                <div style={{ fontSize: '12px', color: '#64748b', marginTop: '6px', fontWeight: 600 }}>
+                  Last updated: {formatExactDateTime(getPaperUpdatedMs(currentPaper))}
+                </div>
+              )}
+            </div>
           </div>
 
           <form onSubmit={handleSave}>
@@ -427,22 +534,82 @@ export default function ManageQuestions() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '16px', marginTop: '40px', borderTop: '2px solid #f1f5f9', paddingTop: '32px' }}>
-              <button type="button" onClick={() => setShowForm(false)} style={{ padding: '14px 32px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: 'pointer' }}>Discard</button>
-              <button type="submit" style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>Save Question Paper</button>
+              <button type="button" disabled={saving} onClick={() => setShowForm(false)} style={{ padding: '14px 32px', borderRadius: '12px', border: '1.5px solid #e2e8f0', background: 'white', fontWeight: 700, color: '#64748b', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.6 : 1 }}>Discard</button>
+              <button type="submit" disabled={saving} style={{ padding: '14px 32px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1a56db 0%, #2563eb 100%)', color: 'white', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.75 : 1, boxShadow: '0 8px 16px rgba(37, 99, 235, 0.2)' }}>
+                {saving ? 'Saving...' : 'Save Question Paper'}
+              </button>
             </div>
           </form>
         </div>
         </>
       ) : (
         <>
-          <div className="admin-card" style={{ padding: '24px', marginBottom: '2rem', display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <div style={{ position: 'relative', flex: 1 }}>
+          <div className="last-updated-summary" data-testid="last-updated-summary">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" strokeWidth="2.5">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#1d4ed8' }}>
+                  Last Updated Question Paper
+                </span>
+                {latestUpdatedPaper && (
+                  <span className={isPaperUpdated(latestUpdatedPaper) ? 'updated-badge' : 'created-badge'}>
+                    {isPaperUpdated(latestUpdatedPaper) ? 'Updated' : 'Created'}
+                  </span>
+                )}
+              </div>
+              {latestUpdatedPaper ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>
+                    {latestUpdatedPaper.title || latestUpdatedPaper.titleEn || 'Untitled Paper'}
+                  </span>
+                  {latestUpdatedPaper.titleEn && latestUpdatedPaper.title && latestUpdatedPaper.titleEn !== latestUpdatedPaper.title && (
+                    <span style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>
+                      ({latestUpdatedPaper.titleEn})
+                    </span>
+                  )}
+                  <span className="cat-pill">{getCategoryLabel(latestUpdatedPaper.category || '')}</span>
+                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748b' }}>
+                    {Array.isArray(latestUpdatedPaper.questions) ? latestUpdatedPaper.questions.length : (latestUpdatedPaper.totalQuestions || 0)} MCQs
+                  </span>
+                </div>
+              ) : (
+                <div style={{ fontSize: '14px', fontWeight: 600, color: '#64748b' }}>
+                  No question papers recorded yet.
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+              {latestUpdatedPaper ? (
+                <>
+                  <span className={`timestamp-pill ${isPaperUpdated(latestUpdatedPaper) ? 'is-updated' : ''}`}>
+                    {formatExactDateTime(getPaperUpdatedMs(latestUpdatedPaper))}
+                  </span>
+                  <span style={{ fontSize: '11.5px', fontWeight: 600, color: '#64748b' }}>
+                    {formatTimeAgo(getPaperUpdatedMs(latestUpdatedPaper), true)} • {papers.length} Total Papers
+                  </span>
+                </>
+              ) : (
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>0 Total Papers</span>
+              )}
+            </div>
+          </div>
+
+          <div className="admin-card" style={{ padding: '24px', marginBottom: '2rem', display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: '220px' }}>
                <svg style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                <input placeholder="Search question papers..." style={{ width: '100%', padding: '14px 48px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', fontSize: '14px', outline: 'none' }} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} />
             </div>
-            <select style={{ padding: '14px 24px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', outline: 'none', fontWeight: 600 }} value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+            <select style={{ padding: '14px 20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', outline: 'none', fontWeight: 600 }} value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                <option value="all">All Categories</option>
                {['bcs', 'bank', 'ntrca', 'primary', 'ministry', 'recent', 'subjectwise'].map(c => <option key={c} value={c}>{getCategoryLabel(c)}</option>)}
+            </select>
+            <select aria-label="Sort question papers" style={{ padding: '14px 20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', outline: 'none', fontWeight: 600 }} value={sortBy} onChange={e => setSortBy(e.target.value)}>
+               <option value="updatedAt">Sort: Recently Updated</option>
+               <option value="createdAt">Sort: Created Date</option>
             </select>
           </div>
 
@@ -454,29 +621,54 @@ export default function ManageQuestions() {
                   <th>Category</th>
                   <th>Date</th>
                   <th>Time Limit</th>
+                  <th>Last Updated</th>
                   <th style={{ textAlign: 'center' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {papers.filter(p => (categoryFilter === 'all' || p.category === categoryFilter) && ((p.title||'').toLowerCase().includes(searchQuery.toLowerCase()) || (p.titleEn||'').toLowerCase().includes(searchQuery.toLowerCase()))).map(paper => (
-                  <tr key={paper.id}>
-                    <td>
-                      <div style={{ fontWeight: 700, color: '#1e293b' }}>{paper.titleEn}</div>
-                      <div style={{ fontSize: '12px', color: '#64748b' }}>{paper.title}</div>
-                    </td>
-                    <td><span className="cat-pill">{paper.category}</span></td>
-                    <td style={{ color: '#475569', fontWeight: 600 }}>{paper.dateEn || paper.date || 'N/A'}</td>
-                    <td style={{ color: '#475569', fontWeight: 600 }}>{paper.timeLimitEn}</td>
-                    <td style={{ textAlign: 'center' }}>
-                       <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                          <button onClick={() => handleOpenEdit(paper)} style={{ padding: '8px 16px', background: '#eff6ff', color: '#1a56db', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Edit</button>
-                          <button onClick={() => handleDelete(paper.id)} style={{ padding: '8px 16px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Delete</button>
-                       </div>
-                    </td>
-                  </tr>
-                ))}
-                {papers.length === 0 && (
-                  <tr><td colSpan="5" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: '15px' }}>No question papers found.</td></tr>
+                {sortedFilteredPapers.map(paper => {
+                  const lastUpdatedMs = getPaperUpdatedMs(paper);
+                  const updated = isPaperUpdated(paper);
+                  const formattedLastUpdated = formatExactDateTime(lastUpdatedMs);
+                  return (
+                    <tr key={paper.id}>
+                      <td>
+                        <div style={{ fontWeight: 700, color: '#1e293b' }}>{paper.title || paper.titleEn || 'Untitled Paper'}</div>
+                        {paper.titleEn && paper.title && paper.titleEn !== paper.title && (
+                          <div style={{ fontSize: '12px', color: '#64748b' }}>{paper.titleEn}</div>
+                        )}
+                      </td>
+                      <td><span className="cat-pill">{paper.category}</span></td>
+                      <td style={{ color: '#475569', fontWeight: 600 }}>{paper.dateEn || paper.date || 'N/A'}</td>
+                      <td style={{ color: '#475569', fontWeight: 600 }}>{paper.timeLimitEn}</td>
+                      <td>
+                        {lastUpdatedMs > 0 ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '4px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                              <span className={`timestamp-pill ${updated ? 'is-updated' : ''}`}>
+                                {formattedLastUpdated}
+                              </span>
+                              {updated && <span className="updated-badge">Updated</span>}
+                            </div>
+                            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                              {formatTimeAgo(lastUpdatedMs, true)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="timestamp-pill">N/A</span>
+                        )}
+                      </td>
+                      <td style={{ textAlign: 'center' }}>
+                         <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                            <button onClick={() => handleOpenEdit(paper)} style={{ padding: '8px 16px', background: '#eff6ff', color: '#1a56db', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Edit</button>
+                            <button onClick={() => handleDelete(paper.id)} style={{ padding: '8px 16px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}>Delete</button>
+                         </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+                {sortedFilteredPapers.length === 0 && (
+                  <tr><td colSpan="6" style={{ padding: '60px', textAlign: 'center', color: '#94a3b8', fontSize: '15px' }}>No question papers found.</td></tr>
                 )}
               </tbody>
             </table>

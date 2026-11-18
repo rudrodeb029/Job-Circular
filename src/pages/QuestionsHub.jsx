@@ -57,7 +57,9 @@ export default function QuestionsHub() {
     }, 180);
   };
 
-  const papers = (adminState.questions && adminState.questions.length > 0) ? adminState.questions : getQuestionsData();
+  const papers = (Array.isArray(adminState?.questions) && adminState.questions.length > 0)
+    ? adminState.questions
+    : (adminState?.firestoreReady ? [] : getQuestionsData());
   
   const allCategories = useMemo(() => {
     const config = { ...categoryConfig };
@@ -104,7 +106,7 @@ export default function QuestionsHub() {
         </h1>
       </div>
 
-      <PullToRefresh onRefresh={refreshData}>
+      <PullToRefresh onRefresh={() => refreshData(true)}>
         <div className="page-content animate-fade-in" style={{ padding: '8px 12px' }}>
         
         {/* Live MCQ Section */}

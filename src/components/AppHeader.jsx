@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Menu, Search, Globe, Bell, User, X, Home, LayoutGrid, Bookmark, FileText, Settings, Moon, Sun, ChevronRight, Briefcase, Calendar, Rss } from './Icons';
 import { useAppContext } from '../context/AppContext';
 import { useAdminContext } from '../context/AdminContext';
-import { getQuestionsData } from '../data/questionsData';
 import { getFilteredNotifications } from '../utils/notificationHelpers';
 import { useBackInterceptor } from '../utils/backButtonManager';
 
@@ -363,7 +362,8 @@ const AppHeader = React.memo(function AppHeader() {
                       { id: 'subjectwise', label: 'বিষয়ভিত্তিক', labelEn: 'Subjectwise Questions', icon: '🗂️' }
                     ].map(cat => {
                       const isExpanded = expandedCategory === cat.id;
-                      const papers = getQuestionsData().filter(p => p.category === cat.id || (cat.id === 'recent' && p.category === 'admission'));
+                      const allQuestions = Array.isArray(adminState?.questions) ? adminState.questions : [];
+                      const papers = allQuestions.filter(p => p.category === cat.id || (cat.id === 'recent' && p.category === 'admission') || (cat.id === 'admission' && p.category === 'recent'));
 
                       return (
                         <div key={cat.id} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -426,8 +426,8 @@ const AppHeader = React.memo(function AppHeader() {
                                   const match = dateStr.match(/\d{4}/);
                                   return match ? match[0] : '';
                                 };
-                                const year = getYear(state.language === 'en' ? paper.dateEn : paper.date);
-                                const rawTitle = state.language === 'en' ? paper.titleEn : paper.title;
+                                const year = getYear(state.language === 'en' ? (paper.dateEn || paper.date) : (paper.date || paper.dateEn));
+                                const rawTitle = (state.language === 'en' ? (paper.titleEn || paper.title) : (paper.title || paper.titleEn)) || '';
                                 
                                 // Clean and shorten title professionally
                                 const cleanTitle = rawTitle
